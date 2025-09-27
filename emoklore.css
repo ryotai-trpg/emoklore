@@ -1,0 +1,17 @@
+
+.sheet header.img-name {
+    align-items: center;
+    display: flex ;
+    gap: 1rem;
+    img {
+        height: 64px;
+        flex: 0 0 64px;
+        object-fit: contain;
+    }
+
+    input {
+        flex: 1;
+        font-size: var(--font-size-32);
+        height: initial;
+    }
+}

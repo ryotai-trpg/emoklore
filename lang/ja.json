@@ -1,0 +1,24 @@
+{
+  "TYPES": {
+    "Actor": {
+      "character": "共鳴者",
+      "npc": "NPC",
+
+      "pawn": "ポーン"
+    },
+    "Item": {
+      "weapon": "武器",
+      "spell": "呪文"
+    }
+  },
+
+  "EMOKLORE": {
+    "sheetClass": {
+      "character": "共鳴者シート"
+    },
+    "CharacterSheet.tab": {
+      "biography": "バイオグラフィー",
+      "stats": "能力値"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "id": "emoklore",
+  "title": "Emo-klore TRPG",
+  "description": "",
+  "version": "0.0.1",
+  "compatibility": {
+    "minimum": 13,
+    "verified": 13
+  },
+  "authors": [{
+    "name": "Ryotai"
+  }],
+  "esmodules": ["emoklore.mjs"],
+  "styles": ["emoklore.css"],
+  "languages": [
+    {
+      "lang": "ja",
+      "name": "日本語",
+      "path": "lang/ja.json"
+    },
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "character": { "htmlFields": ["background.biography"] },
+      "npc": { "htmlFields": ["background.biography"] },
+      "pawn": {}
+    },
+    "Item": {
+      "weapon": {},
+      "spell": {}
+    }
+  },
+  "background": "systems/emoklore/assets/official/emoklore-logoB_white.svg",
+  "grid": {
+    "distance": "1",
+    "units": "m"
+  }
+}
