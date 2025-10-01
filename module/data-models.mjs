@@ -45,9 +45,20 @@ export class CharacterDataModel extends EmokloreActorDataModel {
         value: new NumberField({ required: true, integer: true, min: 0, initial: 5 }),
         max: new NumberField({ required: true, integer: true, min: 0, initial: 10 })
       }),
-      level: new NumberField({ required: true, integer: true, min: 0, initial: 0, max: 30 })
+      level: new NumberField({ required: true, integer: true, min: 0, initial: 0, max: 30 }),
+      characteristics: new SchemaField({
+        physical: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.physical" }),
+        dexterity: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.dexterity" }),
+        mentality: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.mentality" }),
+        sensitivity: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.sensitivity" }),
+        intelligence: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.intelligence" }),
+        charisma: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.charisma" }),
+        sociality: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.sociality" }),
+        luck: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.luck" }),
+      })
     };
   }
+
 }
 
 export class NpcDataModel extends EmokloreActorDataModel {
@@ -68,8 +79,8 @@ export class NpcDataModel extends EmokloreActorDataModel {
   export class PawnDataModel extends ActorDataModel {}
 
 /* -------------------------------------------- */
-  /*  Item Models                                 */
-  /* -------------------------------------------- */
+/*  Item Models                                 */
+/* -------------------------------------------- */
 
   class ItemDataModel extends foundry.abstract.TypeDataModel {
     static defineSchema() {

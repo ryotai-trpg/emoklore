@@ -13,12 +13,24 @@
   },
 
   "EMOKLORE": {
-    "sheetClass": {
+    "SheetClass": {
       "character": "共鳴者シート"
     },
     "CharacterSheet.tab": {
-      "biography": "バイオグラフィー",
+      "biography": "人物",
       "stats": "能力値"
+    },
+    "Actor": {
+      "characteristics": {
+        "physical": "身体",
+        "dexterity": "器用",
+        "mentality": "精神",
+        "sensitivity": "五感",
+        "intelligence": "知力",
+        "charisma": "魅力",
+        "sociality": "社会",
+        "luck": "運勢"
+      }
     }
   }
 }

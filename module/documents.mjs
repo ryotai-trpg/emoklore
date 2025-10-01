@@ -12,6 +12,10 @@ export class EmokloreActor extends Actor {
       content: `${this.name} took ${damage} damage!`
     });
   }
+
+  prepareDerivedData() {
+    super.prepareDerivedData();
+  }
 }
 
 

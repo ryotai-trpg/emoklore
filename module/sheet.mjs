@@ -12,7 +12,7 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
     // this.#dragDrop = this.#createDragDropHandlers();
   }
   static DEFAULT_OPTIONS = {
-    classes: ["emoklore", "actor", "character"],
+    classes: ["standard-form", "emoklore", "actor", "character"],
     position: {
       width: 600,
       height: 700
@@ -48,4 +48,50 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
       initial: "stats",
     },
   };
+
+  async _prepareContext(options) {
+    const context = await super._prepareContext(options);
+
+    Object.assign(context, {
+      owner: this.document.isOwner,
+      limited: this.document.limited,
+      gm: game.user.isGM,
+      document: this.document,
+      system: this.document.system,
+      flags: this.document.flags,
+    });
+
+    console.log(context);
+
+    return context;
+  }
+
+  async _preparePartContext(partId, context, options) {
+    await super._preparePartContext(partId, context, options);
+    switch (partId) {
+      case "stats":
+        context.characteristics = this._getCharacteristics();
+        context.sum_char = Object.values(context.characteristics).reduce((sum, obj) =>
+          {return sum + obj.value}, 0) - context.characteristics.luck.value
+        break;
+    }
+    if (partId in context.tabs) context.tab = context.tabs[partId];
+    return context;
+  }
+
+
+  _getCharacteristics() {
+    // const isPlay = this.isPlayMode;
+    // const data = isPlay ? this.actor : this.actor._source;
+    const data = this.actor;
+    return Object.keys(CONFIG.EMOKLORE.characteristics).reduce((obj, chc) => {
+      const value = foundry.utils.getProperty(data, `system.characteristics.${chc}`);
+      obj[chc] = {
+        field: this.actor.system.schema.getField(["characteristics", chc]),
+        value: value ?? 0
+      };
+      return obj;
+    }, {});
+  }
+
 }
