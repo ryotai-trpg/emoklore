@@ -1,7 +1,7 @@
 {{! Stats Tab }}
 <section class='tab stats {{tab.cssClass}}' data-group='primary' data-tab='stats'>
 <fieldset class="characteristics flexcol">
-  <legend>能力値</legend>
+  <legend>{{localize "EMOKLORE.characteristics"}}</legend>
   {{#each characteristics as |chr key|}}
   <div class="characteristic flexrow" data-characteristic="{{key}}">
     <span class="label">{{localize chr.field.label}}</span>
@@ -10,4 +10,13 @@
   {{/each}}
 </fieldset>
 {{ sum_char }} / 25
+
+<fieldset class="baseskill flexrow">
+  <legend>ベース技能</legend>
+  {{#each system.baseSkills as |baseSkill key|}}
+  <div class="baseskill flexrow" data-baseskill="{{key}}">
+    <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">{{localize baseSkill.label}}</a>
+  </div>
+  {{/each}}
+</fieldset>
 </section>

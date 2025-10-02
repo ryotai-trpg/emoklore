@@ -29,8 +29,31 @@
         "intelligence": "知力",
         "charisma": "魅力",
         "sociality": "社会",
-        "luck": "運勢"
+        "fortune": "運勢"
+      },
+      "baseSkills": {
+        "investigation": "調査", 
+        "perception": "知覚",
+        "negotiations": "交渉",
+        "knowledge": "知識",
+        "news": "ニュース",
+        "exercise": "運動",
+        "fight": "格闘",
+        "throw": "投擲",
+        "survival": "生存",
+        "self": "自我",
+        "treatment": "手当",
+        "handiwork": "細工",
+        "luck": "幸運"
       }
-    }
+    },
+    "baseSkill": "ベース技能",
+    "skill": "技能",
+    "characteristics": "能力値",
+    "skillRoll": "{skillName}判定"
+  },
+  "USER": {
+    "RoleAssistant": "サブディーラー",
+    "RoleGamemaster": "ディーラー"
   }
 }

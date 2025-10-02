@@ -6,59 +6,75 @@ const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields
 
   class ActorDataModel extends foundry.abstract.TypeDataModel {
     static defineSchema() {
-      // All Actors have resources.
-        return {
-          resources: new SchemaField({
-            health: new SchemaField({
-              min: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
-              value: new NumberField({ required: true, integer: true, min: 0, initial: 10 }),
-              max: new NumberField({ required: true, integer: true, min: 0, initial: 10 })
-            }),
-            power: new SchemaField({
-              min: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
-              value: new NumberField({ required: true, integer: true, min: 0, initial: 1 }),
-              max: new NumberField({ required: true, integer: true, min: 0, initial: 3 })
-            })
-          })
-        };
-    }
+
+      const schema = {};
+
+      schema.resources = new SchemaField({
+        health: new SchemaField({
+          min: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+          value: new NumberField({ required: true, integer: true, min: 0, initial: 10 }),
+          max: new NumberField({ required: true, integer: true, min: 0, initial: 10 })
+        }),
+        power: new SchemaField({
+          min: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+          value: new NumberField({ required: true, integer: true, min: 0, initial: 1 }),
+          max: new NumberField({ required: true, integer: true, min: 0, initial: 3 })
+        })
+      })
+      return schema
+    };
   }
 
 class EmokloreActorDataModel extends ActorDataModel {
   static defineSchema() {
-    // Only important Actors have a background and hair color.
-      return {
-        ...super.defineSchema(),
-          background: new SchemaField({
-            biography: new HTMLField({ required: true, blank: true }),
-            hairColor: new StringField({ required: true, blank: true })
-          })
-      };
+    const schema = super.defineSchema();
+
+    schema.background = new SchemaField({
+      biography: new HTMLField({ required: true, blank: true }),
+      hairColor: new StringField({ required: true, blank: true })
+    })
+
+    return schema;
   }
 }
 
 export class CharacterDataModel extends EmokloreActorDataModel {
   static defineSchema() {
-    return {
-      ...super.defineSchema(),
-      goodness: new SchemaField({
-        value: new NumberField({ required: true, integer: true, min: 0, initial: 5 }),
-        max: new NumberField({ required: true, integer: true, min: 0, initial: 10 })
-      }),
-      level: new NumberField({ required: true, integer: true, min: 0, initial: 0, max: 30 }),
-      characteristics: new SchemaField({
-        physical: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.physical" }),
-        dexterity: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.dexterity" }),
-        mentality: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.mentality" }),
-        sensitivity: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.sensitivity" }),
-        intelligence: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.intelligence" }),
-        charisma: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.charisma" }),
-        sociality: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.sociality" }),
-        luck: new NumberField({ required: true, integer: true, min: 1, max: 6, initial: 1, label: "EMOKLORE.Actor.characteristics.luck" }),
-      })
-    };
+    const schema = super.defineSchema();
+
+    schema.goodness = new SchemaField({
+      value: new NumberField({ required: true, integer: true, min: 0, initial: 5 }),
+      max: new NumberField({ required: true, integer: true, min: 0, initial: 10 })
+    })
+
+    schema.level = new NumberField({ required: true, integer: true, min: 0, initial: 0, max: 30 })
+
+    const characteristic = { min: 1, max: 6, initial: 1, integer: true, required: true, nullable: false };
+
+    schema.characteristics = new SchemaField(
+      Object.entries(CONFIG.EMOKLORE.characteristics).reduce((obj, [chc, { label }]) => {
+        obj[chc] = new NumberField({ ...characteristic, label });
+        return obj;
+      }, {}),
+    );
+
+    return schema;
   }
 
+  prepareDerivedData() {
+    super.prepareDerivedData();
+
+    this.baseSkills = Object.fromEntries(
+      Object.entries(CONFIG.EMOKLORE.baseSkills).map(([key, skill]) => [
+        key,
+        {
+          ...skill,
+          target: foundry.utils.getProperty(this, `characteristics.${skill.characteristic}`),
+          level: 3
+        }
+      ])
+    );
+   }
 }
 
 export class NpcDataModel extends EmokloreActorDataModel {
