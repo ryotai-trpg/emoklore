@@ -2,6 +2,7 @@ import { EMOKLORE } from "./module/config.mjs";
 import { EmokloreActor, EmokloreItem } from "./module/documents.mjs";
 import { CharacterDataModel, NpcDataModel, PawnDataModel, WeaponDataModel, SpellDataModel } from "./module/data-models.mjs";
 import * as applications from "./module/sheet.mjs"
+import { performPreLocalization } from "./module/helpers/localization.mjs";
 
 // import { EmokloreDie } from './module/dice/emoklore-die.mjs';
 // import { EmokloreRollParser } from './module/dice/emoklore-parser.mjs';
@@ -52,6 +53,11 @@ Hooks.once("init", () => {
     label: "EMOKLORE.SheetClass.character"
   });
 });
+
+Hooks.once("i18nInit", () => {
+  performPreLocalization(CONFIG.EMOKLORE);
+});
+
 
 function addControl(sceneControls) {
     // if (!game.user.isGM)

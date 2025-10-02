@@ -15,7 +15,7 @@
   <legend>ベース技能</legend>
   {{#each system.baseSkills as |baseSkill key|}}
   <div class="baseskill flexrow" data-baseskill="{{key}}">
-    <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">{{localize baseSkill.label}}</a>
+    <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">{{baseSkill.label}}</a>
   </div>
   {{/each}}
 </fieldset>

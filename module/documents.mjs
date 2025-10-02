@@ -27,9 +27,8 @@ export class EmokloreActor extends Actor {
 
     const messageData = {
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      // flavor: game.i18n.localize(label),
       flavor: "<h3>" + game.i18n.format("EMOKLORE.skillRoll", { 
-        skillName: game.i18n.localize(label)
+        skillName: label
       }) + "</h3><br>判定値：" + target,
       rolls: [ roll ],
       // sound: CONFIG.sounds.dice,

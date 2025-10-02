@@ -1,3 +1,5 @@
+import { preLocalize } from "./helpers/localization.mjs";
+
 export const EMOKLORE = {};
 
 EMOKLORE.characteristics = {
@@ -34,6 +36,7 @@ EMOKLORE.characteristics = {
     emoji: "🎲"
   }
 };
+preLocalize("characteristics", { keys: ["label"] });
 
 EMOKLORE.baseSkills = {
   investigation: {
@@ -89,3 +92,4 @@ EMOKLORE.baseSkills = {
     characteristic: "fortune"
   }
 };
+preLocalize("baseSkills", { keys: ["label"] });
