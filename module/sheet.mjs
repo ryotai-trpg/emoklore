@@ -13,12 +13,15 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
   }
   static DEFAULT_OPTIONS = {
     classes: ["standard-form", "emoklore", "actor", "character"],
-    // position: {
-    //   width: 600,
-    //   height: 700
-    // },
+    position: {
+      width: 700,
+      height: 800
+    },
     actions: {
       roll: this.#onRoll
+    },
+    window: {
+      resizable: true
     },
     form: {
       submitOnChange: true
@@ -35,7 +38,7 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
       },
       stats: {
         template: "systems/emoklore/templates/actor/stats.hbs",
-        // scrollable: [""],
+        scrollable: [""],
       },
       biography: {
         template: "systems/emoklore/templates/actor/biography.hbs"
@@ -72,6 +75,7 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
       // gm: game.user.isGM,
       document: this.document,
       system: this.document.system,
+      systemFields: this.document.system.schema.fields,
       flags: this.document.flags,
     });
 
@@ -84,16 +88,28 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
     await super._preparePartContext(partId, context, options);
     switch (partId) {
       case "stats":
+        context.skills = this._getSkills();
         context.characteristics = this._getCharacteristics();
         context.sum_char = Object.values(context.characteristics).reduce((sum, obj) =>
           {return sum + obj.value}, 0) - context.characteristics.fortune.value
-        // context.baseSkills = this._getBaseSkills();
+
+        context.skillLevelOptions = Object.entries(CONFIG.EMOKLORE.skillLevel).
+          map(([value, { label }]) => 
+            ({ value, label })
+          )
         break;
+
+      case "biography":
+        context.emotionOptions = Object.entries(CONFIG.EMOKLORE.sympatheticEmotion).
+          map(([value, { label, attribute }]) => 
+            ({ value, label, group: game.i18n.localize(`EMOKLORE.emotionAttributes.${attribute}`)})
+          )
+        break
     }
+
     if (partId in context.tabs) context.tab = context.tabs[partId];
     return context;
   }
-
 
   _getCharacteristics() {
     // const isPlay = this.isPlayMode;
@@ -104,6 +120,20 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
       obj[chc] = {
         field: this.actor.system.schema.getField(["characteristics", chc]),
         value: value ?? 0
+      };
+      return obj;
+    }, {});
+  }
+
+  _getSkills() {
+    // const isPlay = this.isPlayMode;
+    // const data = isPlay ? this.actor : this.actor._source;
+    const data = this.actor;
+    return Object.keys(CONFIG.EMOKLORE.skills).reduce((obj, chc) => {
+      const value = foundry.utils.getProperty(data, `system.skills.${chc}`);
+      obj[chc] = {
+        field: this.actor.system.schema.getField(["skills", chc]),
+        ...value
       };
       return obj;
     }, {});

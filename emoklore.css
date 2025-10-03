@@ -15,3 +15,17 @@
         height: initial;
     }
 }
+
+.emoklore {
+    section.tab {
+        overflow: auto;
+    }
+}
+
+.emoklore.character {
+    & [data-application-part="biography"] {
+        div.flexrow {
+            gap: 20px;
+        }
+    }
+}

@@ -4,15 +4,27 @@
   <legend>{{localize "EMOKLORE.characteristics"}}</legend>
   {{#each characteristics as |chr key|}}
   <div class="characteristic flexrow" data-characteristic="{{key}}">
-    <span class="label">{{localize chr.field.label}}</span>
+    <span class="label">{{chr.field.label}}</span>
     {{formInput chr.field value=chr.value type="number" placeholder="1"}}
   </div>
   {{/each}}
 </fieldset>
 {{ sum_char }} / 25
 
-<fieldset class="baseskill flexrow">
-  <legend>ベース技能</legend>
+<fieldset class="skill">
+  <legend>{{localize "EMOKLORE.skill"}}</legend>
+  {{#each skills as |skill key|}}
+  <div class="skill flexrow" data-skill="{{key}}">
+    <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">{{skill.label}}</a>
+    {{formInput skill.field.fields.level value=skill.level options=skillLevelOptions}}
+    <span>{{skill.target}} {{localize (concat "EMOKLORE.Actor.characteristics." skill.characteristic)}}</span>
+  </div>
+
+  {{/each}}
+</fieldset>
+
+<fieldset class="baseskill">
+  <legend>{{localize "EMOKLORE.baseSkill"}}</legend>
   {{#each system.baseSkills as |baseSkill key|}}
   <div class="baseskill flexrow" data-baseskill="{{key}}">
     <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">{{baseSkill.label}}</a>

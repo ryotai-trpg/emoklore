@@ -1,6 +1,6 @@
 import { EMOKLORE } from "./module/config.mjs";
 import { EmokloreActor, EmokloreItem } from "./module/documents.mjs";
-import { CharacterDataModel, NpcDataModel, PawnDataModel, WeaponDataModel, SpellDataModel } from "./module/data-models.mjs";
+import { CharacterDataModel, NpcDataModel, WeaponDataModel, SpellDataModel } from "./module/data-models.mjs";
 import * as applications from "./module/sheet.mjs"
 import { performPreLocalization } from "./module/helpers/localization.mjs";
 
@@ -22,7 +22,6 @@ Hooks.once("init", () => {
   CONFIG.Actor.dataModels = {
     character: CharacterDataModel,
     npc: NpcDataModel,
-    pawn: PawnDataModel
   };
   CONFIG.Item.dataModels = {
     weapon: WeaponDataModel,
@@ -56,6 +55,29 @@ Hooks.once("init", () => {
 
 Hooks.once("i18nInit", () => {
   performPreLocalization(CONFIG.EMOKLORE);
+
+  // These fields are not auto-localized due to having a different location in ja.json
+  for (const model of Object.values(CONFIG.Actor.dataModels)) {
+
+    /** @type {foundry.data.fields.SchemaField} */
+    const characteristicSchema = model.schema.getField("characteristics");
+    if (characteristicSchema) {
+      for (const [characteristic, { label }] of Object.entries(CONFIG.EMOKLORE.characteristics)) {
+        const field = characteristicSchema.getField(`${characteristic}`);
+        if (!field) continue;
+        field.label = label;
+      }
+    }
+
+    const skillsSchema = model.schema.getField("skills");
+    if (skillsSchema) {
+      for (const [skill, { label }] of Object.entries(CONFIG.EMOKLORE.skills)) {
+        const field = skillsSchema.getField(`${skill}`);
+        if (!field) continue;
+        field.fields.label.initial = label;
+      }
+    }
+  }
 });
 
 

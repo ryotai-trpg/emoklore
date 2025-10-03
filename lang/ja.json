@@ -2,9 +2,7 @@
   "TYPES": {
     "Actor": {
       "character": "共鳴者",
-      "npc": "NPC",
-
-      "pawn": "ポーン"
+      "npc": "NPC"
     },
     "Item": {
       "weapon": "武器",
@@ -20,7 +18,123 @@
       "biography": "人物",
       "stats": "能力値"
     },
+
+    "emotionAttributes": {
+      "desire": "欲望",
+      "passion": "情念",
+      "ideal": "理想",
+      "relationship": "関係",
+      "wound": "傷"
+    },
+
+    "skillLevel": {
+      "0": "Lv.0",
+      "1": "Lv.1",
+      "2": "Lv.2",
+      "3": "Lv.3"
+    },
+
+    "sympatheticEmotion": {
+      "selfAssertion": "自己顕示",
+      "possession": "所有",
+      "instinct": "本能",
+      "destruction": "破壊",
+      "superiority": "優越感",
+      "sloth": "怠惰",
+      "escape": "逃避",
+      "curiosity": "好奇心",
+      "thrill": "スリル",
+
+      "joy": "喜び",
+      "anger": "怒り",
+      "sorrow": "哀しみ",
+      "happiness": "幸福",
+      "anxiety": "不安",
+      "disgust": "嫌悪",
+      "fear": "恐怖",
+      "jealousy": "嫉妬",
+      "grudge": "恨み",
+
+      "justice": "正義",
+      "worship": "崇拝",
+      "goodAndEvil": "善悪",
+      "hope": "希望",
+      "aspiration": "向上",
+      "reason": "理性",
+      "victory": "勝利",
+      "order": "秩序",
+      "admiration": "憧憬",
+      "selflessness": "無我",
+
+      "friendship": "友情",
+      "love": "愛",
+      "romance": "恋",
+      "dependence": "依存",
+      "respect": "尊敬",
+      "contempt": "軽蔑",
+      "protection": "庇護",
+      "domination": "支配",
+      "service": "奉仕",
+      "indulgence": "甘え",
+
+      "regret": "後悔",
+      "loneliness": "孤独",
+      "resignation": "諦観",
+      "despair": "絶望",
+      "denial": "否定",
+      "doubt": "疑念",
+      "guilt": "罪悪感",
+      "madness": "狂気",
+      "inferiorityComplex": "劣等感"
+    },
     "Actor": {
+      "character": {
+        "FIELDS": {
+          "biography": {
+            "age": {
+              "label": "年齢"
+            },
+            "gender": {
+              "label": "性別"
+            },
+            "occupation": {
+              "label": "職業"
+            },
+            "hometown": {
+              "label": "出身"
+            },
+            "appearance": {
+              "label": "外見的特徴"
+            },
+            "personality": {
+              "label": "性格"
+            },
+            "background": {
+              "label": "経歴"
+            },
+            "importantPeople": {
+              "label": "関係ある人々"
+            },
+            "likesAndDislikes": {
+              "label": "好きなもの・嫌いなもの"
+            },
+            "note": {
+              "label": "メモ"
+            }
+          },
+          "emotions": {
+            "surface": {
+              "label": "表"
+            },
+            "hidden": {
+              "label": "裏"
+            },
+            "root": {
+              "label": "ルーツ"
+            }
+          }
+        }
+      },
       "characteristics": {
         "physical": "身体",
         "dexterity": "器用",
@@ -45,6 +159,13 @@
         "treatment": "手当",
         "handiwork": "細工",
         "luck": "幸運"
+      },
+      "skills": {
+        "search": "検索",
+        "insight": "洞察",
+        "mapping": "マッピング",
+        "instinct": "直感",
+        "appraisal": "鑑定"
       }
     },
     "baseSkill": "ベース技能",

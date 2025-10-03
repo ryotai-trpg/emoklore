@@ -1,6 +1,8 @@
 import { EmokloreRoll } from './dice/emoklore-roll.mjs';
 
 export class EmokloreActor extends Actor {
+
+  /*
   async applyDamage(damage) {
     // Always take a minimum of 1 damage, and round to the nearest integer.
     damage = Math.round(Math.max(1, damage));
@@ -14,13 +16,15 @@ export class EmokloreActor extends Actor {
       content: `${this.name} took ${damage} damage!`
     });
   }
+  */
 
   prepareDerivedData() {
     super.prepareDerivedData();
   }
 
   async rollSkill(skill, options={}) {
-    const { level, target, label } = this.system.baseSkills[skill]
+    // const { level, target, label } = this.system.baseSkills[skill]
+    const { level, target, label } = this.system.skills[skill]
     options.target = target
     let roll = await new EmokloreRoll(level + "d10", {}, options).evaluate();
     // TODO: JSの引数の取り方がわからん
@@ -31,7 +35,7 @@ export class EmokloreActor extends Actor {
         skillName: label
       }) + "</h3><br>判定値：" + target,
       rolls: [ roll ],
-      // sound: CONFIG.sounds.dice,
+      sound: CONFIG.sounds.dice,
       flags: { core: { canPopout: true } },
     };
     // ChatMessage.applyRollMode(messageData, rollMode);
@@ -41,7 +45,9 @@ export class EmokloreActor extends Actor {
 
 
 export class EmokloreItem extends Item {
+  /*
   get isFree() {
     return this.price < 1;
   }
+  */
 }

@@ -1,4 +1,24 @@
 {{! Biography Tab }}
 <section class='tab biography {{tab.cssClass}}' data-group='primary' data-tab='biography'>
-  {{ system.goodness.value }}
+  <div class="emotions flexrow">
+    {{formGroup systemFields.emotions.fields.surface value=system.emotions.surface options=emotionOptions}}
+    {{formGroup systemFields.emotions.fields.hidden value=system.emotions.hidden options=emotionOptions}}
+    {{formGroup systemFields.emotions.fields.root value=system.emotions.root options=emotionOptions}}
+  </div>
+
+  <div class="flexrow">
+    {{formGroup systemFields.biography.fields.age value=system.biography.age}}
+    {{formGroup systemFields.biography.fields.gender value=system.biography.gender}}
+  </div>
+  <div class="flexrow">
+    {{formGroup systemFields.biography.fields.occupation value=system.biography.occupation}}
+    {{formGroup systemFields.biography.fields.hometown value=system.biography.hometown}}
+  </div>
+    {{formGroup systemFields.biography.fields.appearance value=system.biography.appearance}}
+    {{formGroup systemFields.biography.fields.personality value=system.biography.personality}}
+    {{formGroup systemFields.biography.fields.background value=system.biography.background}}
+    {{formGroup systemFields.biography.fields.importantPeople value=system.biography.importantPeople}}
+    {{formGroup systemFields.biography.fields.likesAndDislikes value=system.biography.likesAndDislikes}}
+    {{formGroup systemFields.biography.fields.note value=system.biography.note}}
+
 </section>
