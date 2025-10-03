@@ -18,6 +18,7 @@
       "biography": "人物",
       "stats": "能力値"
     },
+    "SHEET.ToggleMode": "プレイ・編集モード切替",
 
     "emotionAttributes": {
       "desire": "欲望",

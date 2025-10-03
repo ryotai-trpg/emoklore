@@ -26,6 +26,8 @@
         <div class="uuid">{{document.uuid}}</div>
     </section>
     {{/if}}
+    {{#if isPlay}}
     HP: {{ system.resources.hp.value }} / {{ system.resources.hp.max }}
     MP: {{ system.resources.mp.value }} / {{ system.resources.mp.max }}
+    {{/if}}
 </div>

@@ -1,3 +1,5 @@
+import constructHTMLButton from "./helpers/construct-html-button.mjs";
+
 const {api, sheets} = foundry.applications;
 
 /**
@@ -18,6 +20,7 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
       height: 800
     },
     actions: {
+      toggleMode: this.#toggleMode,
       roll: this.#onRoll
     },
     window: {
@@ -66,10 +69,50 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
     }
   }
 
+  async _renderFrame(options) {
+    const frame = await super._renderFrame(options);
+    const buttons = [constructHTMLButton({
+      label: "",
+      classes: ["header-control", "icon", "fa-solid", "fa-user-lock"],
+      dataset: { action: "toggleMode", tooltip: "EMOKLORE.SHEET.ToggleMode" },
+    })];
+
+    this.window.controls.after(...buttons);
+
+    return frame;
+  }
+
+  static MODES = Object.freeze({
+    PLAY: 1,
+    EDIT: 2,
+  });
+
+  _mode = EmokloreActorSheet.MODES.PLAY;
+
+  get isPlayMode() {
+    return this._mode === EmokloreActorSheet.MODES.PLAY;
+  }
+
+  get isEditMode() {
+    return this._mode === EmokloreActorSheet.MODES.EDIT;
+  }
+
+
+  static async #toggleMode(event, target) {
+    if (!this.isEditable) {
+      console.error("You can't switch to Edit mode if the sheet is uneditable");
+      return;
+    }
+    this._mode = this.isPlayMode ? EmokloreActorSheet.MODES.EDIT : EmokloreActorSheet.MODES.PLAY;
+    this.render();
+  }
+
+
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
     Object.assign(context, {
+      isPlay: this.isPlayMode,
       // owner: this.document.isOwner,
       // limited: this.document.limited,
       // gm: game.user.isGM,
