@@ -1,3 +1,5 @@
+import "./emoklore.css"; // for dev
+
 import { EMOKLORE } from "./module/config.mjs";
 import { EmokloreActor, EmokloreItem } from "./module/documents.mjs";
 import { CharacterDataModel, NpcDataModel, WeaponDataModel, SpellDataModel } from "./module/data-models.mjs";
