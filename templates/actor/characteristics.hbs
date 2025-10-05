@@ -1,0 +1,16 @@
+<fieldset class="characteristics">
+
+  <legend>{{localize "EMOKLORE.characteristics"}}</legend>
+
+  {{#each characteristics as |chr key|}}
+  <div class="characteristic edit" data-characteristic="{{key}}">
+    {{formGroup chr.field value=chr.value placeholder="1"}}
+  </div>
+  {{/each}}
+
+  {{#if isPlay}}
+  {{ sum_char }} / 25
+  {{/if}}
+
+</fieldset>
+

@@ -1,0 +1,11 @@
+<fieldset class="skill">
+  <legend>{{localize "EMOKLORE.skill"}}</legend>
+  {{#each skills as |skill key|}}
+  <div class="skill flexrow" data-skill="{{key}}">
+    <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">{{skill.label}}</a>
+    {{formGroup skill.field.fields.level value=skill.level options=skillLevelOptions}}
+    <span>{{skill.target}} {{localize (concat "EMOKLORE.Actor.characteristics." skill.characteristic)}}</span>
+  </div>
+  {{/each}}
+</fieldset>
+

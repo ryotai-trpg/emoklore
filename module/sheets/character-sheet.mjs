@@ -1,4 +1,5 @@
 import { EmokloreActorSheet } from "./actor-sheet.mjs";
+import { systemPath } from "../constants.mjs";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -20,6 +21,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     tabs: { template: "templates/generic/tab-navigation.hbs" },
     stats: {
       template: "systems/emoklore/templates/actor/stats.hbs",
+      templates: [ "characteristics.hbs", "skills.hbs", "base-skills.hbs" ].map(t => systemPath(`templates/actor/${t}`)),
       scrollable: [""],
     },
     biography: {
