@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import { viteStaticCopy } from 'vite-plugin-static-copy'
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 export default defineConfig({
   // publicDir: "public",
@@ -30,9 +30,7 @@ export default defineConfig({
   plugins: [
     viteStaticCopy({
       targets: [
-        { src: "system.json",
-          dest: "",
-        },
+        { src: "system.json", dest: "" },
         {
           src: "lang/*",
           dest: "lang",
@@ -53,4 +51,3 @@ export default defineConfig({
     }),
   ],
 });
-

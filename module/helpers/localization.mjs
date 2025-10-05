@@ -13,8 +13,10 @@
  */
 export function sortObjectEntries(obj, sortKey) {
   let sorted = Object.entries(obj);
-  const sort = (lhs, rhs) => foundry.utils.getType(lhs) === "string" ? lhs.localeCompare(rhs, game.i18n.lang) : lhs - rhs;
-  if (foundry.utils.getType(sortKey) === "function") sorted = sorted.sort((lhs, rhs) => sortKey(lhs[1], rhs[1]));
+  const sort = (lhs, rhs) =>
+    foundry.utils.getType(lhs) === "string" ? lhs.localeCompare(rhs, game.i18n.lang) : lhs - rhs;
+  if (foundry.utils.getType(sortKey) === "function")
+    sorted = sorted.sort((lhs, rhs) => sortKey(lhs[1], rhs[1]));
   else if (sortKey) sorted = sorted.sort((lhs, rhs) => sort(lhs[1][sortKey], rhs[1][sortKey]));
   else sorted = sorted.sort((lhs, rhs) => sort(lhs[1], rhs[1]));
   return Object.fromEntries(sorted);
@@ -57,7 +59,8 @@ export function performPreLocalization(config) {
     const target = foundry.utils.getProperty(config, keyPath);
     if (!target) continue;
     _localizeObject(target, settings.keys);
-    if (settings.sort) foundry.utils.setProperty(config, keyPath, sortObjectEntries(target, settings.keys[0]));
+    if (settings.sort)
+      foundry.utils.setProperty(config, keyPath, sortObjectEntries(target, settings.keys[0]));
   }
 
   // Localize & sort status effects
@@ -84,15 +87,19 @@ function _localizeObject(obj, keys) {
     }
 
     if (type !== "object") {
-      console.error(new Error(
-        `Pre-localized configuration values must be a string or object, ${type} found for "${k}" instead.`,
-      ));
+      console.error(
+        new Error(
+          `Pre-localized configuration values must be a string or object, ${type} found for "${k}" instead.`,
+        ),
+      );
       continue;
     }
     if (!keys?.length) {
-      console.error(new Error(
-        "Localization keys must be provided for pre-localizing when target is an object.",
-      ));
+      console.error(
+        new Error(
+          "Localization keys must be provided for pre-localizing when target is an object.",
+        ),
+      );
       continue;
     }
 

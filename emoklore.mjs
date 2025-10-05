@@ -10,21 +10,19 @@ import { WeaponDataModel } from "./module/data/item-models.mjs";
 import { CharacterDataModel } from "./module/data/character.mjs";
 import { NpcDataModel } from "./module/data/npc.mjs";
 
-import * as applications from "./module/sheets/character-sheet.mjs"
+import * as applications from "./module/sheets/character-sheet.mjs";
 
 import { performPreLocalization } from "./module/helpers/localization.mjs";
 
 // import { EmokloreDie } from './module/dice/emoklore-die.mjs';
 // import { EmokloreRollParser } from './module/dice/emoklore-parser.mjs';
-import { EmokloreRoll } from './module/dice/emoklore-roll.mjs';
+import { EmokloreRoll } from "./module/dice/emoklore-roll.mjs";
 import { registerSystemSettings } from "./module/settings.mjs";
 
-
 Hooks.once("init", () => {
+  console.log("Emo-klore TRPG | Initializing...");
 
-  console.log("Emo-klore TRPG | Initializing...")
-
-  CONFIG.EMOKLORE = EMOKLORE
+  CONFIG.EMOKLORE = EMOKLORE;
 
   registerSystemSettings();
 
@@ -49,12 +47,12 @@ Hooks.once("init", () => {
   CONFIG.Actor.trackableAttributes = {
     character: {
       bar: ["resources.hp", "resources.mp", "resonance.value"],
-      value: []
+      value: [],
     },
     npc: {
       bar: ["resources.hp", "resources.mp"],
-      value: []
-    }
+      value: [],
+    },
   };
 
   const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
@@ -63,7 +61,7 @@ Hooks.once("init", () => {
   DocumentSheetConfig.registerSheet(Actor, "emoklore", applications.EmokloreCharacterSheet, {
     types: ["character"],
     makeDefault: true,
-    label: "EMOKLORE.SheetClass.character"
+    label: "EMOKLORE.SheetClass.character",
   });
 });
 
@@ -72,7 +70,6 @@ Hooks.once("i18nInit", () => {
 
   // These fields are not auto-localized due to having a different location in ja.json
   for (const model of Object.values(CONFIG.Actor.dataModels)) {
-
     /** @type {foundry.data.fields.SchemaField} */
     const characteristicSchema = model.schema.getField("characteristics");
     if (characteristicSchema) {
@@ -94,8 +91,8 @@ Hooks.once("i18nInit", () => {
   }
 });
 
-Hooks.once("ready", ()=> {
+Hooks.once("ready", () => {
   if (game.settings.get(systemID, "developerMode")) {
     game.actors.get("IqCtJnUqjTsjXqss").sheet.render(true);
   }
-})
+});

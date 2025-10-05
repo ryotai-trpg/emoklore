@@ -1,2 +1,1 @@
-export class EmokloreDie extends foundry.dice.terms.Die {
-}
+export class EmokloreDie extends foundry.dice.terms.Die {}

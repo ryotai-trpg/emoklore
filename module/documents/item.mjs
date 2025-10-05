@@ -1,2 +1,1 @@
-export class EmokloreItem extends Item {
-}
+export class EmokloreItem extends Item {}

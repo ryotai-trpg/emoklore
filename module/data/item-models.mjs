@@ -12,9 +12,14 @@ class BaseItemDataModel extends EmokloreSystemDataModel {
         required: true,
         blank: false,
         options: ["common", "uncommon", "rare", "legendary"],
-        initial: "common"
+        initial: "common",
       }),
-      price: new NumberField({ required: true, integer: true, min: 0, initial: 20 })
+      price: new NumberField({
+        required: true,
+        integer: true,
+        min: 0,
+        initial: 20,
+      }),
     };
   }
 }
@@ -23,7 +28,12 @@ export class WeaponDataModel extends BaseItemDataModel {
   static defineSchema() {
     return {
       ...super.defineSchema(),
-      damage: new NumberField({ required: true, integer: true, positive: true, initial: 5 })
+      damage: new NumberField({
+        required: true,
+        integer: true,
+        positive: true,
+        initial: 5,
+      }),
     };
   }
 }

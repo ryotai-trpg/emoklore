@@ -1,20 +1,19 @@
 import constructHTMLButton from "../helpers/construct-html-button.mjs";
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
-export default base => {
+export default (base) => {
   return class EmokloreDocumentSheet extends HandlebarsApplicationMixin(base) {
-
     static DEFAULT_OPTIONS = {
       classes: ["emoklore"],
       actions: {
         toggleMode: this.#toggleMode,
       },
       window: {
-        resizable: true
+        resizable: true,
       },
       form: {
-        submitOnChange: true
-      }
+        submitOnChange: true,
+      },
     };
 
     async _prepareContext(options) {
@@ -42,16 +41,22 @@ export default base => {
       super._configureRenderOptions(options);
       if (options.mode && this.isEditable) this._mode = options.mode;
       // New sheets should always start in edit mode
-      else if (options.renderContext === `create${this.document.documentName}`) this._mode = EmokloreDocumentSheet.MODES.EDIT;
+      else if (options.renderContext === `create${this.document.documentName}`)
+        this._mode = EmokloreDocumentSheet.MODES.EDIT;
     }
 
     async _renderFrame(options) {
       const frame = await super._renderFrame(options);
-      const buttons = [constructHTMLButton({
-        label: "",
-        classes: ["header-control", "icon", "fa-solid", "fa-user-lock"],
-        dataset: { action: "toggleMode", tooltip: "EMOKLORE.SHEET.ToggleMode" },
-      })];
+      const buttons = [
+        constructHTMLButton({
+          label: "",
+          classes: ["header-control", "icon", "fa-solid", "fa-user-lock"],
+          dataset: {
+            action: "toggleMode",
+            tooltip: "EMOKLORE.SHEET.ToggleMode",
+          },
+        }),
+      ];
 
       this.window.controls.after(...buttons);
 
@@ -78,8 +83,10 @@ export default base => {
         console.error("You can't switch to Edit mode if the sheet is uneditable");
         return;
       }
-      this._mode = this.isPlayMode ? EmokloreDocumentSheet.MODES.EDIT : EmokloreDocumentSheet.MODES.PLAY;
+      this._mode = this.isPlayMode
+        ? EmokloreDocumentSheet.MODES.EDIT
+        : EmokloreDocumentSheet.MODES.PLAY;
       this.render();
     }
-  }
-}
+  };
+};

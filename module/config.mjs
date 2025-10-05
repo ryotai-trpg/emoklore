@@ -5,341 +5,338 @@ export const EMOKLORE = {};
 EMOKLORE.characteristics = {
   physical: {
     label: "EMOKLORE.Actor.characteristics.physical",
-    emoji: "💪"
+    emoji: "💪",
   },
   dexterity: {
     label: "EMOKLORE.Actor.characteristics.dexterity",
-    emoji: "👌"
+    emoji: "👌",
   },
   mentality: {
     label: "EMOKLORE.Actor.characteristics.mentality",
-    emoji: "😶"
+    emoji: "😶",
   },
   sensitivity: {
     label: "EMOKLORE.Actor.characteristics.sensitivity",
-    emoji: "🦻"
+    emoji: "🦻",
   },
   intelligence: {
     label: "EMOKLORE.Actor.characteristics.intelligence",
-    emoji: "📖"
+    emoji: "📖",
   },
   charisma: {
     label: "EMOKLORE.Actor.characteristics.charisma",
-    emoji: "❤️"
+    emoji: "❤️",
   },
   sociality: {
     label: "EMOKLORE.Actor.characteristics.sociality",
-    emoji: "🎫"
+    emoji: "🎫",
   },
   fortune: {
     label: "EMOKLORE.Actor.characteristics.fortune",
-    emoji: "🎲"
-  }
+    emoji: "🎲",
+  },
 };
 preLocalize("characteristics", { keys: ["label"] });
 
 EMOKLORE.baseSkills = {
   investigation: {
     label: "EMOKLORE.Actor.baseSkills.investigation",
-    characteristic: "dexterity"
+    characteristic: "dexterity",
   },
   perception: {
     label: "EMOKLORE.Actor.baseSkills.perception",
-    characteristic: "sensitivity"
+    characteristic: "sensitivity",
   },
   negotiations: {
     label: "EMOKLORE.Actor.baseSkills.negotiations",
-    characteristic: "charisma"
+    characteristic: "charisma",
   },
   knowledge: {
     label: "EMOKLORE.Actor.baseSkills.knowledge",
-    characteristic: "intelligence"
+    characteristic: "intelligence",
   },
   news: {
     label: "EMOKLORE.Actor.baseSkills.news",
-    characteristic: "sociality"
+    characteristic: "sociality",
   },
   exercise: {
     label: "EMOKLORE.Actor.baseSkills.exercise",
-    characteristic: "physical"
+    characteristic: "physical",
   },
   fight: {
     label: "EMOKLORE.Actor.baseSkills.fight",
-    characteristic: "physical"
+    characteristic: "physical",
   },
   throw: {
     label: "EMOKLORE.Actor.baseSkills.throw",
-    characteristic: "dexterity"
+    characteristic: "dexterity",
   },
   survival: {
     label: "EMOKLORE.Actor.baseSkills.survival",
-    characteristic: "physical"
+    characteristic: "physical",
   },
   self: {
     label: "EMOKLORE.Actor.baseSkills.self",
-    characteristic: "mentality"
+    characteristic: "mentality",
   },
   treatment: {
     label: "EMOKLORE.Actor.baseSkills.treatment",
-    characteristic: "intelligence"
+    characteristic: "intelligence",
   },
   handiwork: {
     label: "EMOKLORE.Actor.baseSkills.handiwork",
-    characteristic: "dexterity"
+    characteristic: "dexterity",
   },
   luck: {
     label: "EMOKLORE.Actor.baseSkills.luck",
-    characteristic: "fortune"
-  }
+    characteristic: "fortune",
+  },
 };
 preLocalize("baseSkills", { keys: ["label"] });
-
 
 EMOKLORE.skills = {
   search: {
     label: "EMOKLORE.Actor.skills.search",
-    characteristic: "intelligence"
+    characteristic: "intelligence",
   },
   insight: {
     label: "EMOKLORE.Actor.skills.insight",
-    characteristic: "intelligence"
+    characteristic: "intelligence",
   },
   mapping: {
     label: "EMOKLORE.Actor.skills.mapping",
-    characteristic: "dexterity"
+    characteristic: "dexterity",
   },
   instinct: {
     label: "EMOKLORE.Actor.skills.instinct",
-    characteristic: "mentality"
+    characteristic: "mentality",
   },
   appraisal: {
     label: "EMOKLORE.Actor.skills.appraisal",
-    characteristic: "sensitivity"
+    characteristic: "sensitivity",
   },
 };
 preLocalize("skills", { keys: ["label"] });
 
-
-EMOKLORE.skillLevel = {
+((EMOKLORE.skillLevel = {
   0: { label: "EMOKLORE.skillLevel.0" },
   1: { label: "EMOKLORE.skillLevel.1" },
   2: { label: "EMOKLORE.skillLevel.2" },
   3: { label: "EMOKLORE.skillLevel.3" },
-},
-preLocalize("skillLevel", { keys: ["label"] });
-
+}),
+  preLocalize("skillLevel", { keys: ["label"] }));
 
 EMOKLORE.emotionAttributes = {
   desire: {
-    label: "EMOKLORE.emotionAttributes.desire"
+    label: "EMOKLORE.emotionAttributes.desire",
   },
   passion: {
-    label: "EMOKLORE.emotionAttributes.passion"
+    label: "EMOKLORE.emotionAttributes.passion",
   },
   ideal: {
-    label: "EMOKLORE.emotionAttributes.ideal"
+    label: "EMOKLORE.emotionAttributes.ideal",
   },
   relationship: {
-    label: "EMOKLORE.emotionAttributes.relationship"
+    label: "EMOKLORE.emotionAttributes.relationship",
   },
   wound: {
-    label: "EMOKLORE.emotionAttributes.wound"
-  }
-}
+    label: "EMOKLORE.emotionAttributes.wound",
+  },
+};
 preLocalize("emotionAttributes", { keys: ["label"] });
 
 EMOKLORE.sympatheticEmotion = {
   selfAssertion: {
     label: "EMOKLORE.sympatheticEmotion.selfAssertion",
-    attribute: "desire"
+    attribute: "desire",
   },
   possession: {
     label: "EMOKLORE.sympatheticEmotion.possession",
-    attribute: "desire"
+    attribute: "desire",
   },
   instinct: {
     label: "EMOKLORE.sympatheticEmotion.instinct",
-    attribute: "desire"
+    attribute: "desire",
   },
   destruction: {
     label: "EMOKLORE.sympatheticEmotion.destruction",
-    attribute: "desire"
+    attribute: "desire",
   },
   superiority: {
     label: "EMOKLORE.sympatheticEmotion.superiority",
-    attribute: "desire"
+    attribute: "desire",
   },
   sloth: {
     label: "EMOKLORE.sympatheticEmotion.sloth",
-    attribute: "desire"
+    attribute: "desire",
   },
   escape: {
     label: "EMOKLORE.sympatheticEmotion.escape",
-    attribute: "desire"
+    attribute: "desire",
   },
   curiosity: {
     label: "EMOKLORE.sympatheticEmotion.curiosity",
-    attribute: "desire"
+    attribute: "desire",
   },
   thrill: {
     label: "EMOKLORE.sympatheticEmotion.thrill",
-    attribute: "desire"
+    attribute: "desire",
   },
 
   joy: {
     label: "EMOKLORE.sympatheticEmotion.joy",
-    attribute: "passion"
+    attribute: "passion",
   },
   anger: {
     label: "EMOKLORE.sympatheticEmotion.anger",
-    attribute: "passion"
+    attribute: "passion",
   },
   sorrow: {
     label: "EMOKLORE.sympatheticEmotion.sorrow",
-    attribute: "passion"
+    attribute: "passion",
   },
   happiness: {
     label: "EMOKLORE.sympatheticEmotion.happiness",
-    attribute: "passion"
+    attribute: "passion",
   },
   anxiety: {
     label: "EMOKLORE.sympatheticEmotion.anxiety",
-    attribute: "passion"
+    attribute: "passion",
   },
   disgust: {
     label: "EMOKLORE.sympatheticEmotion.disgust",
-    attribute: "passion"
+    attribute: "passion",
   },
   fear: {
     label: "EMOKLORE.sympatheticEmotion.fear",
-    attribute: "passion"
+    attribute: "passion",
   },
   jealousy: {
     label: "EMOKLORE.sympatheticEmotion.jealousy",
-    attribute: "passion"
+    attribute: "passion",
   },
   grudge: {
     label: "EMOKLORE.sympatheticEmotion.grudge",
-    attribute: "passion"
+    attribute: "passion",
   },
 
   justice: {
     label: "EMOKLORE.sympatheticEmotion.justice",
-    attribute: "ideal"
+    attribute: "ideal",
   },
   worship: {
     label: "EMOKLORE.sympatheticEmotion.worship",
-    attribute: "ideal"
+    attribute: "ideal",
   },
   goodAndEvil: {
     label: "EMOKLORE.sympatheticEmotion.goodAndEvil",
-    attribute: "ideal"
+    attribute: "ideal",
   },
   hope: {
     label: "EMOKLORE.sympatheticEmotion.hope",
-    attribute: "ideal"
+    attribute: "ideal",
   },
   aspiration: {
     label: "EMOKLORE.sympatheticEmotion.aspiration",
-    attribute: "ideal"
+    attribute: "ideal",
   },
   reason: {
     label: "EMOKLORE.sympatheticEmotion.reason",
-    attribute: "ideal"
+    attribute: "ideal",
   },
   victory: {
     label: "EMOKLORE.sympatheticEmotion.victory",
-    attribute: "ideal"
+    attribute: "ideal",
   },
   order: {
     label: "EMOKLORE.sympatheticEmotion.order",
-    attribute: "ideal"
+    attribute: "ideal",
   },
   admiration: {
     label: "EMOKLORE.sympatheticEmotion.admiration",
-    attribute: "ideal"
+    attribute: "ideal",
   },
   selflessness: {
     label: "EMOKLORE.sympatheticEmotion.selflessness",
-    attribute: "ideal"
+    attribute: "ideal",
   },
 
   friendship: {
     label: "EMOKLORE.sympatheticEmotion.friendship",
-    attribute: "relationship"
+    attribute: "relationship",
   },
   love: {
     label: "EMOKLORE.sympatheticEmotion.love",
-    attribute: "relationship"
+    attribute: "relationship",
   },
   romance: {
     label: "EMOKLORE.sympatheticEmotion.romance",
-    attribute: "relationship"
+    attribute: "relationship",
   },
   dependence: {
     label: "EMOKLORE.sympatheticEmotion.dependence",
-    attribute: "relationship"
+    attribute: "relationship",
   },
   respect: {
     label: "EMOKLORE.sympatheticEmotion.respect",
-    attribute: "relationship"
+    attribute: "relationship",
   },
   contempt: {
     label: "EMOKLORE.sympatheticEmotion.contempt",
-    attribute: "relationship"
+    attribute: "relationship",
   },
   protection: {
     label: "EMOKLORE.sympatheticEmotion.protection",
-    attribute: "relationship"
+    attribute: "relationship",
   },
   domination: {
     label: "EMOKLORE.sympatheticEmotion.domination",
-    attribute: "relationship"
+    attribute: "relationship",
   },
   service: {
     label: "EMOKLORE.sympatheticEmotion.service",
-    attribute: "relationship"
+    attribute: "relationship",
   },
   indulgence: {
     label: "EMOKLORE.sympatheticEmotion.indulgence",
-    attribute: "relationship"
+    attribute: "relationship",
   },
 
   regret: {
     label: "EMOKLORE.sympatheticEmotion.regret",
-    attribute: "wound"
+    attribute: "wound",
   },
   loneliness: {
     label: "EMOKLORE.sympatheticEmotion.loneliness",
-    attribute: "wound"
+    attribute: "wound",
   },
   resignation: {
     label: "EMOKLORE.sympatheticEmotion.resignation",
-    attribute: "wound"
+    attribute: "wound",
   },
   despair: {
     label: "EMOKLORE.sympatheticEmotion.despair",
-    attribute: "wound"
+    attribute: "wound",
   },
   denial: {
     label: "EMOKLORE.sympatheticEmotion.denial",
-    attribute: "wound"
+    attribute: "wound",
   },
   doubt: {
     label: "EMOKLORE.sympatheticEmotion.doubt",
-    attribute: "wound"
+    attribute: "wound",
   },
   guilt: {
     label: "EMOKLORE.sympatheticEmotion.guilt",
-    attribute: "wound"
+    attribute: "wound",
   },
   madness: {
     label: "EMOKLORE.sympatheticEmotion.madness",
-    attribute: "wound"
+    attribute: "wound",
   },
   inferiorityComplex: {
     label: "EMOKLORE.sympatheticEmotion.inferiorityComplex",
-    attribute: "wound"
+    attribute: "wound",
   },
-}
+};
 preLocalize("sympatheticEmotion", { keys: ["label"] });

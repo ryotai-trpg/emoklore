@@ -1,2 +1,1 @@
-export class EmokloreRollParser extends foundry.dice.RollParser {
-}
+export class EmokloreRollParser extends foundry.dice.RollParser {}
