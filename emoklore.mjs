@@ -1,13 +1,17 @@
 import "./emoklore.css"; // for dev
 
 import { EMOKLORE } from "./module/config.mjs";
-import { EmokloreActor, EmokloreItem } from "./module/documents.mjs";
+import { systemID } from "./module/constants.mjs";
+
+import { EmokloreActor } from "./module/documents/actor.mjs";
+import { EmokloreItem } from "./module/documents/item.mjs";
 
 import { WeaponDataModel } from "./module/data/item-models.mjs";
 import { CharacterDataModel } from "./module/data/character.mjs";
 import { NpcDataModel } from "./module/data/npc.mjs";
 
-import * as applications from "./module/sheet.mjs"
+import * as applications from "./module/sheets/character-sheet.mjs"
+
 import { performPreLocalization } from "./module/helpers/localization.mjs";
 
 // import { EmokloreDie } from './module/dice/emoklore-die.mjs';
@@ -18,7 +22,7 @@ import { registerSystemSettings } from "./module/settings.mjs";
 
 Hooks.once("init", () => {
 
-  console.log("Emoklore TRPG | Initializing...")
+  console.log("Emo-klore TRPG | Initializing...")
 
   CONFIG.EMOKLORE = EMOKLORE
 
@@ -56,7 +60,7 @@ Hooks.once("init", () => {
   const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
   // DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
 
-  DocumentSheetConfig.registerSheet(Actor, "emoklore", applications.EmokloreActorSheet, {
+  DocumentSheetConfig.registerSheet(Actor, "emoklore", applications.EmokloreCharacterSheet, {
     types: ["character"],
     makeDefault: true,
     label: "EMOKLORE.SheetClass.character"
@@ -91,7 +95,7 @@ Hooks.once("i18nInit", () => {
 });
 
 Hooks.once("ready", ()=> {
-  if (game.settings.get("emoklore", "developerMode")) {
+  if (game.settings.get(systemID, "developerMode")) {
     game.actors.get("IqCtJnUqjTsjXqss").sheet.render(true);
   }
 })

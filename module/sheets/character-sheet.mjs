@@ -1,50 +1,30 @@
-import constructHTMLButton from "./helpers/construct-html-button.mjs";
-
-const {api, sheets} = foundry.applications;
+import { EmokloreActorSheet } from "./actor-sheet.mjs";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
  * @extends {ActorSheetV2}
  */
-export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
-  sheets.ActorSheetV2
-) {
-  constructor(options = {}) {
-    super(options);
-    // this.#dragDrop = this.#createDragDropHandlers();
-  }
+
+export class EmokloreCharacterSheet extends EmokloreActorSheet {
   static DEFAULT_OPTIONS = {
-    classes: ["standard-form", "emoklore", "actor", "character"],
+    classes: ["standard-form", "character"],
     position: {
       width: 700,
       height: 800
     },
-    actions: {
-      toggleMode: this.#toggleMode,
-      roll: this.#onRoll
-    },
-    window: {
-      resizable: true
-    },
-    form: {
-      submitOnChange: true
-    }
   };
 
   /** @override */
     static PARTS = {
-      header: {
-        template: "systems/emoklore/templates/actor/header.hbs"
-      },
-      tabs: {
-        template: "templates/generic/tab-navigation.hbs"
-      },
+      header: { template: "systems/emoklore/templates/actor/header.hbs" },
+      tabs: { template: "templates/generic/tab-navigation.hbs" },
       stats: {
         template: "systems/emoklore/templates/actor/stats.hbs",
         scrollable: [""],
       },
       biography: {
-        template: "systems/emoklore/templates/actor/biography.hbs"
+        template: "systems/emoklore/templates/actor/biography.hbs",
+        scrollable: [""],
       }
     };
 
@@ -58,74 +38,6 @@ export class EmokloreActorSheet extends api.HandlebarsApplicationMixin(
       initial: "stats",
     },
   };
-
-  static async #onRoll(event, target) {
-    event.preventDefault();
-    const dataset = target.dataset
-
-    switch (dataset.rollType) {
-      case "skill":
-        return this.actor.rollSkill(dataset.skill);
-    }
-  }
-
-  async _renderFrame(options) {
-    const frame = await super._renderFrame(options);
-    const buttons = [constructHTMLButton({
-      label: "",
-      classes: ["header-control", "icon", "fa-solid", "fa-user-lock"],
-      dataset: { action: "toggleMode", tooltip: "EMOKLORE.SHEET.ToggleMode" },
-    })];
-
-    this.window.controls.after(...buttons);
-
-    return frame;
-  }
-
-  static MODES = Object.freeze({
-    PLAY: 1,
-    EDIT: 2,
-  });
-
-  _mode = EmokloreActorSheet.MODES.PLAY;
-
-  get isPlayMode() {
-    return this._mode === EmokloreActorSheet.MODES.PLAY;
-  }
-
-  get isEditMode() {
-    return this._mode === EmokloreActorSheet.MODES.EDIT;
-  }
-
-
-  static async #toggleMode(event, target) {
-    if (!this.isEditable) {
-      console.error("You can't switch to Edit mode if the sheet is uneditable");
-      return;
-    }
-    this._mode = this.isPlayMode ? EmokloreActorSheet.MODES.EDIT : EmokloreActorSheet.MODES.PLAY;
-    this.render();
-  }
-
-
-  async _prepareContext(options) {
-    const context = await super._prepareContext(options);
-
-    Object.assign(context, {
-      isPlay: this.isPlayMode,
-      // owner: this.document.isOwner,
-      // limited: this.document.limited,
-      // gm: game.user.isGM,
-      document: this.document,
-      system: this.document.system,
-      systemFields: this.document.system.schema.fields,
-      flags: this.document.flags,
-    });
-
-    console.log(context);
-
-    return context;
-  }
 
   async _preparePartContext(partId, context, options) {
     await super._preparePartContext(partId, context, options);
