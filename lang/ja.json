@@ -10,6 +10,15 @@
     }
   },
 
+  "SETTINGS": {
+    "EMOKLORE": {
+      "DeveloperMode": {
+        "Name": "開発者モード",
+        "Hint": "テスト"
+      }
+    }
+  },
+
   "EMOKLORE": {
     "SheetClass": {
       "character": "共鳴者シート"
@@ -34,6 +43,7 @@
       "2": "Lv.2",
       "3": "Lv.3"
     },
+
 
     "sympatheticEmotion": {
       "selfAssertion": "自己顕示",
@@ -91,6 +101,18 @@
     "Actor": {
       "character": {
         "FIELDS": {
+          "resources": {
+            "hp": {
+              "label": "HP",
+              "value": {
+                "label": "現在"
+              },
+              "max": {
+                "label": "最大"
+              }
+            }
+          },
+
           "biography": {
             "age": {
               "label": "年齢"

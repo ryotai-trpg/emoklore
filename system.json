@@ -1,14 +1,15 @@
 {
   "id": "emoklore",
   "title": "Emo-klore TRPG",
-  "description": "",
+  "description": "An unofficial system for the Emo-klore TRPG",
   "version": "0.0.1",
   "compatibility": {
     "minimum": 13,
     "verified": 13
   },
   "authors": [{
-    "name": "Ryotai"
+    "name": "Ryotai",
+    "discord": "@ryotai."
   }],
   "esmodules": ["emoklore.mjs"],
   "styles": ["emoklore.css"],
@@ -26,18 +27,16 @@
   ],
   "documentTypes": {
     "Actor": {
-      "character": { "htmlFields": ["background.biography"] },
-      "npc": { "htmlFields": ["background.biography"] },
-      "pawn": {}
+      "character": { "htmlFields": ["biography.note"] },
+      "npc": {}
     },
     "Item": {
-      "weapon": {},
-      "spell": {}
+      "weapon": {}
     }
   },
   "background": "systems/emoklore/assets/official/emoklore-logoB_white.svg",
   "grid": {
-    "distance": "1",
+    "distance": "1.5",
     "units": "m"
   }
 }

@@ -2,19 +2,27 @@ import "./emoklore.css"; // for dev
 
 import { EMOKLORE } from "./module/config.mjs";
 import { EmokloreActor, EmokloreItem } from "./module/documents.mjs";
-import { CharacterDataModel, NpcDataModel, WeaponDataModel, SpellDataModel } from "./module/data-models.mjs";
+
+import { WeaponDataModel } from "./module/data/item-models.mjs";
+import { CharacterDataModel } from "./module/data/character.mjs";
+import { NpcDataModel } from "./module/data/npc.mjs";
+
 import * as applications from "./module/sheet.mjs"
 import { performPreLocalization } from "./module/helpers/localization.mjs";
 
 // import { EmokloreDie } from './module/dice/emoklore-die.mjs';
 // import { EmokloreRollParser } from './module/dice/emoklore-parser.mjs';
 import { EmokloreRoll } from './module/dice/emoklore-roll.mjs';
+import { registerSystemSettings } from "./module/settings.mjs";
+
 
 Hooks.once("init", () => {
 
   console.log("Emoklore TRPG | Initializing...")
 
   CONFIG.EMOKLORE = EMOKLORE
+
+  registerSystemSettings();
 
   // Configure custom Document implementations.
   CONFIG.Actor.documentClass = EmokloreActor;
@@ -27,20 +35,20 @@ Hooks.once("init", () => {
   };
   CONFIG.Item.dataModels = {
     weapon: WeaponDataModel,
-    spell: SpellDataModel
   };
 
   // CONFIG.Dice.parser = EmokloreRollParser;
   CONFIG.Dice.rolls.push(EmokloreRoll);
 
   // Configure trackable attributes.
+  // TODO: Not Translated
   CONFIG.Actor.trackableAttributes = {
     character: {
-      bar: ["resources.health", "resources.power", "goodness"],
-      value: ["progress"]
+      bar: ["resources.hp", "resources.mp", "resonance.value"],
+      value: []
     },
     npc: {
-      bar: ["resources.health", "resources.power"],
+      bar: ["resources.hp", "resources.mp"],
       value: []
     }
   };
@@ -82,21 +90,8 @@ Hooks.once("i18nInit", () => {
   }
 });
 
-
-function addControl(sceneControls) {
-    // if (!game.user.isGM)
-    //     return;
-    sceneControls.tokens.tools.emokloreRoll = {
-        name: 'emokloreRoll',
-        title: game.i18n.localize("EmokloreRoll"),
-        icon: 'fas fa-diagram-venn',
-        toggle: true,
-        // active: getSetting('snapTokens'),
-        onChange: async (event, toggled) => {
-          let r = await new EmokloreRoll("4d10").evaluate();
-          console.log(r.result)
-          console.log(r.total)
-        },
-    };
-}
-Hooks.on('getSceneControlButtons', addControl);
+Hooks.once("ready", ()=> {
+  if (game.settings.get("emoklore", "developerMode")) {
+    game.actors.get("IqCtJnUqjTsjXqss").sheet.render(true);
+  }
+})

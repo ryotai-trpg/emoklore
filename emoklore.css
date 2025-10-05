@@ -19,6 +19,7 @@
 .emoklore {
     section.tab {
         overflow: auto;
+        padding: 0.5rem;
     }
 }
 

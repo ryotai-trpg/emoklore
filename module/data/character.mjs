@@ -1,17 +1,7 @@
+import { BaseActorDataModel } from "./base-actor.mjs";
 const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
-/* -------------------------------------------- */
-/*  Actor Models                                */
-/* -------------------------------------------- */
-
-class EmokloreActorDataModel extends foundry.abstract.TypeDataModel {
-  static defineSchema() {
-    const schema = {};
-    return schema
-  };
-}
-
-export class CharacterDataModel extends EmokloreActorDataModel {
+export class CharacterDataModel extends BaseActorDataModel {
   static defineSchema() {
     const schema = super.defineSchema();
 
@@ -103,53 +93,5 @@ export class CharacterDataModel extends EmokloreActorDataModel {
     this.resources.mp.max = foundry.utils.getProperty(this, "characteristics.mentality") + foundry.utils.getProperty(this, "characteristics.intelligence");
     this.resources.mp.value = Math.min(this.resources.mp.value, this.resources.mp.max);
 
-  }
-}
-
-export class NpcDataModel extends EmokloreActorDataModel {
-  static defineSchema() {
-    return {
-      ...super.defineSchema(),
-      wickedness: new SchemaField({
-        value: new NumberField({ required: true, integer: true, min: 0, initial: 5 }),
-        max: new NumberField({ required: true, integer: true, min: 0, initial: 100 })
-      })
-    };
-  }
-}
-
-/* -------------------------------------------- */
-/*  Item Models                                 */
-/* -------------------------------------------- */
-
-class ItemDataModel extends foundry.abstract.TypeDataModel {
-  static defineSchema() {
-    return {
-      rarity: new StringField({
-        required: true,
-        blank: false,
-        options: ["common", "uncommon", "rare", "legendary"],
-        initial: "common"
-      }),
-      price: new NumberField({ required: true, integer: true, min: 0, initial: 20 })
-    };
-  }
-}
-
-export class WeaponDataModel extends ItemDataModel {
-  static defineSchema() {
-    return {
-      ...super.defineSchema(),
-      damage: new NumberField({ required: true, integer: true, positive: true, initial: 5 })
-    };
-  }
-}
-
-export class SpellDataModel extends ItemDataModel {
-  static defineSchema() {
-    return {
-      ...super.defineSchema(),
-      cost: new NumberField({ required: true, integer: true, positive: true, initial: 2 })
-    };
   }
 }
