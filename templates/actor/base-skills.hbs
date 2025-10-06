@@ -1,11 +1,18 @@
 
 {{#if isPlay}}
-<fieldset class="baseskill">
-  <legend>{{localize "EMOKLORE.baseSkill"}}</legend>
+<div class="baseskills">
+  {{#unless isPlay}}
+  <h2>{{localize "EMOKLORE.baseSkill"}}</h2>
+  {{/unless}}
   {{#each system.baseSkills as |baseSkill key|}}
-  <div class="baseskill flexrow" data-baseskill="{{key}}">
-    <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">{{baseSkill.label}}</a>
+  <div class="baseskill" data-baseskill="{{key}}">
+    <a class="label" 
+      data-action="roll" 
+      data-roll-type="skill" 
+      data-skill="{{key}}">
+      {{baseSkill.label}} | {{baseSkill.target}}
+    </a>
   </div>
   {{/each}}
-</fieldset>
+</div>
 {{/if}}

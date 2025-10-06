@@ -1,31 +1,309 @@
-.sheet header.img-name {
-  align-items: center;
-  display: flex;
-  gap: 1rem;
-  img {
-    height: 64px;
-    flex: 0 0 64px;
-    object-fit: contain;
-  }
-
-  input {
-    flex: 1;
-    font-size: var(--font-size-32);
-    height: initial;
-  }
+.emoklore.sheet.character:not(.minimized, .minimizing, .maximizing) {
+  min-width: 500px;
+  min-height: 400px;
 }
 
-.emoklore {
+.emoklore.sheet.character {
   section.tab {
     overflow: auto;
     padding: 0.5rem;
   }
-}
 
-.emoklore.character {
+  .sheet-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+
+    button {
+      border: none;
+      padding: 0 0.2rem;
+      height: inherit;
+      min-height: inherit;
+    }
+  }
+
+  progress {
+    height: 10px;
+    background-color: var(--emoklore-gray);
+    border-radius: var(--emoklore-progress-radius);
+    margin:2px
+  }
+
+  .resources{
+    height: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .bar{
+      position: relative;
+      justify-content: space-evenly;
+
+      label {
+        position: absolute;
+        left: 26px;
+        font-size: 0.9em;
+        pointer-events: none;
+      }
+
+      .value {
+        right: 26px;
+        font-size: 0.9em;
+        pointer-events: none;
+        position: absolute;
+      }
+    }
+  }
+
+  .resources progress {
+      height: 14px;
+  }
+
+  .characteristic progress {
+      height: 20px;
+    border-radius: var(--emoklore-progress-radius2);
+  }
+
+  .characteristic progress::-webkit-progress-bar {
+    border-radius: var(--emoklore-progress-radius2);
+  }
+  .characteristic progress::-webkit-progress-value {
+    border-radius: var(--emoklore-progress-radius2);
+  }
+  .characteristic progress::-moz-progress-bar {
+    border-radius: var(--emoklore-progress-radius2);
+  }
+  .characteristic progress::-ms-fill {
+    border-radius: var(--emoklore-progress-radius2);
+  }
+
+  .skill progress {
+      height: 20px;
+    border-radius: var(--emoklore-progress-radius2);
+  }
+
+  .skill progress::-webkit-progress-bar {
+    border-radius: var(--emoklore-progress-radius2);
+  }
+  .skill progress::-webkit-progress-value {
+    border-radius: var(--emoklore-progress-radius2);
+  }
+  .skill progress::-moz-progress-bar {
+    border-radius: var(--emoklore-progress-radius2);
+  }
+  .skill progress::-ms-fill {
+    border-radius: var(--emoklore-progress-radius2);
+  }
+
+
+  progress::-webkit-progress-bar {
+    background-color: var(--emoklore-gray);
+    border-radius: var(--emoklore-progress-radius);
+  }
+  progress::-webkit-progress-value {
+    background-color: var(--emoklore-accent-color);
+    border-radius: var(--emoklore-progress-radius);
+  }
+  progress::-moz-progress-bar {
+    background-color: var(--emoklore-accent-color);
+    border-radius: var(--emoklore-progress-radius);
+  }
+  progress::-ms-fill {
+    background-color: var(--emoklore-accent-color);
+    border-radius: var(--emoklore-progress-radius);
+  }
+
+  .emotions {
+    display:flex;
+    flex-direction: column;
+  }
+
+  .card {
+    background:rgb(40 40 40 / 80%); /* テーマ対応 */
+    display:flex;
+    flex-direction:column;
+    border-radius:10px;
+
+    img {
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    }
+  }
+
+  .characteristics {
+    display:flex;
+    flex-direction:column;
+    padding: 8px;
+    padding-top: 2px;
+
+    .characteristic {
+      align-items: center;
+      display:flex;
+      margin-top: 6px;
+      justify-content:space-between;
+
+      label {
+        margin-right: auto;
+      }
+      .value {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .emotions .play {
+    display:flex;
+    flex-direction:row;
+    justify-content:space-around;
+  }
+
+  .pill {
+    font-size:1.1em;
+    margin-top:12px;
+    background:#000000; /* テーマ対応 */
+    border-radius:10px;
+    text-align:center;
+    padding-top:2px;
+    padding-bottom:2px;
+    padding-left:8px;
+    padding-right:8px;
+  }
+
+  .skills {
+    display:flex;
+    flex-direction:column;
+    padding: 8px;
+  }
+
+  .skill.play{
+    display:grid;
+    grid-template-columns: 80px 20px 120px 20px 50px;
+    align-items:center;
+    margin-top:5px;
+    margin-bottom:5px;
+  }
+
+  .skill{
+    display:grid;
+    grid-template-columns: 80px 1fr 20px 50px;
+    align-items:center;
+    margin-top:2px;
+    margin-bottom:2px;
+  }
+
+  .skill progress {
+    margin-left:10px;
+    width:90px;
+    height: 20px;
+  }
+  .skill.play .target{
+    margin-left:0px;
+  }
+  .skill .target{
+    border:1px solid;
+    border-radius:2px;
+    text-align:center;
+    margin-left:5px;
+  }
+  .skill .characteristic{
+    margin-left:3px;
+  }
+
+  .baseskills {
+    display:flex;
+    flex-direction:row;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    padding:8px;
+  }
+
+  .baseskill {
+    background:rgb(40 40 40 / 80%); /* テーマ対応 */
+    margin-right:10px;
+    margin-top:4px;
+    border:1px dotted;
+    border-radius:2px;
+    text-align:center;
+    padding-left:3px;
+    padding-right:3px;
+  }
+
+
+
+  header {
+    height: 72px;
+
+    .name {
+      flex: 1;
+      font-size: var(--font-size-48);
+      padding: 0 .5rem;
+
+      input {
+        height: initial;
+        padding: inherit;
+      }
+    }
+  }
+
+  .tab.active {
+    display: grid;
+    --emoklore-sheet-sidebar-width: 250px;
+    grid-template-columns: var(--emoklore-sheet-sidebar-width) 1fr;
+  }
+
+  .biographies {
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+
   & [data-application-part="biography"] {
     div.flexrow {
       gap: 20px;
     }
+
+    .form-group {
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:0px;
+    }
+
+    .form-group.stacked{
+      display:flex;
+      flex-direction:row;
+    }
+
+    .bio {
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:0px;
+    }
+
+    .bio.stacked{
+      display:flex;
+      flex-direction:row;
+    }
+
+    .biographies label {
+    color: var(--color-form-label);
+        font-weight: bold;
+      }
+    .biographies .label {
+    color: var(--color-form-label);
+        font-weight: bold;
+      }
+
   }
+  --emoklore-accent-color: #2196f3;
+  --emoklore-gray: #383838;
+  --emoklore-progress-radius: 5px;
+  --emoklore-progress-radius2: 2px;
 }

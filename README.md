@@ -1,11 +1,11 @@
-# エモクロアTRPG for FoundryVTT
+# Emo-klore TRPG for FoundryVTT
 
-FoundryVTT向けのエモクロアTRPGシステムになる予定のものです．
+An unofficial implementation of Emo-klore TRPG for Foundry Virtual Tabletop.
 
-FoundryやJS・HTMLの学習を兼ねてのんびりとフルスクラッチで作ろうと思っています．
+A rulebook is required to play. You can view it for free on the [Official Website](https://emoklore.dicetous.com) (Japanese Only).
 
-### ダイスタス・コモンズ
-◆表示：不要  
-◆改変：許可  
-◆公演：許可（収益化OK）  
-◆営利：許可
+### Dice to Us Commons
+- Display: Not required
+- Modification: Permitted
+- Public performance: Permitted
+- Commercial use: Permitted

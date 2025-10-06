@@ -1,6 +1,8 @@
 {{! Stats Tab }}
 <section class='tab stats {{tab.cssClass}}' data-group='primary' data-tab='stats'>
-{{> "systems/emoklore/templates/actor/characteristics.hbs"}}
-{{> "systems/emoklore/templates/actor/skills.hbs"}}
-{{> "systems/emoklore/templates/actor/base-skills.hbs"}}
+    {{> "systems/emoklore/templates/actor/card.hbs"}}
+  <div>
+    {{> "systems/emoklore/templates/actor/skills.hbs"}}
+    {{> "systems/emoklore/templates/actor/base-skills.hbs"}}
+  </div>
 </section>

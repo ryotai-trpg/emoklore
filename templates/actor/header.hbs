@@ -1,33 +1,72 @@
 {{! Sheet Header }}
 <div>
-    {{#if (and fields.name fields.img)}}
-    <header class="sheet-header img-name">
-        <img src="{{source.img}}" data-action="editImage" data-edit="img" alt="{{localize "DOCUMENT.FIELDS.img.label"}}">
+  <header class="sheet-header">
+    <div class="container">
+      <div class="name">
+        {{#if isPlay}}
+        {{source.name}}
+        {{else}}
         {{formInput fields.name value=source.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
-            aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
-    </header>
-    {{else if fields.img}}
-    {{formGroup fields.img value=source.img rootId=rootId}}
-    {{else if fields.name}}
-    {{formGroup fields.name value=source.name rootId=rootId}}
-    {{/if}}
+        aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
+        {{/if}}
+      </div>
 
-    {{#if descriptionHTML}}
-    <div class="form-group">
-        <div class="form-fields">
-            {{formInput fields.description value=source.description enriched=descriptionHTML compact=true toggled=true}}
+      <div class="resources">
+        {{#if isPlay}}
+        <div class="hp bar">
+          <label for="character-hp">HP</label>
+          <span class="value">
+            {{ system.resources.hp.value }}/{{ system.resources.hp.max }}
+          </span>
+          <button>
+            <i class="fa-duotone fa-solid fa-minus"></i>
+          </button>
+          <progress 
+            id="character-hp"
+            value="{{ system.resources.hp.value }}" 
+            max="{{ system.resources.hp.max }}"
+          ></progress>
+          <button>
+            <i class="fa-duotone fa-solid fa-plus"></i>
+          </button>
         </div>
-    </div>
-    {{/if}}
+        <div class="mp bar">
+          <label for="character-mp">MP</label>
+          <button>
+            <i class="fa-duotone fa-solid fa-minus"></i>
+          </button>
+          <progress 
+            id="character-mp"
+            value="{{ system.resources.mp.value }}" 
+            max="{{ system.resources.mp.max }}"
+            ></progress>
+          <button>
+            <i class="fa-duotone fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <div class="sympathy bar">
+          <label for="character-sympathy">∞共鳴</label>
+          <button>
+            <i class="fa-duotone fa-solid fa-minus"></i>
+          </button>
+          <progress 
+            id="character-sympathy"
+            value="3" 
+            max="9"
+            ></progress>
+          <button>
+            <i class="fa-duotone fa-solid fa-plus"></i>
+          </button>
+        </div>
+        {{else}}
+        <div class="hp">
+          最大HP: {{ system.resources.hp.max }}
+        </div>
+        <div class="mp">
+          最大MP: {{ system.resources.mp.max }}
+        </div>
+        {{/if}}
+      </div>
 
-    {{#if (not (or fields.name fields.img descriptionHTML))}}
-    <section class="no-data">
-        <h1>{{document.documentName}}</h1>
-        <div class="uuid">{{document.uuid}}</div>
-    </section>
-    {{/if}}
-    {{#if isPlay}}
-    HP: {{ system.resources.hp.value }} / {{ system.resources.hp.max }}
-    MP: {{ system.resources.mp.value }} / {{ system.resources.mp.max }}
-    {{/if}}
-</div>
+  </header>
+    </div>

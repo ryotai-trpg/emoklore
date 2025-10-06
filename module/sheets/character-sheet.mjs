@@ -10,22 +10,28 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   static DEFAULT_OPTIONS = {
     classes: ["standard-form", "character"],
     position: {
-      width: 700,
-      height: 800,
+      width: 620,
+      height: 750,
     },
   };
 
   /** @override */
   static PARTS = {
-    header: { template: "systems/emoklore/templates/actor/header.hbs" },
+    header: { 
+      template: "systems/emoklore/templates/actor/header.hbs"
+    },
     tabs: { template: "templates/generic/tab-navigation.hbs" },
     stats: {
       template: "systems/emoklore/templates/actor/stats.hbs",
-      templates: [ "characteristics.hbs", "skills.hbs", "base-skills.hbs" ].map(t => systemPath(`templates/actor/${t}`)),
+      templates: [ "card.hbs", "sympathy.hbs", "characteristics.hbs", "skills.hbs", "base-skills.hbs" ].map(t => systemPath(`templates/actor/${t}`)),
       scrollable: [""],
     },
     biography: {
       template: "systems/emoklore/templates/actor/biography.hbs",
+      templates: [ 
+        "systems/emoklore/templates/actor/card.hbs",
+        "systems/emoklore/templates/actor/sympathy.hbs",
+      ],
       scrollable: [""],
     },
   };
@@ -53,6 +59,13 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
           ([value, { label }]) => ({
             value,
             label,
+          }),
+        );
+        context.emotionOptions = Object.entries(CONFIG.EMOKLORE.sympatheticEmotion).map(
+          ([value, { label, attribute }]) => ({
+            value,
+            label,
+            group: game.i18n.localize(`EMOKLORE.emotionAttributes.${attribute}`),
           }),
         );
         break;
@@ -104,10 +117,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     // const isPlay = this.isPlayMode;
     // const data = isPlay ? this.actor : this.actor._source;
     const data = this.actor;
-    console.log(this.actor.system);
     return Object.keys(CONFIG.EMOKLORE.baseSkills).reduce((obj, baseSkill) => {
       const value = foundry.utils.getProperty(data, `system.baseSkills.${baseSkill}`);
-      console.log(value);
       obj[baseSkill] = {
         label: value.label ?? "Null",
         level: value.level ?? 0,

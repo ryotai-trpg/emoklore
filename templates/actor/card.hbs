@@ -1,0 +1,9 @@
+<div class="card">
+  {{#if isPlay}}
+  <img src="{{source.img}}" data-action="showPortraitArtwork" data-edit="img" alt="{{localize "DOCUMENT.FIELDS.img.label"}}">
+  {{else}}
+  <img src="{{source.img}}" data-action="editImage" data-edit="img" alt="{{localize "DOCUMENT.FIELDS.img.label"}}">
+  {{/if}}
+  {{> "systems/emoklore/templates/actor/sympathy.hbs"}}
+  {{> "systems/emoklore/templates/actor/characteristics.hbs"}}
+</div>

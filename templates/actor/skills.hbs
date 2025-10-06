@@ -1,11 +1,25 @@
-<fieldset class="skill">
-  <legend>{{localize "EMOKLORE.skill"}}</legend>
+<div class="skills">
+  {{#unless isPlay}}
+  {{/unless}}
   {{#each skills as |skill key|}}
-  <div class="skill flexrow" data-skill="{{key}}">
+  {{#if ../isPlay}}
+  {{#if skill.level}}
+  <div class="skill play" data-skill="{{key}}">
     <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">{{skill.label}}</a>
-    {{formGroup skill.field.fields.level value=skill.level options=skillLevelOptions}}
-    <span>{{skill.target}} {{localize (concat "EMOKLORE.Actor.characteristics." skill.characteristic)}}</span>
+    <span>Lv.{{skill.level}}</span>
+    <progress value="{{skill.level}}" max="3"></progress>
+    <span class="target">{{skill.target}}</span>
+    <span class="characteristic">{{localize (concat "EMOKLORE.Actor.characteristics." skill.characteristic)}}</span>
   </div>
+  {{/if}}
+  {{else}}
+  <div class="skill" data-skill="{{key}}">
+    <span class="label">{{skill.label}}</span>
+    {{formInput skill.field.fields.level value=skill.level options=skillLevelOptions}}
+    <span class="target">{{skill.target}}</span>
+    <span class="characteristic">{{localize (concat "EMOKLORE.Actor.characteristics." skill.characteristic)}}</span>
+  </div>
+  {{/if}}
   {{/each}}
-</fieldset>
+</div>
 
