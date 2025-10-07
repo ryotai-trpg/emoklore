@@ -23,14 +23,13 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     tabs: { template: "templates/generic/tab-navigation.hbs" },
     stats: {
       template: "systems/emoklore/templates/actor/stats.hbs",
-      templates: [ "card.hbs", "sympathy.hbs", "characteristics.hbs", "skills.hbs", "base-skills.hbs" ].map(t => systemPath(`templates/actor/${t}`)),
+      templates: [ "card.hbs", "skills.hbs", "base-skills.hbs" ].map(t => systemPath(`templates/actor/${t}`)),
       scrollable: [""],
     },
     biography: {
       template: "systems/emoklore/templates/actor/biography.hbs",
       templates: [ 
-        "systems/emoklore/templates/actor/card.hbs",
-        "systems/emoklore/templates/actor/sympathy.hbs",
+        "systems/emoklore/templates/actor/card-view.hbs",
       ],
       scrollable: [""],
     },
