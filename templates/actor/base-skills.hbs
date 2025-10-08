@@ -8,9 +8,10 @@
   <div class="baseskill" data-baseskill="{{key}}">
     <a class="label" 
       data-action="roll" 
-      data-roll-type="skill" 
+      data-roll-type="base-skill" 
       data-skill="{{key}}">
       {{baseSkill.label}} | {{baseSkill.target}}
+      <i class="characteristic fa-solid {{lookup (lookup ../config.characteristics baseSkill.characteristic) 'fa'}}"></i>
     </a>
   </div>
   {{/each}}

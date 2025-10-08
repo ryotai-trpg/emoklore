@@ -11,7 +11,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     classes: ["standard-form", "character"],
     position: {
       width: 620,
-      height: 750,
+      height: 730,
     },
   };
 
@@ -23,7 +23,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     tabs: { template: "templates/generic/tab-navigation.hbs" },
     stats: {
       template: "systems/emoklore/templates/actor/stats.hbs",
-      templates: [ "card.hbs", "skills.hbs", "base-skills.hbs" ].map(t => systemPath(`templates/actor/${t}`)),
+      templates: [ "card-view.hbs", "card-edit.hbs", "skills.hbs", "base-skills.hbs" ].map(t => systemPath(`templates/actor/${t}`)),
       scrollable: [""],
     },
     biography: {
@@ -67,6 +67,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
             group: game.i18n.localize(`EMOKLORE.emotionAttributes.${attribute}`),
           }),
         );
+        context.config=CONFIG.EMOKLORE;
         break;
 
       case "biography":
@@ -89,7 +90,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     // const data = isPlay ? this.actor : this.actor._source;
     const data = this.actor;
     return Object.keys(CONFIG.EMOKLORE.characteristics).reduce((obj, chc) => {
-      const value = foundry.utils.getProperty(data, `system.characteristics.${chc}`);
+      const value = foundry.utils.getProperty(data, `system.characteristics.${chc}.value`);
       obj[chc] = {
         field: this.actor.system.schema.getField(["characteristics", chc]),
         value: value ?? 0,

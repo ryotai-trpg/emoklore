@@ -27,13 +27,18 @@ export class CharacterDataModel extends BaseActorDataModel {
 
     schema.characteristics = new SchemaField(
       Object.entries(CONFIG.EMOKLORE.characteristics).reduce((obj, [chc, { label }]) => {
-        obj[chc] = new NumberField({ ...characteristic, label });
+        obj[chc] = new SchemaField({
+          value: new NumberField({ ...characteristic, label }),
+          bonus: new NumberField({ required: true, integer: true, initial: 0}),
+          success_count: new NumberField({ required: true, integer: true, initial: 0}),
+        })
+        
         return obj;
       }, {}),
     );
 
     schema.skills = new SchemaField(
-      Object.entries(CONFIG.EMOKLORE.skills).reduce((obj, [skill, { characteristic, label }]) => {
+      Object.entries(CONFIG.EMOKLORE.skills).reduce((obj, [skill, { characteristic, label, characteristicOptions }]) => {
         obj[skill] = new SchemaField({
           level: new NumberField({
             min: 0,
@@ -46,8 +51,11 @@ export class CharacterDataModel extends BaseActorDataModel {
           characteristic: new StringField({
             required: true,
             initial: characteristic,
+            ...(characteristicOptions ? { choices: characteristicOptions} : {} ),
           }),
           label: new StringField({ initial: label }),
+          bonus: new NumberField({ required: true, integer: true, initial: 0}),
+          success_count: new NumberField({ required: true, integer: true, initial: 0}),
         });
         return obj;
       }, {}),
@@ -87,7 +95,7 @@ export class CharacterDataModel extends BaseActorDataModel {
           ...skill,
           target:
             skill.level +
-            foundry.utils.getProperty(this, `characteristics.${skill.characteristic}`),
+            foundry.utils.getProperty(this, `characteristics.${skill.characteristic}.value`),
         },
       ]),
     );
@@ -97,18 +105,20 @@ export class CharacterDataModel extends BaseActorDataModel {
         key,
         {
           ...skill,
-          target: foundry.utils.getProperty(this, `characteristics.${skill.characteristic}`),
+          target: foundry.utils.getProperty(this, `characteristics.${skill.characteristic}.value`),
           level: 1,
+          bonus: 0,
+          success_count: 0,
         },
       ]),
     );
 
-    this.resources.hp.max = 10 + foundry.utils.getProperty(this, "characteristics.physical");
+    this.resources.hp.max = 10 + foundry.utils.getProperty(this, "characteristics.physical.value");
     this.resources.hp.value = Math.min(this.resources.hp.value, this.resources.hp.max);
 
     this.resources.mp.max =
-      foundry.utils.getProperty(this, "characteristics.mentality") +
-      foundry.utils.getProperty(this, "characteristics.intelligence");
+      foundry.utils.getProperty(this, "characteristics.mentality.value") +
+      foundry.utils.getProperty(this, "characteristics.intelligence.value");
     this.resources.mp.value = Math.min(this.resources.mp.value, this.resources.mp.max);
   }
 }

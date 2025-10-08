@@ -5,35 +5,35 @@ export const EMOKLORE = {};
 EMOKLORE.characteristics = {
   physical: {
     label: "EMOKLORE.Actor.characteristics.physical",
-    emoji: "💪",
+    fa: "fa-person-running",
   },
   dexterity: {
     label: "EMOKLORE.Actor.characteristics.dexterity",
-    emoji: "👌",
+    fa: "fa-hand-sparkles",
   },
   mentality: {
     label: "EMOKLORE.Actor.characteristics.mentality",
-    emoji: "😶",
+    fa: "fa-face-meh-blank",
   },
   sensitivity: {
     label: "EMOKLORE.Actor.characteristics.sensitivity",
-    emoji: "🦻",
+    fa: "fa-ear-listen",
   },
   intelligence: {
     label: "EMOKLORE.Actor.characteristics.intelligence",
-    emoji: "📖",
+    fa: "fa-book-open",
   },
   charisma: {
     label: "EMOKLORE.Actor.characteristics.charisma",
-    emoji: "❤️",
+    fa: "fa-face-kiss-wink-heart",
   },
   sociality: {
     label: "EMOKLORE.Actor.characteristics.sociality",
-    emoji: "🎫",
+    fa: "fa-id-card",
   },
   fortune: {
     label: "EMOKLORE.Actor.characteristics.fortune",
-    emoji: "🎲",
+    fa: "fa-dice-six",
   },
 };
 preLocalize("characteristics", { keys: ["label"] });
@@ -106,6 +106,11 @@ EMOKLORE.skills = {
   mapping: {
     label: "EMOKLORE.Actor.skills.mapping",
     characteristic: "dexterity",
+    characteristicOptions: {
+      dexterity: { label: "EMOKLORE.Actor.characteristics.dexterity" },
+      sensitivity: { label: "EMOKLORE.Actor.characteristics.sensitivity" }
+      // TODO: Refactor
+    }
   },
   instinct: {
     label: "EMOKLORE.Actor.skills.instinct",
@@ -114,6 +119,10 @@ EMOKLORE.skills = {
   appraisal: {
     label: "EMOKLORE.Actor.skills.appraisal",
     characteristic: "sensitivity",
+  },
+  debate: {
+    label: "EMOKLORE.Actor.skills.debate",
+    characteristic: "intelligence",
   },
 };
 preLocalize("skills", { keys: ["label"] });

@@ -22,6 +22,8 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
     switch (dataset.rollType) {
       case "skill":
         return this.actor.rollSkill(dataset.skill);
+      case "base-skill":
+        return this.actor.rollBaseSkill(dataset.skill);
     }
   }
 }

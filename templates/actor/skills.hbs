@@ -9,7 +9,7 @@
     <span>Lv.{{skill.level}}</span>
     <progress value="{{skill.level}}" max="3"></progress>
     <span class="target">{{skill.target}}</span>
-    <span class="characteristic">{{localize (concat "EMOKLORE.Actor.characteristics." skill.characteristic)}}</span>
+    <i class="characteristic fa-solid {{lookup (lookup ../config.characteristics skill.characteristic) 'fa'}}"></i>
   </div>
   {{/if}}
   {{else}}
@@ -17,7 +17,11 @@
     <span class="label">{{skill.label}}</span>
     {{formInput skill.field.fields.level value=skill.level options=skillLevelOptions}}
     <span class="target">{{skill.target}}</span>
+    {{#if skill.field.fields.characteristic.choices}}
+    <span class="characteristic">{{formInput skill.field.fields.characteristic value=skill.characteristic localize=true}}</span>
+    {{else}}
     <span class="characteristic">{{localize (concat "EMOKLORE.Actor.characteristics." skill.characteristic)}}</span>
+    {{/if}}
   </div>
   {{/if}}
   {{/each}}

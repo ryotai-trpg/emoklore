@@ -1,31 +1,32 @@
 <div class="card">
   <img src="{{source.img}}" data-action="showPortraitArtwork" data-edit="img" alt="{{localize "DOCUMENT.FIELDS.img.label"}}">
-
   <div class="emotions">
     <div class="play">
+      {{#if system.emotions.surface}}
       <span class="pill">
         {{localize (concat "EMOKLORE.sympatheticEmotion." system.emotions.surface)}}
       </span>
+      {{/if}}
       <span class="pill">
+        {{#if system.emotions.hidden}}
         {{localize (concat "EMOKLORE.sympatheticEmotion." system.emotions.hidden)}}
       </span>
+      {{/if}}
       <span class="pill">
+        {{#if system.emotions.root}}
         {{localize (concat "EMOKLORE.sympatheticEmotion." system.emotions.root)}}
       </span>
+      {{/if}}
     </div>
-
   </div>
-
   <div class="characteristics">
-
     {{#each characteristics as |chr key|}}
-
     <div class="characteristic" data-characteristic="{{key}}">
-      <label for="{{key}}">{{chr.field.label}}</label>
+      <i class="fa-solid {{lookup (lookup ../config.characteristics chr.field.name) 'fa'}} label"></i>
+      <label for="{{key}}">{{chr.field.fields.value.label}}</label>
       <span class="value">{{chr.value}}</span>
       <progress id="{{key}}" value="{{chr.value}}" max="6"></progress>
     </div>
     {{/each}}
   </div>
 </div>
-

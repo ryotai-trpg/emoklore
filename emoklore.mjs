@@ -74,7 +74,7 @@ Hooks.once("i18nInit", () => {
     const characteristicSchema = model.schema.getField("characteristics");
     if (characteristicSchema) {
       for (const [characteristic, { label }] of Object.entries(CONFIG.EMOKLORE.characteristics)) {
-        const field = characteristicSchema.getField(`${characteristic}`);
+        const field = characteristicSchema.getField(`${characteristic}.value`);
         if (!field) continue;
         field.label = label;
       }

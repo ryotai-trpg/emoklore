@@ -14,12 +14,12 @@
       <div class="resources">
         {{#if isPlay}}
         <div class="hp bar">
-          <label for="character-hp">HP</label>
+          <i class="fa-solid fa-heart label"></i>
           <span class="value">
             {{ system.resources.hp.value }}/{{ system.resources.hp.max }}
           </span>
           <button>
-            <i class="fa-duotone fa-solid fa-minus"></i>
+            <i class="fa-regular fa-minus"></i>
           </button>
           <progress 
             id="character-hp"
@@ -27,13 +27,16 @@
             max="{{ system.resources.hp.max }}"
           ></progress>
           <button>
-            <i class="fa-duotone fa-solid fa-plus"></i>
+            <i class="fa-regular fa-plus"></i>
           </button>
         </div>
         <div class="mp bar">
-          <label for="character-mp">MP</label>
+          <i class="fa-solid fa-wand-magic-sparkles label"></i>
+          <span class="value">
+            {{ system.resources.mp.value }}/{{ system.resources.mp.max }}
+          </span>
           <button>
-            <i class="fa-duotone fa-solid fa-minus"></i>
+            <i class="fa-regular fa-minus"></i>
           </button>
           <progress 
             id="character-mp"
@@ -41,13 +44,16 @@
             max="{{ system.resources.mp.max }}"
             ></progress>
           <button>
-            <i class="fa-duotone fa-solid fa-plus"></i>
+            <i class="fa-regular fa-plus"></i>
           </button>
         </div>
         <div class="sympathy bar">
-          <label for="character-sympathy">∞共鳴</label>
+          <i class="fa-solid fa-infinity label"></i>
+          <span class="value">
+            Lv.3/9
+          </span>
           <button>
-            <i class="fa-duotone fa-solid fa-minus"></i>
+            <i class="fa-regular fa-minus"></i>
           </button>
           <progress 
             id="character-sympathy"
@@ -55,7 +61,7 @@
             max="9"
             ></progress>
           <button>
-            <i class="fa-duotone fa-solid fa-plus"></i>
+            <i class="fa-regular fa-plus"></i>
           </button>
         </div>
         {{else}}

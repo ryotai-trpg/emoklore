@@ -45,7 +45,7 @@
       position: relative;
       justify-content: space-evenly;
 
-      label {
+      i.label {
         position: absolute;
         left: 26px;
         font-size: 0.9em;
@@ -237,7 +237,7 @@
 
 
   header {
-    height: 72px;
+    height: 56px;
 
     .name {
       flex: 1;
@@ -302,7 +302,7 @@
       }
 
   }
-  --emoklore-accent-color: #2196f3;
+  --emoklore-accent-color: #1976d2; /* Material Blue 700 */
   --emoklore-gray: #383838;
   --emoklore-progress-radius: 5px;
   --emoklore-progress-radius2: 2px;

@@ -188,13 +188,15 @@
         "insight": "洞察",
         "mapping": "マッピング",
         "instinct": "直感",
-        "appraisal": "鑑定"
+        "appraisal": "鑑定",
+
+        "debate": "ディベート"
       }
     },
     "baseSkill": "ベース技能",
     "skill": "技能",
     "characteristics": "能力値",
-    "skillRoll": "{skillName}判定"
+    "skillRoll": "〈{skillName}〉判定"
   },
   "USER": {
     "RoleAssistant": "サブディーラー",
