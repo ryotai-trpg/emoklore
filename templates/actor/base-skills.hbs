@@ -1,11 +1,8 @@
 
 {{#if isPlay}}
-<div class="baseskills">
-  {{#unless isPlay}}
-  <h2>{{localize "EMOKLORE.baseSkill"}}</h2>
-  {{/unless}}
+<div class="base-skills">
   {{#each system.baseSkills as |baseSkill key|}}
-  <div class="baseskill" data-baseskill="{{key}}">
+  <div class="base-skill" data-base-skill="{{key}}">
     <a class="label" 
       data-action="roll" 
       data-roll-type="base-skill" 

@@ -88,6 +88,15 @@ Hooks.once("i18nInit", () => {
         field.fields.label.initial = label;
       }
     }
+
+    const baseSkillsSchema = model.schema.getField("baseSkills");
+    if (baseSkillsSchema) {
+      for (const [skill, { label }] of Object.entries(CONFIG.EMOKLORE.baseSkills)) {
+        const field = baseSkillsSchema.getField(`${skill}`);
+        if (!field) continue;
+        field.fields.label.initial = label;
+      }
+    }
   }
 });
 

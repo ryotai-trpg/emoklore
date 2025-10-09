@@ -1,2 +1,248 @@
 {
+  "TYPES": {
+    "Actor": {
+      "character": "Character",
+      "npc": "NPC"
+    },
+    "Item": {
+      "weapon": "Weapon"
+    }
+  },
+
+  "SETTINGS": {
+    "EMOKLORE": {
+      "DeveloperMode": {
+        "Name": "Developer Mode",
+        "Hint": "test"
+      }
+    }
+  },
+
+  "EMOKLORE": {
+    "SheetClass": {
+      "character": "Character Sheet"
+    },
+    "CharacterSheet.tab": {
+      "biography": "Biography",
+      "skills": "Skills",
+      "effects": "Effects"
+    },
+    "SHEET.ToggleMode": "Toggle Play/Edit mode",
+
+    "emotionAttributes": {
+      "desire": "Desire",
+      "passion": "Passion",
+      "ideal": "Ideal",
+      "relationship": "Relationship",
+      "wound": "Wound"
+    },
+
+    "skillLevel": {
+      "0": "Lv.0",
+      "1": "Lv.1",
+      "2": "Lv.2",
+      "3": "Lv.3"
+    },
+
+
+    "sympatheticEmotion": {
+      "selfAssertion": "SelfAssertion",
+      "possession": "Possession",
+      "instinct": "Instinct",
+      "destruction": "Destruction",
+      "superiority": "Superiority",
+      "sloth": "Sloth",
+      "escape": "Escape",
+      "curiosity": "Curiosity",
+      "thrill": "Thrill",
+
+      "joy": "Joy",
+      "anger": "Anger",
+      "sorrow": "Sorrow",
+      "happiness": "Happiness",
+      "anxiety": "Anxiety",
+      "disgust": "Disgust",
+      "fear": "Fear",
+      "jealousy": "Jealousy",
+      "grudge": "Grudge",
+
+      "justice": "Justice",
+      "worship": "Worship",
+      "goodAndEvil": "Good and Evil",
+      "hope": "Hope",
+      "aspiration": "Aspiration",
+      "reason": "Reason",
+      "victory": "Victory",
+      "order": "Order",
+      "admiration": "Admiration",
+      "selflessness": "Selflessness",
+
+      "friendship": "Friendship",
+      "love": "Love",
+      "romance": "Romance",
+      "dependence": "Dependence",
+      "respect": "Respect",
+      "contempt": "Contempt",
+      "protection": "Protection",
+      "domination": "Domination",
+      "service": "Service",
+      "indulgence": "Indulgence",
+
+      "regret": "Regret",
+      "loneliness": "Loneliness",
+      "resignation": "Resignation",
+      "despair": "Despair",
+      "denial": "Denial",
+      "doubt": "Doubt",
+      "guilt": "Guilt",
+      "madness": "Madness",
+      "inferiorityComplex": "Inferiority Complex"
+    },
+    "Actor": {
+      "character": {
+        "FIELDS": {
+          "resources": {
+            "hp": {
+              "label": "HP",
+              "value": {
+                "label": "Current"
+              },
+              "max": {
+                "label": "Max"
+              }
+            }
+          },
+
+          "biography": {
+            "age": {
+              "label": "Age"
+            },
+            "gender": {
+              "label": "Gender"
+            },
+            "occupation": {
+              "label": "Occupation"
+            },
+            "hometown": {
+              "label": "Hometown"
+            },
+            "appearance": {
+              "label": "Appearance"
+            },
+            "personality": {
+              "label": "Personality"
+            },
+            "background": {
+              "label": "Background"
+            },
+            "importantPeople": {
+              "label": "Important People"
+            },
+            "likesAndDislikes": {
+              "label": "Likes and Dislikes"
+            },
+            "note": {
+              "label": "Note"
+            }
+          },
+          "emotions": {
+            "surface": {
+              "label": "Surface"
+            },
+            "hidden": {
+              "label": "Hidden"
+            },
+            "root": {
+              "label": "Root"
+            }
+          }
+        }
+      },
+      "characteristics": {
+        "physical": "Physical",
+        "dexterity": "Dexterity",
+        "mentality": "Mentality",
+        "sensitivity": "Sensitivity",
+        "intelligence": "Intelligence",
+        "charisma": "Charisma",
+        "sociality": "Sociality",
+        "fortune": "Fortune"
+      },
+      "skillGroup": {
+        "investigation": "Investigation", 
+        "perception": "Perception",
+        "negotiations": "Negotiations",
+        "knowledge": "Knowledge",
+        "athletic": "Athletic",
+        "survival": "Survival",
+        "unique": "Unique"
+      },
+      "baseSkills": {
+        "investigation": "Investigation", 
+        "perception": "Perception",
+        "negotiations": "Negotiations",
+        "knowledge": "Knowledge",
+        "news": "News",
+        "athletic": "Athletic",
+        "fight": "Fight",
+        "throw": "Throw",
+        "survival": "Survival",
+        "self": "Self",
+        "treatment": "Treatment",
+        "handiwork": "Handiwork",
+        "luck": "Luck"
+      },
+      "skills": {
+        "search": "Search",
+        "insight": "Insight",
+        "mapping": "Mapping",
+        "instinct": "Instinct",
+        "appraisal": "Appraisal",
+        "keenObservation": "Keen Observation",
+        "listen": "Listen",
+        "taste": "Taste",
+        "threatDetection": "Threat Detection",
+        "spiritualSense": "Spiritual Sense",
+        "etiquette": "Etiquette",
+        "debate": "Debate",
+        "charm": "Charm",
+        "psychology": "Psychology",
+        "specializedKnowledge": "Specialized Knowledge",
+        "insider": "Insider",
+        "industryKnowledge": "Industry Knowledge",
+        "speed": "Speed",
+        "strength": "Strength",
+        "acrobatics": "Acrobatics",
+        "dive": "Dive",
+        "martialArt": "Martial Art",
+        "secretTechnique": "Secret Technique",
+        "rangedAttack": "Ranged Attack",
+        "endurance": "Endurance",
+        "grit": "Grit",
+        "medicine": "Medicine",
+        "resurrection": "Resurrection",
+        "technique": "Technique",
+        "art": "Art",
+        "pilot": "Pilot",
+        "cipher": "Cipher",
+        "computer": "Computer",
+        "hide": "Hide",
+        "strongLuck": "StrongLuck"
+      }
+    },
+    "baseSkill": "Base Skills",
+    "skill": "Skills",
+    "characteristics": "Characteristics",
+    "skillRoll": "{skillName} Roll",
+    "Effect": {
+      "Source": "Source",
+      "Temporary": "Temporary",
+      "Passive": "Passive",
+      "Inactive": "Inactive"
+    }
+  },
+  "USER": {
+    "RoleAssistant": "Assitant Dealer",
+    "RoleGamemaster": "Dealer"
+  }
 }

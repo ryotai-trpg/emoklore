@@ -1,12 +1,11 @@
 {
   "TYPES": {
     "Actor": {
-      "character": "共鳴者",
+      "character": "キャラクター",
       "npc": "NPC"
     },
     "Item": {
-      "weapon": "武器",
-      "spell": "呪文"
+      "weapon": "武器"
     }
   },
 
@@ -21,11 +20,12 @@
 
   "EMOKLORE": {
     "SheetClass": {
-      "character": "共鳴者シート"
+      "character": "キャラクターシート"
     },
     "CharacterSheet.tab": {
-      "biography": "人物",
-      "stats": "能力値"
+      "biography": "プロフィール",
+      "skills": "技能",
+      "effects": "効果"
     },
     "SHEET.ToggleMode": "プレイ・編集モード切替",
 
@@ -168,18 +168,27 @@
         "sociality": "社会",
         "fortune": "運勢"
       },
+      "skillGroup": {
+        "investigation": "調査系", 
+        "perception": "知覚系",
+        "negotiations": "交渉系",
+        "knowledge": "情報系",
+        "athletic": "運動系",
+        "survival": "生存系",
+        "unique": "特殊"
+      },
       "baseSkills": {
         "investigation": "調査", 
         "perception": "知覚",
         "negotiations": "交渉",
         "knowledge": "知識",
         "news": "ニュース",
-        "exercise": "運動",
+        "athletic": "運動",
         "fight": "格闘",
         "throw": "投擲",
         "survival": "生存",
         "self": "自我",
-        "treatment": "手当",
+        "treatment": "手当て",
         "handiwork": "細工",
         "luck": "幸運"
       },
@@ -189,14 +198,48 @@
         "mapping": "マッピング",
         "instinct": "直感",
         "appraisal": "鑑定",
-
-        "debate": "ディベート"
+        "keenObservation": "観察眼",
+        "listen": "聞き耳",
+        "taste": "毒味",
+        "threatDetection": "危機察知",
+        "spiritualSense": "霊感",
+        "etiquette": "社交術",
+        "debate": "ディベート",
+        "charm": "魅了",
+        "psychology": "心理",
+        "specializedKnowledge": "専門知識",
+        "insider": "事情通",
+        "industryKnowledge": "業界",
+        "speed": "スピード",
+        "strength": "ストレングス",
+        "acrobatics": "アクロバット",
+        "dive": "ダイブ",
+        "martialArt": "武術",
+        "secretTechnique": "奥義",
+        "rangedAttack": "射撃",
+        "endurance": "耐久",
+        "grit": "根性",
+        "medicine": "医術",
+        "resurrection": "蘇生",
+        "technique": "技巧",
+        "art": "芸術",
+        "pilot": "操縦",
+        "cipher": "暗号",
+        "computer": "電脳",
+        "hide": "隠匿",
+        "strongLuck": "強運"
       }
     },
     "baseSkill": "ベース技能",
     "skill": "技能",
     "characteristics": "能力値",
-    "skillRoll": "〈{skillName}〉判定"
+    "skillRoll": "〈{skillName}〉判定",
+    "Effect": {
+      "Source": "ソース",
+      "Temporary": "一時的",
+      "Passive": "受動",
+      "Inactive": "無効"
+    }
   },
   "USER": {
     "RoleAssistant": "サブディーラー",

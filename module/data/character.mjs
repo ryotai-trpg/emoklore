@@ -30,7 +30,8 @@ export class CharacterDataModel extends BaseActorDataModel {
         obj[chc] = new SchemaField({
           value: new NumberField({ ...characteristic, label }),
           bonus: new NumberField({ required: true, integer: true, initial: 0}),
-          success_count: new NumberField({ required: true, integer: true, initial: 0}),
+          successModifier: new NumberField({ required: true, integer: true, initial: 0}),
+          targetModifier: new NumberField({ required: true, integer: true, initial: 0}),
         })
         
         return obj;
@@ -50,12 +51,40 @@ export class CharacterDataModel extends BaseActorDataModel {
           }),
           characteristic: new StringField({
             required: true,
-            initial: characteristic,
-            ...(characteristicOptions ? { choices: characteristicOptions} : {} ),
+            // initial: characteristic,
+            initial: characteristicOptions?.[0] ?? characteristic,
+            ...(characteristicOptions 
+              ? { choices: Object.fromEntries( characteristicOptions.map(key => [key, game.i18n.localize(`EMOKLORE.Actor.characteristics.${key}`)])  )}
+              : {} ),
           }),
           label: new StringField({ initial: label }),
           bonus: new NumberField({ required: true, integer: true, initial: 0}),
-          success_count: new NumberField({ required: true, integer: true, initial: 0}),
+          successModifier: new NumberField({ required: true, integer: true, initial: 0}),
+          targetModifier: new NumberField({ required: true, integer: true, initial: 0}),
+        });
+        return obj;
+      }, {}),
+    );
+
+    schema.baseSkills = new SchemaField(
+      Object.entries(CONFIG.EMOKLORE.baseSkills).reduce((obj, [skill, { characteristic, label }]) => {
+        obj[skill] = new SchemaField({
+          level: new NumberField({
+            min: 1,
+            max: 1,
+            initial: 1,
+            integer: true,
+            required: true,
+            nullable: false,
+          }),
+          characteristic: new StringField({
+            required: true,
+            initial: characteristic,
+          }),
+          label: new StringField({ initial: label }),
+          bonus: new NumberField({ required: true, integer: true, initial: 0}),
+          successModifier: new NumberField({ required: true, integer: true, initial: 0}),
+          targetModifier: new NumberField({ required: true, integer: true, initial: 0}),
         });
         return obj;
       }, {}),
@@ -101,14 +130,11 @@ export class CharacterDataModel extends BaseActorDataModel {
     );
 
     this.baseSkills = Object.fromEntries(
-      Object.entries(CONFIG.EMOKLORE.baseSkills).map(([key, skill]) => [
+      Object.entries(this.baseSkills).map(([key, skill]) => [
         key,
         {
           ...skill,
           target: foundry.utils.getProperty(this, `characteristics.${skill.characteristic}.value`),
-          level: 1,
-          bonus: 0,
-          success_count: 0,
         },
       ]),
     );

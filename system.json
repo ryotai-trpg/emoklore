@@ -34,7 +34,7 @@
       "weapon": {}
     }
   },
-  "background": "systems/emoklore/assets/official/emoklore-logoB_white.svg",
+  "background": "systems/emoklore/assets/background.webp",
   "grid": {
     "distance": "1.5",
     "units": "m"
