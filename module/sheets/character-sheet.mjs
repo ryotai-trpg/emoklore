@@ -1,6 +1,6 @@
 import { EmokloreActorSheet } from "./actor-sheet.mjs";
 import { systemPath } from "../constants.mjs";
-import { prepareActiveEffectCategories } from '../helpers/effects.mjs';
+import { prepareActiveEffectCategories } from "../helpers/effects.mjs";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -19,29 +19,29 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       createDoc: this._createDoc,
       deleteDoc: this._deleteDoc,
       toggleEffect: this._toggleEffect,
-    }
+    },
   };
 
   /** @override */
   static PARTS = {
-    header: { 
-      template: "systems/emoklore/templates/actor/header.hbs"
+    header: {
+      template: "systems/emoklore/templates/actor/header.hbs",
     },
     tabs: { template: "templates/generic/tab-navigation.hbs" },
     skills: {
       template: "systems/emoklore/templates/actor/stats.hbs", // TODO: reaname
-      templates: [ "card-view.hbs", "card-edit.hbs", "skills.hbs", "base-skills.hbs" ].map(t => systemPath(`templates/actor/${t}`)),
+      templates: ["card-view.hbs", "card-edit.hbs", "skills.hbs", "base-skills.hbs"].map((t) =>
+        systemPath(`templates/actor/${t}`),
+      ),
       scrollable: [""],
     },
     biography: {
       template: "systems/emoklore/templates/actor/biography.hbs",
-      templates: [ 
-        "systems/emoklore/templates/actor/card-view.hbs",
-      ],
+      templates: ["systems/emoklore/templates/actor/card-view.hbs"],
       scrollable: [""],
     },
-      effects: {
-      template: 'systems/emoklore/templates/actor/effects.hbs',
+    effects: {
+      template: "systems/emoklore/templates/actor/effects.hbs",
       scrollable: [""],
     },
   };
@@ -78,7 +78,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
             group: game.i18n.localize(`EMOKLORE.emotionAttributes.${attribute}`),
           }),
         );
-        context.config=CONFIG.EMOKLORE;
+        context.config = CONFIG.EMOKLORE;
         break;
 
       case "biography":
@@ -90,13 +90,13 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
           }),
         );
         break;
-        case 'effects':
+      case "effects":
         context.tab = context.tabs[partId];
         // Prepare active effects
         context.effects = prepareActiveEffectCategories(
           // A generator that returns all effects stored on the actor
           // as well as any items
-          this.actor.allApplicableEffects()
+          this.actor.allApplicableEffects(),
         );
         break;
     }
@@ -119,17 +119,17 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     // Retrieve the configured document class for Item or ActiveEffect
     const docCls = getDocumentClass(target.dataset.documentClass);
     // Prepare the document creation data by initializing it a default name.
-      const docData = {
-        name: docCls.defaultName({
-          // defaultName handles an undefined type gracefully
-          type: target.dataset.type,
-          parent: this.actor,
-        }),
-      };
+    const docData = {
+      name: docCls.defaultName({
+        // defaultName handles an undefined type gracefully
+        type: target.dataset.type,
+        parent: this.actor,
+      }),
+    };
     // Loop through the dataset and add it to our docData
     for (const [dataKey, value] of Object.entries(target.dataset)) {
       // These data attributes are reserved for the action handling
-      if (['action', 'documentClass'].includes(dataKey)) continue;
+      if (["action", "documentClass"].includes(dataKey)) continue;
       // Nested properties require dot notation in the HTML, e.g. anything with `system`
       // An example exists in spells.hbs, with `data-system.spell-level`
       // which turns into the dataKey 'system.spellLevel'
@@ -137,7 +137,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     }
 
     // Finally, create the embedded document!
-      await docCls.create(docData, { parent: this.actor });
+    await docCls.create(docData, { parent: this.actor });
   }
 
   static async _toggleEffect(event, target) {
@@ -145,20 +145,18 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     await effect.update({ disabled: !effect.disabled });
   }
 
-   _getEmbeddedDocument(target) {
-    const docRow = target.closest('li[data-document-class]');
-    if (docRow.dataset.documentClass === 'Item') {
+  _getEmbeddedDocument(target) {
+    const docRow = target.closest("li[data-document-class]");
+    if (docRow.dataset.documentClass === "Item") {
       return this.actor.items.get(docRow.dataset.itemId);
-    } else if (docRow.dataset.documentClass === 'ActiveEffect') {
+    } else if (docRow.dataset.documentClass === "ActiveEffect") {
       const parent =
         docRow.dataset.parentId === this.actor.id
           ? this.actor
           : this.actor.items.get(docRow?.dataset.parentId);
       return parent.effects.get(docRow?.dataset.effectId);
-    } else return console.warn('Could not find document class');
+    } else return console.warn("Could not find document class");
   }
-
-
 
   _getCharacteristics() {
     // const isPlay = this.isPlayMode;

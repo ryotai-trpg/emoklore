@@ -18,7 +18,7 @@
           <span class="value">
             {{ system.resources.hp.value }}/{{ system.resources.hp.max }}
           </span>
-          <button>
+          <button data-action="decreaseResources" data-type="hp">
             <i class="fa-regular fa-minus"></i>
           </button>
           <progress 
@@ -26,16 +26,17 @@
             value="{{ system.resources.hp.value }}" 
             max="{{ system.resources.hp.max }}"
           ></progress>
-          <button>
+          <button data-action="increaseResources" data-type="hp">
             <i class="fa-regular fa-plus"></i>
           </button>
         </div>
+
         <div class="mp bar">
           <i class="fa-solid fa-wand-magic-sparkles label"></i>
           <span class="value">
             {{ system.resources.mp.value }}/{{ system.resources.mp.max }}
           </span>
-          <button>
+          <button data-action="decreaseResources" data-type="mp">
             <i class="fa-regular fa-minus"></i>
           </button>
           <progress 
@@ -43,24 +44,25 @@
             value="{{ system.resources.mp.value }}" 
             max="{{ system.resources.mp.max }}"
             ></progress>
-          <button>
+          <button data-action="increaseResources" data-type="mp">
             <i class="fa-regular fa-plus"></i>
           </button>
         </div>
+
         <div class="sympathy bar">
-          <i class="fa-solid fa-infinity label"></i>
+          <a class="fa-solid fa-infinity label" data-action="roll" data-roll-type="resonance"></a>
           <span class="value">
-            Lv.3/9
+            Lv.{{ system.resources.resonance.value }}/{{ system.resources.resonance.max }}
           </span>
-          <button>
+          <button data-action="decreaseResources" data-type="resonance">
             <i class="fa-regular fa-minus"></i>
           </button>
           <progress 
             id="character-sympathy"
-            value="3" 
-            max="9"
+            value="{{ system.resources.resonance.value }}" 
+            max="{{ system.resources.resonance.max }}" 
             ></progress>
-          <button>
+          <button data-action="increaseResources" data-type="resonance">
             <i class="fa-regular fa-plus"></i>
           </button>
         </div>

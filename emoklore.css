@@ -45,11 +45,11 @@
       position: relative;
       justify-content: space-evenly;
 
-      i.label {
+      .label {
         position: absolute;
         left: 26px;
         font-size: 0.9em;
-        pointer-events: none;
+        /* pointer-events: none; */
       }
 
       .value {
@@ -307,7 +307,8 @@
       }
 
   }
-  --emoklore-accent-color: #1976d2; /* Material Blue 700 */
+  --emoklore-accent-color: #1565C0;
+  /* #1976d2;  Material Blue 700 */
   --emoklore-gray: #383838;
   --emoklore-progress-radius: 5px;
   --emoklore-progress-radius2: 2px;

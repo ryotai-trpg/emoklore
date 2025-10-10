@@ -46,7 +46,7 @@ Hooks.once("init", () => {
   // TODO: Not Translated
   CONFIG.Actor.trackableAttributes = {
     character: {
-      bar: ["resources.hp", "resources.mp", "resonance.value"],
+      bar: ["resources.hp", "resources.mp", "resources.resonance"],
       value: [],
     },
     npc: {

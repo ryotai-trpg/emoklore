@@ -226,7 +226,7 @@
         "pilot": "Pilot",
         "cipher": "Cipher",
         "computer": "Computer",
-        "hide": "Hide",
+        "stealth": "Stealth",
         "strongLuck": "StrongLuck"
       }
     },

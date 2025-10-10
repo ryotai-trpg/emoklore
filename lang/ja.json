@@ -226,7 +226,7 @@
         "pilot": "操縦",
         "cipher": "暗号",
         "computer": "電脳",
-        "hide": "隠匿",
+        "stealth": "隠匿",
         "strongLuck": "強運"
       }
     },
@@ -239,6 +239,15 @@
       "Temporary": "一時的",
       "Passive": "受動",
       "Inactive": "無効"
+    },
+    "result": {
+      "fumble": "ファンブル",
+      "failure": "失敗",
+      "single": "シングル成功",
+      "double": "ダブル成功",
+      "triple": "トリプル成功",
+      "miracle": "ミラクル成功",
+      "catastrophe": "カタストロフ"
     }
   },
   "USER": {

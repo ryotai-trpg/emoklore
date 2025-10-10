@@ -7,18 +7,18 @@ export function prepareActiveEffectCategories(effects) {
   // Define effect header categories
   const categories = {
     temporary: {
-      type: 'temporary',
-      label: game.i18n.localize('EMOKLORE.Effect.Temporary'),
+      type: "temporary",
+      label: game.i18n.localize("EMOKLORE.Effect.Temporary"),
       effects: [],
     },
     passive: {
-      type: 'passive',
-      label: game.i18n.localize('EMOKLORE.Effect.Passive'),
+      type: "passive",
+      label: game.i18n.localize("EMOKLORE.Effect.Passive"),
       effects: [],
     },
     inactive: {
-      type: 'inactive',
-      label: game.i18n.localize('EMOKLORE.Effect.Inactive'),
+      type: "inactive",
+      label: game.i18n.localize("EMOKLORE.Effect.Inactive"),
       effects: [],
     },
   };

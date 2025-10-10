@@ -38,15 +38,15 @@ EMOKLORE.characteristics = {
 };
 preLocalize("characteristics", { keys: ["label"] });
 
-EMOKLORE.skillGroup = {
+((EMOKLORE.skillGroups = {
   investigation: {
-    label: "EMOKLORE.Actor.skillGroup.investigation", 
+    label: "EMOKLORE.Actor.skillGroup.investigation",
   },
   perception: {
     label: "EMOKLORE.Actor.skillGroup.perception",
   },
   negotiation: {
-    label: "EMOKLORE.Actor.skillGroup.negotiation",
+    label: "EMOKLORE.Actor.skillGroup.negotiations",
   },
   knowledge: {
     label: "EMOKLORE.Actor.skillGroup.knowledge",
@@ -60,8 +60,8 @@ EMOKLORE.skillGroup = {
   unique: {
     label: "EMOKLORE.Actor.skillGroup.unique",
   },
-},
-preLocalize("skillGroup", { keys: ["label"] });
+}),
+  preLocalize("skillGroups", { keys: ["label"] }));
 
 EMOKLORE.baseSkills = {
   investigation: {
@@ -145,7 +145,7 @@ EMOKLORE.skills = {
   },
   mapping: {
     label: "EMOKLORE.Actor.skills.mapping",
-    characteristicOptions: [ "dexterity", "sensitivity"],
+    characteristicOptions: ["dexterity", "sensitivity"],
     group: "investigation",
   },
   instinct: {
@@ -176,13 +176,14 @@ EMOKLORE.skills = {
   },
   threatDetection: {
     label: "EMOKLORE.Actor.skills.threatDetection",
-    characteristicOptions: [ "sensitivity", "fortune"],
+    characteristicOptions: ["sensitivity", "fortune"],
     group: "perception",
   },
   spiritualSense: {
     label: "EMOKLORE.Actor.skills.spiritualSense",
-    characteristicOptions: [ "mentality", "fortune"],
+    characteristicOptions: ["mentality", "fortune"],
     group: "perception",
+    isExtra: true,
   },
 
   etiquette: {
@@ -202,7 +203,7 @@ EMOKLORE.skills = {
   },
   psychology: {
     label: "EMOKLORE.Actor.skills.psychology",
-    characteristicOptions: [ "mentality", "intelligence"],
+    characteristicOptions: ["mentality", "intelligence"],
     group: "negotiations",
   },
 
@@ -213,12 +214,12 @@ EMOKLORE.skills = {
   },
   insider: {
     label: "EMOKLORE.Actor.skills.insider",
-    characteristicOptions: [ "sensitivity", "sociality"],
+    characteristicOptions: ["sensitivity", "sociality"],
     group: "knowledge",
   },
   industryKnowledge: {
     label: "EMOKLORE.Actor.skills.industryKnowledge",
-    characteristicOptions: [ "sociality", "charisma"],
+    characteristicOptions: ["sociality", "charisma"],
     group: "knowledge",
   },
 
@@ -234,7 +235,7 @@ EMOKLORE.skills = {
   },
   acrobatics: {
     label: "EMOKLORE.Actor.skills.acrobatics",
-    characteristicOptions: [ "physical", "dexterity"],
+    characteristicOptions: ["physical", "dexterity"],
     group: "athletic",
   },
   dive: {
@@ -249,13 +250,15 @@ EMOKLORE.skills = {
   },
   secretTechnique: {
     label: "EMOKLORE.Actor.skills.secretTechnique",
-    characteristicOptions: [ "physical", "mentality", "dexterity" ],
+    characteristicOptions: ["physical", "mentality", "dexterity"],
     group: "athletic",
+    isExtra: true,
   },
   rangedAttack: {
     label: "EMOKLORE.Actor.skills.rangedAttack",
-    characteristicOptions: [ "dexterity", "sensitivity"],
+    characteristicOptions: ["dexterity", "sensitivity"],
     group: "athletic",
+    isExtra: true,
   },
 
   endurance: {
@@ -270,13 +273,14 @@ EMOKLORE.skills = {
   },
   medicine: {
     label: "EMOKLORE.Actor.skills.medicine",
-    characteristicOptions: [ "dexterity", "intelligence"],
+    characteristicOptions: ["dexterity", "intelligence"],
     group: "survival",
   },
   resurrection: {
     label: "EMOKLORE.Actor.skills.resurrection",
-    characteristicOptions: [ "intelligence", "mentality"],
+    characteristicOptions: ["intelligence", "mentality"],
     group: "survival",
+    isExtra: true,
   },
 
   technique: {
@@ -286,12 +290,12 @@ EMOKLORE.skills = {
   },
   art: {
     label: "EMOKLORE.Actor.skills.art",
-    characteristicOptions: [ "dexterity", "mentality", "sensitivity" ],
+    characteristicOptions: ["dexterity", "mentality", "sensitivity"],
     group: "unique",
   },
   pilot: {
     label: "EMOKLORE.Actor.skills.pilot",
-    characteristicOptions: [ "dexterity", "sensitivity", "intelligence" ],
+    characteristicOptions: ["dexterity", "sensitivity", "intelligence"],
     group: "unique",
   },
   cipher: {
@@ -304,17 +308,17 @@ EMOKLORE.skills = {
     characteristic: "intelligence",
     group: "unique",
   },
-  hide: {
-    label: "EMOKLORE.Actor.skills.hide",
-    characteristicOptions: [ "dexterity", "sociality", "fortune" ],
+  stealth: {
+    label: "EMOKLORE.Actor.skills.stealth",
+    characteristicOptions: ["dexterity", "sociality", "fortune"],
     group: "unique",
   },
   strongLuck: {
     label: "EMOKLORE.Actor.skills.strongLuck",
     characteristic: "fortune",
     group: "unique",
+    isExtra: true,
   },
-
 };
 preLocalize("skills", { keys: ["label"] });
 
