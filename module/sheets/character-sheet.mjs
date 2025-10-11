@@ -11,7 +11,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   static DEFAULT_OPTIONS = {
     classes: ["standard-form", "character"],
     position: {
-      width: 620,
+      width: 601,
       height: 730,
     },
     actions: {

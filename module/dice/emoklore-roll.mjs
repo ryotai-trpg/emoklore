@@ -3,21 +3,25 @@ import { systemPath } from "../constants.mjs";
 export class EmokloreRoll extends foundry.dice.Roll {
   constructor(formula = "1d10", data = {}, options = {}) {
     super(formula, data, options);
-    const { baseTarget, targetModifier, successModifier, skillName, bonus, level } = options;
+    const { successModifier, dmFormula, target } = options;
     this.successModifier = successModifier;
-    this.skillName = skillName;
-    this.bonus = bonus;
-    this.level = level;
-    this.baseTarget = baseTarget;
-    this.targetModifier = targetModifier;
+    this.dmFormula = dmFormula;
+    this.target = target;
   }
 
-  get target() {
-    return this.baseTarget + this.targetModifier;
-  }
+  async evaluate(options) {
+    const roll = await super.evaluate(options);
 
-  get total() {
-    return super.total;
+    for (const term of roll.terms) {
+      if (term.results) {
+        term.results = term.results.map(r => ({
+          ...r,
+          success: r.result <= this.target,
+          // failure: r.result > this.target,
+        }));
+      }
+    }
+    return roll
   }
 
   get diceResults() {
@@ -65,16 +69,17 @@ export class EmokloreRoll extends foundry.dice.Roll {
     context.result = this.result;
     context.resultName = this.resultName;
     context.successModifier = this.successModifier;
-    context.bonus = this.bonus;
-    context.skillName = this.skillName;
-    context.level = this.level;
-    context.baseTarget = this.baseTarget;
-    context.targetModifier =
-      this.targetModifier > 0 ? `+${this.targetModifier}` : this.targetModifier;
-
-    // console.log(`${this.formula.split("d")[0]}DM<=${this.baseTarget}${context.targetModifier}`)
-    // HACK: 書き直す
+    context.dmFormula = this.dmFormula;
     return context;
+  }
+
+  async getTooltip() {
+    const parts = this.dice.map(d => d.getTooltipData());
+    return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, 
+      {
+        parts,
+        result: this.result
+      });
   }
 
   static CHAT_TEMPLATE = systemPath("templates/rolls/skill.hbs");

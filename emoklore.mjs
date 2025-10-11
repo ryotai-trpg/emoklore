@@ -14,7 +14,7 @@ import * as applications from "./module/sheets/character-sheet.mjs";
 
 import { performPreLocalization } from "./module/helpers/localization.mjs";
 
-// import { EmokloreDie } from './module/dice/emoklore-die.mjs';
+import { EmokloreDie } from './module/dice/emoklore-die.mjs';
 // import { EmokloreRollParser } from './module/dice/emoklore-parser.mjs';
 import { EmokloreRoll } from "./module/dice/emoklore-roll.mjs";
 import { registerSystemSettings } from "./module/settings.mjs";
@@ -41,6 +41,7 @@ Hooks.once("init", () => {
 
   // CONFIG.Dice.parser = EmokloreRollParser;
   CONFIG.Dice.rolls.push(EmokloreRoll);
+  CONFIG.Dice.terms["d"] = EmokloreDie;
 
   // Configure trackable attributes.
   // TODO: Not Translated

@@ -84,7 +84,7 @@ export class CharacterDataModel extends BaseActorDataModel {
 
     schema.baseSkills = new SchemaField(
       Object.entries(CONFIG.EMOKLORE.baseSkills).reduce(
-        (obj, [skill, { characteristic, label }]) => {
+        (obj, [skill, { characteristic, label, group }]) => {
           obj[skill] = new SchemaField({
             level: new NumberField({
               min: 1,
@@ -99,6 +99,7 @@ export class CharacterDataModel extends BaseActorDataModel {
               initial: characteristic,
             }),
             label: new StringField({ initial: label }),
+            group: new StringField({ initial: group }),
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
             successModifier: new NumberField({ required: true, integer: true, initial: 0 }),
             targetModifier: new NumberField({ required: true, integer: true, initial: 0 }),

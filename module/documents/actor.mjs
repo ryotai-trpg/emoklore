@@ -11,31 +11,24 @@ export class EmokloreActor extends Actor {
   }
 
   async rollResonance(intensity = 1, {...options} = {}) {
-    const bonus = 0;
-    options.skillName = "♾️共鳴";
-    options.level= this.system.resources.resonance.value;
-    options.baseTarget = intensity
-    options.successModifier = 0;
-    options.targetModifier = 0;
-    options.bonus = bonus;
-    console.log(options)
 
-    const roll =
-      bonus == 0
-        ? await new EmokloreRoll(`${options.level}d10`, {}, options).evaluate()
-        : await new EmokloreRoll(`(${options.level} + @bonus)d10`, { bonus: bonus }, options).evaluate();
+    const level= this.system.resources.resonance.value;
+
+    options.target = intensity
+    options.successModifier = 0;
+    options.dmFormula = `${level}DM≦${intensity}`;
+
+    const roll = await new EmokloreRoll(`${level}d10`, {}, options).evaluate()
 
     const messageData = {
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: `
-      `,
+      flavor: game.i18n.format("EMOKLORE.skillRoll", {skillName: "♾️共鳴"}),
       rolls: [roll],
       sound: CONFIG.sounds.dice,
       flags: { core: { canPopout: true } },
     };
 
     return ChatMessage.create(messageData);
-
   }
 
   async rollSkill(skill, { base = false, ...options } = {}) {
@@ -59,6 +52,7 @@ export class EmokloreActor extends Actor {
       targetModifier: characteristicTargetModifier,
     } = this.system.characteristics[characteristic];
 
+
     const {
       bonus: skillGroupBonus,
       successModifier: skillGroupSuccessModifier,
@@ -72,23 +66,31 @@ export class EmokloreActor extends Actor {
     const successModifier =
       skillSuccessModifier + characteristicSuccessModifier + skillGroupSuccessModifier;
     const bonus = skillBonus + characteristicBonus + skillGroupBonus;
+    const skillName = `${prefix}${label}`;
 
+
+    const bonusString = bonus > 0 ? `+${bonus}` : bonus;
+    const leftPart = bonusString == 0
+      ? level
+      : `(${level}${bonusString})`;
+
+    const targetModifierString = targetModifier > 0 
+      ? `+${targetModifier}` 
+      : targetModifier;
+
+    const rightPart = targetModifierString == 0
+      ? baseTarget
+      : `(${baseTarget}${targetModifierString})`;
+
+    options.dmFormula = `${leftPart}DM≦${rightPart}`;
     options.successModifier = successModifier;
-    options.skillName = `${prefix}${label}`;
-    options.bonus = bonus;
-    options.level = level;
-    options.baseTarget = baseTarget;
-    options.targetModifier = targetModifier;
+    options.target = baseTarget+targetModifier;
 
-    const roll =
-      bonus == 0
-        ? await new EmokloreRoll(`${level}d10`, {}, options).evaluate()
-        : await new EmokloreRoll(`(${level} + @bonus)d10`, { bonus: bonus }, options).evaluate();
+    const roll = await new EmokloreRoll(`${level+bonus}d10`, {}, options).evaluate()
 
     const messageData = {
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: `
-      `,
+      flavor: game.i18n.format("EMOKLORE.skillRoll", {skillName: skillName}),
       rolls: [roll],
       sound: CONFIG.sounds.dice,
       flags: { core: { canPopout: true } },

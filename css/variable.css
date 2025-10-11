@@ -1,0 +1,13 @@
+.emoklore {
+  --emoklore-sheet-sidebar-width: 250px;
+
+  --emoklore-accent-color: #1565C0;
+  /* #1976d2;  Material Blue 700 */
+  --emoklore-darkgray: rgb(40 40 40 / 80%);
+  --emoklore-gray: #383838;
+  --emoklore-progress-radius: 5px;
+  --emoklore-progress-radius2: 2px;
+
+  --emoklore-card-radius: 10px;
+  --emoklore-black: #000000;
+}

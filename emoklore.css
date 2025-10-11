@@ -1,12 +1,28 @@
+@import url("./css/variable.css");
+
+/* .emokloredie.d10.max { */
+/*   color: #aa0200; */
+/*   filter: sepia(0.5) hue-rotate(60deg); */
+/* } */
+/**/
+/* .emokloredie.d10.min.success { */
+/*   color: #0072ff; */
+/*   filter: sepia(0.5) hue-rotate(60deg); */
+/* } */
+
 .emoklore.sheet.character:not(.minimized, .minimizing, .maximizing) {
-  min-width: 500px;
-  min-height: 400px;
+  min-width: 601px;
+  min-height: 420px;
 }
 
 .emoklore.sheet.character {
   section.tab {
     overflow: auto;
     padding: 0.5rem;
+  }
+
+  range-picker > input[type=number] {
+    flex: 0 0 20px;
   }
 
   .sheet-header .container {
@@ -41,6 +57,10 @@
     flex-direction: column;
     justify-content: center;
 
+    progress {
+      height: 14px;
+    }
+
     .bar{
       position: relative;
       justify-content: space-evenly;
@@ -61,44 +81,45 @@
     }
   }
 
-  .resources progress {
-      height: 14px;
-  }
 
-  .characteristic progress {
+  .characteristic {
+    progress {
       height: 20px;
-    border-radius: var(--emoklore-progress-radius2);
+      border-radius: var(--emoklore-progress-radius2);
+    }
+
+    progress::-webkit-progress-bar {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-webkit-progress-value {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-moz-progress-bar {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-ms-fill {
+      border-radius: var(--emoklore-progress-radius2);
+    }
   }
 
-  .characteristic progress::-webkit-progress-bar {
-    border-radius: var(--emoklore-progress-radius2);
-  }
-  .characteristic progress::-webkit-progress-value {
-    border-radius: var(--emoklore-progress-radius2);
-  }
-  .characteristic progress::-moz-progress-bar {
-    border-radius: var(--emoklore-progress-radius2);
-  }
-  .characteristic progress::-ms-fill {
-    border-radius: var(--emoklore-progress-radius2);
-  }
-
-  .skill progress {
+  .skill {
+    progress {
       height: 20px;
-    border-radius: var(--emoklore-progress-radius2);
-  }
+      border-radius: var(--emoklore-progress-radius2);
+    }
 
-  .skill progress::-webkit-progress-bar {
-    border-radius: var(--emoklore-progress-radius2);
-  }
-  .skill progress::-webkit-progress-value {
-    border-radius: var(--emoklore-progress-radius2);
-  }
-  .skill progress::-moz-progress-bar {
-    border-radius: var(--emoklore-progress-radius2);
-  }
-  .skill progress::-ms-fill {
-    border-radius: var(--emoklore-progress-radius2);
+    progress::-webkit-progress-bar {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-webkit-progress-value {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-moz-progress-bar {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-ms-fill {
+      border-radius: var(--emoklore-progress-radius2);
+    }
   }
 
 
@@ -125,14 +146,14 @@
   }
 
   .card {
-    background:rgb(40 40 40 / 80%); /* テーマ対応 */
+    background: var(--emoklore-darkgray);
     display:flex;
     flex-direction:column;
-    border-radius:10px;
+    border-radius: var(--emoklore-card-radius);
 
     img {
-    border-top-left-radius:10px;
-    border-top-right-radius:10px;
+      border-top-left-radius: var(--emoklore-card-radius);
+      border-top-right-radius: var(--emoklore-card-radius);
     }
   }
 
@@ -166,7 +187,7 @@
   .pill {
     font-size:1.1em;
     margin-top:12px;
-    background:#000000; /* テーマ対応 */
+    background: var(--emoklore-black);
     border-radius:10px;
     text-align:center;
     padding-top:2px;
@@ -183,7 +204,7 @@
 
   .skill.play{
     display:grid;
-    grid-template-columns: 80px 20px 120px 20px 50px;
+    grid-template-columns: 1fr 20px 115px 20px 20px;
     align-items:center;
     margin-top:5px;
     margin-bottom:5px;
@@ -191,10 +212,14 @@
 
   .skill{
     display:grid;
-    grid-template-columns: 80px 1fr 20px 50px;
+    grid-template-columns: 1fr 120px 20px 60px;
     align-items:center;
     margin-top:2px;
     margin-bottom:2px;
+
+    select {
+      padding: 0;
+    }
   }
 
   .skill progress {
@@ -212,7 +237,10 @@
     margin-left:5px;
   }
   .skill .characteristic{
-    margin-left:3px;
+    margin-left:6px;
+  }
+  .skill .characteristic:has(select){
+    margin-left:1px;
   }
 
   .base-skills {
@@ -253,13 +281,11 @@
 
   .tab.active {
     display: grid;
-    --emoklore-sheet-sidebar-width: 250px;
     grid-template-columns: var(--emoklore-sheet-sidebar-width) 1fr;
   }
 
   .effects.tab.active {
     display: flex;
-    --emoklore-sheet-sidebar-width: 250px;
   }
 
   .biographies {
@@ -307,12 +333,6 @@
       }
 
   }
-  --emoklore-accent-color: #1565C0;
-  /* #1976d2;  Material Blue 700 */
-  --emoklore-gray: #383838;
-  --emoklore-progress-radius: 5px;
-  --emoklore-progress-radius2: 2px;
-
 
   /*
   .effects-header {
