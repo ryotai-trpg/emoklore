@@ -1,4 +1,5 @@
 import { EmokloreRoll } from "../dice/emoklore-roll.mjs";
+import { formatDMPart } from "../helpers/helper.mjs";
 
 export class EmokloreActor extends Actor {
   prepareDerivedData() {
@@ -68,19 +69,8 @@ export class EmokloreActor extends Actor {
     const bonus = skillBonus + characteristicBonus + skillGroupBonus;
     const skillName = `${prefix}${label}`;
 
-
-    const bonusString = bonus > 0 ? `+${bonus}` : bonus;
-    const leftPart = bonusString == 0
-      ? level
-      : `(${level}${bonusString})`;
-
-    const targetModifierString = targetModifier > 0 
-      ? `+${targetModifier}` 
-      : targetModifier;
-
-    const rightPart = targetModifierString == 0
-      ? baseTarget
-      : `(${baseTarget}${targetModifierString})`;
+    const leftPart = formatDMPart(level, bonus);
+    const rightPart = formatDMPart(baseTarget, targetModifier);
 
     options.dmFormula = `${leftPart}DM≦${rightPart}`;
     options.successModifier = successModifier;

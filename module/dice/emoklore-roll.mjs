@@ -1,4 +1,5 @@
 import { systemPath } from "../constants.mjs";
+import { formatSuccess } from "../helpers/helper.mjs";
 
 export class EmokloreRoll extends foundry.dice.Roll {
   constructor(formula = "1d10", data = {}, options = {}) {
@@ -32,7 +33,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return diceResults;
   }
 
-  get result() {
+  get rawResult() {
     const diceResults = this.diceResults;
 
     const base_count = diceResults.filter((diceResult) => diceResult <= this.target).length;
@@ -40,7 +41,11 @@ export class EmokloreRoll extends foundry.dice.Roll {
     const error_count = diceResults.filter((diceResult) => diceResult >= 10).length;
 
     const success_count = base_count + critical_count - error_count;
-    return success_count + this.successModifier;
+    return success_count;
+  }
+
+  get result() {
+    return this.rawResult + this.successModifier;
   }
 
   get resultName() {
@@ -75,10 +80,11 @@ export class EmokloreRoll extends foundry.dice.Roll {
 
   async getTooltip() {
     const parts = this.dice.map(d => d.getTooltipData());
+    // resultString = ${rawResult}
     return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, 
       {
         parts,
-        result: this.result
+        result: formatSuccess(this.rawResult, this.successModifier)
       });
   }
 
