@@ -45,7 +45,7 @@
     },
 
 
-    "sympatheticEmotion": {
+    "resonantEmotions": {
       "selfAssertion": "自己顕示",
       "possession": "所有",
       "instinct": "本能",
@@ -234,6 +234,7 @@
     "skill": "技能",
     "characteristics": "能力値",
     "skillRoll": "〈{skillName}〉判定",
+    "resonantEmotion": "{emotion}（{attribute}）",
     "Effect": {
       "Source": "ソース",
       "Temporary": "一時的",

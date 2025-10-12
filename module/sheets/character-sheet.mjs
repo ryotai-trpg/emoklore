@@ -12,7 +12,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     classes: ["standard-form", "character"],
     position: {
       width: 601,
-      height: 730,
+      height: 705,
     },
     actions: {
       viewDoc: this._viewDoc,
@@ -54,16 +54,56 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
   };
 
+  async _prepareContext(options) {
+    const context = await super._prepareContext(options);
+    context.config = CONFIG.EMOKLORE;
+    context.emotionAttributes = {};
+
+    const { resonantEmotions } = context.config;
+    const { emotions } = context.system;
+
+    for (const key of ["surface", "hidden", "root"]) {
+      const emotionKey = emotions[key];
+      const attr = resonantEmotions[emotionKey]?.attribute ?? "";
+      context.emotionAttributes[key] = `EMOKLORE.emotionAttributes.${attr}`;
+    }
+
+    context.emotionOptions = Object.entries(CONFIG.EMOKLORE.resonantEmotions).map(
+      ([value, { label, attribute }]) => ({
+        value,
+        label: game.i18n.format("EMOKLORE.resonantEmotion", {
+          emotion: label, 
+          attribute: game.i18n.format(`EMOKLORE.emotionAttributes.${attribute}`)
+        }),
+        group: game.i18n.localize(`EMOKLORE.emotionAttributes.${attribute}`),
+      }),
+    );
+    return context
+  }
+
   async _preparePartContext(partId, context, options) {
     await super._preparePartContext(partId, context, options);
     switch (partId) {
       case "skills":
-        context.skills = this._getSkills();
         context.characteristics = this._getCharacteristics();
-        context.sum_char =
+        context.charPointSum =
           Object.values(context.characteristics).reduce((sum, obj) => {
             return sum + obj.value;
           }, 0) - context.characteristics.fortune.value;
+
+        context.skills = this._getSkills();
+
+        const skillsObject = Object.values(context.skills)
+        const exSkillsObject = skillsObject.filter( skill => skill.isExtra )
+
+        context.skillPointSum = 
+          skillsObject.filter( skill => skill.level == 1).length * 1 +
+          skillsObject.filter( skill => skill.level == 2).length * 5 +
+          skillsObject.filter( skill => skill.level == 3).length * 15 +
+          exSkillsObject.filter( skill => skill.level == 1).length * 1 +
+          exSkillsObject.filter( skill => skill.level == 2).length * 5 +
+          exSkillsObject.filter( skill => skill.level == 3).length * 15;
+
 
         context.skillLevelOptions = Object.entries(CONFIG.EMOKLORE.skillLevel).map(
           ([value, { label }]) => ({
@@ -71,25 +111,12 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
             label,
           }),
         );
-        context.emotionOptions = Object.entries(CONFIG.EMOKLORE.sympatheticEmotion).map(
-          ([value, { label, attribute }]) => ({
-            value,
-            label,
-            group: game.i18n.localize(`EMOKLORE.emotionAttributes.${attribute}`),
-          }),
-        );
-        context.config = CONFIG.EMOKLORE;
+
         break;
 
       case "biography":
-        context.emotionOptions = Object.entries(CONFIG.EMOKLORE.sympatheticEmotion).map(
-          ([value, { label, attribute }]) => ({
-            value,
-            label,
-            group: game.i18n.localize(`EMOKLORE.emotionAttributes.${attribute}`),
-          }),
-        );
         break;
+
       case "effects":
         context.tab = context.tabs[partId];
         // Prepare active effects

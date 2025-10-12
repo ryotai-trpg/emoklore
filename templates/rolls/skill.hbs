@@ -1,10 +1,10 @@
 <div class="dice-roll" data-action="expandRoll">
-    {{#if flavor}}
+  {{#if flavor}}
     <div class="dice-flavor">{{flavor}}</div>
-    {{/if}}
-    <div class="dice-result">
-      <div class="dice-formula">{{dmFormula}}</div>
-        {{{tooltip}}}
-        <h4 class="dice-total">{{localize (concat "EMOKLORE.result." resultName)}}</h4>
-    </div>
+  {{/if}}
+  <div class="dice-result">
+    <div class="dice-formula">{{dmFormula}}</div>
+    {{{tooltip}}}
+    <h4 class="dice-total">{{localize (concat "EMOKLORE.result." resultName)}}</h4>
+  </div>
 </div>

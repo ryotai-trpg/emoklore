@@ -1,5 +1,8 @@
 <div class="skills">
   {{#unless isPlay}}
+  <div class ="skills-cap">
+    {{skillPointSum}} / 30
+  </div>
   {{/unless}}
   {{#each skills as |skill key|}}
   {{#if ../isPlay}}
@@ -26,4 +29,3 @@
   {{/if}}
   {{/each}}
 </div>
-

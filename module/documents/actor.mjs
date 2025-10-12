@@ -16,7 +16,7 @@ export class EmokloreActor extends Actor {
     const level= this.system.resources.resonance.value;
 
     options.target = intensity
-    options.successModifier = 0;
+    options.successMod = 0;
     options.dmFormula = `${level}DM≦${intensity}`;
 
     const roll = await new EmokloreRoll(`${level}d10`, {}, options).evaluate()
@@ -39,42 +39,45 @@ export class EmokloreActor extends Actor {
       label,
       level,
       target: baseTarget,
-      bonus: skillBonus,
-      successModifier: skillSuccessModifier,
-      targetModifier: skillTargetModifier,
       characteristic,
       group,
       isExtra,
     } = skillSource[skill];
 
     const {
+      bonus: skillBonus,
+      success: skillSuccessMod,
+      target: skillTargetMod,
+    } = skillSource[skill].mod;
+
+    const {
       bonus: characteristicBonus,
-      successModifier: characteristicSuccessModifier,
-      targetModifier: characteristicTargetModifier,
-    } = this.system.characteristics[characteristic];
+      success: characteristicSuccessMod,
+      target: characteristicTargetMod,
+    } = this.system.characteristics[characteristic].mod;
 
 
     const {
       bonus: skillGroupBonus,
-      successModifier: skillGroupSuccessModifier,
-      targetModifier: skillGroupTargetModifier,
-    } = this.system.skillGroups[group];
+      success: skillGroupSuccessMod,
+      target: skillGroupTargetMod,
+    } = this.system.skillGroups[group].mod;
 
     const prefix = base ? "＊" : isExtra ? "★" : "";
 
-    const targetModifier =
-      skillTargetModifier + characteristicTargetModifier + skillGroupTargetModifier;
-    const successModifier =
-      skillSuccessModifier + characteristicSuccessModifier + skillGroupSuccessModifier;
+    const targetMod =
+      skillTargetMod + characteristicTargetMod + skillGroupTargetMod;
+    const successMod =
+      skillSuccessMod + characteristicSuccessMod + skillGroupSuccessMod;
     const bonus = skillBonus + characteristicBonus + skillGroupBonus;
     const skillName = `${prefix}${label}`;
 
     const leftPart = formatDMPart(level, bonus);
-    const rightPart = formatDMPart(baseTarget, targetModifier);
+    const rightPart = formatDMPart(baseTarget, targetMod);
 
     options.dmFormula = `${leftPart}DM≦${rightPart}`;
-    options.successModifier = successModifier;
-    options.target = baseTarget+targetModifier;
+    options.successMod = successMod;
+    options.target = baseTarget+targetMod;
 
     const roll = await new EmokloreRoll(`${level+bonus}d10`, {}, options).evaluate()
 

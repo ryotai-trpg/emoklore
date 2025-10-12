@@ -33,11 +33,12 @@ export class CharacterDataModel extends BaseActorDataModel {
       Object.entries(CONFIG.EMOKLORE.characteristics).reduce((obj, [chc, { label }]) => {
         obj[chc] = new SchemaField({
           value: new NumberField({ ...characteristic, label }),
-          bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-          successModifier: new NumberField({ required: true, integer: true, initial: 0 }),
-          targetModifier: new NumberField({ required: true, integer: true, initial: 0 }),
+          mod: new SchemaField({
+            bonus: new NumberField({ required: true, integer: true, initial: 0 }),
+            success: new NumberField({ required: true, integer: true, initial: 0 }),
+            target: new NumberField({ required: true, integer: true, initial: 0 }),
+          })
         });
-
         return obj;
       }, {}),
     );
@@ -72,9 +73,11 @@ export class CharacterDataModel extends BaseActorDataModel {
             label: new StringField({ initial: label }),
             group: new StringField({ initial: group }),
             isExtra: new BooleanField({ initial: isExtra ?? false }),
-            bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-            successModifier: new NumberField({ required: true, integer: true, initial: 0 }),
-            targetModifier: new NumberField({ required: true, integer: true, initial: 0 }),
+            mod: new SchemaField({
+              bonus: new NumberField({ required: true, integer: true, initial: 0 }),
+              success: new NumberField({ required: true, integer: true, initial: 0 }),
+              target: new NumberField({ required: true, integer: true, initial: 0 }),
+            })
           });
           return obj;
         },
@@ -100,9 +103,11 @@ export class CharacterDataModel extends BaseActorDataModel {
             }),
             label: new StringField({ initial: label }),
             group: new StringField({ initial: group }),
-            bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-            successModifier: new NumberField({ required: true, integer: true, initial: 0 }),
-            targetModifier: new NumberField({ required: true, integer: true, initial: 0 }),
+            mod: new SchemaField({
+              bonus: new NumberField({ required: true, integer: true, initial: 0 }),
+              success: new NumberField({ required: true, integer: true, initial: 0 }),
+              target: new NumberField({ required: true, integer: true, initial: 0 }),
+            })
           });
           return obj;
         },
@@ -114,9 +119,11 @@ export class CharacterDataModel extends BaseActorDataModel {
       Object.entries(CONFIG.EMOKLORE.skillGroups).reduce((obj, [group, { label }]) => {
         obj[group] = new SchemaField({
           label: new StringField({ initial: game.i18n.localize(label) }),
-          bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-          successModifier: new NumberField({ required: true, integer: true, initial: 0 }),
-          targetModifier: new NumberField({ required: true, integer: true, initial: 0 }),
+          mod: new SchemaField({
+            bonus: new NumberField({ required: true, integer: true, initial: 0 }),
+            success: new NumberField({ required: true, integer: true, initial: 0 }),
+            target: new NumberField({ required: true, integer: true, initial: 0 }),
+          })
         });
         return obj;
       }, {}),

@@ -11,70 +11,102 @@
         {{/if}}
       </div>
 
+      {{#if isPlay}}
       <div class="resources">
-        {{#if isPlay}}
         <div class="hp bar">
-          <i class="fa-solid fa-heart label"></i>
-          <span class="value">
-            {{ system.resources.hp.value }}/{{ system.resources.hp.max }}
-          </span>
-          <button data-action="decreaseResources" data-type="hp">
-            <i class="fa-regular fa-minus"></i>
-          </button>
+
+          <div class="info">
+            <i class="fa-solid fa-heart label"></i>
+            <div class="value">
+              {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
+              <span class="small">/{{ system.resources.hp.max }}</span>
+            </div>
+          </div>
+
           <progress 
             id="character-hp"
             value="{{ system.resources.hp.value }}" 
             max="{{ system.resources.hp.max }}"
-          ></progress>
-          <button data-action="increaseResources" data-type="hp">
-            <i class="fa-regular fa-plus"></i>
-          </button>
+            ></progress>
         </div>
 
         <div class="mp bar">
-          <i class="fa-solid fa-wand-magic-sparkles label"></i>
-          <span class="value">
-            {{ system.resources.mp.value }}/{{ system.resources.mp.max }}
-          </span>
-          <button data-action="decreaseResources" data-type="mp">
-            <i class="fa-regular fa-minus"></i>
-          </button>
+          <div class="info">
+            <i class="fa-solid fa-wand-magic-sparkles label"></i>
+            <div class="value">
+              {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
+              <span class="small">/{{ system.resources.mp.max }}</span>
+            </div>
+          </div>
           <progress 
             id="character-mp"
             value="{{ system.resources.mp.value }}" 
             max="{{ system.resources.mp.max }}"
             ></progress>
-          <button data-action="increaseResources" data-type="mp">
-            <i class="fa-regular fa-plus"></i>
-          </button>
         </div>
 
-        <div class="sympathy bar">
-          <a class="fa-solid fa-infinity label" data-action="roll" data-roll-type="resonance"></a>
-          <span class="value">
-            Lv.{{ system.resources.resonance.value }}/{{ system.resources.resonance.max }}
-          </span>
-          <button data-action="decreaseResources" data-type="resonance">
-            <i class="fa-regular fa-minus"></i>
-          </button>
+        <div class="resonance bar">
+          <div class="info">
+            <a class="fa-solid fa-infinity label" data-action="roll" data-roll-type="resonance"></a>
+            <div class="value">
+              Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
+            </div>
+            <div>
+              {{#if system.emotions.surface}}
+              {{localize (concat "EMOKLORE.resonantEmotions." system.emotions.surface)}}
+              {{/if}}
+            </div>
+            <div class="small">
+              {{#if system.emotions.surface}}
+              （{{localize emotionAttributes.surface}}）
+              {{/if}}
+            </div>
+            <div>
+              {{#if system.emotions.hidden}}
+              {{localize (concat "EMOKLORE.resonantEmotions." system.emotions.hidden)}}
+              {{/if}}
+            </div>
+            <div class="small">
+              {{#if system.emotions.hidden}}
+              （{{localize emotionAttributes.hidden}}）
+              {{/if}}
+            </div>
+            <div>
+              {{#if system.emotions.root}}
+              {{localize (concat "EMOKLORE.resonantEmotions." system.emotions.root)}}
+              {{/if}}
+            </div>
+            <div class="small">
+              {{#if system.emotions.root}}
+              （{{localize emotionAttributes.root}}）
+              {{/if}}
+            </div>
+          </div>
           <progress 
-            id="character-sympathy"
+            id="character-resonance"
             value="{{ system.resources.resonance.value }}" 
             max="{{ system.resources.resonance.max }}" 
             ></progress>
-          <button data-action="increaseResources" data-type="resonance">
-            <i class="fa-regular fa-plus"></i>
-          </button>
         </div>
-        {{else}}
-        <div class="hp">
-          最大HP: {{ system.resources.hp.max }}
-        </div>
-        <div class="mp">
-          最大MP: {{ system.resources.mp.max }}
-        </div>
-        {{/if}}
       </div>
-
+      {{else}}
+      <div class="emotions">
+        {{formGroup
+        systemFields.emotions.fields.surface
+        value=system.emotions.surface
+        options=emotionOptions
+        }}
+        {{formGroup
+        systemFields.emotions.fields.hidden
+        value=system.emotions.hidden
+        options=emotionOptions
+        }}
+        {{formGroup
+        systemFields.emotions.fields.root
+        value=system.emotions.root
+        options=emotionOptions
+        }}
+      </div>
+      {{/if}}
   </header>
     </div>

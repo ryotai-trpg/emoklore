@@ -15,114 +15,68 @@
   min-height: 420px;
 }
 
+
+.theme-dark .window-content {
+  padding-top: 0 !important;
+}
+
+.emoklore .application secton.window-content {
+    padding-top:0;
+  }
+
 .emoklore.sheet.character {
   section.tab {
     overflow: auto;
     padding: 0.5rem;
   }
 
+  .small {
+    font-size:small;
+  }
+
   range-picker > input[type=number] {
     flex: 0 0 20px;
   }
 
+  header {
+    /* height: 74px; */
+
+    .name {
+      flex: 1;
+      font-size: var(--font-size-48);
+      padding: 0 .5rem;
+
+      input {
+        height: initial;
+        padding: inherit;
+      }
+    }
+  }
+
   .sheet-header .container {
-    display: flex;
+    display: grid;
+    grid-auto-flow:column;
     justify-content: space-between;
-    align-items: center;
+    align-items:flex-end;
     height: 100%;
   }
 
-  .bar {
-    display: flex;
-    align-items: center;
-
-    button {
-      border: none;
-      padding: 0 0.2rem;
-      height: inherit;
-      min-height: inherit;
-    }
+  .tab.active {
+    display: grid;
+    grid-template-columns: var(--emoklore-sheet-sidebar-width) 1fr;
   }
+
+  .effects.tab.active {
+    display: flex;
+  }
+
 
   progress {
     height: 10px;
+    margin:2px;
     background-color: var(--emoklore-gray);
     border-radius: var(--emoklore-progress-radius);
-    margin:2px
   }
-
-  .resources{
-    height: inherit;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    progress {
-      height: 14px;
-    }
-
-    .bar{
-      position: relative;
-      justify-content: space-evenly;
-
-      .label {
-        position: absolute;
-        left: 26px;
-        font-size: 0.9em;
-        /* pointer-events: none; */
-      }
-
-      .value {
-        right: 26px;
-        font-size: 0.9em;
-        pointer-events: none;
-        position: absolute;
-      }
-    }
-  }
-
-
-  .characteristic {
-    progress {
-      height: 20px;
-      border-radius: var(--emoklore-progress-radius2);
-    }
-
-    progress::-webkit-progress-bar {
-      border-radius: var(--emoklore-progress-radius2);
-    }
-    progress::-webkit-progress-value {
-      border-radius: var(--emoklore-progress-radius2);
-    }
-    progress::-moz-progress-bar {
-      border-radius: var(--emoklore-progress-radius2);
-    }
-    progress::-ms-fill {
-      border-radius: var(--emoklore-progress-radius2);
-    }
-  }
-
-  .skill {
-    progress {
-      height: 20px;
-      border-radius: var(--emoklore-progress-radius2);
-    }
-
-    progress::-webkit-progress-bar {
-      border-radius: var(--emoklore-progress-radius2);
-    }
-    progress::-webkit-progress-value {
-      border-radius: var(--emoklore-progress-radius2);
-    }
-    progress::-moz-progress-bar {
-      border-radius: var(--emoklore-progress-radius2);
-    }
-    progress::-ms-fill {
-      border-radius: var(--emoklore-progress-radius2);
-    }
-  }
-
-
   progress::-webkit-progress-bar {
     background-color: var(--emoklore-gray);
     border-radius: var(--emoklore-progress-radius);
@@ -140,9 +94,107 @@
     border-radius: var(--emoklore-progress-radius);
   }
 
-  .emotions {
-    display:flex;
-    flex-direction: column;
+  div.resources > div.bar > div > div > input[type=number] {
+    padding: 5px;
+    height:1.3em;
+    width: 2em;
+    font-size:1.1em;
+  }
+
+  .resources{
+    height: inherit;
+    display: grid;
+    grid-template-columns:90px 145px;
+    grid-template-rows:1fr 1fr;
+    justify-content: center;
+    padding-bottom:8px;
+    column-gap:15px;
+
+    .hp {
+      grid-row:1;
+      grid-column:1;
+    }
+    .mp {
+      grid-row:2;
+      grid-column:1;
+    }
+    .resonance {
+      grid-row:1/3;
+      grid-column:2;
+      padding-bottom:2px;
+    }
+
+    progress {
+      height: 4px;
+      width:90px;
+      /* grid-row:2/3; */
+      /* grid-column:1/4; */
+    }
+
+    .resonance progress {
+      width:145px;
+    }
+
+    div.resonance.bar {
+      display:flex;
+      align-items:flex-end;
+
+
+      .info {
+        /* display:flex; */
+        /* justify-content:space-between; */
+        /* align-items:flex-end; */
+        display:grid;
+        grid-template-columns:49px 56px 40px;
+        grid-template-rows:1fr 1fr 1fr;
+
+
+        a.label {
+          grid-row:1/3;
+          grid-column:1;
+          font-size:1.8em;
+          margin-top:5px;
+          align-self:flex-start;
+        }
+
+        div.value {
+          grid-row:3;
+          grid-column:1;
+        }
+      }
+
+      .small {
+        font-size:0.8em;
+      }
+
+      .emotions {
+        font-size:0.9em;
+      }
+    }
+
+    .bar{
+      display:flex;
+      /* grid-template-rows:1fr 6px; */
+      /* grid-template-columns:25px 1fr 25px; */
+      /* position: relative; */
+      flex-direction:column;
+      justify-content: space-evenly;
+
+
+      i.label {
+        display:flex;
+        /* justify-content:space-between; */
+        align-items:flex-end;
+        font-size: 1.1em;
+        /* pointer-events: none; */
+      }
+
+      .info {
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-end;
+      }
+    }
   }
 
   .card {
@@ -156,6 +208,19 @@
       border-top-right-radius: var(--emoklore-card-radius);
     }
   }
+
+  /* 共鳴感情 */
+  .emotions {
+    display:flex;
+    flex-direction: column;
+  }
+
+  .emotions .play {
+    display:flex;
+    flex-direction:row;
+    justify-content:space-around;
+  }
+
 
   .characteristics {
     display:flex;
@@ -178,28 +243,55 @@
     }
   }
 
-  .emotions .play {
-    display:flex;
-    flex-direction:row;
-    justify-content:space-around;
+  /* 能力値 */
+  .characteristic {
+    progress {
+      height: 20px;
+      border-radius: var(--emoklore-progress-radius2);
+    }
+
+    progress::-webkit-progress-bar {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-webkit-progress-value {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-moz-progress-bar {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-ms-fill {
+      border-radius: var(--emoklore-progress-radius2);
+    }
   }
 
-  .pill {
-    font-size:1.1em;
-    margin-top:12px;
-    background: var(--emoklore-black);
-    border-radius:10px;
-    text-align:center;
-    padding-top:2px;
-    padding-bottom:2px;
-    padding-left:8px;
-    padding-right:8px;
-  }
+  /* 技能 */
 
   .skills {
     display:flex;
     flex-direction:column;
     padding: 8px;
+  }
+
+  .skill {
+    progress {
+      height: 20px;
+      margin-left:10px;
+      width:90px;
+      border-radius: var(--emoklore-progress-radius2);
+    }
+
+    progress::-webkit-progress-bar {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-webkit-progress-value {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-moz-progress-bar {
+      border-radius: var(--emoklore-progress-radius2);
+    }
+    progress::-ms-fill {
+      border-radius: var(--emoklore-progress-radius2);
+    }
   }
 
   .skill.play{
@@ -208,6 +300,10 @@
     align-items:center;
     margin-top:5px;
     margin-bottom:5px;
+
+    .target{
+      margin-left:0px;
+    }
   }
 
   .skill{
@@ -220,28 +316,23 @@
     select {
       padding: 0;
     }
+
+    .target{
+      border:1px solid;
+      border-radius:2px;
+      text-align:center;
+      margin-left:5px;
+    }
+
+    .characteristic{
+      margin-left:6px;
+    }
+
+    .characteristic:has(select){
+      margin-left:1px;
+    }
   }
 
-  .skill progress {
-    margin-left:10px;
-    width:90px;
-    height: 20px;
-  }
-  .skill.play .target{
-    margin-left:0px;
-  }
-  .skill .target{
-    border:1px solid;
-    border-radius:2px;
-    text-align:center;
-    margin-left:5px;
-  }
-  .skill .characteristic{
-    margin-left:6px;
-  }
-  .skill .characteristic:has(select){
-    margin-left:1px;
-  }
 
   .base-skills {
     display:flex;
@@ -262,30 +353,16 @@
     padding-right:3px;
   }
 
-
-
-  header {
-    height: 56px;
-
-    .name {
-      flex: 1;
-      font-size: var(--font-size-48);
-      padding: 0 .5rem;
-
-      input {
-        height: initial;
-        padding: inherit;
-      }
-    }
-  }
-
-  .tab.active {
-    display: grid;
-    grid-template-columns: var(--emoklore-sheet-sidebar-width) 1fr;
-  }
-
-  .effects.tab.active {
-    display: flex;
+  .pill {
+    font-size:1.1em;
+    margin-top:12px;
+    background: var(--emoklore-black);
+    border-radius:10px;
+    text-align:center;
+    padding-top:2px;
+    padding-bottom:2px;
+    padding-left:8px;
+    padding-right:8px;
   }
 
   .biographies {
@@ -318,6 +395,12 @@
       gap:0px;
     }
 
+    .bio.very-short, .bio.short {
+      display:flex;
+      flex-direction:row;
+      gap:8px;
+    }
+
     .bio.stacked{
       display:flex;
       flex-direction:row;
@@ -331,7 +414,6 @@
     color: var(--color-form-label);
         font-weight: bold;
       }
-
   }
 
   /*

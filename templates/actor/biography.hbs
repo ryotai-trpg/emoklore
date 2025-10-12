@@ -5,19 +5,21 @@
 
   <div class="biographies">
     {{#if isPlay}}
-    <div class="bio">
-      <label>{{systemFields.biography.fields.age.label}}</label>
-      <span class="value">{{system.biography.age}}</span>
+    <div class="flexrow">
+      <div class="bio very-short">
+        <label>{{systemFields.biography.fields.age.label}}</label>
+        <span class="value">{{system.biography.age}}</span>
+      </div>
+      <div class="bio very-short">
+        <label>{{systemFields.biography.fields.gender.label}}</label>
+        <span class="value">{{system.biography.gender}}</span>
+      </div>
     </div>
-    <div class="bio">
-      <label>{{systemFields.biography.fields.gender.label}}</label>
-      <span class="value">{{system.biography.gender}}</span>
-    </div>
-    <div class="bio">
+    <div class="bio short">
       <label>{{systemFields.biography.fields.occupation.label}}</label>
       <span class="value">{{system.biography.occupation}}</span>
     </div>
-    <div class="bio">
+    <div class="bio short">
       <label>{{systemFields.biography.fields.hometown.label}}</label>
       <span class="value">{{system.biography.hometown}}</span>
     </div>

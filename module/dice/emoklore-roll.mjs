@@ -4,8 +4,8 @@ import { formatSuccess } from "../helpers/helper.mjs";
 export class EmokloreRoll extends foundry.dice.Roll {
   constructor(formula = "1d10", data = {}, options = {}) {
     super(formula, data, options);
-    const { successModifier, dmFormula, target } = options;
-    this.successModifier = successModifier;
+    const { successMod, dmFormula, target } = options;
+    this.successMod = successMod;
     this.dmFormula = dmFormula;
     this.target = target;
   }
@@ -40,12 +40,11 @@ export class EmokloreRoll extends foundry.dice.Roll {
     const critical_count = diceResults.filter((diceResult) => diceResult <= 1).length;
     const error_count = diceResults.filter((diceResult) => diceResult >= 10).length;
 
-    const success_count = base_count + critical_count - error_count;
-    return success_count;
+    return base_count + critical_count - error_count;
   }
 
   get result() {
-    return this.rawResult + this.successModifier;
+    return this.rawResult + this.successMod;
   }
 
   get resultName() {
@@ -63,8 +62,10 @@ export class EmokloreRoll extends foundry.dice.Roll {
       resultName = "triple";
     } else if (success_count < 10) {
       resultName = "miracle";
-    } else {
+    } else if (success_count >= 10) {
       resultName = "catastrophe";
+    } else {
+      resultName = "error!";
     }
     return resultName;
   }
@@ -73,18 +74,17 @@ export class EmokloreRoll extends foundry.dice.Roll {
     const context = await super._prepareChatRenderContext(options);
     context.result = this.result;
     context.resultName = this.resultName;
-    context.successModifier = this.successModifier;
+    context.successMod = this.successMod;
     context.dmFormula = this.dmFormula;
     return context;
   }
 
   async getTooltip() {
     const parts = this.dice.map(d => d.getTooltipData());
-    // resultString = ${rawResult}
     return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, 
       {
         parts,
-        result: formatSuccess(this.rawResult, this.successModifier)
+        result: formatSuccess(this.rawResult, this.successMod)
       });
   }
 

@@ -1,19 +1,25 @@
-<div class="card">
-  <img src="{{source.img}}" data-action="editImage" data-edit="img" alt="{{localize "DOCUMENT.FIELDS.img.label"}}">
+<div>
+  <div class="card">
+    <img
+      src="{{source.img}}"
+      data-action="editImage"
+      data-edit="img"
+      alt="{{localize 'DOCUMENT.FIELDS.img.label'}}"
+    />
 
-  <div class="emotions">
-    {{formGroup systemFields.emotions.fields.surface value=system.emotions.surface options=emotionOptions}}
-    {{formGroup systemFields.emotions.fields.hidden value=system.emotions.hidden options=emotionOptions}}
-    {{formGroup systemFields.emotions.fields.root value=system.emotions.root options=emotionOptions}}
+    <div class="characteristics">
+      <div class="characteristics-cap">
+        {{charPointSum}}
+        / 25
+      </div>
+      {{#each characteristics as |chr key|}}
+        <div class="characteristic" data-characteristic="{{key}}">
+          {{formGroup chr.field.fields.value value=chr.value placeholder="1"}}
+        </div>
+      {{/each}}
+    </div>
   </div>
-  <div class="characteristics">
-    <div class=characteristics-cap>
-      {{ sum_char }} / 25
-    </div>
-    {{#each characteristics as |chr key|}}
-    <div class="characteristic" data-characteristic="{{key}}">
-      {{formGroup chr.field.fields.value value=chr.value placeholder="1"}}
-    </div>
-    {{/each}}
+
+  <div>
   </div>
 </div>
