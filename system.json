@@ -27,16 +27,15 @@
   ],
   "documentTypes": {
     "Actor": {
-      "character": { "htmlFields": ["biography.note"] },
-      "npc": {}
-    },
-    "Item": {
-      "weapon": {}
+      "character": { "htmlFields": ["biography.note"] }
     }
   },
   "background": "systems/emoklore/assets/background.webp",
   "grid": {
     "distance": "1.5",
     "units": "m"
-  }
+  },
+  "manifest": "https://github.com/ryotai-trpg/emoklore/releases/latest/download/system.json",
+  "download": "https://github.com/ryotai-trpg/emoklore/releases/latest/download/dist.zip",
+  "url": "https://github.com/ryotai-trpg/emoklore"
 }

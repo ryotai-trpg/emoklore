@@ -12,7 +12,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     classes: ["standard-form", "character"],
     position: {
       width: 601,
-      height: 705,
+      height: 710,
     },
     actions: {
       viewDoc: this._viewDoc,
@@ -72,13 +72,13 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       ([value, { label, attribute }]) => ({
         value,
         label: game.i18n.format("EMOKLORE.resonantEmotion", {
-          emotion: label, 
-          attribute: game.i18n.format(`EMOKLORE.emotionAttributes.${attribute}`)
+          emotion: label,
+          attribute: game.i18n.format(`EMOKLORE.emotionAttributes.${attribute}`),
         }),
         group: game.i18n.localize(`EMOKLORE.emotionAttributes.${attribute}`),
       }),
     );
-    return context
+    return context;
   }
 
   async _preparePartContext(partId, context, options) {
@@ -93,17 +93,16 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
 
         context.skills = this._getSkills();
 
-        const skillsObject = Object.values(context.skills)
-        const exSkillsObject = skillsObject.filter( skill => skill.isExtra )
+        const skillsObject = Object.values(context.skills);
+        const exSkillsObject = skillsObject.filter((skill) => skill.isExtra);
 
-        context.skillPointSum = 
-          skillsObject.filter( skill => skill.level == 1).length * 1 +
-          skillsObject.filter( skill => skill.level == 2).length * 5 +
-          skillsObject.filter( skill => skill.level == 3).length * 15 +
-          exSkillsObject.filter( skill => skill.level == 1).length * 1 +
-          exSkillsObject.filter( skill => skill.level == 2).length * 5 +
-          exSkillsObject.filter( skill => skill.level == 3).length * 15;
-
+        context.skillPointSum =
+          skillsObject.filter((skill) => skill.level == 1).length * 1 +
+          skillsObject.filter((skill) => skill.level == 2).length * 5 +
+          skillsObject.filter((skill) => skill.level == 3).length * 15 +
+          exSkillsObject.filter((skill) => skill.level == 1).length * 1 +
+          exSkillsObject.filter((skill) => skill.level == 2).length * 5 +
+          exSkillsObject.filter((skill) => skill.level == 3).length * 15;
 
         context.skillLevelOptions = Object.entries(CONFIG.EMOKLORE.skillLevel).map(
           ([value, { label }]) => ({

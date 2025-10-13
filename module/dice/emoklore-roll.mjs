@@ -15,14 +15,14 @@ export class EmokloreRoll extends foundry.dice.Roll {
 
     for (const term of roll.terms) {
       if (term.results) {
-        term.results = term.results.map(r => ({
+        term.results = term.results.map((r) => ({
           ...r,
           success: r.result <= this.target,
           // failure: r.result > this.target,
         }));
       }
     }
-    return roll
+    return roll;
   }
 
   get diceResults() {
@@ -80,12 +80,11 @@ export class EmokloreRoll extends foundry.dice.Roll {
   }
 
   async getTooltip() {
-    const parts = this.dice.map(d => d.getTooltipData());
-    return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, 
-      {
-        parts,
-        result: formatSuccess(this.rawResult, this.successMod)
-      });
+    const parts = this.dice.map((d) => d.getTooltipData());
+    return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, {
+      parts,
+      result: formatSuccess(this.rawResult, this.successMod),
+    });
   }
 
   static CHAT_TEMPLATE = systemPath("templates/rolls/skill.hbs");

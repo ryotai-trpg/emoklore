@@ -237,9 +237,10 @@
     "resonantEmotion": "{emotion}（{attribute}）",
     "Effect": {
       "Source": "ソース",
-      "Temporary": "一時的",
-      "Passive": "受動",
-      "Inactive": "無効"
+      "Temporary": "一時的効果",
+      "Passive": "永続的効果",
+      "Inactive": "無効",
+      "Toggle": "切替"
     },
     "result": {
       "fumble": "ファンブル",

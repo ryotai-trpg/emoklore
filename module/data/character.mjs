@@ -15,9 +15,9 @@ export class CharacterDataModel extends BaseActorDataModel {
         max: new NumberField({ required: true, integer: true, initial: 2 }),
       }),
       resonance: new SchemaField({
-        value: new NumberField({ required: true, interger: true, initial: 1}),
-        max: new NumberField({ required: true, interger: true, initial: 9}),
-      })
+        value: new NumberField({ required: true, interger: true, initial: 1 }),
+        max: new NumberField({ required: true, interger: true, initial: 9 }),
+      }),
     });
 
     const characteristic = {
@@ -37,7 +37,7 @@ export class CharacterDataModel extends BaseActorDataModel {
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
             success: new NumberField({ required: true, integer: true, initial: 0 }),
             target: new NumberField({ required: true, integer: true, initial: 0 }),
-          })
+          }),
         });
         return obj;
       }, {}),
@@ -77,7 +77,7 @@ export class CharacterDataModel extends BaseActorDataModel {
               bonus: new NumberField({ required: true, integer: true, initial: 0 }),
               success: new NumberField({ required: true, integer: true, initial: 0 }),
               target: new NumberField({ required: true, integer: true, initial: 0 }),
-            })
+            }),
           });
           return obj;
         },
@@ -107,7 +107,7 @@ export class CharacterDataModel extends BaseActorDataModel {
               bonus: new NumberField({ required: true, integer: true, initial: 0 }),
               success: new NumberField({ required: true, integer: true, initial: 0 }),
               target: new NumberField({ required: true, integer: true, initial: 0 }),
-            })
+            }),
           });
           return obj;
         },
@@ -123,7 +123,7 @@ export class CharacterDataModel extends BaseActorDataModel {
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
             success: new NumberField({ required: true, integer: true, initial: 0 }),
             target: new NumberField({ required: true, integer: true, initial: 0 }),
-          })
+          }),
         });
         return obj;
       }, {}),
@@ -177,6 +177,8 @@ export class CharacterDataModel extends BaseActorDataModel {
         },
       ]),
     );
+
+    this.baseSkills.treatment.target = Math.ceil(this.baseSkills.treatment.target / 2);
 
     this.resources.hp.max = 10 + foundry.utils.getProperty(this, "characteristics.physical.value");
     this.resources.hp.value = Math.min(this.resources.hp.value, this.resources.hp.max);

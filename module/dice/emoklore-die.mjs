@@ -1,5 +1,5 @@
 export class EmokloreDie extends foundry.dice.terms.Die {
-   getResultCSS(result) {
+  getResultCSS(result) {
     const isMax = result.result === this.faces;
     const isMin = result.result === 1;
     return [
@@ -11,7 +11,7 @@ export class EmokloreDie extends foundry.dice.terms.Die {
       result.exploded ? "exploded" : null,
       result.discarded ? "discarded" : null,
       isMin ? "max" : null,
-      isMax ? "min" : null
+      isMax ? "min" : null,
     ];
   }
 }
