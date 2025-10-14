@@ -1,10 +1,25 @@
-import { systemPath } from "../constants.mjs";
-import { formatSuccess } from "../helpers/helper.mjs";
+import { systemPath } from "../constants";
+import { formatSuccess } from "../helpers/helper";
+
+
+export interface EmokloreRollOptions extends foundry.dice.Roll.Options {
+  successMod?: number;
+  dmFormula?: string;
+  target?: number;
+}
 
 export class EmokloreRoll extends foundry.dice.Roll {
-  constructor(formula = "1d10", data = {}, options = {}) {
+  successMod: number;
+  dmFormula: string;
+  target: number;
+
+  constructor(
+    formula: string = "1d10",
+    data: Record<string, unknown> = {},
+    options: EmokloreRollOptions = {}
+  ) {
     super(formula, data, options);
-    const { successMod, dmFormula, target } = options;
+    const { successMod=0, dmFormula, target=10 } = options;
     this.successMod = successMod;
     this.dmFormula = dmFormula;
     this.target = target;
@@ -25,7 +40,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return roll;
   }
 
-  get diceResults() {
+  get diceResults(): number[] {
     const diceResults = new Array();
     this.terms.forEach((term) => {
       diceResults.push(...term.results.map((r) => r.result));
@@ -33,7 +48,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return diceResults;
   }
 
-  get rawResult() {
+  get rawResult(): number {
     const diceResults = this.diceResults;
 
     const base_count = diceResults.filter((diceResult) => diceResult <= this.target).length;
@@ -43,11 +58,11 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return base_count + critical_count - error_count;
   }
 
-  get result() {
+  get result(): number {
     return this.rawResult + this.successMod;
   }
 
-  get resultName() {
+  get resultName(): string {
     const success_count = this.result;
     let resultName;
     if (success_count < 0) {
@@ -70,7 +85,9 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return resultName;
   }
 
-  async _prepareChatRenderContext(options) {
+  async _prepareChatRenderContext(
+    options?: Record<string, unknown>
+  ): Promise<Record<string, unknown>> {
     const context = await super._prepareChatRenderContext(options);
     context.result = this.result;
     context.resultName = this.resultName;
@@ -87,6 +104,6 @@ export class EmokloreRoll extends foundry.dice.Roll {
     });
   }
 
-  static CHAT_TEMPLATE = systemPath("templates/rolls/skill.hbs");
-  static TOOLTIP_TEMPLATE = systemPath("templates/rolls/tooltip.hbs");
+  static readonly CHAT_TEMPLATE = systemPath("templates/rolls/skill.hbs");
+  static readonly TOOLTIP_TEMPLATE = systemPath("templates/rolls/tooltip.hbs");
 }

@@ -1,6 +1,6 @@
-import { EmokloreActorSheet } from "./actor-sheet.mjs";
-import { systemPath } from "../constants.mjs";
-import { prepareActiveEffectCategories } from "../helpers/effects.mjs";
+import { EmokloreActorSheet } from "./actor-sheet";
+import { systemPath } from "../constants";
+import { prepareActiveEffectCategories } from "../helpers/effects";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -73,9 +73,9 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         value,
         label: game.i18n.format("EMOKLORE.resonantEmotion", {
           emotion: label,
-          attribute: game.i18n.format(`EMOKLORE.emotionAttributes.${attribute}`),
+          attribute: game.i18n.format(`EMOKLORE.emotionAttributes.${String(attribute)}`),
         }),
-        group: game.i18n.localize(`EMOKLORE.emotionAttributes.${attribute}`),
+        group: game.i18n.localize(`EMOKLORE.emotionAttributes.${String(attribute)}`),
       }),
     );
     return context;
@@ -87,7 +87,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       case "skills":
         context.characteristics = this._getCharacteristics();
         context.charPointSum =
-          Object.values(context.characteristics).reduce((sum, obj) => {
+          Object.values(context.characteristics as Record <string, { value: number }>).reduce((sum, obj) => {
             return sum + obj.value;
           }, 0) - context.characteristics.fortune.value;
 
@@ -185,8 +185,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   _getCharacteristics() {
-    // const isPlay = this.isPlayMode;
-    // const data = isPlay ? this.actor : this.actor._source;
     const data = this.actor;
     return Object.keys(CONFIG.EMOKLORE.characteristics).reduce((obj, chc) => {
       const value = foundry.utils.getProperty(data, `system.characteristics.${chc}.value`);
@@ -199,8 +197,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   _getSkills() {
-    // const isPlay = this.isPlayMode;
-    // const data = isPlay ? this.actor : this.actor._source;
     const data = this.actor;
     return Object.keys(CONFIG.EMOKLORE.skills).reduce((obj, chc) => {
       const value = foundry.utils.getProperty(data, `system.skills.${chc}`);
@@ -213,8 +209,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   _getBaseSkills() {
-    // const isPlay = this.isPlayMode;
-    // const data = isPlay ? this.actor : this.actor._source;
     const data = this.actor;
     return Object.keys(CONFIG.EMOKLORE.baseSkills).reduce((obj, baseSkill) => {
       const value = foundry.utils.getProperty(data, `system.baseSkills.${baseSkill}`);

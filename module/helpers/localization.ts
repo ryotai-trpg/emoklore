@@ -11,9 +11,13 @@
  * @param {string|Function} [sortKey]  An inner key upon which to sort or sorting function.
  * @returns {object}                   A copy of the original object that has been sorted.
  */
-export function sortObjectEntries(obj, sortKey) {
+// export function sortObjectEntries(obj, sortKey) {
+export function sortObjectEntries<T extends Record<string, any>>(
+  obj: T,
+  sortKey?: keyof T | ((a: any, b: any) => number)
+  ): T {
   let sorted = Object.entries(obj);
-  const sort = (lhs, rhs) =>
+  const sort = (lhs: any, rhs: any) =>
     foundry.utils.getType(lhs) === "string" ? lhs.localeCompare(rhs, game.i18n.lang) : lhs - rhs;
   if (foundry.utils.getType(sortKey) === "function")
     sorted = sorted.sort((lhs, rhs) => sortKey(lhs[1], rhs[1]));

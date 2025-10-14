@@ -1,5 +1,5 @@
-import { EmokloreRoll } from "../dice/emoklore-roll.mjs";
-import { formatDMPart } from "../helpers/helper.mjs";
+import { EmokloreRoll } from "../dice/emoklore-roll";
+import { formatDMPart } from "../helpers/helper";
 
 export class EmokloreActor extends Actor {
   prepareDerivedData() {
@@ -16,7 +16,7 @@ export class EmokloreActor extends Actor {
 
     if (intensity === undefined) {
       try {
-        [intensity, emotionMatch] = await foundry.applications.api.DialogV2.prompt({
+        [intensity, emotionMatch] = await (foundry.applications.api.DialogV2.prompt as any)({
           window: { title: "〈♾️共鳴〉判定" },
           content: `
           <div>

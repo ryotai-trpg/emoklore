@@ -1,12 +1,8 @@
-import EmokloreDocumentSheetMixin from "./document-sheet-mixin.mjs";
+import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
 
 export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
   foundry.applications.sheets.ActorSheetV2,
 ) {
-  constructor(options = {}) {
-    super(options);
-    // this.#dragDrop = this.#createDragDropHandlers();
-  }
 
   static DEFAULT_OPTIONS = {
     classes: ["actor"],

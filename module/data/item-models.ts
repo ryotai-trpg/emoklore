@@ -1,4 +1,4 @@
-import { EmokloreSystemDataModel } from "./system-model.mjs";
+import { EmokloreSystemDataModel } from "./system-model";
 const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 /* -------------------------------------------- */

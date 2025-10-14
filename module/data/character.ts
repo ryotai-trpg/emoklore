@@ -1,9 +1,34 @@
-import { BaseActorDataModel } from "./base-actor.mjs";
+import { BaseActorDataModel } from "./base-actor";
 const { HTMLField, NumberField, SchemaField, StringField, BooleanField } = foundry.data.fields;
 
 export class CharacterDataModel extends BaseActorDataModel {
-  static defineSchema() {
-    const schema = super.defineSchema();
+
+  declare skills: Record<
+  string,
+  {
+    level: number;
+    characteristic: string;
+    target?: number;
+  }
+  >;
+
+  declare baseSkills: Record<
+  string,
+  {
+    characteristic: string;
+    target?: number;
+  }
+  >;
+
+  declare resources: {
+    hp: { value: number; max: number };
+    mp: { value: number; max: number };
+    resonance: { value: number; max: number };
+  };
+
+
+  static defineSchema(): Record<string, any> {
+    const schema = super.defineSchema() as Record<string, any>;
 
     schema.resources = new SchemaField({
       hp: new SchemaField({
@@ -64,7 +89,7 @@ export class CharacterDataModel extends BaseActorDataModel {
                     choices: Object.fromEntries(
                       characteristicOptions.map((key) => [
                         key,
-                        game.i18n.localize(`EMOKLORE.Actor.characteristics.${key}`),
+                        game.i18n.localize(`EMOKLORE.Actor.characteristics.${String(key)}`),
                       ]),
                     ),
                   }
@@ -163,7 +188,7 @@ export class CharacterDataModel extends BaseActorDataModel {
           ...skill,
           target:
             skill.level +
-            foundry.utils.getProperty(this, `characteristics.${skill.characteristic}.value`),
+            (foundry.utils.getProperty(this, `characteristics.${skill.characteristic}.value`) as number),
         },
       ]),
     );
@@ -173,19 +198,19 @@ export class CharacterDataModel extends BaseActorDataModel {
         key,
         {
           ...skill,
-          target: foundry.utils.getProperty(this, `characteristics.${skill.characteristic}.value`),
+          target: foundry.utils.getProperty(this, `characteristics.${skill.characteristic}.value`) as number,
         },
       ]),
     );
 
     this.baseSkills.treatment.target = Math.ceil(this.baseSkills.treatment.target / 2);
 
-    this.resources.hp.max = 10 + foundry.utils.getProperty(this, "characteristics.physical.value");
+    this.resources.hp.max = 10 + (foundry.utils.getProperty(this, "characteristics.physical.value") as number);
     this.resources.hp.value = Math.min(this.resources.hp.value, this.resources.hp.max);
 
     this.resources.mp.max =
-      foundry.utils.getProperty(this, "characteristics.mentality.value") +
-      foundry.utils.getProperty(this, "characteristics.intelligence.value");
+      (foundry.utils.getProperty(this, "characteristics.mentality.value") as number) +
+      (foundry.utils.getProperty(this, "characteristics.intelligence.value") as number);
     this.resources.mp.value = Math.min(this.resources.mp.value, this.resources.mp.max);
 
     this.resources.resonance.value = Math.max(this.resources.resonance.value, 1);

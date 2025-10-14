@@ -1,4 +1,5 @@
-import constructHTMLButton from "../helpers/construct-html-button.mjs";
+import constructHTMLButton from "../helpers/construct-html-button";
+import {systemID } from "../constants";
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 export default (base) => {
@@ -30,7 +31,7 @@ export default (base) => {
         flags: this.document.flags,
       });
 
-      if (game.settings.get("emoklore", "developerMode")) {
+      if (game.settings.get(systemID, "developerMode")) {
         console.log(context);
       }
 
@@ -42,7 +43,7 @@ export default (base) => {
       if (options.mode && this.isEditable) this._mode = options.mode;
       // New sheets should always start in edit mode
       else if (options.renderContext === `create${this.document.documentName}`)
-        this._mode = EmokloreDocumentSheet.MODES.EDIT;
+      this._mode = EmokloreDocumentSheet.MODES.EDIT;
     }
 
     async _renderFrame(options) {
@@ -86,7 +87,7 @@ export default (base) => {
       this._mode = this.isPlayMode
         ? EmokloreDocumentSheet.MODES.EDIT
         : EmokloreDocumentSheet.MODES.PLAY;
-      this.render();
+        this.render();
     }
   };
 };

@@ -1,23 +1,25 @@
 /**
  * Prepare the data structure for Active Effects which are currently embedded in an Actor or Item.
- * @param {ActiveEffect[]} effects    A collection or generator of Active Effect documents to prepare sheet data for
- * @return {object}                   Data for rendering
+ * @param effects    A collection or generator of Active Effect documents to prepare sheet data for
+ * @return                  Data for rendering
  */
-export function prepareActiveEffectCategories(effects) {
+export function prepareActiveEffectCategories(
+  effects: Iterable<ActiveEffect>
+): Record<string, EffectCategory> {
   // Define effect header categories
   const categories = {
     temporary: {
-      type: "temporary",
+      type: "temporary" as const,
       label: game.i18n.localize("EMOKLORE.Effect.Temporary"),
       effects: [],
     },
     passive: {
-      type: "passive",
+      type: "passive" as const,
       label: game.i18n.localize("EMOKLORE.Effect.Passive"),
       effects: [],
     },
     inactive: {
-      type: "inactive",
+      type: "inactive" as const,
       label: game.i18n.localize("EMOKLORE.Effect.Inactive"),
       effects: [],
     },
@@ -35,4 +37,10 @@ export function prepareActiveEffectCategories(effects) {
     c.effects.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   }
   return categories;
+}
+
+interface EffectCategory {
+  type: "temporary" | "passive" | "inactive";
+  label: string;
+  effects: ActiveEffect[]
 }

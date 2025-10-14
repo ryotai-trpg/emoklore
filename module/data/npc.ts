@@ -1,4 +1,4 @@
-import { BaseActorDataModel } from "./base-actor.mjs";
+import { BaseActorDataModel } from "./base-actor";
 const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 export class NpcDataModel extends BaseActorDataModel {

@@ -1,6 +1,23 @@
-import { preLocalize } from "./helpers/localization.mjs";
+import { preLocalize } from "./helpers/localization";
+import type { 
+  CharacteristicConfig, 
+  SkillGroupsConfig, 
+  BaseSkillConfig,
+  SkillConfig,
+  SkillLevelConfig,
+  EmotionAttributesConfig,
+  ResonantEmotionsConfig,
+} from "./types/emoklore";
 
-export const EMOKLORE = {};
+export const EMOKLORE = {} as {
+  characteristics: Record<string, CharacteristicConfig>;
+  skillGroups: Record<string, SkillGroupsConfig>;
+  baseSkills: Record<string, BaseSkillConfig>;
+  skills: Record<string, SkillConfig>;
+  skillLevel: Record<number, SkillLevelConfig>;
+  emotionAttributes: Record<string, EmotionAttributesConfig>;
+  resonantEmotions: Record<string, ResonantEmotionsConfig>;
+};
 
 EMOKLORE.characteristics = {
   physical: {
@@ -35,7 +52,7 @@ EMOKLORE.characteristics = {
     label: "EMOKLORE.Actor.characteristics.fortune",
     fa: "fa-dice-six",
   },
-};
+} as const;
 preLocalize("characteristics", { keys: ["label"] });
 
 ((EMOKLORE.skillGroups = {
@@ -129,7 +146,7 @@ EMOKLORE.baseSkills = {
     characteristic: "fortune",
     group: "unique",
   },
-};
+} as const;
 preLocalize("baseSkills", { keys: ["label"] });
 
 EMOKLORE.skills = {
@@ -319,7 +336,7 @@ EMOKLORE.skills = {
     group: "unique",
     isExtra: true,
   },
-};
+} as const;
 preLocalize("skills", { keys: ["label"] });
 
 ((EMOKLORE.skillLevel = {
@@ -346,7 +363,7 @@ EMOKLORE.emotionAttributes = {
   wound: {
     label: "EMOKLORE.emotionAttributes.wound",
   },
-};
+} as const;
 preLocalize("emotionAttributes", { keys: ["label"] });
 
 EMOKLORE.resonantEmotions = {
@@ -542,5 +559,5 @@ EMOKLORE.resonantEmotions = {
     label: "EMOKLORE.resonantEmotions.inferiorityComplex",
     attribute: "wound",
   },
-};
+} as const;
 preLocalize("resonantEmotions", { keys: ["label"] });
