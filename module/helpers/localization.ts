@@ -12,18 +12,35 @@
  * @returns {object}                   A copy of the original object that has been sorted.
  */
 // export function sortObjectEntries(obj, sortKey) {
-export function sortObjectEntries<T extends Record<string, any>>(
+export function sortObjectEntries<T extends Record<string, unknown>, V = T[keyof T]>(
   obj: T,
-  sortKey?: keyof T | ((a: any, b: any) => number)
-  ): T {
-  let sorted = Object.entries(obj);
-  const sort = (lhs: any, rhs: any) =>
-    foundry.utils.getType(lhs) === "string" ? lhs.localeCompare(rhs, game.i18n.lang) : lhs - rhs;
-  if (foundry.utils.getType(sortKey) === "function")
+  sortKey?: string | ((a: V, b: V) => number)
+): T {
+  let sorted = Object.entries(obj) as [string, V][];
+
+  const compareValues = (lhs: unknown, rhs: unknown): number => {
+    if (typeof lhs === "string" && typeof rhs === "string") {
+      return lhs.localeCompare(rhs, game.i18n.lang);
+    }
+    const ln = Number(lhs);
+    const rn = Number(rhs);
+    if (!Number.isNaN(ln) && !Number.isNaN(rn)) return ln - rn;
+    return 0;
+  };
+
+  if (typeof sortKey === "function") {
     sorted = sorted.sort((lhs, rhs) => sortKey(lhs[1], rhs[1]));
-  else if (sortKey) sorted = sorted.sort((lhs, rhs) => sort(lhs[1][sortKey], rhs[1][sortKey]));
-  else sorted = sorted.sort((lhs, rhs) => sort(lhs[1], rhs[1]));
-  return Object.fromEntries(sorted);
+  } else if (typeof sortKey === "string") {
+    sorted = sorted.sort((lhs, rhs) => {
+      const lval = (lhs[1] as Record<string, unknown> | unknown as Record<string, unknown>)[sortKey as string];
+      const rval = (rhs[1] as Record<string, unknown> | unknown as Record<string, unknown>)[sortKey as string];
+      return compareValues(lval, rval);
+    });
+  } else {
+    sorted = sorted.sort((lhs, rhs) => compareValues(lhs[1], rhs[1]));
+  }
+
+  return Object.fromEntries(sorted) as T;
 }
 
 /* -------------------------------------------------- */
@@ -33,7 +50,12 @@ export function sortObjectEntries<T extends Record<string, any>>(
  * @type {object}
  * @private
  */
-const _preLocalizationRegistrations = {};
+type PreLocalizationRegistration = {
+  keys: string[];
+  sort: boolean;
+};
+
+const _preLocalizationRegistrations: Record<string, PreLocalizationRegistration> = {};
 
 /* -------------------------------------------------- */
 
@@ -47,7 +69,10 @@ const _preLocalizationRegistrations = {};
  *                                        if multiple are provided.
  * @param {boolean} [options.sort=false]  Sort this config enum, using the key if set.
  */
-export function preLocalize(configKeyPath, { key, keys = [], sort = false } = {}) {
+export function preLocalize(
+  configKeyPath: string,
+  { key, keys = [], sort = false }: { key?: string; keys?: string[]; sort?: boolean } = {}
+) {
   if (key) keys.unshift(key);
   _preLocalizationRegistrations[configKeyPath] = { keys, sort };
 }
@@ -58,13 +83,17 @@ export function preLocalize(configKeyPath, { key, keys = [], sort = false } = {}
  * Execute previously defined pre-localization tasks on the provided config object.
  * @param {object} config  The `ds.CONFIG` object to localize and sort. *Will be mutated.*.
  */
-export function performPreLocalization(config) {
+export function performPreLocalization(config: Record<string, unknown>) {
   for (const [keyPath, settings] of Object.entries(_preLocalizationRegistrations)) {
     const target = foundry.utils.getProperty(config, keyPath);
     if (!target) continue;
-    _localizeObject(target, settings.keys);
+    _localizeObject(target as Record<string, unknown>, settings.keys);
     if (settings.sort)
-      foundry.utils.setProperty(config, keyPath, sortObjectEntries(target, settings.keys[0]));
+      foundry.utils.setProperty(
+        config,
+        keyPath,
+        sortObjectEntries(target as Record<string, unknown>, settings.keys[0])
+      );
   }
 
   // Localize & sort status effects
@@ -82,11 +111,11 @@ export function performPreLocalization(config) {
  * @param {string[]} [keys]  List of inner keys that should be localized if this is an object.
  * @private
  */
-function _localizeObject(obj, keys) {
+function _localizeObject(obj: Record<string, unknown>, keys?: string[]): void {
   for (const [k, v] of Object.entries(obj)) {
     const type = typeof v;
     if (type === "string") {
-      obj[k] = game.i18n.localize(v);
+      obj[k] = game.i18n.localize(v as string);
       continue;
     }
 
@@ -108,9 +137,9 @@ function _localizeObject(obj, keys) {
     }
 
     for (const key of keys) {
-      const value = foundry.utils.getProperty(v, key);
-      if (!value) continue;
-      foundry.utils.setProperty(v, key, game.i18n.localize(value));
+      const value = foundry.utils.getProperty(v as Record<string, unknown>, key);
+      if (typeof value !== "string") continue;
+      foundry.utils.setProperty(v as Record<string, unknown>, key, game.i18n.localize(value));
     }
   }
 }

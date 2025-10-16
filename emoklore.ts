@@ -16,8 +16,6 @@ import { EmokloreDie } from './module/dice/emoklore-die';
 // import { EmokloreRollParser } from './module/dice/emoklore-parser';
 import { EmokloreRoll } from "./module/dice/emoklore-roll";
 import { registerSystemSettings } from "./module/settings";
-
-// @ts-expect-error
 Hooks.once("init", () => {
   console.log("Emo-klore TRPG | Initializing...");
 
@@ -27,24 +25,24 @@ Hooks.once("init", () => {
 
   // Configure custom Document implementations.
   (CONFIG as any).Actor.documentClass = EmokloreActor;
-  CONFIG.Item.documentClass = EmokloreItem;
+  (CONFIG as any).Item.documentClass = EmokloreItem;
 
   // Configure System Data Models.
-  CONFIG.Actor.dataModels = {
+  (CONFIG as any).Actor.dataModels = {
     character: CharacterDataModel,
     npc: NpcDataModel,
   };
-  CONFIG.Item.dataModels = {
+  (CONFIG as any).Item.dataModels = {
     weapon: WeaponDataModel,
   };
 
   // CONFIG.Dice.parser = EmokloreRollParser;
-  CONFIG.Dice.rolls.push(EmokloreRoll);
-  CONFIG.Dice.terms["d"] = EmokloreDie;
+  (CONFIG as any).Dice.rolls.push(EmokloreRoll);
+  (CONFIG as any).Dice.terms["d"] = EmokloreDie;
 
   // Configure trackable attributes.
   // TODO: Not Translated
-  CONFIG.Actor.trackableAttributes = {
+  (CONFIG as any).Actor.trackableAttributes = {
     character: {
       bar: ["resources.hp", "resources.mp", "resources.resonance"],
       value: [],
@@ -58,21 +56,19 @@ Hooks.once("init", () => {
   const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
   // DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
 
-  DocumentSheetConfig.registerSheet(Actor, "emoklore", applications.EmokloreCharacterSheet, {
+  DocumentSheetConfig.registerSheet(Actor, "emoklore", applications.EmokloreCharacterSheet as any, {
     types: ["character"],
     makeDefault: true,
     label: "EMOKLORE.SheetClass.character",
   });
 });
-
-// @ts-expect-error
 Hooks.once("i18nInit", () => {
-  performPreLocalization(CONFIG.EMOKLORE);
+  performPreLocalization(CONFIG.EMOKLORE as unknown as Record<string, unknown>);
 
   // These fields are not auto-localized due to having a different location in ja.json
-  for (const model of Object.values(CONFIG.Actor.dataModels)) {
+  for (const model of Object.values((CONFIG as any).Actor.dataModels)) {
     /** @type {foundry.data.fields.SchemaField} */
-    const characteristicSchema = model.schema.getField("characteristics");
+    const characteristicSchema = (model as any).schema.getField("characteristics");
     if (characteristicSchema) {
       for (const [characteristic, { label }] of Object.entries(CONFIG.EMOKLORE.characteristics)) {
         const field = characteristicSchema.getField(`${characteristic}.value`);
@@ -81,7 +77,7 @@ Hooks.once("i18nInit", () => {
       }
     }
 
-    const skillsSchema = model.schema.getField("skills");
+    const skillsSchema = (model as any).schema.getField("skills");
     if (skillsSchema) {
       for (const [skill, { label }] of Object.entries(CONFIG.EMOKLORE.skills)) {
         const field = skillsSchema.getField(`${skill}`);
@@ -90,7 +86,7 @@ Hooks.once("i18nInit", () => {
       }
     }
 
-    const baseSkillsSchema = model.schema.getField("baseSkills");
+    const baseSkillsSchema = (model as any).schema.getField("baseSkills");
     if (baseSkillsSchema) {
       for (const [skill, { label }] of Object.entries(CONFIG.EMOKLORE.baseSkills)) {
         const field = baseSkillsSchema.getField(`${skill}`);
@@ -102,7 +98,7 @@ Hooks.once("i18nInit", () => {
 });
 
 Hooks.once("ready", () => {
-  if (game.settings.get(systemID, "developerMode")) {
-    game.actors.get("IqCtJnUqjTsjXqss").sheet.render(true);
+  if (game.settings.get(systemID as any, "developerMode" as any)) {
+    (game.actors as any).get("IqCtJnUqjTsjXqss").sheet.render(true);
   }
 });

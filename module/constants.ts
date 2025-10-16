@@ -1,4 +1,4 @@
-export const systemID: string = "emoklore";
+export const systemID = "emoklore" as const;
 
 /**
  * Translates repository paths to Foundry Data paths.

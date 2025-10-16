@@ -1,11 +1,24 @@
 import { systemPath } from "../constants";
 import { formatSuccess } from "../helpers/helper";
 
-
 export interface EmokloreRollOptions extends foundry.dice.Roll.Options {
   successMod?: number;
   dmFormula?: string;
   target?: number;
+}
+
+interface DiceResult {
+  result: number;
+  success?: boolean;
+  failure?: boolean;
+  rerolled?: boolean;
+  exploded?: boolean;
+  discarded?: boolean;
+}
+
+interface DiceTerm {
+  results?: DiceResult[];
+  [key: string]: unknown;
 }
 
 export class EmokloreRoll extends foundry.dice.Roll {
@@ -18,19 +31,19 @@ export class EmokloreRoll extends foundry.dice.Roll {
     data: Record<string, unknown> = {},
     options: EmokloreRollOptions = {}
   ) {
-    super(formula, data, options);
-    const { successMod=0, dmFormula, target=10 } = options;
+    super(formula, data as any, options);
+    const { successMod = 0, dmFormula = "", target = 10 } = options;
     this.successMod = successMod;
     this.dmFormula = dmFormula;
     this.target = target;
   }
 
-  async evaluate(options) {
+  override async evaluate(options?: any): Promise<any> {
     const roll = await super.evaluate(options);
 
-    for (const term of roll.terms) {
-      if (term.results) {
-        term.results = term.results.map((r) => ({
+    for (const term of roll.terms as any[]) {
+      if (term && Array.isArray(term.results)) {
+        term.results = term.results.map((r: any) => ({
           ...r,
           success: r.result <= this.target,
           // failure: r.result > this.target,
@@ -41,9 +54,11 @@ export class EmokloreRoll extends foundry.dice.Roll {
   }
 
   get diceResults(): number[] {
-    const diceResults = new Array();
-    this.terms.forEach((term) => {
-      diceResults.push(...term.results.map((r) => r.result));
+    const diceResults: number[] = [];
+    (this.terms as any[]).forEach((term) => {
+      if (Array.isArray(term.results)) {
+        diceResults.push(...term.results.map((r: any) => r.result));
+      }
     });
     return diceResults;
   }
@@ -58,22 +73,22 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return base_count + critical_count - error_count;
   }
 
-  get result(): number {
+  get rollResult(): number {
     return this.rawResult + this.successMod;
   }
 
   get resultName(): string {
-    const success_count = this.result;
-    let resultName;
+    const success_count = this.rollResult;
+    let resultName: string;
     if (success_count < 0) {
       resultName = "fumble";
-    } else if (success_count == 0) {
+    } else if (success_count === 0) {
       resultName = "failure";
-    } else if (success_count == 1) {
+    } else if (success_count === 1) {
       resultName = "single";
-    } else if (success_count == 2) {
+    } else if (success_count === 2) {
       resultName = "double";
-    } else if (success_count == 3) {
+    } else if (success_count === 3) {
       resultName = "triple";
     } else if (success_count < 10) {
       resultName = "miracle";
@@ -88,22 +103,28 @@ export class EmokloreRoll extends foundry.dice.Roll {
   async _prepareChatRenderContext(
     options?: Record<string, unknown>
   ): Promise<Record<string, unknown>> {
-    const context = await super._prepareChatRenderContext(options);
-    context.result = this.result;
-    context.resultName = this.resultName;
-    context.successMod = this.successMod;
-    context.dmFormula = this.dmFormula;
-    return context;
+    // @ts-ignore - _prepareChatRenderContext exists but not in type definition
+    const baseContext = await super._prepareChatRenderContext(options);
+    return {
+      ...baseContext,
+      result: this.rollResult,
+      resultName: this.resultName,
+      successMod: this.successMod,
+      dmFormula: this.dmFormula,
+    };
   }
 
-  async getTooltip() {
+  override async getTooltip(): Promise<string> {
     const parts = this.dice.map((d) => d.getTooltipData());
-    return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, {
-      parts,
-      result: formatSuccess(this.rawResult, this.successMod),
-    });
+    return foundry.applications.handlebars.renderTemplate(
+      (this.constructor as typeof EmokloreRoll).TOOLTIP_TEMPLATE, 
+      {
+        parts,
+        result: formatSuccess(this.rawResult, this.successMod),
+      }
+    );
   }
 
-  static readonly CHAT_TEMPLATE = systemPath("templates/rolls/skill.hbs");
-  static readonly TOOLTIP_TEMPLATE = systemPath("templates/rolls/tooltip.hbs");
+  static override readonly CHAT_TEMPLATE = systemPath("templates/rolls/skill.hbs");
+  static override readonly TOOLTIP_TEMPLATE = systemPath("templates/rolls/tooltip.hbs");
 }

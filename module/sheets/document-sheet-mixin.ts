@@ -1,10 +1,35 @@
 import constructHTMLButton from "../helpers/construct-html-button";
-import {systemID } from "../constants";
+import { systemID } from "../constants";
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
-export default (base) => {
+interface DocumentSheetOptions {
+  classes: string[];
+  actions: Record<string, (event: Event, target: HTMLElement) => Promise<void>>;
+  window: {
+    resizable: boolean;
+  };
+  form: {
+    submitOnChange: boolean;
+  };
+}
+
+interface DocumentSheetContext {
+  isPlay: boolean;
+  owner: boolean;
+  limited: boolean;
+  gm: boolean;
+  document: any;
+  system: any;
+  systemFields: any;
+  flags: any;
+  [key: string]: unknown;
+}
+
+export default (base: any) => {
   return class EmokloreDocumentSheet extends HandlebarsApplicationMixin(base) {
-    static DEFAULT_OPTIONS = {
+    declare document: any;
+    declare window: any;
+    static DEFAULT_OPTIONS: DocumentSheetOptions = {
       classes: ["emoklore"],
       actions: {
         toggleMode: this.#toggleMode,
@@ -17,8 +42,8 @@ export default (base) => {
       },
     };
 
-    async _prepareContext(options) {
-      const context = await super._prepareContext(options);
+    async _prepareContext(options: Record<string, unknown>): Promise<DocumentSheetContext> {
+      const context = await super._prepareContext(options) as DocumentSheetContext;
 
       Object.assign(context, {
         isPlay: this.isPlayMode,
@@ -31,22 +56,25 @@ export default (base) => {
         flags: this.document.flags,
       });
 
-      if (game.settings.get(systemID, "developerMode")) {
+      if (game.settings.get(systemID as any, "developerMode" as any)) {
         console.log(context);
       }
 
       return context;
     }
 
-    _configureRenderOptions(options) {
+    _configureRenderOptions(options: Record<string, unknown>): void {
       super._configureRenderOptions(options);
-      if (options.mode && this.isEditable) this._mode = options.mode;
+      if (options.mode && (this as any).isEditable) {
+        this._mode = options.mode as number;
+      }
       // New sheets should always start in edit mode
-      else if (options.renderContext === `create${this.document.documentName}`)
-      this._mode = EmokloreDocumentSheet.MODES.EDIT;
+      else if (options.renderContext === `create${(this.document as any).documentName}`) {
+        this._mode = EmokloreDocumentSheet.MODES.EDIT;
+      }
     }
 
-    async _renderFrame(options) {
+    async _renderFrame(options: Record<string, unknown>): Promise<HTMLElement> {
       const frame = await super._renderFrame(options);
       const buttons = [
         constructHTMLButton({
@@ -64,30 +92,30 @@ export default (base) => {
       return frame;
     }
 
-    static MODES = Object.freeze({
+    static readonly MODES = Object.freeze({
       PLAY: 1,
       EDIT: 2,
-    });
+    } as const);
 
-    _mode = EmokloreDocumentSheet.MODES.PLAY;
+    _mode: number = EmokloreDocumentSheet.MODES.PLAY;
 
-    get isPlayMode() {
+    get isPlayMode(): boolean {
       return this._mode === EmokloreDocumentSheet.MODES.PLAY;
     }
 
-    get isEditMode() {
+    get isEditMode(): boolean {
       return this._mode === EmokloreDocumentSheet.MODES.EDIT;
     }
 
-    static async #toggleMode(event, target) {
-      if (!this.isEditable) {
+    static async #toggleMode(event: Event, target: HTMLElement): Promise<void> {
+      if (!(this as any).isEditable) {
         console.error("You can't switch to Edit mode if the sheet is uneditable");
         return;
       }
-      this._mode = this.isPlayMode
+      (this as any)._mode = (this as any).isPlayMode
         ? EmokloreDocumentSheet.MODES.EDIT
         : EmokloreDocumentSheet.MODES.PLAY;
-        this.render();
+      (this as any).render();
     }
   };
 };

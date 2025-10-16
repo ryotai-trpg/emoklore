@@ -1,6 +1,40 @@
 import { EmokloreActorSheet } from "./actor-sheet";
 import { systemPath } from "../constants";
 import { prepareActiveEffectCategories } from "../helpers/effects";
+import type { CharacterDataModel } from "../data/character";
+import type { EmokloreActor } from "../documents/actor";
+
+type EmotionKey = "surface" | "hidden" | "root";
+
+type SkillRow = {
+  level: number;
+  isExtra?: boolean;
+  [key: string]: unknown;
+};
+
+type CharacteristicsMap = Record<string, { field: foundry.data.fields.DataField; value: number }>;
+
+type CharacterContext = Record<string, any> & {
+  config: typeof CONFIG.EMOKLORE;
+  system: CharacterDataModel;
+  emotionAttributes: Record<EmotionKey, string>;
+  emotionOptions: Array<{ value: string; label: string; group: string }>;
+  characteristics?: CharacteristicsMap;
+  charPointSum?: number;
+  skills?: Record<string, SkillRow>;
+  skillPointSum?: number;
+  skillLevelOptions?: Array<{ value: string; label: string }>;
+  tabs: Record<string, unknown>;
+  tab?: unknown;
+  // DocumentSheetContext properties
+  isPlay: boolean;
+  owner: boolean;
+  limited: boolean;
+  gm: boolean;
+  document: EmokloreActor;
+  systemFields: Record<string, foundry.data.fields.DataField>;
+  flags: Record<string, unknown>;
+};
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -8,13 +42,17 @@ import { prepareActiveEffectCategories } from "../helpers/effects";
  */
 
 export class EmokloreCharacterSheet extends EmokloreActorSheet {
-  static DEFAULT_OPTIONS = {
+  declare actor: EmokloreActor;
+
+  static override DEFAULT_OPTIONS = {
+    ...super.DEFAULT_OPTIONS,
     classes: ["standard-form", "character"],
     position: {
       width: 601,
       height: 710,
     },
     actions: {
+      ...super.DEFAULT_OPTIONS.actions,
       viewDoc: this._viewDoc,
       createDoc: this._createDoc,
       deleteDoc: this._deleteDoc,
@@ -54,10 +92,11 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
   };
 
-  async _prepareContext(options) {
-    const context = await super._prepareContext(options);
+  override async _prepareContext(options: Record<string, unknown>): Promise<CharacterContext> {
+    const baseContext = await super._prepareContext(options);
+    const context = baseContext as CharacterContext;
     context.config = CONFIG.EMOKLORE;
-    context.emotionAttributes = {};
+    context.emotionAttributes = {} as Record<EmotionKey, string>;
 
     const { resonantEmotions } = context.config;
     const { emotions } = context.system;
@@ -65,12 +104,12 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     for (const key of ["surface", "hidden", "root"]) {
       const emotionKey = emotions[key];
       const attr = resonantEmotions[emotionKey]?.attribute ?? "";
-      context.emotionAttributes[key] = `EMOKLORE.emotionAttributes.${attr}`;
+      context.emotionAttributes[key] = `EMOKLORE.emotionAttributes.${String(attr)}`;
     }
 
     context.emotionOptions = Object.entries(CONFIG.EMOKLORE.resonantEmotions).map(
       ([value, { label, attribute }]) => ({
-        value,
+        value: String(value),
         label: game.i18n.format("EMOKLORE.resonantEmotion", {
           emotion: label,
           attribute: game.i18n.format(`EMOKLORE.emotionAttributes.${String(attribute)}`),
@@ -81,19 +120,19 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     return context;
   }
 
-  async _preparePartContext(partId, context, options) {
+  async _preparePartContext(partId: string, context: CharacterContext, options: Record<string, unknown>): Promise<CharacterContext> {
     await super._preparePartContext(partId, context, options);
     switch (partId) {
       case "skills":
-        context.characteristics = this._getCharacteristics();
+        context.characteristics = this._getCharacteristics() as unknown as CharacteristicsMap;
         context.charPointSum =
-          Object.values(context.characteristics as Record <string, { value: number }>).reduce((sum, obj) => {
+          Object.values(context.characteristics as Record<string, { value: number }>).reduce((sum, obj) => {
             return sum + obj.value;
           }, 0) - context.characteristics.fortune.value;
 
-        context.skills = this._getSkills();
+        context.skills = this._getSkills() as unknown as Record<string, SkillRow>;
 
-        const skillsObject = Object.values(context.skills);
+        const skillsObject = Object.values(context.skills) as Array<{ level: number; isExtra?: boolean }>;
         const exSkillsObject = skillsObject.filter((skill) => skill.isExtra);
 
         context.skillPointSum =
@@ -127,29 +166,29 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         break;
     }
 
-    if (partId in context.tabs) context.tab = context.tabs[partId];
+    if (partId in context.tabs) context.tab = context.tabs[partId] as unknown;
     return context;
   }
 
-  static async _viewDoc(event, target) {
+  static async _viewDoc(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
     const doc = this._getEmbeddedDocument(target);
-    doc.sheet.render(true);
+    (doc as any).sheet.render(true);
   }
 
-  static async _deleteDoc(event, target) {
+  static async _deleteDoc(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
     const doc = this._getEmbeddedDocument(target);
-    await doc.delete();
+    await (doc as any).delete();
   }
 
-  static async _createDoc(event, target) {
+  static async _createDoc(this: EmokloreCharacterSheet, event: Event, target: HTMLElement & { dataset: DOMStringMap }) {
     // Retrieve the configured document class for Item or ActiveEffect
-    const docCls = getDocumentClass(target.dataset.documentClass);
+    const docCls = getDocumentClass(target.dataset.documentClass as any) as any;
     // Prepare the document creation data by initializing it a default name.
     const docData = {
       name: docCls.defaultName({
         // defaultName handles an undefined type gracefully
-        type: target.dataset.type,
-        parent: this.actor,
+        type: target.dataset.type as any,
+        parent: this.actor as any,
       }),
     };
     // Loop through the dataset and add it to our docData
@@ -166,57 +205,60 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     await docCls.create(docData, { parent: this.actor });
   }
 
-  static async _toggleEffect(event, target) {
+  static async _toggleEffect(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
     const effect = this._getEmbeddedDocument(target);
-    await effect.update({ disabled: !effect.disabled });
+    await (effect as any).update({ disabled: !(effect as any).disabled });
   }
 
-  _getEmbeddedDocument(target) {
-    const docRow = target.closest("li[data-document-class]");
+  _getEmbeddedDocument(target: HTMLElement): any {
+    const docRow = target.closest("li[data-document-class]") as HTMLElement & { dataset: DOMStringMap };
     if (docRow.dataset.documentClass === "Item") {
-      return this.actor.items.get(docRow.dataset.itemId);
+      return (this.actor as any).items.get(docRow.dataset.itemId!);
     } else if (docRow.dataset.documentClass === "ActiveEffect") {
       const parent =
-        docRow.dataset.parentId === this.actor.id
+        docRow.dataset.parentId === (this.actor as any).id
           ? this.actor
-          : this.actor.items.get(docRow?.dataset.parentId);
-      return parent.effects.get(docRow?.dataset.effectId);
+          : (this.actor as any).items.get(docRow?.dataset.parentId!);
+      return (parent as any)!.effects.get(docRow?.dataset.effectId!);
     } else return console.warn("Could not find document class");
   }
 
-  _getCharacteristics() {
+  _getCharacteristics(): Record<string, unknown> {
     const data = this.actor;
     return Object.keys(CONFIG.EMOKLORE.characteristics).reduce((obj, chc) => {
       const value = foundry.utils.getProperty(data, `system.characteristics.${chc}.value`);
-      obj[chc] = {
-        field: this.actor.system.schema.getField(["characteristics", chc]),
+      (obj as Record<string, unknown>)[chc] = {
+        field: (this.actor as any).system.schema.getField(["characteristics", chc]),
         value: value ?? 0,
       };
       return obj;
-    }, {});
+    }, {} as Record<string, unknown>);
   }
 
-  _getSkills() {
+  _getSkills(): Record<string, unknown> {
     const data = this.actor;
     return Object.keys(CONFIG.EMOKLORE.skills).reduce((obj, chc) => {
-      const value = foundry.utils.getProperty(data, `system.skills.${chc}`);
-      obj[chc] = {
-        field: this.actor.system.schema.getField(["skills", chc]),
-        ...value,
+      const value = foundry.utils.getProperty(
+        data,
+        `system.skills.${chc}`
+      ) as Record<string, unknown> | undefined;
+      (obj as Record<string, unknown>)[chc] = {
+        field: (this.actor as any).system.schema.getField(["skills", chc]),
+        ...(value ?? {}),
       };
       return obj;
-    }, {});
+    }, {} as Record<string, unknown>);
   }
 
-  _getBaseSkills() {
+  _getBaseSkills(): Record<string, unknown> {
     const data = this.actor;
     return Object.keys(CONFIG.EMOKLORE.baseSkills).reduce((obj, baseSkill) => {
-      const value = foundry.utils.getProperty(data, `system.baseSkills.${baseSkill}`);
-      obj[baseSkill] = {
+      const value = foundry.utils.getProperty(data, `system.baseSkills.${baseSkill}`) as Record<string, unknown>;
+      (obj as Record<string, unknown>)[baseSkill] = {
         label: value.label ?? "Null",
         level: value.level ?? 0,
       };
       return obj;
-    }, {});
+    }, {} as Record<string, unknown>);
   }
 }

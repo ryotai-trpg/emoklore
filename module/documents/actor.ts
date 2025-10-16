@@ -1,22 +1,33 @@
 import { EmokloreRoll } from "../dice/emoklore-roll";
 import { formatDMPart } from "../helpers/helper";
+import type { CharacterDataModel } from "../data/character";
+
+type ResonanceMatch = "none" | "root" | "completely";
+type ResourceKey = "hp" | "mp" | "resonance";
 
 export class EmokloreActor extends Actor {
-  prepareDerivedData() {
+  declare system: any;
+  override prepareDerivedData(): void {
     super.prepareDerivedData();
   }
 
-  async adjustResource(resource, point) {
-    const newvalue = this.system.resources[resource].value + point;
-    return await this.update({ [`system.resources.${resource}.value`]: newvalue });
+  async adjustResource(resource: ResourceKey, point: number): Promise<Actor | null> {
+    const newvalue = (this.system.resources[resource]?.value ?? 0) + point;
+    return await (this as any).update({ [`system.resources.${resource}.value`]: newvalue });
   }
 
-  async rollResonance(intensity, emotionMatch, { ...options } = {}) {
+  async rollResonance(
+    intensity?: number,
+    emotionMatch?: ResonanceMatch,
+    options: Record<string, unknown> = {}
+  ): Promise<ChatMessage | undefined> {
     // TODO: 雑・リファクタ
 
     if (intensity === undefined) {
       try {
-        [intensity, emotionMatch] = await (foundry.applications.api.DialogV2.prompt as any)({
+        const result = await (foundry.applications.api.DialogV2.prompt as (
+          args: { window: { title: string }; content: string; ok: { label: string; callback: (event: Event, button: HTMLElement) => [number, ResonanceMatch] }; rejectClose: boolean }
+        ) => Promise<[number, ResonanceMatch]>)({
           window: { title: "〈♾️共鳴〉判定" },
           content: `
           <div>
@@ -31,13 +42,15 @@ export class EmokloreActor extends Actor {
           `,
           ok: {
             label: "ロール",
-            callback: (event, button, dialog) => {
-              const value = button.form.elements.intensity.valueAsNumber;
-              return [isNaN(value) || value <= 0 ? 1 : value, button.form.elements.choice.value];
+            callback: (event, button) => {
+              const form = (button as any).form;
+              const value = form.elements.intensity.valueAsNumber;
+              return [isNaN(value) || value <= 0 ? 1 : value, form.elements.choice.value];
             },
           },
           rejectClose: true,
         });
+        [intensity, emotionMatch] = result;
       } catch {
         return;
       }
@@ -51,46 +64,49 @@ export class EmokloreActor extends Actor {
       level *= 2;
     }
 
-    options.target = intensity;
-    options.successMod = 0;
+    (options as Record<string, unknown>)["target"] = intensity;
+    (options as Record<string, unknown>)["successMod"] = 0;
 
-    options.dmFormula = `${level}DM≦${intensity}`;
+    (options as Record<string, unknown>)["dmFormula"] = `${level}DM≦${intensity}`;
 
     const roll = await new EmokloreRoll(`${level}d10`, {}, options).evaluate();
 
     const messageData = {
-      speaker: ChatMessage.getSpeaker({ actor: this }),
+      speaker: ChatMessage.getSpeaker({ actor: this as any }),
       flavor: game.i18n.format("EMOKLORE.skillRoll", { skillName: "♾️共鳴" }),
       rolls: [roll],
-      sound: CONFIG.sounds.dice,
+      sound: (CONFIG as any).sounds.dice,
       flags: { core: { canPopout: true } },
     };
 
-    return ChatMessage.create(messageData);
+    return ChatMessage.create(messageData as any);
   }
 
-  async rollSkill(skill, { base = false, ...options } = {}) {
+  async rollSkill(
+    skill: string,
+    { base = false, ...options }: { base?: boolean } & Record<string, unknown> = {}
+  ): Promise<ChatMessage | undefined> {
     const skillSource = base ? this.system.baseSkills : this.system.skills;
 
-    const { label, level, target: baseTarget, characteristic, group, isExtra } = skillSource[skill];
+    const { label, level, target: baseTarget, characteristic, group, isExtra } = skillSource[skill] as any;
 
     const {
       bonus: skillBonus,
       success: skillSuccessMod,
       target: skillTargetMod,
-    } = skillSource[skill].mod;
+    } = (skillSource[skill] as any).mod;
 
     const {
       bonus: characteristicBonus,
       success: characteristicSuccessMod,
       target: characteristicTargetMod,
-    } = this.system.characteristics[characteristic].mod;
+    } = (this.system.characteristics[characteristic] as any).mod;
 
     const {
       bonus: skillGroupBonus,
       success: skillGroupSuccessMod,
       target: skillGroupTargetMod,
-    } = this.system.skillGroups[group].mod;
+    } = (this.system.skillGroups[group] as any).mod;
 
     const prefix = base ? "＊" : isExtra ? "★" : "";
 
@@ -102,20 +118,20 @@ export class EmokloreActor extends Actor {
     const leftPart = formatDMPart(level, bonus);
     const rightPart = formatDMPart(baseTarget, targetMod);
 
-    options.dmFormula = `${leftPart}DM≦${rightPart}`;
-    options.successMod = successMod;
-    options.target = baseTarget + targetMod;
+    (options as Record<string, unknown>)["dmFormula"] = `${leftPart}DM≦${rightPart}`;
+    (options as Record<string, unknown>)["successMod"] = successMod;
+    (options as Record<string, unknown>)["target"] = baseTarget + targetMod;
 
     const roll = await new EmokloreRoll(`${level + bonus}d10`, {}, options).evaluate();
 
     const messageData = {
-      speaker: ChatMessage.getSpeaker({ actor: this }),
+      speaker: ChatMessage.getSpeaker({ actor: this as any }),
       flavor: game.i18n.format("EMOKLORE.skillRoll", { skillName: skillName }),
       rolls: [roll],
-      sound: CONFIG.sounds.dice,
+      sound: (CONFIG as any).sounds.dice,
       flags: { core: { canPopout: true } },
     };
 
-    return ChatMessage.create(messageData);
+    return ChatMessage.create(messageData as any);
   }
 }

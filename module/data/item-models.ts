@@ -6,7 +6,10 @@ const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields
 /* -------------------------------------------- */
 
 class BaseItemDataModel extends EmokloreSystemDataModel {
-  static defineSchema() {
+  declare rarity: string;
+  declare price: number;
+
+  static defineSchema(): Record<string, unknown> {
     return {
       rarity: new StringField({
         required: true,
@@ -25,7 +28,9 @@ class BaseItemDataModel extends EmokloreSystemDataModel {
 }
 
 export class WeaponDataModel extends BaseItemDataModel {
-  static defineSchema() {
+  declare damage: number;
+
+  static override defineSchema(): Record<string, unknown> {
     return {
       ...super.defineSchema(),
       damage: new NumberField({

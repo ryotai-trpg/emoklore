@@ -4,20 +4,20 @@ const { HTMLField, NumberField, SchemaField, StringField, BooleanField } = found
 export class CharacterDataModel extends BaseActorDataModel {
 
   declare skills: Record<
-  string,
-  {
-    level: number;
-    characteristic: string;
-    target?: number;
-  }
+    keyof typeof CONFIG.EMOKLORE["skills"],
+    {
+      level: number;
+      characteristic: keyof typeof CONFIG.EMOKLORE["characteristics"];
+      target?: number;
+    }
   >;
 
   declare baseSkills: Record<
-  string,
-  {
-    characteristic: string;
-    target?: number;
-  }
+    keyof typeof CONFIG.EMOKLORE["baseSkills"],
+    {
+      characteristic: keyof typeof CONFIG.EMOKLORE["characteristics"];
+      target?: number;
+    }
   >;
 
   declare resources: {
@@ -27,8 +27,8 @@ export class CharacterDataModel extends BaseActorDataModel {
   };
 
 
-  static defineSchema(): Record<string, any> {
-    const schema = super.defineSchema() as Record<string, any>;
+  static override defineSchema(): Record<string, foundry.data.fields.DataField> {
+    const schema = super.defineSchema() as Record<string, foundry.data.fields.DataField>;
 
     schema.resources = new SchemaField({
       hp: new SchemaField({
@@ -40,8 +40,8 @@ export class CharacterDataModel extends BaseActorDataModel {
         max: new NumberField({ required: true, integer: true, initial: 2 }),
       }),
       resonance: new SchemaField({
-        value: new NumberField({ required: true, interger: true, initial: 1 }),
-        max: new NumberField({ required: true, interger: true, initial: 9 }),
+        value: new NumberField({ required: true, integer: true, initial: 1 }),
+        max: new NumberField({ required: true, integer: true, initial: 9 }),
       }),
     });
 
@@ -55,23 +55,26 @@ export class CharacterDataModel extends BaseActorDataModel {
     };
 
     schema.characteristics = new SchemaField(
-      Object.entries(CONFIG.EMOKLORE.characteristics).reduce((obj, [chc, { label }]) => {
-        obj[chc] = new SchemaField({
-          value: new NumberField({ ...characteristic, label }),
-          mod: new SchemaField({
-            bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-            success: new NumberField({ required: true, integer: true, initial: 0 }),
-            target: new NumberField({ required: true, integer: true, initial: 0 }),
-          }),
-        });
-        return obj;
-      }, {}),
+      Object.entries(CONFIG.EMOKLORE.characteristics).reduce(
+        (obj, [chc, { label }]) => {
+          (obj as Record<string, foundry.data.fields.DataField>)[chc] = new SchemaField({
+            value: new NumberField({ ...characteristic, label }),
+            mod: new SchemaField({
+              bonus: new NumberField({ required: true, integer: true, initial: 0 }),
+              success: new NumberField({ required: true, integer: true, initial: 0 }),
+              target: new NumberField({ required: true, integer: true, initial: 0 }),
+            }),
+          });
+          return obj;
+        },
+        {} as Record<string, foundry.data.fields.DataField>,
+      ),
     );
 
     schema.skills = new SchemaField(
       Object.entries(CONFIG.EMOKLORE.skills).reduce(
         (obj, [skill, { characteristic, label, characteristicOptions, group, isExtra }]) => {
-          obj[skill] = new SchemaField({
+          (obj as Record<string, foundry.data.fields.DataField>)[skill] = new SchemaField({
             level: new NumberField({
               min: 0,
               max: 3,
@@ -106,14 +109,14 @@ export class CharacterDataModel extends BaseActorDataModel {
           });
           return obj;
         },
-        {},
+        {} as Record<string, foundry.data.fields.DataField>,
       ),
     );
 
     schema.baseSkills = new SchemaField(
       Object.entries(CONFIG.EMOKLORE.baseSkills).reduce(
         (obj, [skill, { characteristic, label, group }]) => {
-          obj[skill] = new SchemaField({
+          (obj as Record<string, foundry.data.fields.DataField>)[skill] = new SchemaField({
             level: new NumberField({
               min: 1,
               max: 1,
@@ -136,13 +139,13 @@ export class CharacterDataModel extends BaseActorDataModel {
           });
           return obj;
         },
-        {},
+        {} as Record<string, foundry.data.fields.DataField>,
       ),
     );
 
     schema.skillGroups = new SchemaField(
       Object.entries(CONFIG.EMOKLORE.skillGroups).reduce((obj, [group, { label }]) => {
-        obj[group] = new SchemaField({
+        (obj as Record<string, foundry.data.fields.DataField>)[group] = new SchemaField({
           label: new StringField({ initial: game.i18n.localize(label) }),
           mod: new SchemaField({
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
@@ -151,7 +154,7 @@ export class CharacterDataModel extends BaseActorDataModel {
           }),
         });
         return obj;
-      }, {}),
+      }, {} as Record<string, any>),
     );
 
     schema.emotions = new SchemaField({
@@ -176,7 +179,7 @@ export class CharacterDataModel extends BaseActorDataModel {
     return schema;
   }
 
-  static LOCALIZATION_PREFIXES = ["EMOKLORE.Actor.character"];
+  static LOCALIZATION_PREFIXES = ["EMOKLORE.Actor.character"] as const;
 
   prepareDerivedData() {
     super.prepareDerivedData();
@@ -188,7 +191,7 @@ export class CharacterDataModel extends BaseActorDataModel {
           ...skill,
           target:
             skill.level +
-            (foundry.utils.getProperty(this, `characteristics.${skill.characteristic}.value`) as number),
+            (foundry.utils.getProperty(this, `characteristics.${String(skill.characteristic)}.value`) as number),
         },
       ]),
     );
@@ -198,7 +201,7 @@ export class CharacterDataModel extends BaseActorDataModel {
         key,
         {
           ...skill,
-          target: foundry.utils.getProperty(this, `characteristics.${skill.characteristic}.value`) as number,
+          target: foundry.utils.getProperty(this, `characteristics.${String(skill.characteristic)}.value`) as number,
         },
       ]),
     );

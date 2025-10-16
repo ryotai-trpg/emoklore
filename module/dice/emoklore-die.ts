@@ -1,5 +1,12 @@
 export class EmokloreDie extends foundry.dice.terms.Die {
-  getResultCSS(result) {
+  override getResultCSS(result: { 
+    result: number; 
+    success?: boolean; 
+    failure?: boolean; 
+    rerolled?: boolean; 
+    exploded?: boolean; 
+    discarded?: boolean 
+  }): string[] {
     const isMax = result.result === this.faces;
     const isMin = result.result === 1;
     return [
@@ -12,6 +19,6 @@ export class EmokloreDie extends foundry.dice.terms.Die {
       result.discarded ? "discarded" : null,
       isMin ? "max" : null,
       isMax ? "min" : null,
-    ];
+    ].filter((x): x is string => Boolean(x));
   }
 }

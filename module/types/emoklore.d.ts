@@ -22,7 +22,7 @@ export interface SkillConfig {
 }
 
 export interface SkillLevelConfig {
-  label: stirng;
+  label: string;
 }
 
 export interface EmotionAttributesConfig {

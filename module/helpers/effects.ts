@@ -5,7 +5,7 @@
  */
 export function prepareActiveEffectCategories(
   effects: Iterable<ActiveEffect>
-): Record<string, EffectCategory> {
+): Record<EffectCategory["type"], EffectCategory> {
   // Define effect header categories
   const categories = {
     temporary: {

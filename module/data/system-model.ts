@@ -1,1 +1,1 @@
-export class EmokloreSystemDataModel extends foundry.abstract.TypeDataModel {}
+export class EmokloreSystemDataModel extends (foundry as any).abstract.TypeDataModel {}

@@ -8,10 +8,13 @@
     "outDir": "dist",
     "noEmit": true,
     "strict": false,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "types": ["fvtt-types"]
   },
-  "include": ["module/**/*"],
+  "include": ["*.ts", "module/**/*"],
   "exclude": ["node_modules", "dist"]
 }
