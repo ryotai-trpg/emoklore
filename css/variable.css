@@ -1,15 +1,23 @@
+/* ===========================================
+   Emoklore CSS Variables
+   =========================================== */
+
 .emoklore {
+  /* Layout Variables */
   --emoklore-sheet-sidebar-width: 250px;
 
-  --emoklore-accent-color: #1565C0; /* #1976d2;  Material Blue 700 */
+  /* Color Palette */
+  --emoklore-accent-color: #1565C0; /* Material Blue 700 */
   --emoklore-darkgray: rgb(40 40 40 / 80%);
-
-  --emoklore-green: #008b00;
-  --emoklore-red: #BF360C;
   --emoklore-gray: #383838;
-  --emoklore-progress-radius: 5px;
-  --emoklore-progress-radius2: 2px;
-
-  --emoklore-card-radius: 10px;
   --emoklore-black: #000000;
+
+  /* Status Colors */
+  --emoklore-green: #008b00;  /* HP color */
+  --emoklore-red: #BF360C;    /* MP color */
+
+  /* Border Radius */
+  --emoklore-progress-radius: 5px;
+  --emoklore-progress-radius-small: 2px;
+  --emoklore-card-radius: 10px;
 }
