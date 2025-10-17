@@ -18,14 +18,25 @@
     }
   },
 
+  "colon": ": ",
+
   "EMOKLORE": {
     "SheetClass": {
       "character": "Character Sheet"
     },
-    "CharacterSheet.tab": {
-      "biography": "Biography",
-      "skills": "Skills",
-      "effects": "Effects"
+    "CharacterSheet": {
+      "tab": {
+        "biography": "Biography",
+        "skills": "Skills",
+        "effects": "Effects"
+      },
+      "fields": {
+        "specialization": "Specialization",
+        "skillName": "Skill Name",
+        "skillCharacteristic": "Characteristic",
+        "skillGroup": "Skill Group",
+        "isExtra": "Extra Skill"
+      }
     },
     "SHEET.ToggleMode": "Toggle Play/Edit mode",
 

@@ -4,6 +4,7 @@ export interface SkillConfig {
   characteristicOptions?: string[];
   group: string;
   isExtra?: boolean;
+  hasSpecialization?: boolean;
 }
 
 export const skills: Record<string, SkillConfig> = {
@@ -85,6 +86,7 @@ export const skills: Record<string, SkillConfig> = {
     label: "EMOKLORE.Actor.skills.specializedKnowledge",
     characteristic: "intelligence",
     group: "knowledge",
+    hasSpecialization: true,
   },
   insider: {
     label: "EMOKLORE.Actor.skills.insider",
@@ -95,6 +97,7 @@ export const skills: Record<string, SkillConfig> = {
     label: "EMOKLORE.Actor.skills.industryKnowledge",
     characteristicOptions: ["sociality", "charisma"],
     group: "knowledge",
+    hasSpecialization: true,
   },
 
   speed: {
@@ -121,18 +124,21 @@ export const skills: Record<string, SkillConfig> = {
     label: "EMOKLORE.Actor.skills.martialArt",
     characteristic: "physical",
     group: "athletic",
+    hasSpecialization: true,
   },
   secretTechnique: {
     label: "EMOKLORE.Actor.skills.secretTechnique",
     characteristicOptions: ["physical", "mentality", "dexterity"],
     group: "athletic",
     isExtra: true,
+    hasSpecialization: true,
   },
   rangedAttack: {
     label: "EMOKLORE.Actor.skills.rangedAttack",
     characteristicOptions: ["dexterity", "sensitivity"],
     group: "athletic",
     isExtra: true,
+    hasSpecialization: true,
   },
 
   endurance: {
@@ -161,16 +167,19 @@ export const skills: Record<string, SkillConfig> = {
     label: "EMOKLORE.Actor.skills.technique",
     characteristic: "dexterity",
     group: "unique",
+    hasSpecialization: true,
   },
   art: {
     label: "EMOKLORE.Actor.skills.art",
     characteristicOptions: ["dexterity", "mentality", "sensitivity"],
     group: "unique",
+    hasSpecialization: true,
   },
   pilot: {
     label: "EMOKLORE.Actor.skills.pilot",
     characteristicOptions: ["dexterity", "sensitivity", "intelligence"],
     group: "unique",
+    hasSpecialization: true,
   },
   cipher: {
     label: "EMOKLORE.Actor.skills.cipher",

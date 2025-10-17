@@ -104,6 +104,7 @@ export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extend
       characteristic,
       group,
       isExtra,
+      specialization,
     } = skillSource[skill] as any;
 
     const {
@@ -129,7 +130,8 @@ export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extend
     const targetMod = skillTargetMod + characteristicTargetMod + skillGroupTargetMod;
     const successMod = skillSuccessMod + characteristicSuccessMod + skillGroupSuccessMod;
     const bonus = skillBonus + characteristicBonus + skillGroupBonus;
-    const skillName = `${prefix}${label}`;
+    const skillName = `${prefix}${label}${specialization ? `${game.i18n.localize("colon")}${specialization}` : ""}`;
+    // TODO: Refactor
 
     const leftPart = formatDMPart(level, bonus);
     const rightPart = formatDMPart(baseTarget, targetMod);

@@ -18,14 +18,25 @@
     }
   },
 
+  "colon": "：",
+
   "EMOKLORE": {
     "SheetClass": {
       "character": "キャラクターシート"
     },
-    "CharacterSheet.tab": {
-      "biography": "プロフィール",
-      "skills": "技能",
-      "effects": "効果"
+    "CharacterSheet": {
+      "tab": {
+        "biography": "プロフィール",
+        "skills": "技能",
+        "effects": "効果"
+      },
+      "fields": {
+        "specialization": "分野",
+        "skillName": "技能名",
+        "skillCharacteristic": "能力値",
+        "skillGroup": "グループ",
+        "isExtra": "EX技能"
+      }
     },
     "SHEET.ToggleMode": "プレイ・編集モード切替",
 

@@ -47,7 +47,7 @@ const defineCharacterDataModelSchema = () => {
 
   schema.skills = new SchemaField(
     Object.entries(CONFIG.EMOKLORE.skills).reduce(
-      (obj, [skill, { characteristic, label, characteristicOptions, group, isExtra }]) => {
+      (obj, [skill, { characteristic, label, characteristicOptions, group, isExtra, hasSpecialization }]) => {
         (obj as Record<string, foundry.data.fields.DataField>)[skill] = new SchemaField({
           level: new NumberField({
             min: 0,
@@ -74,6 +74,8 @@ const defineCharacterDataModelSchema = () => {
           label: new StringField({ initial: label }),
           group: new StringField({ initial: group }),
           isExtra: new BooleanField({ initial: isExtra ?? false }),
+          hasSpecialization: new BooleanField({ initial: hasSpecialization ?? false }),
+          ...(hasSpecialization ? { specialization: new StringField({ initial: "" }) } : {}),
           mod: new SchemaField({
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
             success: new NumberField({ required: true, integer: true, initial: 0 }),

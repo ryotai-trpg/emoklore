@@ -8,7 +8,9 @@
   {{#if ../isPlay}}
   {{#if skill.level}}
   <div class="skill play" data-skill="{{key}}">
-    <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">{{skill.label}}</a>
+    <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">
+      {{skill.label}}{{#if skill.specialization}}{{localize "colon"}}{{skill.specialization}}{{/if}}
+    </a>
     <span>Lv.{{skill.level}}</span>
     <progress value="{{skill.level}}" max="3"></progress>
     <span class="target">{{skill.target}}</span>
@@ -24,6 +26,9 @@
     <span class="characteristic">{{formInput skill.field.fields.characteristic value=skill.characteristic localize=true}}</span>
     {{else}}
     <span class="characteristic">{{localize (concat "EMOKLORE.Actor.characteristics." skill.characteristic)}}</span>
+    {{/if}}
+    {{#if skill.field.fields.specialization}}
+    <span class="specialization">{{formInput skill.field.fields.specialization value=skill.specialization placeholder=(localize "EMOKLORE.CharacterSheet.fields.specialization")}}</span>
     {{/if}}
   </div>
   {{/if}}
