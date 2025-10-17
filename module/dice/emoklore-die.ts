@@ -1,11 +1,11 @@
 export class EmokloreDie extends foundry.dice.terms.Die {
-  override getResultCSS(result: { 
-    result: number; 
-    success?: boolean; 
-    failure?: boolean; 
-    rerolled?: boolean; 
-    exploded?: boolean; 
-    discarded?: boolean 
+  override getResultCSS(result: {
+    result: number;
+    success?: boolean;
+    failure?: boolean;
+    rerolled?: boolean;
+    exploded?: boolean;
+    discarded?: boolean;
   }): string[] {
     const isMax = result.result === this.faces;
     const isMin = result.result === 1;

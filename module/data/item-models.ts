@@ -5,40 +5,47 @@ const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields
 /*  Item Models                                 */
 /* -------------------------------------------- */
 
-class BaseItemDataModel extends EmokloreSystemDataModel {
-  declare rarity: string;
-  declare price: number;
+const defineBaseItemDataModelSchema = () => {
+  return {
+    rarity: new StringField({
+      required: true,
+      blank: false,
+      options: ["common", "uncommon", "rare", "legendary"],
+      initial: "common",
+    }),
+    price: new NumberField({
+      required: true,
+      integer: true,
+      min: 0,
+      initial: 20,
+    }),
+  };
+};
 
-  static defineSchema(): Record<string, unknown> {
-    return {
-      rarity: new StringField({
-        required: true,
-        blank: false,
-        options: ["common", "uncommon", "rare", "legendary"],
-        initial: "common",
-      }),
-      price: new NumberField({
-        required: true,
-        integer: true,
-        min: 0,
-        initial: 20,
-      }),
-    };
+export type BaseItemDataModelSchema = ReturnType<typeof defineBaseItemDataModelSchema>;
+
+export class BaseItemDataModel extends EmokloreSystemDataModel<BaseItemDataModelSchema> {
+  static override defineSchema() {
+    return defineBaseItemDataModelSchema();
   }
 }
 
-export class WeaponDataModel extends BaseItemDataModel {
-  declare damage: number;
+const defineWeaponDataModelSchema = () => {
+  return {
+    ...defineBaseItemDataModelSchema(),
+    damage: new NumberField({
+      required: true,
+      integer: true,
+      positive: true,
+      initial: 5,
+    }),
+  };
+};
 
-  static override defineSchema(): Record<string, unknown> {
-    return {
-      ...super.defineSchema(),
-      damage: new NumberField({
-        required: true,
-        integer: true,
-        positive: true,
-        initial: 5,
-      }),
-    };
+export type WeaponDataModelSchema = ReturnType<typeof defineWeaponDataModelSchema>;
+
+export class WeaponDataModel extends BaseItemDataModel {
+  static override defineSchema() {
+    return defineWeaponDataModelSchema();
   }
 }

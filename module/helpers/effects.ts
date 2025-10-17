@@ -1,10 +1,5 @@
-/**
- * Prepare the data structure for Active Effects which are currently embedded in an Actor or Item.
- * @param effects    A collection or generator of Active Effect documents to prepare sheet data for
- * @return                  Data for rendering
- */
 export function prepareActiveEffectCategories(
-  effects: Iterable<ActiveEffect>
+  effects: Iterable<ActiveEffect>,
 ): Record<EffectCategory["type"], EffectCategory> {
   // Define effect header categories
   const categories = {
@@ -42,5 +37,5 @@ export function prepareActiveEffectCategories(
 interface EffectCategory {
   type: "temporary" | "passive" | "inactive";
   label: string;
-  effects: ActiveEffect[]
+  effects: ActiveEffect[];
 }

@@ -29,7 +29,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
   constructor(
     formula: string = "1d10",
     data: Record<string, unknown> = {},
-    options: EmokloreRollOptions = {}
+    options: EmokloreRollOptions = {},
   ) {
     super(formula, data as any, options);
     const { successMod = 0, dmFormula = "", target = 10 } = options;
@@ -101,7 +101,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
   }
 
   async _prepareChatRenderContext(
-    options?: Record<string, unknown>
+    options?: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
     // @ts-ignore - _prepareChatRenderContext exists but not in type definition
     const baseContext = await super._prepareChatRenderContext(options);
@@ -117,11 +117,11 @@ export class EmokloreRoll extends foundry.dice.Roll {
   override async getTooltip(): Promise<string> {
     const parts = this.dice.map((d) => d.getTooltipData());
     return foundry.applications.handlebars.renderTemplate(
-      (this.constructor as typeof EmokloreRoll).TOOLTIP_TEMPLATE, 
+      (this.constructor as typeof EmokloreRoll).TOOLTIP_TEMPLATE,
       {
         parts,
         result: formatSuccess(this.rawResult, this.successMod),
-      }
+      },
     );
   }
 

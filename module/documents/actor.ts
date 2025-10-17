@@ -5,29 +5,38 @@ import type { CharacterDataModel } from "../data/character";
 type ResonanceMatch = "none" | "root" | "completely";
 type ResourceKey = "hp" | "mp" | "resonance";
 
-export class EmokloreActor extends Actor {
-  declare system: any;
-  override prepareDerivedData(): void {
-    super.prepareDerivedData();
-  }
+export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extends Actor<SubType> {
+  declare system: SubType extends "character"
+    ? CharacterDataModel
+    : SubType extends "npc"
+      ? any // NPCの型定義が必要
+      : any;
 
-  async adjustResource(resource: ResourceKey, point: number): Promise<Actor | null> {
+  async adjustResource(resource: ResourceKey, point: number): Promise<this | null> {
     const newvalue = (this.system.resources[resource]?.value ?? 0) + point;
-    return await (this as any).update({ [`system.resources.${resource}.value`]: newvalue });
+    return await this.update({ [`system.resources.${resource}.value`]: newvalue });
   }
 
   async rollResonance(
     intensity?: number,
     emotionMatch?: ResonanceMatch,
-    options: Record<string, unknown> = {}
+    options: Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
-    // TODO: 雑・リファクタ
+    // TODO: Refactor
 
     if (intensity === undefined) {
       try {
-        const result = await (foundry.applications.api.DialogV2.prompt as (
-          args: { window: { title: string }; content: string; ok: { label: string; callback: (event: Event, button: HTMLElement) => [number, ResonanceMatch] }; rejectClose: boolean }
-        ) => Promise<[number, ResonanceMatch]>)({
+        const result = await (
+          foundry.applications.api.DialogV2.prompt as (args: {
+            window: { title: string };
+            content: string;
+            ok: {
+              label: string;
+              callback: (event: Event, button: HTMLElement) => [number, ResonanceMatch];
+            };
+            rejectClose: boolean;
+          }) => Promise<[number, ResonanceMatch]>
+        )({
           window: { title: "〈♾️共鳴〉判定" },
           content: `
           <div>
@@ -71,24 +80,31 @@ export class EmokloreActor extends Actor {
 
     const roll = await new EmokloreRoll(`${level}d10`, {}, options).evaluate();
 
-    const messageData = {
-      speaker: ChatMessage.getSpeaker({ actor: this as any }),
+    const messageData: any = {
+      speaker: ChatMessage.getSpeaker({ actor: this }),
       flavor: game.i18n.format("EMOKLORE.skillRoll", { skillName: "♾️共鳴" }),
       rolls: [roll],
       sound: (CONFIG as any).sounds.dice,
       flags: { core: { canPopout: true } },
     };
 
-    return ChatMessage.create(messageData as any);
+    return ChatMessage.create(messageData);
   }
 
   async rollSkill(
     skill: string,
-    { base = false, ...options }: { base?: boolean } & Record<string, unknown> = {}
+    { base = false, ...options }: { base?: boolean } & Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
     const skillSource = base ? this.system.baseSkills : this.system.skills;
 
-    const { label, level, target: baseTarget, characteristic, group, isExtra } = skillSource[skill] as any;
+    const {
+      label,
+      level,
+      target: baseTarget,
+      characteristic,
+      group,
+      isExtra,
+    } = skillSource[skill] as any;
 
     const {
       bonus: skillBonus,
@@ -124,14 +140,14 @@ export class EmokloreActor extends Actor {
 
     const roll = await new EmokloreRoll(`${level + bonus}d10`, {}, options).evaluate();
 
-    const messageData = {
-      speaker: ChatMessage.getSpeaker({ actor: this as any }),
+    const messageData: any = {
+      speaker: ChatMessage.getSpeaker({ actor: this }),
       flavor: game.i18n.format("EMOKLORE.skillRoll", { skillName: skillName }),
       rolls: [roll],
       sound: (CONFIG as any).sounds.dice,
       flags: { core: { canPopout: true } },
     };
 
-    return ChatMessage.create(messageData as any);
+    return ChatMessage.create(messageData);
   }
 }

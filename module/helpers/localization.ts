@@ -3,18 +3,11 @@
 /* -------------------------------------------- */
 
 // Adapted from dnd5e and draw-steel
-// 正直よくわからんけど動いるからよし！
 
-/**
- * Sort the provided object by its values or by an inner sortKey.
- * @param {object} obj                 The object to sort.
- * @param {string|Function} [sortKey]  An inner key upon which to sort or sorting function.
- * @returns {object}                   A copy of the original object that has been sorted.
- */
 // export function sortObjectEntries(obj, sortKey) {
 export function sortObjectEntries<T extends Record<string, unknown>, V = T[keyof T]>(
   obj: T,
-  sortKey?: string | ((a: V, b: V) => number)
+  sortKey?: string | ((a: V, b: V) => number),
 ): T {
   let sorted = Object.entries(obj) as [string, V][];
 
@@ -32,8 +25,12 @@ export function sortObjectEntries<T extends Record<string, unknown>, V = T[keyof
     sorted = sorted.sort((lhs, rhs) => sortKey(lhs[1], rhs[1]));
   } else if (typeof sortKey === "string") {
     sorted = sorted.sort((lhs, rhs) => {
-      const lval = (lhs[1] as Record<string, unknown> | unknown as Record<string, unknown>)[sortKey as string];
-      const rval = (rhs[1] as Record<string, unknown> | unknown as Record<string, unknown>)[sortKey as string];
+      const lval = (lhs[1] as Record<string, unknown> | unknown as Record<string, unknown>)[
+        sortKey as string
+      ];
+      const rval = (rhs[1] as Record<string, unknown> | unknown as Record<string, unknown>)[
+        sortKey as string
+      ];
       return compareValues(lval, rval);
     });
   } else {
@@ -59,19 +56,9 @@ const _preLocalizationRegistrations: Record<string, PreLocalizationRegistration>
 
 /* -------------------------------------------------- */
 
-/**
- * Mark the provided config key to be pre-localized during the init stage.
- * @param {string} configKeyPath          Key path within `ds.CONFIG` to localize.
- * @param {object} [options={}]
- * @param {string} [options.key]          If each entry in the config enum is an object,
- *                                        localize and sort using this property.
- * @param {string[]} [options.keys=[]]    Array of localization keys. First key listed will be used for sorting
- *                                        if multiple are provided.
- * @param {boolean} [options.sort=false]  Sort this config enum, using the key if set.
- */
 export function preLocalize(
   configKeyPath: string,
-  { key, keys = [], sort = false }: { key?: string; keys?: string[]; sort?: boolean } = {}
+  { key, keys = [], sort = false }: { key?: string; keys?: string[]; sort?: boolean } = {},
 ) {
   if (key) keys.unshift(key);
   _preLocalizationRegistrations[configKeyPath] = { keys, sort };
@@ -79,10 +66,6 @@ export function preLocalize(
 
 /* -------------------------------------------------- */
 
-/**
- * Execute previously defined pre-localization tasks on the provided config object.
- * @param {object} config  The `ds.CONFIG` object to localize and sort. *Will be mutated.*.
- */
 export function performPreLocalization(config: Record<string, unknown>) {
   for (const [keyPath, settings] of Object.entries(_preLocalizationRegistrations)) {
     const target = foundry.utils.getProperty(config, keyPath);
@@ -92,7 +75,7 @@ export function performPreLocalization(config: Record<string, unknown>) {
       foundry.utils.setProperty(
         config,
         keyPath,
-        sortObjectEntries(target as Record<string, unknown>, settings.keys[0])
+        sortObjectEntries(target as Record<string, unknown>, settings.keys[0]),
       );
   }
 
@@ -105,12 +88,6 @@ export function performPreLocalization(config: Record<string, unknown>) {
 
 /* -------------------------------------------------- */
 
-/**
- * Localize the values of a configuration object by translating them in-place.
- * @param {object} obj       The configuration object to localize.
- * @param {string[]} [keys]  List of inner keys that should be localized if this is an object.
- * @private
- */
 function _localizeObject(obj: Record<string, unknown>, keys?: string[]): void {
   for (const [k, v] of Object.entries(obj)) {
     const type = typeof v;

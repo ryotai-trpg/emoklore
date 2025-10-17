@@ -1,4 +1,4 @@
-import { EMOKLORE } from "./module/config";
+import { EMOKLORE } from "./module/config/index";
 import { systemID } from "./module/constants";
 
 import { EmokloreActor } from "./module/documents/actor";
