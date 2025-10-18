@@ -2,7 +2,7 @@
   "id": "emoklore",
   "title": "Emo-klore TRPG",
   "description": "An unofficial system for the Emo-klore TRPG",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "compatibility": {
     "minimum": 13,
     "verified": 13
@@ -28,9 +28,6 @@
   "documentTypes": {
     "Actor": {
       "character": { "htmlFields": ["biography.note"] }
-    },
-    "Item": {
-      "weapon": {}
     }
   },
   "background": "systems/emoklore/assets/background.webp",
