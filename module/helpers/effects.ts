@@ -2,7 +2,7 @@ export function prepareActiveEffectCategories(
   effects: Iterable<ActiveEffect>,
 ): Record<EffectCategory["type"], EffectCategory> {
   // Define effect header categories
-  const categories = {
+  const categories: Record<EffectCategory["type"], EffectCategory> = {
     temporary: {
       type: "temporary" as const,
       label: game.i18n.localize("EMOKLORE.Effect.Temporary"),

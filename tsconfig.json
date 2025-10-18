@@ -7,10 +7,13 @@
     "rootDir": "./",
     "outDir": "dist",
     "noEmit": true,
+
     "strict": false,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
+    "noImplicitAny": true,
+
     "esModuleInterop": true,
     "skipLibCheck": true,
     "types": ["fvtt-types"]
