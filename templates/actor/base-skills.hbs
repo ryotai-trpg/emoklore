@@ -1,15 +1,13 @@
 {{#if isPlay}}
 <div class="base-skills">
   {{#each system.baseSkills as |baseSkill key|}}
-  <div class="base-skill" data-base-skill="{{key}}">
-    <a class="label" 
-      data-action="roll" 
-      data-roll-type="base-skill" 
-      data-skill="{{key}}">
-      {{baseSkill.label}} | {{baseSkill.target}}
-      <i class="characteristic fa-solid {{lookup (lookup ../config.characteristics baseSkill.characteristic) 'fa'}}"></i>
-    </a>
-  </div>
+  <button class="base-skill label" 
+    data-action="roll" 
+    data-roll-type="base-skill" 
+    data-skill="{{key}}">
+    {{baseSkill.label}} | {{baseSkill.target}}
+    <i class="characteristic fa-solid {{lookup (lookup ../config.characteristics baseSkill.characteristic) 'fa'}}"></i>
+  </button>
   {{/each}}
 </div>
 {{/if}}
