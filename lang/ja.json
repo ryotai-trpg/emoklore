@@ -253,6 +253,20 @@
       "Inactive": "無効",
       "Toggle": "切替"
     },
+    "Import": {
+      "DialogTitle": "キャラクターシートインポート",
+      "ImportButton": "インポート",
+      "ImportTooltip": "キャラクターシートからインポート",
+      "PasteJSON": "JSONデータを貼り付け",
+      "JSONPlaceholder": "キャラクターシートのJSONデータをここに貼り付けてください...",
+      "Hint": "https://emoklore.charasheet.jp からエクスポートしたJSONデータを貼り付けてください。",
+      "Success": "{name}のデータをインポートしました",
+      "ErrorEmptyInput": "JSONデータを入力してください",
+      "ErrorInvalidJSON": "無効なJSONデータです",
+      "ErrorInvalidKind": "キャラクターデータではありません",
+      "ErrorMissingData": "データが見つかりません",
+      "ErrorImportFailed": "インポートに失敗しました"
+    },
     "result": {
       "fumble": "ファンブル",
       "failure": "失敗",

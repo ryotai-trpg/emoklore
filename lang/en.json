@@ -250,6 +250,20 @@
       "Temporary": "Temporary",
       "Passive": "Passive",
       "Inactive": "Inactive"
+    },
+    "Import": {
+      "DialogTitle": "Import Character Sheet",
+      "ImportButton": "Import",
+      "ImportTooltip": "Import from Character Sheet",
+      "PasteJSON": "Paste JSON Data",
+      "JSONPlaceholder": "Paste the JSON data from the character sheet here...",
+      "Hint": "Paste the JSON data exported from https://emoklore.charasheet.jp",
+      "Success": "Imported data for {name}",
+      "ErrorEmptyInput": "Please enter JSON data",
+      "ErrorInvalidJSON": "Invalid JSON data",
+      "ErrorInvalidKind": "Not a character data",
+      "ErrorMissingData": "Data not found",
+      "ErrorImportFailed": "Import failed"
     }
   },
   "USER": {

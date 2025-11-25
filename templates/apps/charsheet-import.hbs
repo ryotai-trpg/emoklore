@@ -1,0 +1,23 @@
+<div class="charsheet-import-dialog">
+  <div class="form-group">
+    <label for="jsonInput">{{localize "EMOKLORE.Import.PasteJSON"}}</label>
+    <textarea 
+      name="jsonInput" 
+      id="jsonInput" 
+      rows="15" 
+      placeholder="{{localize 'EMOKLORE.Import.JSONPlaceholder'}}"
+      autofocus
+    ></textarea>
+  </div>
+  
+  <div class="form-group stacked">
+    <p class="hint">{{localize "EMOKLORE.Import.Hint"}}</p>
+  </div>
+
+  <footer class="form-footer flexrow">
+    <button type="button" data-action="import" class="default">
+      <i class="fa-solid fa-file-import"></i>
+      {{localize "EMOKLORE.Import.ImportButton"}}
+    </button>
+  </footer>
+</div>

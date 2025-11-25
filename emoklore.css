@@ -600,4 +600,53 @@
   .effects .item .effect-controls {
     border: none;
   }
+
+  /* ===========================================
+   Character Sheet Import Dialog
+   =========================================== */
+  
+  .charsheet-import-dialog {
+    textarea {
+      width: 100%;
+      font-family: monospace;
+      font-size: 12px;
+      resize: vertical;
+    }
+
+    .hint {
+      font-size: var(--font-size-12);
+      color: var(--color-text-dark-secondary);
+      margin: 0;
+    }
+
+    .form-footer {
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+  }
+
+  /* Header Actions (Import Button) */
+  .header-actions {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+
+    button {
+      padding: 0.25rem 0.5rem;
+      background: var(--color-cool-2);
+      border: 1px solid var(--color-border-dark-tertiary);
+      border-radius: 3px;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--color-cool-3);
+        box-shadow: 0 0 6px var(--color-shadow-primary);
+      }
+
+      i {
+        margin: 0;
+      }
+    }
+  }
 }
