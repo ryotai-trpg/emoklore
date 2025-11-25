@@ -19,6 +19,7 @@ import {
   getEmbeddedDocument,
   createDocumentData,
 } from "./helpers";
+import { CharSheetImportDialog } from "./charsheet-import-dialog";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -41,6 +42,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       createDoc: this._createDoc,
       deleteDoc: this._deleteDoc,
       toggleEffect: this._toggleEffect,
+      importCharacter: this._importCharacter,
     },
   };
 
@@ -140,6 +142,12 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     if (effect && "update" in effect && "disabled" in effect) {
       await (effect as any).update({ disabled: !(effect as any).disabled });
     }
+  }
+
+  static async _importCharacter(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
+    event.preventDefault();
+    console.log("Opening import dialog for actor:", this.actor);
+    await CharSheetImportDialog.show(this.actor);
   }
 
   _getCharacteristics(): Record<string, unknown> {

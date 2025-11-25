@@ -24,7 +24,8 @@ export default defineConfig({
       name: "emoklore",
       entry: "emoklore.mjs",
       formats: ["es"],
-      fileName: "emoklore",
+      fileName: () => "emoklore.mjs",
+      cssFileName: "emoklore",
     },
   },
   plugins: [
