@@ -256,6 +256,11 @@
       },
       "notes": "備考"
     },
+    "ItemSheet": {
+      "tab": {
+        "detail": "詳細"
+      }
+    },
     "Import": {
       "DialogTitle": "キャラクターシートインポート",
       "ImportButton": "インポート",

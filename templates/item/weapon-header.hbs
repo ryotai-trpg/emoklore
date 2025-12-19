@@ -1,0 +1,16 @@
+{{! Weapon Sheet Header }}
+<div>
+  <header class="sheet-header">
+    <div class="container">
+      <div class="name">
+        {{#if isPlay}}
+        {{document.name}}
+        {{else}}
+        {{formInput fields.name value=document.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
+        aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
+        {{/if}}
+      </div>
+    </div>
+  </header>
+</div>
+

@@ -255,6 +255,11 @@
       },
       "notes": "Notes"
     },
+    "ItemSheet": {
+      "tab": {
+        "detail": "Detail"
+      }
+    },
     "Import": {
       "DialogTitle": "Import Character Sheet",
       "ImportButton": "Import",

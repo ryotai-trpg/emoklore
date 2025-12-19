@@ -14,11 +14,25 @@ export class EmokloreWeaponSheet extends EmokloreDocumentSheetMixin(
   static override DEFAULT_OPTIONS = {
     ...super.DEFAULT_OPTIONS,
     classes: ["emoklore", "weapon"],
+    tag: "form",
   };
 
   static PARTS = {
-    form: {
-      template: "systems/emoklore/templates/item/weapon-sheet.hbs",
+    header: {
+      template: "systems/emoklore/templates/item/weapon-header.hbs",
+    },
+    tabs: { template: "templates/generic/tab-navigation.hbs" },
+    detail: {
+      template: "systems/emoklore/templates/item/weapon-detail.hbs",
+      scrollable: [""],
+    },
+  };
+
+  static TABS = {
+    primary: {
+      tabs: [{ id: "detail" }],
+      labelPrefix: "EMOKLORE.ItemSheet.tab",
+      initial: "detail",
     },
   };
 
@@ -33,6 +47,20 @@ export class EmokloreWeaponSheet extends EmokloreDocumentSheetMixin(
     // Ensure source is available (ItemSheetV2 standard, though we use document)
     if (!context.source) {
       context.source = this.item.toObject();
+    }
+    return context;
+  }
+
+  async _preparePartContext(
+    partId: string,
+    context: EmokloreDocumentSheetContext,
+    options: Record<string, unknown>,
+  ): Promise<EmokloreDocumentSheetContext> {
+    await super._preparePartContext(partId, context, options);
+
+    const tabs = context.tabs as Record<string, unknown> | undefined;
+    if (tabs && partId in tabs) {
+      (context as any).tab = tabs[partId];
     }
     return context;
   }
