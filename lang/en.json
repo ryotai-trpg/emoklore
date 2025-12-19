@@ -19,7 +19,8 @@
   "colon": ": ",
   "EMOKLORE": {
     "SheetClass": {
-      "character": "Character Sheet"
+      "character": "Character Sheet",
+      "weapon": "Weapon Sheet"
     },
     "CharacterSheet": {
       "tab": {

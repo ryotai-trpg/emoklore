@@ -9,6 +9,7 @@ import { CharacterDataModel } from "./module/data/character";
 import { NpcDataModel } from "./module/data/npc";
 
 import * as applications from "./module/sheets/character-sheet";
+import { EmokloreWeaponSheet } from "./module/sheets/weapon-sheet";
 
 import { performPreLocalization } from "./module/helpers/localization";
 
@@ -60,6 +61,12 @@ Hooks.once("init", () => {
     types: ["character"],
     makeDefault: true,
     label: "EMOKLORE.SheetClass.character",
+  });
+
+  DocumentSheetConfig.registerSheet(Item, "emoklore", EmokloreWeaponSheet as any, {
+    types: ["weapon"],
+    makeDefault: true,
+    label: "EMOKLORE.SheetClass.weapon",
   });
 });
 Hooks.once("i18nInit", () => {

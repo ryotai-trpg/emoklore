@@ -19,7 +19,8 @@
   "colon": "：",
   "EMOKLORE": {
     "SheetClass": {
-      "character": "キャラクターシート"
+      "character": "キャラクターシート",
+      "weapon": "武器シート"
     },
     "CharacterSheet": {
       "tab": {
