@@ -8,7 +8,6 @@
       "weapon": "Weapon"
     }
   },
-
   "SETTINGS": {
     "EMOKLORE": {
       "DeveloperMode": {
@@ -17,9 +16,7 @@
       }
     }
   },
-
   "colon": ": ",
-
   "EMOKLORE": {
     "SheetClass": {
       "character": "Character Sheet"
@@ -28,6 +25,7 @@
       "tab": {
         "biography": "Biography",
         "skills": "Skills",
+        "items": "Items",
         "effects": "Effects"
       },
       "fields": {
@@ -39,7 +37,6 @@
       }
     },
     "SHEET.ToggleMode": "Toggle Play/Edit mode",
-
     "emotionAttributes": {
       "desire": "Desire",
       "passion": "Passion",
@@ -47,15 +44,12 @@
       "relationship": "Relationship",
       "wound": "Wound"
     },
-
     "skillLevel": {
       "0": "Lv.0",
       "1": "Lv.1",
       "2": "Lv.2",
       "3": "Lv.3"
     },
-
-
     "resonantEmotions": {
       "selfAssertion": "SelfAssertion",
       "possession": "Possession",
@@ -66,7 +60,6 @@
       "escape": "Escape",
       "curiosity": "Curiosity",
       "thrill": "Thrill",
-
       "joy": "Joy",
       "anger": "Anger",
       "sorrow": "Sorrow",
@@ -76,7 +69,6 @@
       "fear": "Fear",
       "jealousy": "Jealousy",
       "grudge": "Grudge",
-
       "justice": "Justice",
       "worship": "Worship",
       "goodAndEvil": "Good and Evil",
@@ -87,7 +79,6 @@
       "order": "Order",
       "admiration": "Admiration",
       "selflessness": "Selflessness",
-
       "friendship": "Friendship",
       "love": "Love",
       "romance": "Romance",
@@ -98,7 +89,6 @@
       "domination": "Domination",
       "service": "Service",
       "indulgence": "Indulgence",
-
       "regret": "Regret",
       "loneliness": "Loneliness",
       "resignation": "Resignation",
@@ -123,7 +113,6 @@
               }
             }
           },
-
           "biography": {
             "age": {
               "label": "Age"
@@ -180,7 +169,7 @@
         "fortune": "Fortune"
       },
       "skillGroup": {
-        "investigation": "Investigation", 
+        "investigation": "Investigation",
         "perception": "Perception",
         "negotiations": "Negotiations",
         "knowledge": "Knowledge",
@@ -189,7 +178,7 @@
         "unique": "Unique"
       },
       "baseSkills": {
-        "investigation": "Investigation", 
+        "investigation": "Investigation",
         "perception": "Perception",
         "negotiations": "Negotiations",
         "knowledge": "Knowledge",
@@ -245,11 +234,25 @@
     "skill": "Skills",
     "characteristics": "Characteristics",
     "skillRoll": "{skillName} Roll",
+    "resonantEmotion": "{emotion} ({attribute})",
     "Effect": {
       "Source": "Source",
       "Temporary": "Temporary",
       "Passive": "Passive",
       "Inactive": "Inactive"
+    },
+    "Item": {
+      "rangeType": {
+        "label": "Type",
+        "melee": "Melee",
+        "ranged": "Ranged"
+      },
+      "attackPower": "Attack Power",
+      "range": {
+        "label": "Range",
+        "melee": "Melee"
+      },
+      "notes": "Notes"
     },
     "Import": {
       "DialogTitle": "Import Character Sheet",

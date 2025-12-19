@@ -71,6 +71,7 @@
     grid-template-columns: var(--emoklore-sheet-sidebar-width) 1fr;
   }
 
+  .items.tab.active,
   .effects.tab.active {
     display: flex;
   }

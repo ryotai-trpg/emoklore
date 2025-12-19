@@ -8,7 +8,6 @@
       "weapon": "武器"
     }
   },
-
   "SETTINGS": {
     "EMOKLORE": {
       "DeveloperMode": {
@@ -17,17 +16,16 @@
       }
     }
   },
-
   "colon": "：",
-
   "EMOKLORE": {
     "SheetClass": {
       "character": "キャラクターシート"
     },
     "CharacterSheet": {
       "tab": {
-        "biography": "プロフィール",
         "skills": "技能",
+        "biography": "プロフィール",
+        "items": "アイテム",
         "effects": "効果"
       },
       "fields": {
@@ -39,7 +37,6 @@
       }
     },
     "SHEET.ToggleMode": "プレイ・編集モード切替",
-
     "emotionAttributes": {
       "desire": "欲望",
       "passion": "情念",
@@ -47,15 +44,12 @@
       "relationship": "関係",
       "wound": "傷"
     },
-
     "skillLevel": {
       "0": "Lv.0",
       "1": "Lv.1",
       "2": "Lv.2",
       "3": "Lv.3"
     },
-
-
     "resonantEmotions": {
       "selfAssertion": "自己顕示",
       "possession": "所有",
@@ -66,7 +60,6 @@
       "escape": "逃避",
       "curiosity": "好奇心",
       "thrill": "スリル",
-
       "joy": "喜び",
       "anger": "怒り",
       "sorrow": "哀しみ",
@@ -76,7 +69,6 @@
       "fear": "恐怖",
       "jealousy": "嫉妬",
       "grudge": "恨み",
-
       "justice": "正義",
       "worship": "崇拝",
       "goodAndEvil": "善悪",
@@ -87,7 +79,6 @@
       "order": "秩序",
       "admiration": "憧憬",
       "selflessness": "無我",
-
       "friendship": "友情",
       "love": "愛",
       "romance": "恋",
@@ -98,7 +89,6 @@
       "domination": "支配",
       "service": "奉仕",
       "indulgence": "甘え",
-
       "regret": "後悔",
       "loneliness": "孤独",
       "resignation": "諦観",
@@ -123,7 +113,6 @@
               }
             }
           },
-
           "biography": {
             "age": {
               "label": "年齢"
@@ -180,7 +169,7 @@
         "fortune": "運勢"
       },
       "skillGroup": {
-        "investigation": "調査系", 
+        "investigation": "調査系",
         "perception": "知覚系",
         "negotiations": "交渉系",
         "knowledge": "情報系",
@@ -189,7 +178,7 @@
         "unique": "特殊"
       },
       "baseSkills": {
-        "investigation": "調査", 
+        "investigation": "調査",
         "perception": "知覚",
         "negotiations": "交渉",
         "knowledge": "知識",
@@ -252,6 +241,19 @@
       "Passive": "永続的効果",
       "Inactive": "無効",
       "Toggle": "切替"
+    },
+    "Item": {
+      "rangeType": {
+        "label": "種別",
+        "melee": "近距離",
+        "ranged": "遠距離"
+      },
+      "attackPower": "攻撃力",
+      "range": {
+        "label": "射程",
+        "melee": "近距離"
+      },
+      "notes": "備考"
     },
     "Import": {
       "DialogTitle": "キャラクターシートインポート",

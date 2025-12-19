@@ -1,4 +1,4 @@
-import type { SkillRow, CharacteristicsMap } from "./types";
+import type { CharacteristicsMap } from "./types";
 
 // Helper functions for type-safe operations
 export const getSkillPointCosts = (): Record<number, number> => ({

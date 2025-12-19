@@ -28,6 +28,9 @@
   "documentTypes": {
     "Actor": {
       "character": { "htmlFields": ["biography.note"] }
+    },
+    "Item": {
+      "weapon": {}
     }
   },
   "background": "systems/emoklore/assets/background.webp",

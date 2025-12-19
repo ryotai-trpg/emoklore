@@ -6,20 +6,7 @@ const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields
 /* -------------------------------------------- */
 
 const defineBaseItemDataModelSchema = () => {
-  return {
-    rarity: new StringField({
-      required: true,
-      blank: false,
-      options: ["common", "uncommon", "rare", "legendary"],
-      initial: "common",
-    }),
-    price: new NumberField({
-      required: true,
-      integer: true,
-      min: 0,
-      initial: 20,
-    }),
-  };
+  return {};
 };
 
 export type BaseItemDataModelSchema = ReturnType<typeof defineBaseItemDataModelSchema>;
@@ -33,11 +20,26 @@ export class BaseItemDataModel extends EmokloreSystemDataModel<BaseItemDataModel
 const defineWeaponDataModelSchema = () => {
   return {
     ...defineBaseItemDataModelSchema(),
-    damage: new NumberField({
+    rangeType: new StringField({
       required: true,
-      integer: true,
-      positive: true,
-      initial: 5,
+      blank: false,
+      options: ["melee", "ranged"],
+      initial: "melee",
+    }),
+    attackPower: new StringField({
+      required: false,
+      blank: true,
+      initial: "",
+    }),
+    range: new StringField({
+      required: false,
+      blank: true,
+      initial: "",
+    }),
+    notes: new HTMLField({
+      required: false,
+      blank: true,
+      initial: "",
     }),
   };
 };

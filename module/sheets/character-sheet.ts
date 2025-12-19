@@ -63,6 +63,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       templates: ["systems/emoklore/templates/actor/card-view.hbs"],
       scrollable: [""],
     },
+    items: {
+      template: "systems/emoklore/templates/actor/items.hbs",
+      scrollable: [""],
+    },
     effects: {
       template: "systems/emoklore/templates/actor/effects.hbs",
       scrollable: [""],
@@ -71,7 +75,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
 
   static TABS = {
     primary: {
-      tabs: [{ id: "skills" }, { id: "biography" }, { id: "effects" }],
+      tabs: [{ id: "skills" }, { id: "biography" }, { id: "items" }, { id: "effects" }],
       labelPrefix: "EMOKLORE.CharacterSheet.tab",
       initial: "skills",
     },
@@ -103,6 +107,9 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         break;
       case "biography":
         this._prepareBiographyContext(context);
+        break;
+      case "items":
+        this._prepareItemsContext(context);
         break;
       case "effects":
         this._prepareEffectsContext(context);
@@ -210,6 +217,11 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
 
   private _prepareBiographyContext(context: CharacterContext): void {
     // Add biography-specific processing here if needed
+  }
+
+  private _prepareItemsContext(context: CharacterContext): void {
+    context.tab = context.tabs.items;
+    console.log(this.actor.itemTypes.weapon);
   }
 
   private _prepareEffectsContext(context: CharacterContext): void {
