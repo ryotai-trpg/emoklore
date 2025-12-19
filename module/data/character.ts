@@ -226,6 +226,8 @@ export class CharacterDataModel extends BaseActorDataModel<CharacterDataModelSch
     note: string;
   };
 
+  declare initiative: number;
+
   static override defineSchema() {
     return defineCharacterDataModelSchema();
   }
@@ -275,5 +277,13 @@ export class CharacterDataModel extends BaseActorDataModel<CharacterDataModelSch
     this.resources.mp.value = Math.min(this.resources.mp.value, this.resources.mp.max);
 
     this.resources.resonance.value = Math.max(this.resources.resonance.value, 1);
+
+    const physical = foundry.utils.getProperty(this, "characteristics.physical.value") as number;
+    const speedLevel = foundry.utils.getProperty(this, "skills.speed.level") as number;
+    this.initiative = physical + speedLevel;
+  }
+
+  modifyRollData(rollData: Record<string, unknown>): void {
+    rollData.initiative = this.initiative;
   }
 }

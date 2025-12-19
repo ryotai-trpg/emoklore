@@ -12,6 +12,16 @@ export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extend
       ? any // NPCの型定義が必要
       : any;
 
+  override getRollData(): Record<string, unknown> {
+    const rollData = { ...this.system, flags: this.flags, name: this.name };
+
+    if (this.system.modifyRollData instanceof Function) {
+      this.system.modifyRollData(rollData);
+    }
+
+    return rollData;
+  }
+
   async adjustResource(resource: ResourceKey, point: number): Promise<this | null> {
     const newvalue = (this.system.resources[resource]?.value ?? 0) + point;
     return await this.update({ [`system.resources.${resource}.value`]: newvalue });
