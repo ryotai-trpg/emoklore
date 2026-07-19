@@ -32,6 +32,6 @@ npm run docs:build  # VitePressビルド
 
 ## 現在の開発フェーズ
 
-1. **v14対応**（進行中、ブランチ `feat/v14`）— 状況は `docs/v14-migration.md` の「作業状況」
+1. **v14対応**（次の作業）— 状況は `docs/v14-migration.md` の「作業状況」
 2. リファクタリング — `docs/architecture.md`
 3. 新機能 — `docs/roadmap.md`
