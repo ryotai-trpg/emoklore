@@ -1,21 +1,17 @@
 import { EMOKLORE } from "./module/config/index";
 import { systemID } from "./module/constants";
-
-import { EmokloreActor } from "./module/documents/actor";
-import { EmokloreItem } from "./module/documents/item";
-
-import { WeaponDataModel } from "./module/data/item-models";
 import { CharacterDataModel } from "./module/data/character";
+import { WeaponDataModel } from "./module/data/item-models";
 import { NpcDataModel } from "./module/data/npc";
-
-import * as applications from "./module/sheets/character-sheet";
-
-import { performPreLocalization } from "./module/helpers/localization";
-
-import { EmokloreDie } from './module/dice/emoklore-die';
+import { EmokloreDie } from "./module/dice/emoklore-die";
 // import { EmokloreRollParser } from './module/dice/emoklore-parser';
 import { EmokloreRoll } from "./module/dice/emoklore-roll";
+import { EmokloreActor } from "./module/documents/actor";
+import { EmokloreItem } from "./module/documents/item";
+import { performPreLocalization } from "./module/helpers/localization";
 import { registerSystemSettings } from "./module/settings";
+import * as applications from "./module/sheets/character-sheet";
+
 Hooks.once("init", () => {
   console.log("Emo-klore TRPG | Initializing...");
 
@@ -38,7 +34,7 @@ Hooks.once("init", () => {
 
   // CONFIG.Dice.parser = EmokloreRollParser;
   (CONFIG as any).Dice.rolls.push(EmokloreRoll);
-  (CONFIG as any).Dice.terms["d"] = EmokloreDie;
+  (CONFIG as any).Dice.terms.d = EmokloreDie;
 
   // Configure trackable attributes.
   // TODO: Not Translated

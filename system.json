@@ -7,10 +7,12 @@
     "minimum": 13,
     "verified": 13
   },
-  "authors": [{
-    "name": "Ryotai",
-    "discord": "@ryotai."
-  }],
+  "authors": [
+    {
+      "name": "Ryotai",
+      "discord": "@ryotai."
+    }
+  ],
   "esmodules": ["emoklore.mjs"],
   "styles": ["emoklore.css"],
   "languages": [

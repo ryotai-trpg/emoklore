@@ -55,7 +55,6 @@
       "3": "Lv.3"
     },
 
-
     "resonantEmotions": {
       "selfAssertion": "自己顕示",
       "possession": "所有",
@@ -180,7 +179,7 @@
         "fortune": "運勢"
       },
       "skillGroup": {
-        "investigation": "調査系", 
+        "investigation": "調査系",
         "perception": "知覚系",
         "negotiations": "交渉系",
         "knowledge": "情報系",
@@ -189,7 +188,7 @@
         "unique": "特殊"
       },
       "baseSkills": {
-        "investigation": "調査", 
+        "investigation": "調査",
         "perception": "知覚",
         "negotiations": "交渉",
         "knowledge": "知識",

@@ -1,5 +1,5 @@
-import { importFromCharSheet, validateCharSheetJSON } from "../helpers/charsheet-importer";
 import type { EmokloreActor } from "../documents/actor";
+import { importFromCharSheet, validateCharSheetJSON } from "../helpers/charsheet-importer";
 
 interface CharSheetImportDialogContext {
   jsonInput: string;
@@ -55,7 +55,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
     };
   }
 
-  static async onImport(this: CharSheetImportDialog, event: Event, target: HTMLElement) {
+  static async onImport(this: CharSheetImportDialog, event: Event, _target: HTMLElement) {
     event.preventDefault();
     console.log("Import button clicked");
 
@@ -63,20 +63,21 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
     const form = (this as any).element?.querySelector("form") || (this as any).element;
     console.log("Element:", (this as any).element);
     console.log("Form:", form);
-    
+
     if (!form) {
       console.error("Form not found");
       return;
     }
 
     // Try to get the textarea directly
-    const textarea = form.querySelector('textarea[name="jsonInput"]') || 
-                     (this as any).element?.querySelector('textarea[name="jsonInput"]');
-    
+    const textarea =
+      form.querySelector('textarea[name="jsonInput"]') ||
+      (this as any).element?.querySelector('textarea[name="jsonInput"]');
+
     console.log("Textarea:", textarea);
-    
+
     const jsonInput = textarea?.value || "";
-    
+
     console.log("JSON input length:", jsonInput?.length);
 
     if (!jsonInput || jsonInput.trim() === "") {
@@ -113,11 +114,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
     }
   }
 
-  static async onSubmit(
-    event: Event,
-    form: HTMLFormElement,
-    formData: any,
-  ): Promise<void> {
+  static async onSubmit(_event: Event, _form: HTMLFormElement, _formData: any): Promise<void> {
     // This is called when the form is submitted via the import button
     // The actual import logic is handled by onImport
   }

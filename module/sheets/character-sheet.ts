@@ -1,25 +1,18 @@
-import { EmokloreActorSheet } from "./actor-sheet";
 import { systemPath } from "../constants";
-import { prepareActiveEffectCategories } from "../helpers/effects";
-import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
-import type {
-  EmotionKey,
-  SkillRow,
-  CharacteristicsMap,
-  CharacterContext,
-  EmokloreCharacterSheetActions,
-} from "./types";
+import { prepareActiveEffectCategories } from "../helpers/effects";
+import { EmokloreActorSheet } from "./actor-sheet";
+import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import {
   calculateCharPointSum,
   calculateTotalSkillPoints,
-  createSkillLevelOptions,
-  createEmotionOptions,
-  getEmotionAttributes,
-  getEmbeddedDocument,
   createDocumentData,
+  createEmotionOptions,
+  createSkillLevelOptions,
+  getEmbeddedDocument,
+  getEmotionAttributes,
 } from "./helpers";
-import { CharSheetImportDialog } from "./charsheet-import-dialog";
+import type { CharacterContext, CharacteristicsMap, SkillRow } from "./types";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -113,14 +106,14 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     return context;
   }
 
-  static async _viewDoc(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
+  static async _viewDoc(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
     const doc = getEmbeddedDocument(target, this.actor);
     if (doc && "sheet" in doc && doc.sheet) {
       (doc.sheet as any).render(true);
     }
   }
 
-  static async _deleteDoc(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
+  static async _deleteDoc(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
     const doc = getEmbeddedDocument(target, this.actor);
     if (doc && "delete" in doc) {
       await (doc as any).delete();
@@ -129,7 +122,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
 
   static async _createDoc(
     this: EmokloreCharacterSheet,
-    event: Event,
+    _event: Event,
     target: HTMLElement & { dataset: DOMStringMap },
   ) {
     const docData = createDocumentData(target, this.actor);
@@ -137,14 +130,14 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     await docCls.create(docData, { parent: this.actor });
   }
 
-  static async _toggleEffect(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
+  static async _toggleEffect(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
     const effect = getEmbeddedDocument(target, this.actor);
     if (effect && "update" in effect && "disabled" in effect) {
       await (effect as any).update({ disabled: !(effect as any).disabled });
     }
   }
 
-  static async _importCharacter(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
+  static async _importCharacter(this: EmokloreCharacterSheet, event: Event, _target: HTMLElement) {
     event.preventDefault();
     console.log("Opening import dialog for actor:", this.actor);
     await CharSheetImportDialog.show(this.actor);
@@ -208,7 +201,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     context.skillLevelOptions = createSkillLevelOptions();
   }
 
-  private _prepareBiographyContext(context: CharacterContext): void {
+  private _prepareBiographyContext(_context: CharacterContext): void {
     // Add biography-specific processing here if needed
   }
 

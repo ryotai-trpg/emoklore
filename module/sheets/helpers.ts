@@ -1,4 +1,4 @@
-import type { SkillRow, CharacteristicsMap } from "./types";
+import type { CharacteristicsMap } from "./types";
 
 // Helper functions for type-safe operations
 export const getSkillPointCosts = (): Record<number, number> => ({
@@ -10,7 +10,7 @@ export const getSkillPointCosts = (): Record<number, number> => ({
 export const calculateSkillPoints = (skillList: Array<{ level: number }>): number => {
   const costs = getSkillPointCosts();
   return Object.entries(costs).reduce((sum, [level, cost]) => {
-    const count = skillList.filter((skill) => skill.level === parseInt(level)).length;
+    const count = skillList.filter((skill) => skill.level === parseInt(level, 10)).length;
     return sum + count * cost;
   }, 0);
 };
@@ -74,8 +74,8 @@ export const getEmbeddedDocument = (target: HTMLElement, actor: any): any => {
     return actor.items.get(docRow.dataset.itemId!);
   } else if (docRow.dataset.documentClass === "ActiveEffect") {
     const parent =
-      docRow.dataset.parentId === actor.id ? actor : actor.items.get(docRow?.dataset.parentId!);
-    return parent?.effects.get(docRow?.dataset.effectId!);
+      docRow.dataset.parentId === actor.id ? actor : actor.items.get(docRow.dataset.parentId!);
+    return parent?.effects.get(docRow.dataset.effectId!);
   } else {
     console.warn("Could not find document class");
     return null;

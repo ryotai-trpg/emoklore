@@ -55,7 +55,6 @@
       "3": "Lv.3"
     },
 
-
     "resonantEmotions": {
       "selfAssertion": "SelfAssertion",
       "possession": "Possession",
@@ -180,7 +179,7 @@
         "fortune": "Fortune"
       },
       "skillGroup": {
-        "investigation": "Investigation", 
+        "investigation": "Investigation",
         "perception": "Perception",
         "negotiations": "Negotiations",
         "knowledge": "Knowledge",
@@ -189,7 +188,7 @@
         "unique": "Unique"
       },
       "baseSkills": {
-        "investigation": "Investigation", 
+        "investigation": "Investigation",
         "perception": "Perception",
         "negotiations": "Negotiations",
         "knowledge": "Knowledge",

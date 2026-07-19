@@ -1,5 +1,5 @@
-import type { EmokloreActor } from "../documents/actor";
 import type { CharacterDataModel } from "../data/character";
+import type { EmokloreActor } from "../documents/actor";
 
 // Common type definitions
 export type EmotionKey = "surface" | "hidden" | "root";
