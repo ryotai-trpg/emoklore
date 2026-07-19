@@ -16,29 +16,25 @@ const TEMPLATE = systemPath("templates/apps/resonance-roll.hbs");
 export async function promptResonanceRoll(): Promise<ResonanceRollInput | null> {
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {});
 
-  // prompt の型は config.ok を含んでおらず（本体JSDocの制約）そのままでは渡せない
-  const prompt = foundry.applications.api.DialogV2.prompt as (
-    config: Record<string, unknown>,
-  ) => Promise<ResonanceRollInput>;
+  // prompt は static メソッドで中身が this.wait(...) なので、変数に取り出して呼ぶと
+  // thisが外れて壊れる。必ずメソッドとして呼ぶこと。
+  // キャストが要るのは、本体JSDocの引数型に config.ok が含まれていないため
+  const result = await foundry.applications.api.DialogV2.prompt({
+    window: {
+      title: game.i18n.localize("EMOKLORE.skillRoll", {
+        skillName: game.i18n.localize("EMOKLORE.Resonance.Name"),
+      }),
+    },
+    content,
+    ok: {
+      label: game.i18n.localize("EMOKLORE.Resonance.RollButton"),
+      callback: (_event: Event, button: HTMLElement) => readInput(button),
+    },
+    // 閉じられた場合はnullで返る。rejectCloseで例外にすると本物のエラーを握り潰しやすい
+    rejectClose: false,
+  } as Parameters<typeof foundry.applications.api.DialogV2.prompt>[0]);
 
-  try {
-    return await prompt({
-      window: {
-        title: game.i18n.localize("EMOKLORE.skillRoll", {
-          skillName: game.i18n.localize("EMOKLORE.Resonance.Name"),
-        }),
-      },
-      content,
-      ok: {
-        label: game.i18n.localize("EMOKLORE.Resonance.RollButton"),
-        callback: (_event: Event, button: HTMLElement) => readInput(button),
-      },
-      rejectClose: true,
-    });
-  } catch {
-    // rejectClose: true なので、閉じられた場合は例外で戻ってくる
-    return null;
-  }
+  return (result as ResonanceRollInput | null) ?? null;
 }
 
 function readInput(button: HTMLElement): ResonanceRollInput {
