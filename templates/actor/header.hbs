@@ -1,90 +1,93 @@
 {{! Sheet Header }}
-<header class="sheet-header">
-  <div class="container">
-    <div class="name">
-      {{#if isPlay}}
-      {{source.name}}
-      {{else}}
-      {{formInput fields.name value=source.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
-      aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
-      {{/if}}
-    </div>
-
-    {{#unless isPlay}}
-    <div class="header-actions">
-      <button type="button" data-action="importCharacter" data-tooltip="EMOKLORE.Import.ImportTooltip">
-        <i class="fa-solid fa-file-import"></i>
-      </button>
-    </div>
-    {{/unless}}
-
+<header class="sheet-header em-sheet-header">
+  <div class="em-sheet-header__name">
     {{#if isPlay}}
-    <div class="em-resources">
-      {{> "systems/emoklore/templates/actor/partials/meter.hbs"
-        key="hp"
-        icon="fa-heart"
-        field=systemFields.resources.fields.hp.fields.value
-        value=system.resources.hp.value
-        max=system.resources.hp.max}}
-
-      {{> "systems/emoklore/templates/actor/partials/meter.hbs"
-        key="mp"
-        icon="fa-wand-magic-sparkles"
-        field=systemFields.resources.fields.mp.fields.value
-        value=system.resources.mp.value
-        max=system.resources.mp.max}}
-
-      {{! 共鳴は感情3行を抱えていて他の2つと構成が違うので、partialにはしない }}
-      <div class="em-meter em-meter--resonance">
-        <div class="em-meter__head">
-          <button
-            type="button"
-            class="inline-control icon em-meter__action fa-solid fa-infinity"
-            data-action="roll"
-            data-roll-type="resonance"
-          ></button>
-          <div class="em-meter__value">
-            Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
-          </div>
-          <div>{{emotionRows.surface.label}}</div>
-          <div class="em-meter__sub">
-            {{#if emotionRows.surface.attribute}}（{{emotionRows.surface.attribute}}）{{/if}}
-          </div>
-          <div>{{emotionRows.hidden.label}}</div>
-          <div class="em-meter__sub">
-            {{#if emotionRows.hidden.attribute}}（{{emotionRows.hidden.attribute}}）{{/if}}
-          </div>
-          <div>{{emotionRows.root.label}}</div>
-          <div class="em-meter__sub">
-            {{#if emotionRows.root.attribute}}（{{emotionRows.root.attribute}}）{{/if}}
-          </div>
-        </div>
-        <progress
-          class="em-progress em-progress--resonance"
-          id="character-resonance"
-          value="{{ system.resources.resonance.value }}"
-          max="{{ system.resources.resonance.max }}"
-        ></progress>
-      </div>
-    </div>
+    {{source.name}}
     {{else}}
-    <div class="emotions">
-      {{formGroup
-      systemFields.emotions.fields.surface
-      value=system.emotions.surface
-      options=emotionOptions
-      }}
-      {{formGroup
-      systemFields.emotions.fields.hidden
-      value=system.emotions.hidden
-      options=emotionOptions
-      }}
-      {{formGroup
-      systemFields.emotions.fields.root
-      value=system.emotions.root
-      options=emotionOptions
-      }}
-    </div>
+    {{formInput fields.name value=source.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
+    aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
     {{/if}}
   </div>
+
+  {{#unless isPlay}}
+  <div class="em-toolbar">
+    <button
+      type="button"
+      class="em-toolbar__button"
+      data-action="importCharacter"
+      data-tooltip="EMOKLORE.Import.ImportTooltip"
+    >
+      <i class="fa-solid fa-file-import"></i>
+    </button>
+  </div>
+  {{/unless}}
+
+  {{#if isPlay}}
+  <div class="em-resources">
+    {{> "systems/emoklore/templates/actor/partials/meter.hbs"
+      key="hp"
+      icon="fa-heart"
+      field=systemFields.resources.fields.hp.fields.value
+      value=system.resources.hp.value
+      max=system.resources.hp.max}}
+
+    {{> "systems/emoklore/templates/actor/partials/meter.hbs"
+      key="mp"
+      icon="fa-wand-magic-sparkles"
+      field=systemFields.resources.fields.mp.fields.value
+      value=system.resources.mp.value
+      max=system.resources.mp.max}}
+
+    {{! 共鳴は感情3行を抱えていて他の2つと構成が違うので、partialにはしない }}
+    <div class="em-meter em-meter--resonance">
+      <div class="em-meter__head">
+        <button
+          type="button"
+          class="inline-control icon em-meter__action fa-solid fa-infinity"
+          data-action="roll"
+          data-roll-type="resonance"
+        ></button>
+        <div class="em-meter__value">
+          Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
+        </div>
+        <div>{{emotionRows.surface.label}}</div>
+        <div class="em-meter__sub">
+          {{#if emotionRows.surface.attribute}}（{{emotionRows.surface.attribute}}）{{/if}}
+        </div>
+        <div>{{emotionRows.hidden.label}}</div>
+        <div class="em-meter__sub">
+          {{#if emotionRows.hidden.attribute}}（{{emotionRows.hidden.attribute}}）{{/if}}
+        </div>
+        <div>{{emotionRows.root.label}}</div>
+        <div class="em-meter__sub">
+          {{#if emotionRows.root.attribute}}（{{emotionRows.root.attribute}}）{{/if}}
+        </div>
+      </div>
+      <progress
+        class="em-progress em-progress--resonance"
+        id="character-resonance"
+        value="{{ system.resources.resonance.value }}"
+        max="{{ system.resources.resonance.max }}"
+      ></progress>
+    </div>
+  </div>
+  {{else}}
+  <div class="em-emotion-list">
+    {{formGroup
+    systemFields.emotions.fields.surface
+    value=system.emotions.surface
+    options=emotionOptions
+    }}
+    {{formGroup
+    systemFields.emotions.fields.hidden
+    value=system.emotions.hidden
+    options=emotionOptions
+    }}
+    {{formGroup
+    systemFields.emotions.fields.root
+    value=system.emotions.root
+    options=emotionOptions
+    }}
+  </div>
+  {{/if}}
 </header>

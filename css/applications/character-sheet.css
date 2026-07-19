@@ -17,27 +17,23 @@
     flex: 0 0 20px;
   }
 
-  /* Header Section */
-  header {
-    .name {
-      flex: 1;
-      font-size: var(--font-size-48);
-      padding: 0 0.5rem;
-
-      input {
-        height: initial;
-        padding: inherit;
-      }
-    }
-  }
-
-  /* Layout Grids */
-  .sheet-header .container {
+  /* ヘッダ。名前・操作ボタン・リソースを横に並べ、下端で揃える */
+  .em-sheet-header {
     display: grid;
     grid-auto-flow: column;
     justify-content: space-between;
     align-items: flex-end;
     height: 100%;
+  }
+
+  .em-sheet-header__name {
+    font-size: var(--font-size-48);
+    padding: 0 0.5rem;
+
+    input {
+      height: initial;
+      padding: inherit;
+    }
   }
 
   .tab.active {
