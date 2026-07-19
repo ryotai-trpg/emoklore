@@ -102,7 +102,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         this._prepareSkillsContext(context);
         break;
       case "biography":
-        this._prepareBiographyContext(context);
+        await this._prepareBiographyContext(context);
         break;
       case "effects":
         this._prepareEffectsContext(context);
@@ -197,8 +197,19 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     context.skillLevelOptions = createSkillLevelOptions();
   }
 
-  private _prepareBiographyContext(_context: CharacterContext): void {
-    // Add biography-specific processing here if needed
+  /**
+   * 経歴の備考は system.json で htmlFields に指定しているリッチテキスト。
+   * @UUID リンクやインラインロールを解決するため、描画前に enrichHTML を通す。
+   */
+  private async _prepareBiographyContext(context: CharacterContext): Promise<void> {
+    context.noteHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      this.actor.system.biography.note,
+      {
+        secrets: this.actor.isOwner,
+        relativeTo: this.actor,
+        rollData: this.actor.getRollData(),
+      },
+    );
   }
 
   private _prepareEffectsContext(context: CharacterContext): void {
