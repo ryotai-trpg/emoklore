@@ -10,9 +10,8 @@ FoundryVTT v14（build 365 stable）の本体ソース（ローカルインス�
 
 - v14移行は `feat/v14` ブランチで**実装完了**。型定義戦略の切り替え・compatibility更新・viteのFOUNDRY_URL対応・CI型チェックジョブ・ドキュメント追従まで実施済み
 - v14実機検証（build 365、ポート30014、dev-data-v14）済み: シート描画（Play/Edit両モード）・技能判定・基本技能判定・共鳴判定・イニシアチブロールが正常、コンソールのエラー・非推奨警告ともゼロ
-- 残タスク:
-  - リポジトリsecretsへの `FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD` 登録（メンテナ操作）とCI型チェックジョブの実走確認
-  - ココフォリアインポートとActiveEffectの手動確認（自動検証に含まれていない）
+- CI型チェックはsecrets登録済みで**実走成功**（3ジョブすべて緑）
+- 残タスク: ココフォリアインポートとActiveEffectの手動確認（自動検証に含まれていない）
 - `as any` は約50箇所（リファクタリングPhaseの削減指標として記録）
 
 ## 必須
@@ -106,7 +105,7 @@ FoundryVTT v14（build 365 stable）の本体ソース（ローカルインス�
 
 - [x] `tools/fetch-foundry.mjs` 作成
 - [x] 既存の `.github/workflows/ci.yml`（Biome / build / docs / 翻訳・テンプレートチェックは導入済み）に型チェックジョブを追加（`actions/cache` + fetch-foundry + `npm run typecheck`。将来vitestも追加）
-- [ ] リポジトリのsecretsに `FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD` を登録（メンテナ操作）し、CI実走を確認
+- [x] リポジトリのsecretsに `FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD` を登録し、CI実走を確認（fetch→展開→typecheck→cache保存まで成功。キャッシュキー `foundry-types-365`）
 
 ## v14の新機能（採用検討）
 
