@@ -2,6 +2,9 @@
    Emoklore CSS Variables
    =========================================== */
 
+/* 色はライトテーマの値を既定に置く。本体は prefers-color-scheme がライトでも
+   ダークでもない環境では body にテーマクラスを付けないため（client/game.mjs の
+   #configureTheme）、テーマ別ブロックだけに色を置くと変数が未定義になる */
 .emoklore {
   /* Layout Variables */
   --emoklore-sheet-sidebar-width: 250px;
@@ -10,6 +13,14 @@
   --emoklore-progress-radius: 5px;
   --emoklore-progress-radius-small: 2px;
   --emoklore-card-radius: 10px;
+
+  /* Colors */
+  --emoklore-accent-color: #42a5f5; /* Material Blue 400 */
+  --emoklore-darkgray: rgb(0 0 0 / 10%);
+  --emoklore-gray: rgb(0 0 0 / 20%);
+
+  --emoklore-green: #43a047; /* Material Green 600, HP color */
+  --emoklore-red: #e64a19; /* Material DeepOrange 700, MP color */
 }
 
 .theme-dark .emoklore,
@@ -20,14 +31,4 @@
 
   --emoklore-green: #388e3c; /* Material Green 700, HP color */
   --emoklore-red: #bf360c; /* Material DeepOrange 900, MP color */
-}
-
-.theme-light .emoklore,
-.emoklore.theme-light {
-  --emoklore-accent-color: #42a5f5; /* Material Blue 400 */
-  --emoklore-darkgray: rgb(0 0 0 / 10%);
-  --emoklore-gray: rgb(0 0 0 / 20%);
-
-  --emoklore-green: #43a047; /* Material Green 600, HP color */
-  --emoklore-red: #e64a19; /* Material DeepOrange 700, MP color */
 }
