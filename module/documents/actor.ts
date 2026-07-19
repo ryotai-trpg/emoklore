@@ -23,6 +23,8 @@ export class EmokloreActor<SubType extends EmokloreActorType = EmokloreActorType
   // 埋め込みコレクションも同様に型に出ない
   declare items: foundry.utils.Collection<string, EmokloreItem>;
   declare effects: foundry.utils.Collection<string, foundry.documents.ActiveEffect>;
+  // sheet は ClientDocumentMixin 由来でジェネリクスが消えている
+  declare sheet: { render: (force?: boolean) => void } | null;
 
   override getRollData(): Record<string, unknown> {
     const rollData = { ...this.system, flags: this.flags, name: this.name };
