@@ -1,0 +1,106 @@
+/* 見出し行と明細行を同じグリッドで揃える表。ActiveEffect の一覧で使う */
+
+/* .effects-header .effect-name と .effects-list .effect-name は詳細度が同じで
+   font-size がぶつかる。後に置いた .effects-list 側が勝つ順序に依存しているので、
+   このファイル内の並びを入れ替えないこと */
+
+.emoklore.sheet.character {
+  .effects-header {
+    height: 28px;
+    margin: 2px 0;
+    padding: 0;
+    align-items: center;
+    background: var(--emoklore-darkgray);
+    font-weight: bold;
+    border-radius: 3px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 70px;
+
+    .effect-name {
+      font-size: 1.1em;
+    }
+  }
+  /* Effect List Items */
+  li.effect {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 70px;
+  }
+
+  .effect-source {
+    display: flex;
+    justify-content: center;
+  }
+
+  .effect-duration {
+    display: flex;
+    justify-content: center;
+  }
+
+  .effect-controls {
+    display: flex;
+    justify-content: center;
+  }
+
+  .effects-header > * {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* Effects List */
+  .effects-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .effects-list .effect-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .effects-list .effect-name {
+    margin: 0;
+    overflow: hidden;
+    font-size: 13px;
+    text-align: left;
+    align-items: center;
+    display: flex;
+  }
+
+  .effects-list .effect-controls {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .effects-list .effect-controls a {
+    font-size: 12px;
+    text-align: center;
+    margin: 0 6px;
+  }
+
+  .effects-list .effect {
+    align-items: center;
+    padding: 0 2px;
+    border-bottom: 1px solid var(--emoklore-gray);
+  }
+
+  .effects-list .effect:last-child {
+    border-bottom: none;
+  }
+
+  .effects-list .effect .effect-name .effect-image {
+    flex: 0 0 30px;
+    height: 30px;
+    background-size: 30px;
+    border: none;
+    margin-right: 5px;
+  }
+
+  .effects-list .effects-header .effect-name {
+    padding-left: 5px;
+    text-align: left;
+  }
+}

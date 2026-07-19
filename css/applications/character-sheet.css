@@ -1,0 +1,51 @@
+/* キャラクターシート固有のレイアウト。部品の中身ではなく配置と寸法を持つ */
+
+.emoklore.sheet.character:not(.minimized, .minimizing, .maximizing) {
+  min-width: 601px;
+  min-height: 420px;
+}
+
+.emoklore.sheet.character {
+  /* Tab Layout */
+  section.tab {
+    overflow: auto;
+    padding: 0.5rem;
+  }
+
+  /* Form Controls */
+  range-picker > input[type="number"] {
+    flex: 0 0 20px;
+  }
+
+  /* Header Section */
+  header {
+    .name {
+      flex: 1;
+      font-size: var(--font-size-48);
+      padding: 0 0.5rem;
+
+      input {
+        height: initial;
+        padding: inherit;
+      }
+    }
+  }
+
+  /* Layout Grids */
+  .sheet-header .container {
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 100%;
+  }
+
+  .tab.active {
+    display: grid;
+    grid-template-columns: var(--emoklore-sheet-sidebar-width) 1fr;
+  }
+
+  .effects.tab.active {
+    display: flex;
+  }
+}

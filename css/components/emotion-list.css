@@ -1,0 +1,8 @@
+/* 共鳴感情の一覧。編集モードのヘッダに出る */
+
+.emoklore.sheet.character {
+  .emotions {
+    display: flex;
+    flex-direction: column;
+  }
+}
