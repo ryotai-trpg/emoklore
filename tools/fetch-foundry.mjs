@@ -1,7 +1,8 @@
 // FoundryVTT本体（Node配布版zip）をfoundryvtt.comから取得し、型チェックに必要な
 // client/ と common/ だけを foundry/ に展開する。CI用（ローカルはcreate-symlinks.mjsを使う）
-// 認証フローはfelddy/foundryvtt-dockerと同じ:
+// 認証フロー:
 //   トップページでCSRFトークン取得 → POST /auth/login/ → /releases/download でpresigned URL取得 → zip展開
+// フォームのフィールド名（username / password / next / login）は実サイトのログインフォームに合わせている
 // 必要な環境変数: FOUNDRY_USERNAME / FOUNDRY_PASSWORD / FOUNDRY_BUILD
 import { spawnSync } from "node:child_process";
 import { lstatSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -47,9 +48,9 @@ const login = await fetch(`${BASE}/auth/login/`, {
   },
   body: new URLSearchParams({
     csrfmiddlewaretoken: csrf,
-    login_username: FOUNDRY_USERNAME,
-    login_password: FOUNDRY_PASSWORD,
-    login_redirect: "/",
+    username: FOUNDRY_USERNAME,
+    password: FOUNDRY_PASSWORD,
+    next: "/",
     login: "",
   }).toString(),
   redirect: "manual",
