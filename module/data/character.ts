@@ -77,12 +77,15 @@ const defineCharacterDataModelSchema = () => {
           characteristic: new StringField({
             required: true,
             initial: characteristicOptions?.[0] ?? characteristic,
+            // choices の値は翻訳済み文字列ではなくi18nキーを入れる。テンプレートが
+            // formInput に localize=true を渡しており、描画時に本体が解決する。
+            // ここで localize すると、スキーマ定義時に game.i18n へ依存してしまう
             ...(characteristicOptions
               ? {
                   choices: Object.fromEntries(
                     characteristicOptions.map((key) => [
                       key,
-                      game.i18n.localize(`EMOKLORE.Actor.characteristics.${String(key)}`),
+                      `EMOKLORE.Actor.characteristics.${key}`,
                     ]),
                   ),
                 }

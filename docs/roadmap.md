@@ -22,7 +22,7 @@ v14専用に移行します（v13サポートは打ち切り）。
 「動けばいい」で書いてきたコードを、適切な機能を適切な層に分離して責務をはっきりさせる形に書き換えます。設計方針と既知の課題は [アーキテクチャ](/architecture) を参照。
 
 - [x] スキーマ定義の初期化順序依存（`CONFIG.EMOKLORE` / `game.i18n`）の解消
-    - `game.i18n` への定義時依存と `i18nInit` からのパッチは解消。キー集合を得るための `CONFIG.EMOKLORE` 参照は残っており、`TypedObjectField` の採用で外せないか要検討
+    - `game.i18n` への定義時依存と `i18nInit` からのパッチは解消。キー集合を得るための `CONFIG.EMOKLORE` 参照は残るが、`TypedObjectField` での解消は検討のうえ見送った（理由は [アーキテクチャ](/architecture) の「検討して見送ったもの」）
 - [x] `EmokloreActor` から判定計算・ダイアログ・チャット生成を分離
 - [x] シート層に混ざったルール計算を data 層へ移動
 - [x] `as any` の削減（着手時55箇所 → 0。`noExplicitAny` を lint で `error` に）
