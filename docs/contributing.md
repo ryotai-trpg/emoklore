@@ -32,6 +32,17 @@ npm run link:foundry   # foundry/client・foundry/common のsymlinkを作成
 npm run typecheck      # tsc --noEmit（本体ソース内の診断は除外される）
 ```
 
+### テスト
+
+[Vitest](https://vitest.dev/) を使う。テストは対象と同じディレクトリに `*.test.ts` として置く。
+
+```shell
+npm test        # 一度だけ実行
+npx vitest      # ウォッチモード
+```
+
+対象は**FoundryVTT APIに依存しない純粋関数**（判定計算・ポイント計算・書式整形など）に限る。Foundry本体のクラスを継承・参照するコード（`module/dice/` やDocument・シート）はランタイムに本体が必要なため、単体テストではなく実機で確認する。逆に言えば、テストしたいロジックはFoundry非依存の形に切り出す。
+
 ## ブランチ運用
 
 - メインブランチは **`develop`**。PRはここへ向ける
@@ -84,7 +95,7 @@ feat: add resonance roll dialog
 ### 自動チェック
 
 - **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。緊急時は `git commit --no-verify` でスキップできるが非推奨
-- **CI**: pushとPRで GitHub Actions が Biome・ビルド・型チェック・翻訳/テンプレート整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
+- **CI**: pushとPRで GitHub Actions が Biome・テスト・ビルド・型チェック・翻訳/テンプレート整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
   - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない
 
 ## 表記ルール
