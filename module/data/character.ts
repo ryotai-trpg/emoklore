@@ -45,9 +45,11 @@ const defineCharacterDataModelSchema = () => {
 
   schema.characteristics = new SchemaField(
     Object.entries(CONFIG.EMOKLORE.characteristics).reduce(
-      (obj, [chc, { label }]) => {
+      (obj, [chc]) => {
         (obj as Record<string, foundry.data.fields.DataField>)[chc] = new SchemaField({
-          value: new NumberField({ ...characteristic, label }),
+          // label は指定しない。定義時に設定すると localizeSchema の `this.label ||= ...` に
+          // 勝ってしまい、ja.json の FIELDS 側の指定が効かなくなる
+          value: new NumberField({ ...characteristic }),
           mod: new SchemaField({
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
             success: new NumberField({ required: true, integer: true, initial: 0 }),

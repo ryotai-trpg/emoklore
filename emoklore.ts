@@ -59,20 +59,9 @@ Hooks.once("init", () => {
   });
 });
 Hooks.once("i18nInit", () => {
+  // CONFIG.EMOKLORE のラベル（i18nキー）をその場で翻訳文字列に置き換える。
+  // スキーマのラベルは LOCALIZATION_PREFIXES 経由で本体が処理するため、ここでは触らない
   performPreLocalization(CONFIG.EMOKLORE as unknown as Record<string, unknown>);
-
-  // These fields are not auto-localized due to having a different location in ja.json
-  for (const model of Object.values((CONFIG as any).Actor.dataModels)) {
-    /** @type {foundry.data.fields.SchemaField} */
-    const characteristicSchema = (model as any).schema.getField("characteristics");
-    if (characteristicSchema) {
-      for (const [characteristic, { label }] of Object.entries(CONFIG.EMOKLORE.characteristics)) {
-        const field = characteristicSchema.getField(`${characteristic}.value`);
-        if (!field) continue;
-        field.label = label;
-      }
-    }
-  }
 });
 
 Hooks.once("ready", () => {
