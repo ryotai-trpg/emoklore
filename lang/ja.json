@@ -266,6 +266,14 @@
       "ErrorMissingData": "データが見つかりません",
       "ErrorImportFailed": "インポートに失敗しました"
     },
+    "Resonance": {
+      "Name": "♾️共鳴",
+      "Intensity": "強度",
+      "MatchNone": "一致なし",
+      "MatchRoot": "ルーツ属性一致",
+      "MatchCompletely": "完全一致",
+      "RollButton": "ロール"
+    },
     "result": {
       "fumble": "ファンブル",
       "failure": "失敗",

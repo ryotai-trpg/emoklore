@@ -55,7 +55,7 @@ export class EmokloreActor<SubType extends EmokloreActorType = EmokloreActorType
       emotionMatch,
     });
 
-    return this.#postRoll(spec, "♾️共鳴", options);
+    return this.#postRoll(spec, game.i18n.localize("EMOKLORE.Resonance.Name"), options);
   }
 
   async rollSkill(

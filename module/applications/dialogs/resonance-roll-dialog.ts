@@ -23,10 +23,14 @@ export async function promptResonanceRoll(): Promise<ResonanceRollInput | null> 
 
   try {
     return await prompt({
-      window: { title: "〈♾️共鳴〉判定" },
+      window: {
+        title: game.i18n.localize("EMOKLORE.skillRoll", {
+          skillName: game.i18n.localize("EMOKLORE.Resonance.Name"),
+        }),
+      },
       content,
       ok: {
-        label: "ロール",
+        label: game.i18n.localize("EMOKLORE.Resonance.RollButton"),
         callback: (_event: Event, button: HTMLElement) => readInput(button),
       },
       rejectClose: true,
