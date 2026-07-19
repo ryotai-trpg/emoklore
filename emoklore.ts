@@ -4,7 +4,6 @@ import { CharacterDataModel } from "./module/data/character";
 import { WeaponDataModel } from "./module/data/item-models";
 import { NpcDataModel } from "./module/data/npc";
 import { EmokloreDie } from "./module/dice/emoklore-die";
-// import { EmokloreRollParser } from './module/dice/emoklore-parser';
 import { EmokloreRoll } from "./module/dice/emoklore-roll";
 import { EmokloreActor } from "./module/documents/actor";
 import { EmokloreItem } from "./module/documents/item";
@@ -33,7 +32,6 @@ Hooks.once("init", () => {
     weapon: WeaponDataModel,
   } as typeof CONFIG.Item.dataModels;
 
-  // CONFIG.Dice.parser = EmokloreRollParser;
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;
 

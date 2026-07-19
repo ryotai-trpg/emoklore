@@ -4,27 +4,19 @@ import type {
   EmokloreDocumentSheetContext,
   EmokloreDocumentSheetOptions,
   EmokloreRenderOptions,
+  SheetDocument,
 } from "./types";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
-/** 本体の HandlebarsApplicationMixin と同じ制約（`@param {Constructor<ApplicationV2>}`） */
-type ApplicationV2Constructor = new (...args: any[]) => foundry.applications.api.ApplicationV2;
-
 /**
- * シートが参照するドキュメントのメンバー。
+ * 本体の HandlebarsApplicationMixin と同じ制約（`@param {Constructor<ApplicationV2>}`）。
  *
- * 本体の ClientDocumentMixin はJSDocがジェネリクスを消しているため、
- * これらが Document の型に出てこない。utils/effects.ts と同じく、
- * 実際に使うものだけを交差型で補う。
+ * コンストラクタ引数はサブクラスごとに異なるため、mixinの制約としては any[] にするしかない
+ * （unknown[] だと引数を持つクラスを受け付けられない）。
  */
-type SheetDocument = foundry.abstract.Document & {
-  isOwner: boolean;
-  limited: boolean;
-  documentName: string;
-  system: { schema: { fields: Record<string, foundry.data.fields.DataField> } };
-  flags: Record<string, unknown>;
-};
+// biome-ignore lint/suspicious/noExplicitAny: mixinのコンストラクタ制約には any[] が必要
+type ApplicationV2Constructor = new (...args: any[]) => foundry.applications.api.ApplicationV2;
 
 // base を any にすると extends any になり、このファイル全体の型チェックが効かなくなる
 export default (base: ApplicationV2Constructor) => {

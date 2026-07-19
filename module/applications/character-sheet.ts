@@ -74,8 +74,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   };
 
   override async _prepareContext(options: EmokloreRenderOptions): Promise<CharacterContext> {
+    // 基底のコンテキストはドキュメント種別を問わない形なので、
+    // characterシートであることが分かっているここで1回だけ絞る
     const baseContext = await super._prepareContext(options);
-    const context = baseContext as CharacterContext;
+    const context = baseContext as unknown as CharacterContext;
     context.config = CONFIG.EMOKLORE;
     context.emotionAttributes = getEmotionAttributes(
       context.system.emotions,

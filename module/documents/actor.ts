@@ -8,14 +8,17 @@ import { createRollMessage } from "../utils/chat";
 import type { EmokloreItem } from "./item";
 
 type ResourceKey = "hp" | "mp" | "resonance";
-type EmokloreActorType = "character" | "npc";
 
-export class EmokloreActor<SubType extends EmokloreActorType = EmokloreActorType> extends Actor {
-  declare system: SubType extends "character"
-    ? CharacterDataModel
-    : SubType extends "npc"
-      ? any // NPCの型定義が必要
-      : any;
+/**
+ * system を CharacterDataModel として扱う。
+ *
+ * 判定・リソース操作はいずれもcharacterのスキーマ前提で書かれており、NPCに対して
+ * 呼ぶと実行時に壊れる。型引数で character / npc を出し分ける形も試したが、
+ * クラス本体では条件型が解決されず union のままになるため実益がなかった。
+ * NPC用シートの実装（ロードマップ Phase 3）で判定まわりの扱いごと見直す。
+ */
+export class EmokloreActor extends Actor {
+  declare system: CharacterDataModel;
 
   // スキーマ由来のプロパティは本体JSDocの型に出ないため補強する（docs/v14-migration.md「失われるもの」）
   declare name: string;

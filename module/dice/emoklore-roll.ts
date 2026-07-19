@@ -19,39 +19,39 @@ export class EmokloreRoll extends foundry.dice.Roll {
     data: Record<string, unknown> = {},
     options: EmokloreRollOptions = {},
   ) {
-    super(formula, data as any, options);
+    super(formula, data, options);
     const { successMod = 0, dmFormula = "", target = 10 } = options;
     this.successMod = successMod;
     this.dmFormula = dmFormula;
     this.target = target;
   }
 
+  /** results を持つのは DiceTerm だけなので、そこに絞って取り出す */
+  get #diceTerms(): foundry.dice.terms.DiceTerm[] {
+    return this.terms.filter(
+      (term): term is foundry.dice.terms.DiceTerm => term instanceof foundry.dice.terms.DiceTerm,
+    );
+  }
+
   // 注意: ここで全結果に success を立てることが EmokloreDie.getResultCSS と暗黙に結合している。
   // 本体の Die は success/failure が付いていると min/max のCSSクラスを出さないため、
   // EmokloreDie 側でそのガードを意図的に外している。どちらかだけを変更すると出目の
   // 強調表示が壊れるので、両方セットで見ること
-  override async evaluate(options?: any): Promise<any> {
-    const roll = await super.evaluate(options);
+  override async evaluate(options?: Parameters<foundry.dice.Roll["evaluate"]>[0]): Promise<this> {
+    const roll = (await super.evaluate(options)) as this;
 
-    for (const term of roll.terms as any[]) {
-      if (term && Array.isArray(term.results)) {
-        term.results = term.results.map((r: any) => ({
-          ...r,
-          success: r.result <= this.target,
-        }));
-      }
+    for (const term of roll.#diceTerms) {
+      term.results = term.results.map((result) => ({
+        ...result,
+        success: result.result <= this.target,
+      }));
     }
+
     return roll;
   }
 
   get diceResults(): number[] {
-    const diceResults: number[] = [];
-    (this.terms as any[]).forEach((term) => {
-      if (Array.isArray(term.results)) {
-        diceResults.push(...term.results.map((r: any) => r.result));
-      }
-    });
-    return diceResults;
+    return this.#diceTerms.flatMap((term) => term.results.map((result) => result.result));
   }
 
   get rawResult(): number {

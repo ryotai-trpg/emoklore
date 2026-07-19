@@ -4,44 +4,6 @@
 
 // Adapted from dnd5e and draw-steel
 
-// export function sortObjectEntries(obj, sortKey) {
-export function sortObjectEntries<T extends Record<string, unknown>, V = T[keyof T]>(
-  obj: T,
-  sortKey?: string | ((a: V, b: V) => number),
-): T {
-  let sorted = Object.entries(obj) as [string, V][];
-
-  const compareValues = (lhs: unknown, rhs: unknown): number => {
-    if (typeof lhs === "string" && typeof rhs === "string") {
-      return lhs.localeCompare(rhs, game.i18n.lang);
-    }
-    const ln = Number(lhs);
-    const rn = Number(rhs);
-    if (!Number.isNaN(ln) && !Number.isNaN(rn)) return ln - rn;
-    return 0;
-  };
-
-  if (typeof sortKey === "function") {
-    sorted = sorted.sort((lhs, rhs) => sortKey(lhs[1], rhs[1]));
-  } else if (typeof sortKey === "string") {
-    sorted = sorted.sort((lhs, rhs) => {
-      const lval = (lhs[1] as Record<string, unknown> | unknown as Record<string, unknown>)[
-        sortKey as string
-      ];
-      const rval = (rhs[1] as Record<string, unknown> | unknown as Record<string, unknown>)[
-        sortKey as string
-      ];
-      return compareValues(lval, rval);
-    });
-  } else {
-    sorted = sorted.sort((lhs, rhs) => compareValues(lhs[1], rhs[1]));
-  }
-
-  return Object.fromEntries(sorted) as T;
-}
-
-/* -------------------------------------------------- */
-
 /**
  * Storage for pre-localization configuration.
  * @type {object}
@@ -49,7 +11,6 @@ export function sortObjectEntries<T extends Record<string, unknown>, V = T[keyof
  */
 type PreLocalizationRegistration = {
   keys: string[];
-  sort: boolean;
 };
 
 const _preLocalizationRegistrations: Record<string, PreLocalizationRegistration> = {};
@@ -58,10 +19,10 @@ const _preLocalizationRegistrations: Record<string, PreLocalizationRegistration>
 
 export function preLocalize(
   configKeyPath: string,
-  { key, keys = [], sort = false }: { key?: string; keys?: string[]; sort?: boolean } = {},
+  { key, keys = [] }: { key?: string; keys?: string[] } = {},
 ) {
   if (key) keys.unshift(key);
-  _preLocalizationRegistrations[configKeyPath] = { keys, sort };
+  _preLocalizationRegistrations[configKeyPath] = { keys };
 }
 
 /* -------------------------------------------------- */
@@ -71,12 +32,6 @@ export function performPreLocalization(config: Record<string, unknown>) {
     const target = foundry.utils.getProperty(config, keyPath);
     if (!target) continue;
     _localizeObject(target as Record<string, unknown>, settings.keys);
-    if (settings.sort)
-      foundry.utils.setProperty(
-        config,
-        keyPath,
-        sortObjectEntries(target as Record<string, unknown>, settings.keys[0]),
-      );
   }
 
   // Localize & sort status effects
