@@ -24,6 +24,28 @@ export type SkillRow = {
   [key: string]: unknown;
 };
 
+/** 経歴の項目の定義。並び順と見せ方だけを持ち、値は持たない */
+export type BiographyFieldDef = {
+  key: string;
+  /** ラベルと値を横に並べる */
+  inline?: boolean;
+  /** 値をHTMLとして流し込む */
+  html?: boolean;
+};
+
+/** 経歴1項目の表示用データ */
+export type BiographyRow = {
+  key: string;
+  label: string;
+  /** 保存値そのまま。編集モードの formGroup に渡す */
+  value: string;
+  /** 閲覧モードで出す文字列。備考は enrichHTML を通した結果が入る */
+  display: string;
+  field: unknown;
+  inline: boolean;
+  html: boolean;
+};
+
 /** 基本技能の表示用データ。判定のトリガとして1行1ボタンで並べる */
 export type BaseSkillRow = {
   key: string;
@@ -109,8 +131,9 @@ export type CharacterContext = {
   baseSkills?: BaseSkillRow[];
   skillPointSum?: number;
   skillLevelOptions?: Array<{ value: string; label: string }>;
-  // 経歴の備考を enrichHTML に通した結果。生の system.biography.note とは別に持つ
-  noteHTML?: string;
+  // 経歴は横並びの組（年齢・性別）と、それ以降を分けて渡す
+  biographyPairedRows?: BiographyRow[];
+  biographyRows?: BiographyRow[];
   tabs: Record<string, ApplicationTab>;
   tab?: unknown;
   effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;

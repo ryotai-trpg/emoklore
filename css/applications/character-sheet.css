@@ -49,6 +49,29 @@
     display: flex;
   }
 
+  /* 経歴タブの入力フォーム。本体の form-group を縦積みに寄せる */
+  .tab.biography {
+    div.flexrow {
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0px;
+    }
+
+    .form-group.stacked {
+      display: flex;
+      flex-direction: row;
+
+      .editor-container {
+        min-height: 150px;
+      }
+    }
+  }
+
   /* ヘッダのリソース。HPとMPを左列に縦2段、共鳴は右列で2行ぶち抜き */
   .em-resources {
     height: inherit;

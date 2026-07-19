@@ -10,7 +10,13 @@ import {
 } from "../utils/sheet";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
-import { createEmotionOptions, createSkillLevelOptions, getEmotionRows } from "./helpers";
+import {
+  BIOGRAPHY_PAIRED_COUNT,
+  buildBiographyRows,
+  createEmotionOptions,
+  createSkillLevelOptions,
+  getEmotionRows,
+} from "./helpers";
 import type {
   BaseSkillRow,
   CharacterContext,
@@ -65,9 +71,11 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
     biography: {
       template: "systems/emoklore/templates/actor/biography.hbs",
-      templates: ["templates/actor/partials/card.hbs", "templates/actor/partials/stat-row.hbs"].map(
-        systemPath,
-      ),
+      templates: [
+        "templates/actor/partials/card.hbs",
+        "templates/actor/partials/stat-row.hbs",
+        "templates/actor/partials/field.hbs",
+      ].map(systemPath),
       scrollable: [""],
     },
     effects: {
@@ -236,11 +244,13 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   /**
-   * 経歴の備考は system.json で htmlFields に指定しているリッチテキスト。
-   * @UUID リンクやインラインロールを解決するため、描画前に enrichHTML を通す。
+   * 経歴の表示用データ。
+   *
+   * 備考は system.json で htmlFields に指定しているリッチテキストなので、
+   * @UUID リンクやインラインロールを解決するため描画前に enrichHTML を通す。
    */
   private async _prepareBiographyContext(context: CharacterContext): Promise<void> {
-    context.noteHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+    const noteHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.actor.system.biography.note,
       {
         secrets: this.actor.isOwner,
@@ -248,6 +258,21 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         rollData: this.actor.getRollData(),
       },
     );
+
+    // systemFields の型は DataField 止まりで fields に降りられないため、スキーマから引く
+    const biography = this.actor.system.schema.getField([
+      "biography",
+    ]) as foundry.data.fields.SchemaField;
+
+    const rows = buildBiographyRows(
+      biography.fields as unknown as Record<string, { label?: string }>,
+      this.actor.system.biography as unknown as Record<string, string>,
+      { note: noteHTML },
+    );
+
+    // 先頭の数件は横並びの組にするので、テンプレート側で分けて回せるよう2つに割る
+    context.biographyPairedRows = rows.slice(0, BIOGRAPHY_PAIRED_COUNT);
+    context.biographyRows = rows.slice(BIOGRAPHY_PAIRED_COUNT);
   }
 
   private _prepareEffectsContext(context: CharacterContext): void {
