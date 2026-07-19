@@ -9,3 +9,8 @@ A rulebook is required to play. You can view it for free on the [Official Websit
 - Modification: Permitted
 - Public performance: Permitted
 - Commercial use: Permitted
+
+### Documentation & Development
+
+- User guide & docs: https://ryotai-trpg.github.io/emoklore/
+- Contributing: see [CONTRIBUTING.md](CONTRIBUTING.md)
