@@ -52,13 +52,14 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
 
   static override PARTS = {
     header: {
-      template: "systems/emoklore/templates/actor/header.hbs",
+      template: systemPath("templates/actor/header.hbs"),
       // 入れ子のpartialは再帰的に解決されないので、使うものをすべて並べる
       templates: [systemPath("templates/actor/partials/meter.hbs")],
     },
+    // 本体のテンプレートなので systemPath は通さない
     tabs: { template: "templates/generic/tab-navigation.hbs" },
     skills: {
-      template: "systems/emoklore/templates/actor/stats.hbs", // TODO: reaname
+      template: systemPath("templates/actor/skills-tab.hbs"),
       templates: [
         "templates/actor/skills.hbs",
         "templates/actor/base-skills.hbs",
@@ -70,7 +71,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       scrollable: [""],
     },
     biography: {
-      template: "systems/emoklore/templates/actor/biography.hbs",
+      template: systemPath("templates/actor/biography.hbs"),
       templates: [
         "templates/actor/partials/card.hbs",
         "templates/actor/partials/stat-row.hbs",
@@ -79,7 +80,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       scrollable: [""],
     },
     effects: {
-      template: "systems/emoklore/templates/actor/effects.hbs",
+      template: systemPath("templates/actor/effects.hbs"),
       scrollable: [""],
     },
   };

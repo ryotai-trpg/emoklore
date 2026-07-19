@@ -1,5 +1,6 @@
 import type { ApplicationRenderContext } from "@client/applications/_types.mjs";
 import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
+import { systemPath } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
 import { importFromCharSheet, validateCharSheetJSON } from "../utils/charsheet-importer";
 
@@ -41,7 +42,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
 
   static override PARTS = {
     form: {
-      template: "systems/emoklore/templates/apps/charsheet-import.hbs",
+      template: systemPath("templates/apps/charsheet-import.hbs"),
     },
   };
 
