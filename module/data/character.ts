@@ -1,6 +1,17 @@
-import { BaseActorDataModel } from "./base-actor";
+import type { BaseSkillKey } from "../config/base-skills";
+import type { CharacteristicKey } from "../config/characteristics";
+import type { SkillGroupKey } from "../config/skill-groups";
+import type { SkillKey } from "../config/skills";
+import { EmokloreSystemDataModel } from "./system-model";
 
 const { HTMLField, NumberField, SchemaField, StringField, BooleanField } = foundry.data.fields;
+
+/** 技能・能力値・技能グループが共通で持つ修正値の組 */
+export type ModifierSet = {
+  bonus: number;
+  success: number;
+  target: number;
+};
 
 const defineCharacterDataModelSchema = () => {
   const schema: Record<string, foundry.data.fields.DataField> = {};
@@ -166,21 +177,33 @@ const defineCharacterDataModelSchema = () => {
 
 export type CharacterDataModelSchema = ReturnType<typeof defineCharacterDataModelSchema>;
 
-export class CharacterDataModel extends BaseActorDataModel<CharacterDataModelSchema> {
+export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataModelSchema> {
+  // target は prepareDerivedData で必ず設定される派生値（initiative と同じ扱い）。
+  // それ以外は defineCharacterDataModelSchema のスキーマと一致させること
   declare skills: Record<
-    keyof (typeof CONFIG.EMOKLORE)["skills"],
+    SkillKey,
     {
       level: number;
-      characteristic: keyof (typeof CONFIG.EMOKLORE)["characteristics"];
-      target?: number;
+      characteristic: CharacteristicKey;
+      label: string;
+      group: SkillGroupKey;
+      isExtra: boolean;
+      hasSpecialization: boolean;
+      specialization?: string;
+      mod: ModifierSet;
+      target: number;
     }
   >;
 
   declare baseSkills: Record<
-    keyof (typeof CONFIG.EMOKLORE)["baseSkills"],
+    BaseSkillKey,
     {
-      characteristic: keyof (typeof CONFIG.EMOKLORE)["characteristics"];
-      target?: number;
+      level: number;
+      characteristic: CharacteristicKey;
+      label: string;
+      group: SkillGroupKey;
+      mod: ModifierSet;
+      target: number;
     }
   >;
 
@@ -191,26 +214,18 @@ export class CharacterDataModel extends BaseActorDataModel<CharacterDataModelSch
   };
 
   declare characteristics: Record<
-    keyof (typeof CONFIG.EMOKLORE)["characteristics"],
+    CharacteristicKey,
     {
       value: number;
-      mod: {
-        bonus: number;
-        success: number;
-        target: number;
-      };
+      mod: ModifierSet;
     }
   >;
 
   declare skillGroups: Record<
-    keyof (typeof CONFIG.EMOKLORE)["skillGroups"],
+    SkillGroupKey,
     {
       label: string;
-      mod: {
-        bonus: number;
-        success: number;
-        target: number;
-      };
+      mod: ModifierSet;
     }
   >;
 
@@ -244,50 +259,27 @@ export class CharacterDataModel extends BaseActorDataModel<CharacterDataModelSch
   override prepareDerivedData() {
     super.prepareDerivedData();
 
-    this.skills = Object.fromEntries(
-      Object.entries(this.skills).map(([key, skill]) => [
-        key,
-        {
-          ...skill,
-          target:
-            skill.level +
-            (foundry.utils.getProperty(
-              this,
-              `characteristics.${String(skill.characteristic)}.value`,
-            ) as number),
-        },
-      ]),
-    );
+    for (const skill of Object.values(this.skills)) {
+      skill.target = skill.level + this.characteristics[skill.characteristic].value;
+    }
 
-    this.baseSkills = Object.fromEntries(
-      Object.entries(this.baseSkills).map(([key, skill]) => [
-        key,
-        {
-          ...skill,
-          target: foundry.utils.getProperty(
-            this,
-            `characteristics.${String(skill.characteristic)}.value`,
-          ) as number,
-        },
-      ]),
-    );
+    for (const skill of Object.values(this.baseSkills)) {
+      skill.target = this.characteristics[skill.characteristic].value;
+    }
 
+    // 〈手当〉のみ能力値の半分（切り上げ）が目標値になる
     this.baseSkills.treatment.target = Math.ceil(this.baseSkills.treatment.target / 2);
 
-    this.resources.hp.max =
-      10 + (foundry.utils.getProperty(this, "characteristics.physical.value") as number);
+    this.resources.hp.max = 10 + this.characteristics.physical.value;
     this.resources.hp.value = Math.min(this.resources.hp.value, this.resources.hp.max);
 
     this.resources.mp.max =
-      (foundry.utils.getProperty(this, "characteristics.mentality.value") as number) +
-      (foundry.utils.getProperty(this, "characteristics.intelligence.value") as number);
+      this.characteristics.mentality.value + this.characteristics.intelligence.value;
     this.resources.mp.value = Math.min(this.resources.mp.value, this.resources.mp.max);
 
     this.resources.resonance.value = Math.max(this.resources.resonance.value, 1);
 
-    const physical = foundry.utils.getProperty(this, "characteristics.physical.value") as number;
-    const speedLevel = foundry.utils.getProperty(this, "skills.speed.level") as number;
-    this.initiative = physical + speedLevel;
+    this.initiative = this.characteristics.physical.value + this.skills.speed.level;
   }
 
   modifyRollData(rollData: Record<string, unknown>): void {

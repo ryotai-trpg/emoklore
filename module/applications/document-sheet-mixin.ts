@@ -1,5 +1,5 @@
-import constructHTMLButton from "../helpers/construct-html-button";
 import { getSetting } from "../settings";
+import constructHTMLButton from "../utils/construct-html-button";
 import type {
   EmokloreDocumentSheetContext,
   EmokloreDocumentSheetOptions,

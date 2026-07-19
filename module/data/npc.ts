@@ -1,4 +1,4 @@
-import { BaseActorDataModel } from "./base-actor";
+import { EmokloreSystemDataModel } from "./system-model";
 
 const { NumberField, SchemaField } = foundry.data.fields;
 
@@ -25,7 +25,7 @@ const defineNpcDataModelSchema = () => {
 
 export type NpcDataModelSchema = ReturnType<typeof defineNpcDataModelSchema>;
 
-export class NpcDataModel extends BaseActorDataModel<NpcDataModelSchema> {
+export class NpcDataModel extends EmokloreSystemDataModel<NpcDataModelSchema> {
   declare wickedness: {
     value: number;
     max: number;

@@ -3,7 +3,7 @@ export interface CharacteristicConfig {
   fa: string;
 }
 
-export const characteristics: Record<string, CharacteristicConfig> = {
+const definitions = {
   physical: {
     label: "EMOKLORE.Actor.characteristics.physical",
     fa: "fa-person-running",
@@ -36,4 +36,10 @@ export const characteristics: Record<string, CharacteristicConfig> = {
     label: "EMOKLORE.Actor.characteristics.fortune",
     fa: "fa-dice-six",
   },
-} as const;
+} satisfies Record<string, CharacteristicConfig>;
+
+export type CharacteristicKey = keyof typeof definitions;
+
+// satisfies だけだと各値が個別の狭い型に推論されるため、値の型は CharacteristicConfig に揃える。
+// キーは literal のまま保たれるので CharacteristicKey が使える
+export const characteristics: Record<CharacteristicKey, CharacteristicConfig> = definitions;

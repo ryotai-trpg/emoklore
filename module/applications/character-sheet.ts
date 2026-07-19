@@ -1,6 +1,6 @@
 import { systemPath } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
-import { prepareActiveEffectCategories } from "../helpers/effects";
+import { prepareActiveEffectCategories } from "../utils/effects";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import {

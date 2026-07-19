@@ -1,23 +1,13 @@
-import { preLocalize } from "../helpers/localization";
-import { type BaseSkillConfig, baseSkills } from "./base-skills";
-import { type CharacteristicConfig, characteristics } from "./characteristics";
-import { type EmotionAttributesConfig, emotionAttributes } from "./emotion-attributes";
-import { type ResonantEmotionsConfig, resonantEmotions } from "./resonant-emotions";
-import { type SkillGroupsConfig, skillGroups } from "./skill-groups";
-import { type SkillLevelConfig, skillLevels } from "./skill-levels";
-import { type SkillConfig, skills } from "./skills";
+import { preLocalize } from "../utils/localization";
+import { baseSkills } from "./base-skills";
+import { characteristics } from "./characteristics";
+import { emotionAttributes } from "./emotion-attributes";
+import { resonantEmotions } from "./resonant-emotions";
+import { skillGroups } from "./skill-groups";
+import { skillLevels } from "./skill-levels";
+import { skills } from "./skills";
 
-export interface EmokloreConfig {
-  characteristics: Record<string, CharacteristicConfig>;
-  skillGroups: Record<string, SkillGroupsConfig>;
-  baseSkills: Record<string, BaseSkillConfig>;
-  skills: Record<string, SkillConfig>;
-  skillLevel: Record<number, SkillLevelConfig>;
-  emotionAttributes: Record<string, EmotionAttributesConfig>;
-  resonantEmotions: Record<string, ResonantEmotionsConfig>;
-}
-
-export const EMOKLORE: EmokloreConfig = {
+export const EMOKLORE = {
   characteristics,
   skillGroups,
   baseSkills,
@@ -26,6 +16,10 @@ export const EMOKLORE: EmokloreConfig = {
   emotionAttributes,
   resonantEmotions,
 };
+
+// 各定義の実体から型を導く。Record<string, XConfig> で注釈すると
+// キーが string に潰れ、keyof で技能名・能力値名を取り出せなくなる
+export type EmokloreConfig = typeof EMOKLORE;
 
 // ローカライゼーションの設定
 preLocalize("characteristics", { keys: ["label"] });

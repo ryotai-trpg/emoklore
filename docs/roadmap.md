@@ -10,10 +10,12 @@ v14専用に移行します（v13サポートは打ち切り）。
 
 具体的なチェックリストは [v14移行チェックリスト](/v14-migration) を参照。調査の結果、必須変更は `system.json` の compatibility 更新のみで、残りはv16で削除予定の非推奨APIの先回り対応です。
 
-- [ ] `system.json` の compatibility を v14 に
-- [ ] 非推奨API対応（rollMode→messageMode、ActiveEffect mode→type など）
-- [ ] TypeScript型定義戦略の決定（fvtt-types継続 or v14本体からの型生成）
-- [ ] v14で起動して非推奨警告ゼロを確認
+**完了**（2026-07-19）。
+
+- [x] `system.json` の compatibility を v14 に
+- [x] 非推奨API対応（rollMode→messageMode、ActiveEffect mode→type など）
+- [x] TypeScript型定義戦略の決定（fvtt-types継続 or v14本体からの型生成）
+- [x] v14で起動して非推奨警告ゼロを確認
 
 ## Phase 2: リファクタリング
 
@@ -22,8 +24,8 @@ v14専用に移行します（v13サポートは打ち切り）。
 - [ ] スキーマ定義の初期化順序依存（`CONFIG.EMOKLORE` / `game.i18n`）の解消
 - [ ] `EmokloreActor` から判定計算・ダイアログ・チャット生成を分離
 - [ ] シート層に混ざったルール計算を data 層へ移動
-- [ ] `as any` の削減
-- [ ] 純粋関数（判定計算など）への vitest テスト導入検討
+- [ ] `as any` の削減（着手時55箇所）
+- [x] 純粋関数（判定計算など）への vitest テスト導入
 
 参考: dnd5e の module 構成（applications / data / dice / documents / config / utils）
 

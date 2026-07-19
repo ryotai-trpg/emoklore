@@ -1,6 +1,8 @@
+import type { BaseSkillKey } from "../config/base-skills";
+import type { SkillKey } from "../config/skills";
 import type { CharacterDataModel } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
-import { formatDMPart } from "../helpers/helper";
+import { formatDMPart } from "../utils/helper";
 
 type ResonanceMatch = "none" | "root" | "completely";
 type ResourceKey = "hp" | "mp" | "resonance";
@@ -112,35 +114,30 @@ export class EmokloreActor<SubType extends EmokloreActorType = EmokloreActorType
     skill: string,
     { base = false, ...options }: { base?: boolean } & Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
-    const skillSource = base ? this.system.baseSkills : this.system.skills;
+    // シートのdatasetから来る文字列なので、キーであることはここで引き受ける
+    const entry = base
+      ? this.system.baseSkills[skill as BaseSkillKey]
+      : this.system.skills[skill as SkillKey];
 
-    const {
-      label,
-      level,
-      target: baseTarget,
-      characteristic,
-      group,
-      isExtra,
-      specialization,
-    } = skillSource[skill] as any;
+    const { label, level, target: baseTarget, characteristic, group } = entry;
 
-    const {
-      bonus: skillBonus,
-      success: skillSuccessMod,
-      target: skillTargetMod,
-    } = (skillSource[skill] as any).mod;
+    // isExtra / specialization は通常技能にしかない
+    const isExtra = "isExtra" in entry ? entry.isExtra : false;
+    const specialization = "specialization" in entry ? entry.specialization : undefined;
+
+    const { bonus: skillBonus, success: skillSuccessMod, target: skillTargetMod } = entry.mod;
 
     const {
       bonus: characteristicBonus,
       success: characteristicSuccessMod,
       target: characteristicTargetMod,
-    } = (this.system.characteristics[characteristic] as any).mod;
+    } = this.system.characteristics[characteristic].mod;
 
     const {
       bonus: skillGroupBonus,
       success: skillGroupSuccessMod,
       target: skillGroupTargetMod,
-    } = (this.system.skillGroups[group] as any).mod;
+    } = this.system.skillGroups[group].mod;
 
     const prefix = base ? "＊" : isExtra ? "★" : "";
 

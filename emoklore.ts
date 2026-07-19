@@ -1,3 +1,4 @@
+import * as applications from "./module/applications/character-sheet";
 import { EMOKLORE } from "./module/config/index";
 import { systemID } from "./module/constants";
 import { CharacterDataModel } from "./module/data/character";
@@ -8,9 +9,8 @@ import { EmokloreDie } from "./module/dice/emoklore-die";
 import { EmokloreRoll } from "./module/dice/emoklore-roll";
 import { EmokloreActor } from "./module/documents/actor";
 import { EmokloreItem } from "./module/documents/item";
-import { performPreLocalization } from "./module/helpers/localization";
 import { registerSystemSettings } from "./module/settings";
-import * as applications from "./module/sheets/character-sheet";
+import { performPreLocalization } from "./module/utils/localization";
 
 Hooks.once("init", () => {
   console.log("Emo-klore TRPG | Initializing...");

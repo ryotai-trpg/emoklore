@@ -7,7 +7,7 @@ export interface SkillConfig {
   hasSpecialization?: boolean;
 }
 
-export const skills: Record<string, SkillConfig> = {
+const definitions = {
   search: {
     label: "EMOKLORE.Actor.skills.search",
     characteristic: "intelligence",
@@ -202,4 +202,10 @@ export const skills: Record<string, SkillConfig> = {
     group: "unique",
     isExtra: true,
   },
-} as const;
+} satisfies Record<string, SkillConfig>;
+
+export type SkillKey = keyof typeof definitions;
+
+// satisfies だけだと各値が個別の狭い型に推論されるため、値の型は SkillConfig に揃える。
+// キーは literal のまま保たれるので SkillKey が使える
+export const skills: Record<SkillKey, SkillConfig> = definitions;

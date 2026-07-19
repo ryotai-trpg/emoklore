@@ -12,9 +12,9 @@ module/
   config/            … 静的なゲームルール定義（技能・特性・共鳴感情など）→ CONFIG.EMOKLORE
   data/              … TypeDataModelスキーマ（character / npc / weapon）
   documents/         … Actor / Item 拡張。判定ロジック（rollSkill / rollResonance）もここ
-  sheets/            … ApplicationV2シート（HandlebarsApplicationMixin + Play/Editモードmixin）
+  applications/      … ApplicationV2シート（HandlebarsApplicationMixin + Play/Editモードmixin）
   dice/              … カスタムRoll / Die（成功数判定: 1d10≦目標値、1クリティカル / 10ファンブル）
-  helpers/           … i18n事前ローカライズ、ActiveEffect整理、ココフォリアインポートなど
+  utils/             … i18n事前ローカライズ、ActiveEffect整理、ココフォリアインポートなど
 templates/           … Handlebarsテンプレート
 lang/                … ja.json が正、en.json は追従
 ```
@@ -23,7 +23,7 @@ lang/                … ja.json が正、en.json は追従
 
 1. **初期化順序への密結合**: `module/data/character.ts` のスキーマ定義が、定義時点で `CONFIG.EMOKLORE` と `game.i18n` に依存している。さらに `emoklore.ts` の `i18nInit` フックが外側からスキーマのラベルをパッチしており、データ層の関心事がエントリに漏れている
 2. **Documentクラスの責務過多**: `module/documents/actor.ts` の `rollSkill` / `rollResonance` が判定計算・ダイアログUI・チャットメッセージ生成を1メソッドに混在させている（コード中にも `// TODO: Refactor`）
-3. **プレゼンテーション層にルール計算**: `module/sheets/helpers.ts` に `calculateCharPointSum` / `calculateTotalSkillPoints` などのルール計算がある
+3. **プレゼンテーション層にルール計算**: `module/applications/helpers.ts` に `calculateCharPointSum` / `calculateTotalSkillPoints` などのルール計算がある
 4. **`as any` の多用**: 型戦略が未確立（→ [v14移行チェックリスト](/v14-migration) の型定義戦略を参照）
 5. **開発用ハックの混入**: `emoklore.ts` の `ready` フックにハードコードされたactor ID
 
@@ -36,9 +36,9 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 | `config/` | 静的なルール定義のみ（純データ） | ロジック、i18n呼び出し |
 | `data/` | スキーマ定義 + 派生値計算（`prepareDerivedData`）+ ルール計算（判定の目標値・成功数・ポイント合計など） | UI、チャット生成 |
 | `documents/` | Documentライフサイクルの薄いオーケストレーション。data層のルール計算とapplications/chat層をつなぐ | 計算式の実装、ダイアログ |
-| `applications/`（現 `sheets/`） | シート・ダイアログ。コンテキスト整形のみ | ルール計算 |
+| `applications/` | シート・ダイアログ。コンテキスト整形のみ | ルール計算 |
 | `dice/` | Roll / Die / 結果の表現 | — |
-| `utils/`（現 `helpers/`） | 汎用ユーティリティ、i18n機構、インポータ | ルール計算 |
+| `utils/` | 汎用ユーティリティ、i18n機構、インポータ | ルール計算 |
 
 ### 方針
 

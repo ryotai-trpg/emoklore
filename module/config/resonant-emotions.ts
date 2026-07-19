@@ -3,7 +3,7 @@ export interface ResonantEmotionsConfig {
   attribute: string;
 }
 
-export const resonantEmotions: Record<string, ResonantEmotionsConfig> = {
+const definitions = {
   selfAssertion: {
     label: "EMOKLORE.resonantEmotions.selfAssertion",
     attribute: "desire",
@@ -196,4 +196,10 @@ export const resonantEmotions: Record<string, ResonantEmotionsConfig> = {
     label: "EMOKLORE.resonantEmotions.inferiorityComplex",
     attribute: "wound",
   },
-} as const;
+} satisfies Record<string, ResonantEmotionsConfig>;
+
+export type ResonantEmotionKey = keyof typeof definitions;
+
+// satisfies だけだと各値が個別の狭い型に推論されるため、値の型は ResonantEmotionsConfig に揃える。
+// キーは literal のまま保たれるので ResonantEmotionKey が使える
+export const resonantEmotions: Record<ResonantEmotionKey, ResonantEmotionsConfig> = definitions;

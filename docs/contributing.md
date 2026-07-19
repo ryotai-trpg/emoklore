@@ -32,6 +32,17 @@ npm run link:foundry   # foundry/client・foundry/common のsymlinkを作成
 npm run typecheck      # tsc --noEmit（本体ソース内の診断は除外される）
 ```
 
+### テスト
+
+[Vitest](https://vitest.dev/) を使う。テストは対象と同じディレクトリに `*.test.ts` として置く。
+
+```shell
+npm test        # 一度だけ実行
+npx vitest      # ウォッチモード
+```
+
+対象は**FoundryVTT APIに依存しない純粋関数**（判定計算・ポイント計算・書式整形など）に限る。Foundry本体のクラスを継承・参照するコード（`module/dice/` やDocument・シート）はランタイムに本体が必要なため、単体テストではなく実機で確認する。逆に言えば、テストしたいロジックはFoundry非依存の形に切り出す。
+
 ## ブランチ運用
 
 - メインブランチは **`develop`**。PRはここへ向ける
@@ -77,14 +88,14 @@ feat: add resonance roll dialog
 ## コーディング方針
 
 - TypeScript（strict化を目指す）。型定義の都合で `as any` が残っているが、**新規コードでは増やさない・触った箇所では減らす**
-- UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/helpers/localization.ts` の事前ローカライズ機構を通す
+- UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す
 - フォーマット・lintは [Biome](https://biomejs.dev/)（設定: `biome.json`）。手動実行は `npm run check`（修正適用）/ `npm run lint`（検証のみ）
 - 設計の方向性・既知の構造的課題は [アーキテクチャ](/architecture) を参照
 
 ### 自動チェック
 
 - **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。緊急時は `git commit --no-verify` でスキップできるが非推奨
-- **CI**: pushとPRで GitHub Actions が Biome・ビルド・型チェック・翻訳/テンプレート整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
+- **CI**: pushとPRで GitHub Actions が Biome・テスト・ビルド・型チェック・翻訳/テンプレート整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
   - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない
 
 ## 表記ルール
