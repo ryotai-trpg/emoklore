@@ -54,6 +54,11 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return resolveResultName(this.successCount);
   }
 
+  /** 判定結果の表示。チャットカードの見出しに出る「成功」「ダブル」など */
+  get resultLabel(): string {
+    return game.i18n.localize(`EMOKLORE.result.${this.resultName}`);
+  }
+
   /** 成功数修正の表示。修正がなければ空文字 */
   get successModLabel(): string {
     if (this.successMod === 0) return "";
@@ -86,7 +91,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
     const baseContext = await super._prepareChatRenderContext(options);
     return {
       ...baseContext,
-      resultName: this.resultName,
+      resultLabel: this.resultLabel,
       dmFormula: this.dmFormula,
       successModLabel: this.successModLabel,
     };

@@ -59,35 +59,17 @@
             <div class="value">
               Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
             </div>
-            <div>
-              {{#if system.emotions.surface}}
-              {{localize (concat "EMOKLORE.resonantEmotions." system.emotions.surface)}}
-              {{/if}}
-            </div>
+            <div>{{emotionRows.surface.label}}</div>
             <div class="small">
-              {{#if system.emotions.surface}}
-              （{{localize emotionAttributes.surface}}）
-              {{/if}}
+              {{#if emotionRows.surface.attribute}}（{{emotionRows.surface.attribute}}）{{/if}}
             </div>
-            <div>
-              {{#if system.emotions.hidden}}
-              {{localize (concat "EMOKLORE.resonantEmotions." system.emotions.hidden)}}
-              {{/if}}
-            </div>
+            <div>{{emotionRows.hidden.label}}</div>
             <div class="small">
-              {{#if system.emotions.hidden}}
-              （{{localize emotionAttributes.hidden}}）
-              {{/if}}
+              {{#if emotionRows.hidden.attribute}}（{{emotionRows.hidden.attribute}}）{{/if}}
             </div>
-            <div>
-              {{#if system.emotions.root}}
-              {{localize (concat "EMOKLORE.resonantEmotions." system.emotions.root)}}
-              {{/if}}
-            </div>
+            <div>{{emotionRows.root.label}}</div>
             <div class="small">
-              {{#if system.emotions.root}}
-              （{{localize emotionAttributes.root}}）
-              {{/if}}
+              {{#if emotionRows.root.attribute}}（{{emotionRows.root.attribute}}）{{/if}}
             </div>
           </div>
           <progress 

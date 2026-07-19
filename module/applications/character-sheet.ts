@@ -1,3 +1,4 @@
+import type { CharacteristicKey } from "../config/characteristics";
 import { systemPath } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
 import { calculateCharPointSum, calculateTotalSkillPoints } from "../rules/character-points";
@@ -9,7 +10,7 @@ import {
 } from "../utils/sheet";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
-import { createEmotionOptions, createSkillLevelOptions, getEmotionAttributes } from "./helpers";
+import { createEmotionOptions, createSkillLevelOptions, getEmotionRows } from "./helpers";
 import type {
   CharacterContext,
   CharacteristicsMap,
@@ -79,9 +80,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     const baseContext = await super._prepareContext(options);
     const context = baseContext as unknown as CharacterContext;
     context.config = CONFIG.EMOKLORE;
-    context.emotionAttributes = getEmotionAttributes(
+    context.emotionRows = getEmotionRows(
       context.system.emotions,
       context.config.resonantEmotions,
+      context.config.emotionAttributes,
     );
 
     context.emotionOptions = createEmotionOptions();
@@ -159,6 +161,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
    * 技能の表示用データ。
    *
    * label / isExtra はアクターに保存せず CONFIG.EMOKLORE 側の定義なので、ここで合流させる。
+   * 能力値ラベルも同様に引いておく。CONFIG の label は i18nInit の performPreLocalization で
+   * 翻訳済みなので、テンプレート側で言語キーを組み立てる必要はない。
    */
   _getSkills(): Record<string, unknown> {
     const data = this.actor;
@@ -167,11 +171,17 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         const value = foundry.utils.getProperty(data, `system.skills.${key}`) as
           | Record<string, unknown>
           | undefined;
+        const characteristic = value?.characteristic as CharacteristicKey | undefined;
         (obj as Record<string, unknown>)[key] = {
           field: this.actor.system.schema.getField(["skills", key]),
           label,
           isExtra: isExtra ?? false,
           ...(value ?? {}),
+          // spreadより後に置く。保存値には characteristicLabel がないので上書きされないが、
+          // 順序を変えると壊れる
+          characteristicLabel: characteristic
+            ? (CONFIG.EMOKLORE.characteristics[characteristic]?.label ?? "")
+            : "",
         };
         return obj;
       },

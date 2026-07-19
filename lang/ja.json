@@ -35,11 +35,7 @@
         "effects": "効果"
       },
       "fields": {
-        "specialization": "分野",
-        "skillName": "技能名",
-        "skillCharacteristic": "能力値",
-        "skillGroup": "グループ",
-        "isExtra": "EX技能"
+        "specialization": "分野"
       }
     },
     "SHEET.ToggleMode": "プレイ・編集モード切替",
@@ -166,6 +162,24 @@
               "max": {
                 "label": "最大"
               }
+            },
+            "mp": {
+              "label": "MP",
+              "value": {
+                "label": "現在"
+              },
+              "max": {
+                "label": "最大"
+              }
+            },
+            "resonance": {
+              "label": "共鳴",
+              "value": {
+                "label": "現在"
+              },
+              "max": {
+                "label": "最大"
+              }
             }
           },
 
@@ -286,9 +300,6 @@
         "strongLuck": "強運"
       }
     },
-    "baseSkill": "ベース技能",
-    "skill": "技能",
-    "characteristics": "能力値",
     "skillRoll": "〈{skillName}〉判定",
     "successMod": "成功数{mod}",
     "resonantEmotion": "{emotion}（{attribute}）",

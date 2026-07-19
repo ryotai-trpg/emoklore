@@ -6,6 +6,9 @@ import type { EmokloreActor } from "../documents/actor";
 // Common type definitions
 export type EmotionKey = "surface" | "hidden" | "root";
 
+/** 共鳴感情の表示用データ。どちらも翻訳済みの文字列で、未選択なら空文字 */
+export type EmotionRow = { label: string; attribute: string };
+
 // renderに独自オプション（mode等）を載せて受け渡すための型
 export type EmokloreRenderOptions = HandlebarsRenderOptions & {
   mode?: number;
@@ -16,6 +19,8 @@ export type EmokloreRenderOptions = HandlebarsRenderOptions & {
 export type SkillRow = {
   level: number;
   isExtra?: boolean;
+  /** 能力値の表示名。CONFIG.EMOKLORE から引いた翻訳済みの文字列 */
+  characteristicLabel: string;
   [key: string]: unknown;
 };
 
@@ -87,7 +92,8 @@ export interface EmokloreDocumentSheetOptions {
 export type CharacterContext = {
   config: typeof CONFIG.EMOKLORE;
   system: CharacterDataModel;
-  emotionAttributes: Record<EmotionKey, string>;
+  // テンプレートが system.emotions も参照するので、紛れないよう emotionRows にしている
+  emotionRows: Record<EmotionKey, EmotionRow>;
   emotionOptions: Array<{ value: string; label: string; group: string }>;
   characteristics?: CharacteristicsMap;
   charPointSum?: number;
