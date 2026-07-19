@@ -1,7 +1,8 @@
 {{! Biography Tab }}
 <section class='tab biography {{tab.cssClass}}' data-group='primary' data-tab='biography'>
 
-  {{> "systems/emoklore/templates/actor/card-view.hbs"}}
+  {{! 経歴タブでは編集モードでもカードは閲覧表示にする }}
+  {{> "systems/emoklore/templates/actor/partials/card.hbs" readonly=true}}
 
   <div class="biographies">
     {{#if isPlay}}

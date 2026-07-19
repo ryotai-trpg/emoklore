@@ -52,14 +52,19 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     tabs: { template: "templates/generic/tab-navigation.hbs" },
     skills: {
       template: "systems/emoklore/templates/actor/stats.hbs", // TODO: reaname
-      templates: ["card-view.hbs", "card-edit.hbs", "skills.hbs", "base-skills.hbs"].map((t) =>
-        systemPath(`templates/actor/${t}`),
-      ),
+      templates: [
+        "templates/actor/skills.hbs",
+        "templates/actor/base-skills.hbs",
+        "templates/actor/partials/card.hbs",
+        "templates/actor/partials/stat-row.hbs",
+      ].map(systemPath),
       scrollable: [""],
     },
     biography: {
       template: "systems/emoklore/templates/actor/biography.hbs",
-      templates: ["systems/emoklore/templates/actor/card-view.hbs"],
+      templates: ["templates/actor/partials/card.hbs", "templates/actor/partials/stat-row.hbs"].map(
+        systemPath,
+      ),
       scrollable: [""],
     },
     effects: {
@@ -144,14 +149,21 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     await CharSheetImportDialog.show(this.actor);
   }
 
+  /**
+   * 能力値の表示用データ。
+   *
+   * アイコンは CONFIG.EMOKLORE 側の定義なので、テンプレートで二重の lookup を
+   * 組まずに済むようここで引いておく。
+   */
   _getCharacteristics(): Record<string, unknown> {
     const data = this.actor;
-    return Object.keys(CONFIG.EMOKLORE.characteristics).reduce(
-      (obj, chc) => {
+    return Object.entries(CONFIG.EMOKLORE.characteristics).reduce(
+      (obj, [chc, { fa }]) => {
         const value = foundry.utils.getProperty(data, `system.characteristics.${chc}.value`);
         (obj as Record<string, unknown>)[chc] = {
           field: this.actor.system.schema.getField(["characteristics", chc]),
           value: value ?? 0,
+          icon: fa,
         };
         return obj;
       },

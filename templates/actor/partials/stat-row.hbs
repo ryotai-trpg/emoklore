@@ -1,0 +1,19 @@
+{{!--
+  能力値1行。閲覧はアイコン・名前・値・バー、編集は入力欄だけ。
+
+  @param stat 能力値の表示用データ（field / value / icon）
+  @param key  能力値のキー
+  @param view true なら閲覧表示にする
+--}}
+{{#if view}}
+<div class="em-stat-row" data-characteristic="{{key}}">
+  <i class="fa-solid {{stat.icon}} em-stat-row__icon"></i>
+  <label for="{{key}}">{{stat.field.fields.value.label}}</label>
+  <span class="em-stat-row__value">{{stat.value}}</span>
+  <progress class="em-progress em-progress--sm" id="{{key}}" value="{{stat.value}}" max="6"></progress>
+</div>
+{{else}}
+<div class="em-stat-row em-stat-row--edit" data-characteristic="{{key}}">
+  {{formGroup stat.field.fields.value value=stat.value placeholder="1"}}
+</div>
+{{/if}}

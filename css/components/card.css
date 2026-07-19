@@ -1,15 +1,15 @@
 /* 立ち絵と能力値をまとめるカード */
 
-.emoklore.sheet.character {
-  .card {
+.emoklore {
+  .em-card {
     background: var(--emoklore-darkgray);
     display: flex;
     flex-direction: column;
     border-radius: var(--emoklore-card-radius);
+  }
 
-    img {
-      border-top-left-radius: var(--emoklore-card-radius);
-      border-top-right-radius: var(--emoklore-card-radius);
-    }
+  .em-card__image {
+    border-top-left-radius: var(--emoklore-card-radius);
+    border-top-right-radius: var(--emoklore-card-radius);
   }
 }

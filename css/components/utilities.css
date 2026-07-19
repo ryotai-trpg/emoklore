@@ -1,8 +1,8 @@
 /* 単機能のユーティリティ */
 
-.emoklore.sheet.character {
+.emoklore {
   /* 能力値ポイント・技能ポイントの上限表示を下端に寄せる */
-  .cap {
+  .em-cap {
     align-self: end;
   }
 }

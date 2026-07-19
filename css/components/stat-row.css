@@ -1,33 +1,34 @@
 /* 能力値の一覧と各行 */
 
-.emoklore.sheet.character {
-  .characteristics {
+.emoklore {
+  .em-stat-list {
     display: flex;
     flex-direction: column;
     padding: 12px;
     padding-top: 8px;
-
-    .characteristic.play {
-      display: grid;
-      grid-template-columns: 22px 40px 20px 1fr;
-      align-items: center;
-      justify-items: center;
-    }
-
-    .characteristic {
-      align-items: center;
-      display: flex;
-      margin-top: 6px;
-      justify-content: space-around;
-    }
 
     range-picker {
       width: 180px;
     }
   }
 
-  /* 角丸は .em-progress--sm 側で持つ。ここは高さだけ */
-  .characteristic .em-progress {
+  /* 閲覧: アイコン・名前・値・バーの4列 */
+  .em-stat-row {
+    display: grid;
+    grid-template-columns: 22px 40px 20px 1fr;
+    align-items: center;
+    justify-items: center;
+    margin-top: 6px;
+  }
+
+  /* 編集: 入力欄だけなので横に並べるだけでよい */
+  .em-stat-row--edit {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  /* 高さだけ。角丸は .em-progress--sm 側で持つ */
+  .em-stat-row .em-progress {
     height: 20px;
   }
 }
