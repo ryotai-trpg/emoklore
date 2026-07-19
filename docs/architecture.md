@@ -22,14 +22,15 @@ lang/                … ja.json が正、en.json は追従
 
 ## 既知の構造的課題
 
-1. **初期化順序への密結合**: `module/data/character.ts` のスキーマ定義が、定義時点で `CONFIG.EMOKLORE` と `game.i18n` に依存している。さらに `emoklore.ts` の `i18nInit` フックが外側からスキーマのラベルをパッチしており、データ層の関心事がエントリに漏れている
-2. **プレゼンテーション層にルール計算**: `module/applications/helpers.ts` に `calculateCharPointSum` / `calculateTotalSkillPoints` などのルール計算がある
-3. **`as any` の残存**: 型戦略は確立済み（→ [v14移行チェックリスト](/v14-migration) の型定義戦略）だが、CONFIG登録まわりやApplicationV2の型で残っている
-4. **開発用ハックの混入**: `emoklore.ts` の `ready` フックにハードコードされたactor ID
+1. **スキーマ定義が `CONFIG.EMOKLORE` に依存**: `module/data/character.ts` がキー集合を得るために定義時点で `CONFIG.EMOKLORE` を読む。`TypedObjectField`（v14新フィールド型）で静的スキーマ + 動的キーに置き換えられないか要検討（既存データのマイグレーションが必要）
+2. **`as any` の残存**: 型戦略は確立済み（→ [v14移行チェックリスト](/v14-migration) の型定義戦略）だが、CONFIG登録まわりやApplicationV2の型で残っている
+3. **開発用ハックの混入**: `emoklore.ts` の `ready` フックにハードコードされたactor ID
 
 解消済み:
 
 - ~~**Documentクラスの責務過多**~~: `rollSkill` / `rollResonance` の判定計算を `module/rules/`、ダイアログを `module/applications/dialogs/`、チャット生成を `module/utils/chat.ts` に分離した
+- ~~**プレゼンテーション層にルール計算**~~: `applications/helpers.ts` を責務ごとに `rules/character-points.ts` / `utils/sheet.ts` / `applications/helpers.ts` へ分割した
+- ~~**`i18nInit` からのスキーマパッチ**~~: config の複製だったラベルを保存するのをやめ、能力値ラベルは `LOCALIZATION_PREFIXES` と `ja.json` の `FIELDS` に載せた。`game.i18n` への定義時依存もなくなった
 
 ## 目指す層分離
 

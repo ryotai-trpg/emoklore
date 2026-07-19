@@ -4,15 +4,10 @@ import {
   calculateCharPointSum,
   calculateSkillPoints,
   calculateTotalSkillPoints,
-} from "./helpers";
-import type { CharacteristicsMap } from "./types";
+} from "./character-points";
 
-// CharacteristicsMap は描画用の field も持つが、ポイント計算は value しか見ない。
-// テスト側の関心は value だけなので、境界でまとめて1回だけキャストする。
-const characteristics = (values: Record<string, number>): CharacteristicsMap =>
-  Object.fromEntries(
-    Object.entries(values).map(([key, value]) => [key, { value }]),
-  ) as CharacteristicsMap;
+const characteristics = (values: Record<string, number>): Record<string, { value: number }> =>
+  Object.fromEntries(Object.entries(values).map(([key, value]) => [key, { value }]));
 
 describe("calculateSkillPoints", () => {
   it("技能レベルのコストは 1/5/15", () => {
