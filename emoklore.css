@@ -580,31 +580,6 @@
     border: none;
   }
 
-  /* ===========================================
-   Character Sheet Import Dialog
-   =========================================== */
-
-  .charsheet-import-dialog {
-    textarea {
-      width: 100%;
-      font-family: monospace;
-      font-size: 12px;
-      resize: vertical;
-    }
-
-    .hint {
-      font-size: var(--font-size-12);
-      color: var(--color-text-dark-secondary);
-      margin: 0;
-    }
-
-    .form-footer {
-      justify-content: flex-end;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
-  }
-
   /* Header Actions (Import Button) */
   .header-actions {
     display: flex;
@@ -627,6 +602,33 @@
         margin: 0;
       }
     }
+  }
+}
+
+/* ===========================================
+   Character Sheet Import Dialog
+   =========================================== */
+
+/* 取り込みダイアログはシートとは別のウィンドウなので、シートのブロックの中に
+   入れてはいけない。ルート要素が .emoklore.charsheet-import-dialog になる */
+.emoklore.charsheet-import-dialog {
+  textarea {
+    width: 100%;
+    font-family: monospace;
+    font-size: 12px;
+    resize: vertical;
+  }
+
+  .hint {
+    font-size: var(--font-size-12);
+    color: var(--color-text-dark-secondary);
+    margin: 0;
+  }
+
+  .form-footer {
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
   }
 }
 

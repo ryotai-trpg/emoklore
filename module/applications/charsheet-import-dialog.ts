@@ -17,6 +17,9 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
 ) {
   static override DEFAULT_OPTIONS = {
     id: "charsheet-import-{id}",
+    // emoklore は変数の定義スコープ、charsheet-import-dialog はこのダイアログの
+    // スタイルのスコープ。どちらもルート要素に付く
+    classes: ["emoklore", "charsheet-import-dialog"],
     tag: "form",
     form: {
       handler: CharSheetImportDialog.onSubmit,
