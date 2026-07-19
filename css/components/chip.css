@@ -1,7 +1,7 @@
-/* 基本技能のボタン群。折り返して並ぶ */
+/* 小さなボタンを折り返して並べる。基本技能の判定トリガに使う */
 
-.emoklore.sheet.character {
-  .base-skills {
+.emoklore {
+  .em-chip-list {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -9,7 +9,7 @@
     padding: 8px;
   }
 
-  button.base-skill {
+  button.em-chip {
     margin-right: 5px;
     margin-top: 6px;
     padding: 0 0.3rem;

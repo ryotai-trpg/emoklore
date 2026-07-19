@@ -12,6 +12,7 @@ import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import { createEmotionOptions, createSkillLevelOptions, getEmotionRows } from "./helpers";
 import type {
+  BaseSkillRow,
   CharacterContext,
   CharacteristicsMap,
   EmokloreRenderOptions,
@@ -208,12 +209,30 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     );
   }
 
+  /**
+   * 基本技能の表示用データ。
+   *
+   * 目標値と能力値はアクターに、表示名は CONFIG.EMOKLORE にあるので、ここで合流させる。
+   */
+  _getBaseSkills(): BaseSkillRow[] {
+    return Object.entries(this.actor.system.baseSkills).map(
+      ([key, { characteristic, target }]) => ({
+        key,
+        label:
+          CONFIG.EMOKLORE.baseSkills[key as keyof typeof CONFIG.EMOKLORE.baseSkills]?.label ?? "",
+        target,
+        characteristicIcon: CONFIG.EMOKLORE.characteristics[characteristic]?.fa ?? "",
+      }),
+    );
+  }
+
   private _prepareSkillsContext(context: CharacterContext): void {
     context.characteristics = this._getCharacteristics() as unknown as CharacteristicsMap;
     context.charPointSum = calculateCharPointSum(context.characteristics);
     context.skills = this._getSkills() as unknown as Record<string, SkillRow>;
     context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills);
     context.skillLevelOptions = createSkillLevelOptions();
+    context.baseSkills = this._getBaseSkills();
   }
 
   /**

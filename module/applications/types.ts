@@ -24,6 +24,16 @@ export type SkillRow = {
   [key: string]: unknown;
 };
 
+/** 基本技能の表示用データ。判定のトリガとして1行1ボタンで並べる */
+export type BaseSkillRow = {
+  key: string;
+  /** 翻訳済みの表示名 */
+  label: string;
+  target: number;
+  /** 能力値のFont Awesomeアイコンクラス */
+  characteristicIcon: string;
+};
+
 export type CharacteristicsMap = Record<
   string,
   { field: foundry.data.fields.DataField; value: number }
@@ -96,6 +106,7 @@ export type CharacterContext = {
   characteristics?: CharacteristicsMap;
   charPointSum?: number;
   skills?: Record<string, SkillRow>;
+  baseSkills?: BaseSkillRow[];
   skillPointSum?: number;
   skillLevelOptions?: Array<{ value: string; label: string }>;
   // 経歴の備考を enrichHTML に通した結果。生の system.biography.note とは別に持つ
