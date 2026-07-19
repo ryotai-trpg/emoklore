@@ -98,8 +98,3 @@ export type EmokloreCharacterSheetActions = {
   decreaseResources: (event: Event, target: HTMLElement) => Promise<any>;
   toggleMode: (event: Event, target: HTMLElement) => Promise<void>;
 };
-
-export type SkillPointCalculation = {
-  skills: Array<{ level: number; isExtra?: boolean }>;
-  exSkills: Array<{ level: number; isExtra?: boolean }>;
-};

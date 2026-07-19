@@ -1,17 +1,11 @@
 import { systemPath } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
+import { calculateCharPointSum, calculateTotalSkillPoints } from "../rules/character-points";
 import { prepareActiveEffectCategories } from "../utils/effects";
+import { createDocumentData, getEmbeddedDocument } from "../utils/sheet";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
-import {
-  calculateCharPointSum,
-  calculateTotalSkillPoints,
-  createDocumentData,
-  createEmotionOptions,
-  createSkillLevelOptions,
-  getEmbeddedDocument,
-  getEmotionAttributes,
-} from "./helpers";
+import { createEmotionOptions, createSkillLevelOptions, getEmotionAttributes } from "./helpers";
 import type {
   CharacterContext,
   CharacteristicsMap,
@@ -173,24 +167,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         (obj as Record<string, unknown>)[chc] = {
           field: this.actor.system.schema.getField(["skills", chc]),
           ...(value ?? {}),
-        };
-        return obj;
-      },
-      {} as Record<string, unknown>,
-    );
-  }
-
-  _getBaseSkills(): Record<string, unknown> {
-    const data = this.actor;
-    return Object.keys(CONFIG.EMOKLORE.baseSkills).reduce(
-      (obj, baseSkill) => {
-        const value = foundry.utils.getProperty(data, `system.baseSkills.${baseSkill}`) as Record<
-          string,
-          unknown
-        >;
-        (obj as Record<string, unknown>)[baseSkill] = {
-          label: value.label ?? "Null",
-          level: value.level ?? 0,
         };
         return obj;
       },
