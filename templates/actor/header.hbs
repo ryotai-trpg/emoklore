@@ -19,61 +19,52 @@
     {{/unless}}
 
     {{#if isPlay}}
-    <div class="resources">
-      <div class="hp bar">
-        <div class="info">
-          <i class="fa-solid fa-heart label"></i>
-          <div class="value">
-            {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
-            <span class="small">/{{ system.resources.hp.max }}</span>
-          </div>
-        </div>
-        <progress
-          id="character-hp"
-          value="{{ system.resources.hp.value }}"
-          max="{{ system.resources.hp.max }}"
-          ></progress>
-      </div>
+    <div class="em-resources">
+      {{> "systems/emoklore/templates/actor/partials/meter.hbs"
+        key="hp"
+        icon="fa-heart"
+        field=systemFields.resources.fields.hp.fields.value
+        value=system.resources.hp.value
+        max=system.resources.hp.max}}
 
-      <div class="mp bar">
-        <div class="info">
-          <i class="fa-solid fa-wand-magic-sparkles label"></i>
-          <div class="value">
-            {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
-            <span class="small">/{{ system.resources.mp.max }}</span>
-          </div>
-        </div>
-        <progress
-          id="character-mp"
-          value="{{ system.resources.mp.value }}"
-          max="{{ system.resources.mp.max }}"
-          ></progress>
-      </div>
+      {{> "systems/emoklore/templates/actor/partials/meter.hbs"
+        key="mp"
+        icon="fa-wand-magic-sparkles"
+        field=systemFields.resources.fields.mp.fields.value
+        value=system.resources.mp.value
+        max=system.resources.mp.max}}
 
-      <div class="resonance bar">
-        <div class="info">
-          <button type="button" class="inline-control icon fa-solid fa-infinity" data-action="roll" data-roll-type="resonance"></button>
-          <div class="value">
+      {{! 共鳴は感情3行を抱えていて他の2つと構成が違うので、partialにはしない }}
+      <div class="em-meter em-meter--resonance">
+        <div class="em-meter__head">
+          <button
+            type="button"
+            class="inline-control icon em-meter__action fa-solid fa-infinity"
+            data-action="roll"
+            data-roll-type="resonance"
+          ></button>
+          <div class="em-meter__value">
             Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
           </div>
           <div>{{emotionRows.surface.label}}</div>
-          <div class="small">
+          <div class="em-meter__sub">
             {{#if emotionRows.surface.attribute}}（{{emotionRows.surface.attribute}}）{{/if}}
           </div>
           <div>{{emotionRows.hidden.label}}</div>
-          <div class="small">
+          <div class="em-meter__sub">
             {{#if emotionRows.hidden.attribute}}（{{emotionRows.hidden.attribute}}）{{/if}}
           </div>
           <div>{{emotionRows.root.label}}</div>
-          <div class="small">
+          <div class="em-meter__sub">
             {{#if emotionRows.root.attribute}}（{{emotionRows.root.attribute}}）{{/if}}
           </div>
         </div>
         <progress
+          class="em-progress em-progress--resonance"
           id="character-resonance"
           value="{{ system.resources.resonance.value }}"
           max="{{ system.resources.resonance.max }}"
-          ></progress>
+        ></progress>
       </div>
     </div>
     {{else}}

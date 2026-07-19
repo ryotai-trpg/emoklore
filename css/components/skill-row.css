@@ -7,23 +7,11 @@
     padding: 8px;
   }
 
-  .skill {
-    progress {
-      height: 20px;
-      margin-left: 10px;
-      width: 90px;
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-
-    progress::-webkit-progress-bar {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-    progress::-webkit-progress-value {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-    progress::-moz-progress-bar {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
+  /* 角丸は .em-progress--sm 側で持つ */
+  .skill .em-progress {
+    height: 20px;
+    margin-left: 10px;
+    width: 90px;
   }
 
   /* Skill Layout - Play Mode */

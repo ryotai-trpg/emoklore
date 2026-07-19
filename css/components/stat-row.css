@@ -26,21 +26,8 @@
     }
   }
 
-  /* Characteristic Progress Bars */
-  .characteristic {
-    progress {
-      height: 20px;
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-
-    progress::-webkit-progress-bar {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-    progress::-webkit-progress-value {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-    progress::-moz-progress-bar {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
+  /* 角丸は .em-progress--sm 側で持つ。ここは高さだけ */
+  .characteristic .em-progress {
+    height: 20px;
   }
 }

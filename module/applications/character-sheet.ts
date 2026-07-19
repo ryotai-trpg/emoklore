@@ -46,6 +46,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   static override PARTS = {
     header: {
       template: "systems/emoklore/templates/actor/header.hbs",
+      // 入れ子のpartialは再帰的に解決されないので、使うものをすべて並べる
+      templates: [systemPath("templates/actor/partials/meter.hbs")],
     },
     tabs: { template: "templates/generic/tab-navigation.hbs" },
     skills: {

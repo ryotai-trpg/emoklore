@@ -8,7 +8,7 @@
         <i class="fa-solid {{lookup (lookup ../config.characteristics chr.field.name) 'fa'}} label"></i>
         <label for="{{key}}">{{chr.field.fields.value.label}}</label>
         <span class="value">{{chr.value}}</span>
-        <progress id="{{key}}" value="{{chr.value}}" max="6"></progress>
+        <progress class="em-progress em-progress--sm" id="{{key}}" value="{{chr.value}}" max="6"></progress>
       </div>
       {{/each}}
     </div>

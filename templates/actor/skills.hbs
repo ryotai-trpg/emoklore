@@ -12,7 +12,7 @@
       {{skill.label}}{{#if skill.specialization}}{{localize "EMOKLORE.Common.colon"}}{{skill.specialization}}{{/if}}
     </a>
     <span>Lv.{{skill.level}}</span>
-    <progress value="{{skill.level}}" max="3"></progress>
+    <progress class="em-progress em-progress--sm" value="{{skill.level}}" max="3"></progress>
     <span class="target">{{skill.target}}</span>
     <i class="characteristic fa-solid {{lookup (lookup ../config.characteristics skill.characteristic) 'fa'}}"></i>
   </div>
