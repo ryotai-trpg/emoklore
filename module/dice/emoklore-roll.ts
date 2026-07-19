@@ -1,6 +1,6 @@
 import type { RollOptions } from "@client/dice/_types.mjs";
 import { systemPath } from "../constants";
-import { formatSuccess } from "../helpers/helper";
+import { formatSuccess } from "../utils/helper";
 
 export interface EmokloreRollOptions extends RollOptions {
   successMod?: number;

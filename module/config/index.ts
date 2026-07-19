@@ -1,4 +1,4 @@
-import { preLocalize } from "../helpers/localization";
+import { preLocalize } from "../utils/localization";
 import { type BaseSkillConfig, baseSkills } from "./base-skills";
 import { type CharacteristicConfig, characteristics } from "./characteristics";
 import { type EmotionAttributesConfig, emotionAttributes } from "./emotion-attributes";

@@ -1,6 +1,6 @@
 import type { CharacterDataModel } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
-import { formatDMPart } from "../helpers/helper";
+import { formatDMPart } from "../utils/helper";
 
 type ResonanceMatch = "none" | "root" | "completely";
 type ResourceKey = "hp" | "mp" | "resonance";

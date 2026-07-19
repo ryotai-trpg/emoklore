@@ -1,5 +1,5 @@
 import type { EmokloreActor } from "../documents/actor";
-import { importFromCharSheet, validateCharSheetJSON } from "../helpers/charsheet-importer";
+import { importFromCharSheet, validateCharSheetJSON } from "../utils/charsheet-importer";
 
 interface CharSheetImportDialogContext {
   jsonInput: string;
