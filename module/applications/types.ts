@@ -31,8 +31,6 @@ export type CharacteristicsMap = Record<
 
 export type EmokloreActorSheetActions = {
   roll: (event: Event, target: HTMLElement) => Promise<unknown>;
-  increaseResources: (event: Event, target: HTMLElement) => Promise<unknown>;
-  decreaseResources: (event: Event, target: HTMLElement) => Promise<unknown>;
   // mixin側のDEFAULT_OPTIONSから継承チェーン経由でマージされるので、各シートでの宣言は任意
   toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
 };
@@ -121,8 +119,6 @@ export type EmokloreCharacterSheetActions = {
   deleteDoc: (event: Event, target: HTMLElement) => Promise<void>;
   toggleEffect: (event: Event, target: HTMLElement) => Promise<void>;
   roll: (event: Event, target: HTMLElement) => Promise<unknown>;
-  increaseResources: (event: Event, target: HTMLElement) => Promise<unknown>;
-  decreaseResources: (event: Event, target: HTMLElement) => Promise<unknown>;
   // mixin側のDEFAULT_OPTIONSから継承チェーン経由でマージされるので、各シートでの宣言は任意
   toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
 };

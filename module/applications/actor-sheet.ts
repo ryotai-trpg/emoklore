@@ -13,22 +13,8 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
     classes: ["actor"],
     actions: {
       roll: this.#onRoll,
-      increaseResources: this.#onIncreaseResources,
-      decreaseResources: this.#onDecreaseResources,
     },
   };
-
-  static async #onIncreaseResources(this: EmokloreActorSheet, event: Event, target: HTMLElement) {
-    event.preventDefault();
-    const dataset = (target as HTMLElement & { dataset: DOMStringMap }).dataset;
-    return this.actor.adjustResource(dataset.type as "hp" | "mp" | "resonance", 1);
-  }
-
-  static async #onDecreaseResources(this: EmokloreActorSheet, event: Event, target: HTMLElement) {
-    event.preventDefault();
-    const dataset = (target as HTMLElement & { dataset: DOMStringMap }).dataset;
-    return this.actor.adjustResource(dataset.type as "hp" | "mp" | "resonance", -1);
-  }
 
   static async #onRoll(this: EmokloreActorSheet, event: Event, target: HTMLElement) {
     event.preventDefault();
