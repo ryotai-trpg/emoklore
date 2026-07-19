@@ -1,11 +1,11 @@
 import { preLocalize } from "../helpers/localization";
-import { characteristics, type CharacteristicConfig } from "./characteristics";
-import { skillGroups, type SkillGroupsConfig } from "./skill-groups";
-import { baseSkills, type BaseSkillConfig } from "./base-skills";
-import { skills, type SkillConfig } from "./skills";
-import { skillLevels, type SkillLevelConfig } from "./skill-levels";
-import { emotionAttributes, type EmotionAttributesConfig } from "./emotion-attributes";
-import { resonantEmotions, type ResonantEmotionsConfig } from "./resonant-emotions";
+import { type BaseSkillConfig, baseSkills } from "./base-skills";
+import { type CharacteristicConfig, characteristics } from "./characteristics";
+import { type EmotionAttributesConfig, emotionAttributes } from "./emotion-attributes";
+import { type ResonantEmotionsConfig, resonantEmotions } from "./resonant-emotions";
+import { type SkillGroupsConfig, skillGroups } from "./skill-groups";
+import { type SkillLevelConfig, skillLevels } from "./skill-levels";
+import { type SkillConfig, skills } from "./skills";
 
 export interface EmokloreConfig {
   characteristics: Record<string, CharacteristicConfig>;

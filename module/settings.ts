@@ -1,7 +1,5 @@
 import { systemID } from "./constants";
 
-type EmokloreSettingKeys = "developerMode";
-
 interface EmokloreSettings {
   developerMode: boolean;
 }

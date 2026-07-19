@@ -1,6 +1,6 @@
+import type { CharacterDataModel } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
 import { formatDMPart } from "../helpers/helper";
-import type { CharacterDataModel } from "../data/character";
 
 type ResonanceMatch = "none" | "root" | "completely";
 type ResourceKey = "hp" | "mp" | "resonance";
@@ -61,10 +61,10 @@ export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extend
           `,
           ok: {
             label: "ロール",
-            callback: (event, button) => {
+            callback: (_event, button) => {
               const form = (button as any).form;
               const value = form.elements.intensity.valueAsNumber;
-              return [isNaN(value) || value <= 0 ? 1 : value, form.elements.choice.value];
+              return [Number.isNaN(value) || value <= 0 ? 1 : value, form.elements.choice.value];
             },
           },
           rejectClose: true,
@@ -77,16 +77,16 @@ export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extend
 
     let level = this.system.resources.resonance.value;
 
-    if (emotionMatch == "root") {
+    if (emotionMatch === "root") {
       level += 1;
-    } else if (emotionMatch == "completely") {
+    } else if (emotionMatch === "completely") {
       level *= 2;
     }
 
-    (options as Record<string, unknown>)["target"] = intensity;
-    (options as Record<string, unknown>)["successMod"] = 0;
+    (options as Record<string, unknown>).target = intensity;
+    (options as Record<string, unknown>).successMod = 0;
 
-    (options as Record<string, unknown>)["dmFormula"] = `${level}DM≦${intensity}`;
+    (options as Record<string, unknown>).dmFormula = `${level}DM≦${intensity}`;
 
     const roll = await new EmokloreRoll(`${level}d10`, {}, options).evaluate();
 
@@ -146,9 +146,9 @@ export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extend
     const leftPart = formatDMPart(level, bonus);
     const rightPart = formatDMPart(baseTarget, targetMod);
 
-    (options as Record<string, unknown>)["dmFormula"] = `${leftPart}DM≦${rightPart}`;
-    (options as Record<string, unknown>)["successMod"] = successMod;
-    (options as Record<string, unknown>)["target"] = baseTarget + targetMod;
+    (options as Record<string, unknown>).dmFormula = `${leftPart}DM≦${rightPart}`;
+    (options as Record<string, unknown>).successMod = successMod;
+    (options as Record<string, unknown>).target = baseTarget + targetMod;
 
     const roll = await new EmokloreRoll(`${level + bonus}d10`, {}, options).evaluate();
 

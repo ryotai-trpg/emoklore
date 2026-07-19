@@ -1,7 +1,7 @@
 import constructHTMLButton from "../helpers/construct-html-button";
-import { systemID } from "../constants";
 import { getSetting } from "../settings";
-import type { EmokloreDocumentSheetOptions, EmokloreDocumentSheetContext } from "./types";
+import type { EmokloreDocumentSheetContext, EmokloreDocumentSheetOptions } from "./types";
+
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 export default (base: any) => {
@@ -88,8 +88,8 @@ export default (base: any) => {
 
     static async #toggleMode(
       this: EmokloreDocumentSheet,
-      event: Event,
-      target: HTMLElement,
+      _event: Event,
+      _target: HTMLElement,
     ): Promise<void> {
       if (!this.isEditable) {
         console.error("You can't switch to Edit mode if the sheet is uneditable");

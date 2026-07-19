@@ -1,6 +1,6 @@
-import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
 import type { EmokloreActor } from "../documents/actor";
-import type { EmokloreActorSheetActions, EmokloreActorSheetOptions } from "./types";
+import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
+import type { EmokloreActorSheetOptions } from "./types";
 
 export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
   foundry.applications.sheets.ActorSheetV2,
@@ -51,8 +51,8 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
 
   static async #toggleMode(
     this: EmokloreActorSheet,
-    event: Event,
-    target: HTMLElement,
+    _event: Event,
+    _target: HTMLElement,
   ): Promise<void> {
     if (!this.isEditable) {
       console.error("You can't switch to Edit mode if the sheet is uneditable");

@@ -13,21 +13,21 @@
 }
 
 .theme-dark .emoklore,
-.emoklore.theme-dark{
-  --emoklore-accent-color: #1565C0; /* Material Blue 800 */
+.emoklore.theme-dark {
+  --emoklore-accent-color: #1565c0; /* Material Blue 800 */
   --emoklore-darkgray: rgb(255 255 255 / 10%);
   --emoklore-gray: rgb(255 255 255 / 7%);
 
-  --emoklore-green: #388E3C;  /* Material Green 700, HP color */
-  --emoklore-red: #BF360C;    /* Material DeepOrange 900, MP color */
+  --emoklore-green: #388e3c; /* Material Green 700, HP color */
+  --emoklore-red: #bf360c; /* Material DeepOrange 900, MP color */
 }
 
 .theme-light .emoklore,
-.emoklore.theme-light{
-  --emoklore-accent-color: #42A5F5; /* Material Blue 400 */
+.emoklore.theme-light {
+  --emoklore-accent-color: #42a5f5; /* Material Blue 400 */
   --emoklore-darkgray: rgb(0 0 0 / 10%);
   --emoklore-gray: rgb(0 0 0 / 20%);
 
-  --emoklore-green: #43A047;  /* Material Green 600, HP color */
-  --emoklore-red: #E64A19;    /* Material DeepOrange 700, MP color */
+  --emoklore-green: #43a047; /* Material Green 600, HP color */
+  --emoklore-red: #e64a19; /* Material DeepOrange 700, MP color */
 }

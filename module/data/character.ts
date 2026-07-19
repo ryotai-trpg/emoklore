@@ -1,4 +1,5 @@
 import { BaseActorDataModel } from "./base-actor";
+
 const { HTMLField, NumberField, SchemaField, StringField, BooleanField } = foundry.data.fields;
 
 const defineCharacterDataModelSchema = () => {
@@ -47,7 +48,13 @@ const defineCharacterDataModelSchema = () => {
 
   schema.skills = new SchemaField(
     Object.entries(CONFIG.EMOKLORE.skills).reduce(
-      (obj, [skill, { characteristic, label, characteristicOptions, group, isExtra, hasSpecialization }]) => {
+      (
+        obj,
+        [
+          skill,
+          { characteristic, label, characteristicOptions, group, isExtra, hasSpecialization },
+        ],
+      ) => {
         (obj as Record<string, foundry.data.fields.DataField>)[skill] = new SchemaField({
           level: new NumberField({
             min: 0,

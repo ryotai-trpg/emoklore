@@ -1,5 +1,6 @@
 import { BaseActorDataModel } from "./base-actor";
-const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
+
+const { NumberField, SchemaField } = foundry.data.fields;
 
 const defineNpcDataModelSchema = () => {
   const schema: Record<string, foundry.data.fields.DataField> = {};

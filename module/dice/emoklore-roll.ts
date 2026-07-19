@@ -7,20 +7,6 @@ export interface EmokloreRollOptions extends foundry.dice.Roll.Options {
   target?: number;
 }
 
-interface DiceResult {
-  result: number;
-  success?: boolean;
-  failure?: boolean;
-  rerolled?: boolean;
-  exploded?: boolean;
-  discarded?: boolean;
-}
-
-interface DiceTerm {
-  results?: DiceResult[];
-  [key: string]: unknown;
-}
-
 export class EmokloreRoll extends foundry.dice.Roll {
   successMod: number;
   dmFormula: string;
@@ -103,7 +89,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
   async _prepareChatRenderContext(
     options?: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    // @ts-ignore - _prepareChatRenderContext exists but not in type definition
+    // @ts-expect-error - _prepareChatRenderContext exists but not in type definition
     const baseContext = await super._prepareChatRenderContext(options);
     return {
       ...baseContext,

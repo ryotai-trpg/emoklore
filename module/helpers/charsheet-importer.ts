@@ -163,9 +163,9 @@ function parseEmotions(memo: string): {
   const emotions: { surface?: string; hidden?: string; root?: string } = {};
 
   // Match patterns like: 共鳴感情・表: 怒り(情念)
-  const surfaceMatch = memo.match(/共鳴感情[・·]表[:：]\s*([^\(（\n]+)/);
-  const hiddenMatch = memo.match(/共鳴感情[・·]裏[:：]\s*([^\(（\n]+)/);
-  const rootMatch = memo.match(/共鳴感情[・·]ルーツ[:：]\s*([^\(（\n]+)/);
+  const surfaceMatch = memo.match(/共鳴感情[・·]表[:：]\s*([^(（\n]+)/);
+  const hiddenMatch = memo.match(/共鳴感情[・·]裏[:：]\s*([^(（\n]+)/);
+  const rootMatch = memo.match(/共鳴感情[・·]ルーツ[:：]\s*([^(（\n]+)/);
 
   if (surfaceMatch) {
     const emotionLabel = surfaceMatch[1].trim();
@@ -204,7 +204,7 @@ function parseSkills(commands: string): {
     const match = line.match(/(\d+)DM<=\d+\s*[〈<]([＊★]?)([^〉>]+)[〉>]/);
     if (!match) continue;
 
-    const diceCount = parseInt(match[1]);
+    const diceCount = parseInt(match[1], 10);
     const marker = match[2];
     const skillName = match[3].trim();
 
@@ -235,9 +235,9 @@ function parseSkills(commands: string): {
  */
 function calculateSkillLevel(
   diceCount: number,
-  characteristicValue: number,
-  skillKey: string,
-  skillConfig: typeof CONFIG.EMOKLORE.skills,
+  _characteristicValue: number,
+  _skillKey: string,
+  _skillConfig: typeof CONFIG.EMOKLORE.skills,
 ): number {
   // The dice count is the skill level itself
   const skillLevel = diceCount;
@@ -269,8 +269,8 @@ export async function importFromCharSheet(
   for (const param of data.params) {
     const key = CHARACTERISTIC_MAP[param.label];
     if (key) {
-      characteristics[key] = parseInt(param.value);
-      updateData[`system.characteristics.${key}.value`] = parseInt(param.value);
+      characteristics[key] = parseInt(param.value, 10);
+      updateData[`system.characteristics.${key}.value`] = parseInt(param.value, 10);
     }
   }
 
@@ -278,8 +278,8 @@ export async function importFromCharSheet(
   if (data.status && Array.isArray(data.status)) {
     for (const status of data.status) {
       const label = status.label;
-      const value = typeof status.value === "string" ? parseInt(status.value) : status.value;
-      const max = typeof status.max === "string" ? parseInt(status.max) : status.max;
+      const value = typeof status.value === "string" ? parseInt(status.value, 10) : status.value;
+      const max = typeof status.max === "string" ? parseInt(status.max, 10) : status.max;
 
       if (label === "HP") {
         updateData["system.resources.hp.value"] = value;
@@ -345,7 +345,9 @@ export async function importFromCharSheet(
   await (actor as any).update(updateData);
 
   (globalThis as any).ui.notifications?.info(
-    (globalThis as any).game.i18n.format("EMOKLORE.Import.Success", { name: data.name || (actor as any).name }),
+    (globalThis as any).game.i18n.format("EMOKLORE.Import.Success", {
+      name: data.name || (actor as any).name,
+    }),
   );
 }
 
@@ -369,7 +371,7 @@ export function validateCharSheetJSON(jsonString: string): {
     }
 
     return { valid: true, data };
-  } catch (error) {
+  } catch (_error) {
     return { valid: false, error: "EMOKLORE.Import.ErrorInvalidJSON" };
   }
 }

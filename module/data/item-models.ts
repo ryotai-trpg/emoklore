@@ -1,5 +1,6 @@
 import { EmokloreSystemDataModel } from "./system-model";
-const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
+
+const { NumberField, StringField } = foundry.data.fields;
 
 /* -------------------------------------------- */
 /*  Item Models                                 */
