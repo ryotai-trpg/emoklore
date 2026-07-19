@@ -11,7 +11,7 @@
 ```
 https://github.com/ryotai-trpg/emoklore/releases/latest/download/system.json
 ```
-v13のみの対応です。v12以前への対応はしません。
+v14のみの対応です。v13以前への対応はしません。
 
 ## ダイスタス・コモンズ
 ◆表示：不要  
