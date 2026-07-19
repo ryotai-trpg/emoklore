@@ -1,8 +1,24 @@
-# pre-commitフック: stagedファイルにBiome（format+lint）を自動適用する
-# スキップしたい場合は `git commit --no-verify`（非推奨）
+# gitフック定義（スキップしたい場合は `git commit --no-verify`。非推奨）
+# - pre-commit: stagedファイルにBiome（format+lint）を自動適用する
+# - commit-msg: コミットメッセージがdocs/contributing.mdの規約に沿うか検査する
 pre-commit:
   jobs:
     - name: biome
       glob: "*.{ts,mts,cts,js,mjs,cjs,json,jsonc,css}"
       run: npx biome check --write --no-errors-on-unmatched {staged_files}
       stage_fixed: true
+
+commit-msg:
+  jobs:
+    - name: message-format
+      run: |
+        first=$(head -n1 "{1}")
+        case "$first" in
+          Merge* | Revert* | fixup!* | squash!*) exit 0 ;;
+        esac
+        if ! printf '%s' "$first" | grep -qE '^(feat|fix|refactor|style|test|docs|ci|chore): .+'; then
+          echo "NG: コミットメッセージの1行目は 'prefix: summary' 形式で書く（docs/contributing.md参照）"
+          echo "    prefix: feat | fix | refactor | style | test | docs | ci | chore"
+          echo "    例: feat: add resonance roll dialog"
+          exit 1
+        fi
