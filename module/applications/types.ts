@@ -28,16 +28,18 @@ export type EmokloreActorSheetActions = {
   roll: (event: Event, target: HTMLElement) => Promise<any>;
   increaseResources: (event: Event, target: HTMLElement) => Promise<any>;
   decreaseResources: (event: Event, target: HTMLElement) => Promise<any>;
-  toggleMode: (event: Event, target: HTMLElement) => Promise<void>;
+  // mixin側のDEFAULT_OPTIONSから継承チェーン経由でマージされるので、各シートでの宣言は任意
+  toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
 };
 
+// window / form は mixin 側の DEFAULT_OPTIONS が継承チェーン経由でマージされるため任意
 export interface EmokloreActorSheetOptions {
   classes: string[];
   actions: EmokloreActorSheetActions;
-  window: {
+  window?: {
     resizable: boolean;
   };
-  form: {
+  form?: {
     submitOnChange: boolean;
   };
 }
@@ -54,13 +56,14 @@ export interface EmokloreDocumentSheetContext extends ApplicationRenderContext {
   [key: string]: unknown;
 }
 
+// window / form はサブクラス側で省略できる（mixinのDEFAULT_OPTIONSがマージされるため）
 export interface EmokloreDocumentSheetOptions {
   classes: string[];
   actions: Record<string, (event: Event, target: HTMLElement) => Promise<void>>;
-  window: {
+  window?: {
     resizable: boolean;
   };
-  form: {
+  form?: {
     submitOnChange: boolean;
   };
 }
@@ -96,5 +99,6 @@ export type EmokloreCharacterSheetActions = {
   roll: (event: Event, target: HTMLElement) => Promise<any>;
   increaseResources: (event: Event, target: HTMLElement) => Promise<any>;
   decreaseResources: (event: Event, target: HTMLElement) => Promise<any>;
-  toggleMode: (event: Event, target: HTMLElement) => Promise<void>;
+  // mixin側のDEFAULT_OPTIONSから継承チェーン経由でマージされるので、各シートでの宣言は任意
+  toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
 };

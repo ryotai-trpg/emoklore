@@ -7,19 +7,14 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
 ) {
   declare actor: EmokloreActor;
 
+  // toggleMode / window / form は mixin 側の DEFAULT_OPTIONS が継承チェーン経由で
+  // マージされるため、ここでは宣言しない
   static override DEFAULT_OPTIONS: EmokloreActorSheetOptions = {
     classes: ["actor"],
     actions: {
       roll: this.#onRoll,
       increaseResources: this.#onIncreaseResources,
       decreaseResources: this.#onDecreaseResources,
-      toggleMode: this.#toggleMode,
-    },
-    window: {
-      resizable: true,
-    },
-    form: {
-      submitOnChange: true,
     },
   };
 
@@ -47,20 +42,5 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
       case "resonance":
         return this.actor.rollResonance();
     }
-  }
-
-  static async #toggleMode(
-    this: EmokloreActorSheet,
-    _event: Event,
-    _target: HTMLElement,
-  ): Promise<void> {
-    if (!this.isEditable) {
-      console.error("You can't switch to Edit mode if the sheet is uneditable");
-      return;
-    }
-    this._mode = this.isPlayMode
-      ? (this.constructor as any).MODES.EDIT
-      : (this.constructor as any).MODES.PLAY;
-    this.render();
   }
 }

@@ -8,9 +8,28 @@ import type {
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
-export default (base: any) => {
+/** 本体の HandlebarsApplicationMixin と同じ制約（`@param {Constructor<ApplicationV2>}`） */
+type ApplicationV2Constructor = new (...args: any[]) => foundry.applications.api.ApplicationV2;
+
+/**
+ * シートが参照するドキュメントのメンバー。
+ *
+ * 本体の ClientDocumentMixin はJSDocがジェネリクスを消しているため、
+ * これらが Document の型に出てこない。utils/effects.ts と同じく、
+ * 実際に使うものだけを交差型で補う。
+ */
+type SheetDocument = foundry.abstract.Document & {
+  isOwner: boolean;
+  limited: boolean;
+  documentName: string;
+  system: { schema: { fields: Record<string, foundry.data.fields.DataField> } };
+  flags: Record<string, unknown>;
+};
+
+// base を any にすると extends any になり、このファイル全体の型チェックが効かなくなる
+export default (base: ApplicationV2Constructor) => {
   return class EmokloreDocumentSheet extends HandlebarsApplicationMixin(base) {
-    declare document: any;
+    declare document: SheetDocument;
     // DocumentSheetV2のgetterだが、mixinの型（typeof ApplicationV2ベース）からは見えないため補強
     declare readonly isEditable: boolean;
     static override DEFAULT_OPTIONS: EmokloreDocumentSheetOptions = {
