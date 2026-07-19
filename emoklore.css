@@ -588,7 +588,7 @@
 
     button {
       padding: 0.25rem 0.5rem;
-      background: var(--color-cool-2);
+      background: var(--color-cool-4);
       border: 1px solid var(--color-border-dark-tertiary);
       border-radius: 3px;
       cursor: pointer;
