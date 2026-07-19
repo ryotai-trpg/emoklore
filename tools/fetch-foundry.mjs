@@ -4,7 +4,7 @@
 //   トップページでCSRFトークン取得 → POST /auth/login/ → /releases/download でpresigned URL取得 → zip展開
 // 必要な環境変数: FOUNDRY_USERNAME / FOUNDRY_PASSWORD / FOUNDRY_BUILD
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { lstatSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -56,9 +56,19 @@ const login = await fetch(`${BASE}/auth/login/`, {
 });
 storeCookies(login);
 if (!jar.has("sessionid")) {
-  console.error(
-    "ログインに失敗しました（認証情報を確認。2FA有効のアカウントでは自動ログイン不可）",
-  );
+  // 失敗理由を応答ページから推定して出し分ける（値そのものはログに出さない）
+  const page = (await login.text()).toLowerCase();
+  let reason = `原因を特定できませんでした（status: ${login.status}）`;
+  if (page.includes("username and password")) {
+    reason =
+      "ユーザー名またはパスワードが一致しません（secretsの値のタイポ・前後の空白や改行の混入を確認）";
+  } else if (/two.?factor|verification code|authenticator/.test(page)) {
+    reason =
+      "2FAが有効なため自動ログインできません（CI用にはアプリケーションパスワード等が無いため2FA解除が必要）";
+  } else if (login.status === 403) {
+    reason = "アクセスが拒否されました（CSRF検証またはWAF）";
+  }
+  console.error(`ログインに失敗しました: ${reason}`);
   process.exit(1);
 }
 
@@ -77,7 +87,22 @@ if (!zipUrl) {
   process.exit(1);
 }
 
-// 4. zipを取得し client/ と common/ だけ展開
+// 4. zipを取得し client/ と common/ だけ展開（展開先は FOUNDRY_OUT で変更可、既定 foundry/）
+const outDir = process.env.FOUNDRY_OUT ?? "foundry";
+for (const dir of ["client", "common"]) {
+  try {
+    if (lstatSync(path.join(outDir, dir)).isSymbolicLink()) {
+      // ローカルでは foundry/ が本体インストールへのsymlinkのため、unzipで実インストールを
+      // 上書きしないよう拒否する
+      console.error(
+        `${outDir}/${dir} がsymlinkです。ローカルで試す場合は FOUNDRY_OUT=/tmp/foundry-test などを指定してください`,
+      );
+      process.exit(1);
+    }
+  } catch {
+    // 存在しなければ問題ない
+  }
+}
 const zipRes = await fetch(zipUrl, { headers: { "User-Agent": UA } });
 if (!zipRes.ok) {
   console.error(`zipのダウンロードに失敗しました（status: ${zipRes.status}）`);
@@ -86,7 +111,7 @@ if (!zipRes.ok) {
 const tmp = mkdtempSync(path.join(tmpdir(), "foundry-fetch-"));
 const zipPath = path.join(tmp, `foundry-${FOUNDRY_BUILD}.zip`);
 writeFileSync(zipPath, Buffer.from(await zipRes.arrayBuffer()));
-const unzip = spawnSync("unzip", ["-q", "-o", zipPath, "client/*", "common/*", "-d", "foundry"], {
+const unzip = spawnSync("unzip", ["-q", "-o", zipPath, "client/*", "common/*", "-d", outDir], {
   stdio: "inherit",
 });
 rmSync(tmp, { recursive: true, force: true });
@@ -94,4 +119,4 @@ if (unzip.status !== 0) {
   console.error("zipの展開に失敗しました");
   process.exit(1);
 }
-console.log(`foundry/ にbuild ${FOUNDRY_BUILD}の client/ と common/ を展開しました`);
+console.log(`${outDir}/ にbuild ${FOUNDRY_BUILD}の client/ と common/ を展開しました`);
