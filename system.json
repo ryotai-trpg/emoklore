@@ -14,7 +14,7 @@
     }
   ],
   "esmodules": ["emoklore.mjs"],
-  "styles": ["emoklore.css"],
+  "styles": [{ "src": "emoklore.css", "layer": "system" }],
   "languages": [
     {
       "lang": "ja",
