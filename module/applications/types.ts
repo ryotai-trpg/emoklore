@@ -16,6 +16,8 @@ export type EmokloreRenderOptions = HandlebarsRenderOptions & {
 export type SkillRow = {
   level: number;
   isExtra?: boolean;
+  /** 能力値の表示名。CONFIG.EMOKLORE から引いた翻訳済みの文字列 */
+  characteristicLabel: string;
   [key: string]: unknown;
 };
 
