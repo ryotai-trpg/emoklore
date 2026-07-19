@@ -1,13 +1,13 @@
+import type { ApplicationRenderContext } from "@client/applications/_types.mjs";
+import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
 import type { EmokloreActor } from "../documents/actor";
 import { importFromCharSheet, validateCharSheetJSON } from "../utils/charsheet-importer";
 
-interface CharSheetImportDialogContext {
+type CharSheetImportDialogContext = ApplicationRenderContext & {
   jsonInput: string;
   error?: string;
   success?: boolean;
-}
-
-declare const foundry: any;
+};
 
 /**
  * Dialog for importing character data from character sheet website JSON
@@ -15,7 +15,7 @@ declare const foundry: any;
 export class CharSheetImportDialog extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.api.ApplicationV2,
 ) {
-  static DEFAULT_OPTIONS = {
+  static override DEFAULT_OPTIONS = {
     id: "charsheet-import-{id}",
     tag: "form",
     form: {
@@ -36,7 +36,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
     },
   };
 
-  static PARTS = {
+  static override PARTS = {
     form: {
       template: "systems/emoklore/templates/apps/charsheet-import.hbs",
     },
@@ -49,7 +49,9 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
     this.actor = actor;
   }
 
-  async _prepareContext(_options: any): Promise<CharSheetImportDialogContext> {
+  override async _prepareContext(
+    _options: HandlebarsRenderOptions,
+  ): Promise<CharSheetImportDialogContext> {
     return {
       jsonInput: "",
     };
@@ -59,24 +61,16 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
     event.preventDefault();
     console.log("Import button clicked");
 
-    // Get the form - it might be the element itself or we need to find it differently
-    const form = (this as any).element?.querySelector("form") || (this as any).element;
-    console.log("Element:", (this as any).element);
+    // DEFAULT_OPTIONS の tag が "form" なので this.element 自体がフォーム要素になる
+    const form = this.element.querySelector("form") ?? this.element;
+    console.log("Element:", this.element);
     console.log("Form:", form);
 
-    if (!form) {
-      console.error("Form not found");
-      return;
-    }
-
-    // Try to get the textarea directly
-    const textarea =
-      form.querySelector('textarea[name="jsonInput"]') ||
-      (this as any).element?.querySelector('textarea[name="jsonInput"]');
+    const textarea = form.querySelector<HTMLTextAreaElement>('textarea[name="jsonInput"]');
 
     console.log("Textarea:", textarea);
 
-    const jsonInput = textarea?.value || "";
+    const jsonInput = textarea?.value ?? "";
 
     console.log("JSON input length:", jsonInput?.length);
 
@@ -105,7 +99,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
       console.log("Starting import...");
       await importFromCharSheet(this.actor, validation.data!);
       console.log("Import successful");
-      (this as any).close();
+      this.close();
     } catch (error) {
       console.error("Character import error:", error);
       (globalThis as any).ui.notifications?.error(
@@ -124,7 +118,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
    */
   static async show(actor: EmokloreActor): Promise<CharSheetImportDialog> {
     const dialog = new CharSheetImportDialog(actor);
-    (dialog as any).render(true);
+    dialog.render(true);
     return dialog;
   }
 }
