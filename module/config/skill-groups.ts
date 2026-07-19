@@ -2,7 +2,7 @@ export interface SkillGroupsConfig {
   label: string;
 }
 
-export const skillGroups: Record<string, SkillGroupsConfig> = {
+const definitions = {
   investigation: {
     label: "EMOKLORE.Actor.skillGroup.investigation",
   },
@@ -24,4 +24,10 @@ export const skillGroups: Record<string, SkillGroupsConfig> = {
   unique: {
     label: "EMOKLORE.Actor.skillGroup.unique",
   },
-} as const;
+} satisfies Record<string, SkillGroupsConfig>;
+
+export type SkillGroupKey = keyof typeof definitions;
+
+// satisfies だけだと各値が個別の狭い型に推論されるため、値の型は SkillGroupsConfig に揃える。
+// キーは literal のまま保たれるので SkillGroupKey が使える
+export const skillGroups: Record<SkillGroupKey, SkillGroupsConfig> = definitions;

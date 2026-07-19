@@ -2,7 +2,7 @@ export interface EmotionAttributesConfig {
   label: string;
 }
 
-export const emotionAttributes: Record<string, EmotionAttributesConfig> = {
+const definitions = {
   desire: {
     label: "EMOKLORE.emotionAttributes.desire",
   },
@@ -18,4 +18,10 @@ export const emotionAttributes: Record<string, EmotionAttributesConfig> = {
   wound: {
     label: "EMOKLORE.emotionAttributes.wound",
   },
-} as const;
+} satisfies Record<string, EmotionAttributesConfig>;
+
+export type EmotionAttributeKey = keyof typeof definitions;
+
+// satisfies だけだと各値が個別の狭い型に推論されるため、値の型は EmotionAttributesConfig に揃える。
+// キーは literal のまま保たれるので EmotionAttributeKey が使える
+export const emotionAttributes: Record<EmotionAttributeKey, EmotionAttributesConfig> = definitions;

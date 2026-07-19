@@ -4,7 +4,7 @@ export interface BaseSkillConfig {
   group: string;
 }
 
-export const baseSkills: Record<string, BaseSkillConfig> = {
+const definitions = {
   investigation: {
     label: "EMOKLORE.Actor.baseSkills.investigation",
     characteristic: "dexterity",
@@ -70,4 +70,10 @@ export const baseSkills: Record<string, BaseSkillConfig> = {
     characteristic: "fortune",
     group: "unique",
   },
-} as const;
+} satisfies Record<string, BaseSkillConfig>;
+
+export type BaseSkillKey = keyof typeof definitions;
+
+// satisfies だけだと各値が個別の狭い型に推論されるため、値の型は BaseSkillConfig に揃える。
+// キーは literal のまま保たれるので BaseSkillKey が使える
+export const baseSkills: Record<BaseSkillKey, BaseSkillConfig> = definitions;
