@@ -23,14 +23,16 @@ lang/                … ja.json が正、en.json は追従
 ## 既知の構造的課題
 
 1. **スキーマ定義が `CONFIG.EMOKLORE` に依存**: `module/data/character.ts` がキー集合を得るために定義時点で `CONFIG.EMOKLORE` を読む。`TypedObjectField`（v14新フィールド型）で静的スキーマ + 動的キーに置き換えられないか要検討（既存データのマイグレーションが必要）
-2. **`as any` の残存**: 型戦略は確立済み（→ [v14移行チェックリスト](/v14-migration) の型定義戦略）だが、CONFIG登録まわりやApplicationV2の型で残っている
-3. **開発用ハックの混入**: `emoklore.ts` の `ready` フックにハードコードされたactor ID
+2. **NPCの扱いが未定**: `EmokloreActor` は `system` を `CharacterDataModel` として扱っており、判定やリソース操作をNPCに対して呼ぶと実行時に壊れる。NPC用シートの実装（Phase 3）で判定まわりごと決める
+3. **`config/` の副作用**: `module/config/index.ts` が import 時に `preLocalize` を呼び、`performPreLocalization` が `CONFIG.EMOKLORE` を破壊的に書き換える。この表の「`config/` に置かないもの」に反するが、dnd5e / draw-steel 由来の確立したパターンなので当面は踏襲する
 
-解消済み:
+Phase 2 で解消したもの:
 
 - ~~**Documentクラスの責務過多**~~: `rollSkill` / `rollResonance` の判定計算を `module/rules/`、ダイアログを `module/applications/dialogs/`、チャット生成を `module/utils/chat.ts` に分離した
 - ~~**プレゼンテーション層にルール計算**~~: `applications/helpers.ts` を責務ごとに `rules/character-points.ts` / `utils/sheet.ts` / `applications/helpers.ts` へ分割した
 - ~~**`i18nInit` からのスキーマパッチ**~~: config の複製だったラベルを保存するのをやめ、能力値ラベルは `LOCALIZATION_PREFIXES` と `ja.json` の `FIELDS` に載せた。`game.i18n` への定義時依存もなくなった
+- ~~**`as any` の多用**~~: 55箇所あったものをすべて解消し、`biome.json` の `noExplicitAny` を `error` にした。残る `any` は mixin のコンストラクタ制約1箇所のみで、理由コメント付きで個別抑制している
+- ~~**開発用ハックの混入**~~: `ready` フックのハードコードされたactor IDを `developerActorId` 設定に置き換えた
 
 ## 目指す層分離
 
