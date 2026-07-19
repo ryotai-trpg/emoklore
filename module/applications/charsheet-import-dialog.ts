@@ -75,9 +75,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
     console.log("JSON input length:", jsonInput?.length);
 
     if (!jsonInput || jsonInput.trim() === "") {
-      (globalThis as any).ui.notifications?.error(
-        (globalThis as any).game.i18n.localize("EMOKLORE.Import.ErrorEmptyInput"),
-      );
+      ui.notifications?.error(game.i18n.localize("EMOKLORE.Import.ErrorEmptyInput"));
       return;
     }
 
@@ -87,10 +85,10 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
 
     if (!validation.valid) {
       const errorMsg = validation.error
-        ? (globalThis as any).game.i18n.localize(validation.error)
-        : (globalThis as any).game.i18n.localize("EMOKLORE.Import.ErrorInvalidJSON");
+        ? game.i18n.localize(validation.error)
+        : game.i18n.localize("EMOKLORE.Import.ErrorInvalidJSON");
 
-      (globalThis as any).ui.notifications?.error(errorMsg);
+      ui.notifications?.error(errorMsg);
       return;
     }
 
@@ -102,9 +100,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
       this.close();
     } catch (error) {
       console.error("Character import error:", error);
-      (globalThis as any).ui.notifications?.error(
-        (globalThis as any).game.i18n.localize("EMOKLORE.Import.ErrorImportFailed"),
-      );
+      ui.notifications?.error(game.i18n.localize("EMOKLORE.Import.ErrorImportFailed"));
     }
   }
 

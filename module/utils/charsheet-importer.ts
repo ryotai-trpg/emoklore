@@ -344,8 +344,8 @@ export async function importFromCharSheet(
   // Apply all updates to the actor
   await (actor as any).update(updateData);
 
-  (globalThis as any).ui.notifications?.info(
-    (globalThis as any).game.i18n.format("EMOKLORE.Import.Success", {
+  ui.notifications?.info(
+    game.i18n.localize("EMOKLORE.Import.Success", {
       name: data.name || (actor as any).name,
     }),
   );
