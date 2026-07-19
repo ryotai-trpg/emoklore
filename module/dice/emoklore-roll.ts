@@ -1,7 +1,8 @@
+import type { RollOptions } from "@client/dice/_types.mjs";
 import { systemPath } from "../constants";
 import { formatSuccess } from "../helpers/helper";
 
-export interface EmokloreRollOptions extends foundry.dice.Roll.Options {
+export interface EmokloreRollOptions extends RollOptions {
   successMod?: number;
   dmFormula?: string;
   target?: number;
@@ -86,10 +87,9 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return resultName;
   }
 
-  async _prepareChatRenderContext(
+  override async _prepareChatRenderContext(
     options?: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    // @ts-expect-error - _prepareChatRenderContext exists but not in type definition
     const baseContext = await super._prepareChatRenderContext(options);
     return {
       ...baseContext,

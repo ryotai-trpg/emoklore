@@ -1,0 +1,5 @@
+# このファイルをコピーして "foundry-config.yaml" を作る（git管理外）
+# installPath: FoundryVTT本体のインストールルート。型チェック用symlinkの作成に使う
+# 例（macOS/Linux, Node配布版）: /Users/you/FoundryVTT/v14/code
+# 例（Windows, electron版）: "C:\\Program Files\\Foundry Virtual Tabletop"
+installPath: "/path/to/foundryvtt"

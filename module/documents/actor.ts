@@ -4,13 +4,18 @@ import { formatDMPart } from "../helpers/helper";
 
 type ResonanceMatch = "none" | "root" | "completely";
 type ResourceKey = "hp" | "mp" | "resonance";
+type EmokloreActorType = "character" | "npc";
 
-export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extends Actor<SubType> {
+export class EmokloreActor<SubType extends EmokloreActorType = EmokloreActorType> extends Actor {
   declare system: SubType extends "character"
     ? CharacterDataModel
     : SubType extends "npc"
       ? any // NPCの型定義が必要
       : any;
+
+  // スキーマ由来のプロパティは本体JSDocの型に出ないため補強する（docs/v14-migration.md「失われるもの」）
+  declare name: string;
+  declare flags: Record<string, unknown>;
 
   override getRollData(): Record<string, unknown> {
     const rollData = { ...this.system, flags: this.flags, name: this.name };
@@ -22,9 +27,11 @@ export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extend
     return rollData;
   }
 
-  async adjustResource(resource: ResourceKey, point: number): Promise<this | null> {
+  async adjustResource(resource: ResourceKey, point: number): Promise<this | undefined> {
     const newvalue = (this.system.resources[resource]?.value ?? 0) + point;
-    return await this.update({ [`system.resources.${resource}.value`]: newvalue });
+    return (await this.update({ [`system.resources.${resource}.value`]: newvalue })) as
+      | this
+      | undefined;
   }
 
   async rollResonance(
@@ -92,13 +99,13 @@ export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extend
 
     const messageData: any = {
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: game.i18n.format("EMOKLORE.skillRoll", { skillName: "♾️共鳴" }),
+      flavor: game.i18n.localize("EMOKLORE.skillRoll", { skillName: "♾️共鳴" }),
       rolls: [roll],
       sound: (CONFIG as any).sounds.dice,
       flags: { core: { canPopout: true } },
     };
 
-    return ChatMessage.create(messageData);
+    return (await ChatMessage.create(messageData)) as ChatMessage | undefined;
   }
 
   async rollSkill(
@@ -154,12 +161,12 @@ export class EmokloreActor<SubType extends Actor.SubType = Actor.SubType> extend
 
     const messageData: any = {
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: game.i18n.format("EMOKLORE.skillRoll", { skillName: skillName }),
+      flavor: game.i18n.localize("EMOKLORE.skillRoll", { skillName: skillName }),
       rolls: [roll],
       sound: (CONFIG as any).sounds.dice,
       flags: { core: { canPopout: true } },
     };
 
-    return ChatMessage.create(messageData);
+    return (await ChatMessage.create(messageData)) as ChatMessage | undefined;
   }
 }

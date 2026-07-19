@@ -9,21 +9,28 @@
 必要なもの:
 
 - Node.js（v22以降推奨）
-- FoundryVTT 本体（動作確認用。ライセンスが必要）
+- FoundryVTT 本体 v14（動作確認・型チェック用。ライセンスが必要）
 
 ```shell
 git clone https://github.com/ryotai-trpg/emoklore.git
 cd emoklore
-ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm install
+npm install
 npm run dev   # vite build --watch
 ```
 
 - FoundryVTT の `Data/systems/emoklore` に `dist/` を配置（またはsymlink）すると、ローカルのFoundryでシステムが読み込まれる
-- `vite.config.ts` のproxy設定により、Foundry本体（`localhost:30000`）を起動した状態で `localhost:30001` を開くと、ビルド結果が反映された画面で開発できる
+- `vite.config.ts` のproxy設定により、Foundry本体（既定 `localhost:30000`、環境変数 `FOUNDRY_URL` で変更可）を起動した状態で `localhost:30001` を開くと、ビルド結果が反映された画面で開発できる
 
-::: info
-開発環境の構成はv14移行作業（[チェックリスト](/v14-migration)）で更新予定。型チェックにFoundry本体ソースを参照する仕組みが入る
-:::
+### 型チェック
+
+型定義はFoundryVTT本体ソース（`client/` / `common/`）を直接参照する（fvtt-typesは不使用。経緯は[v14移行チェックリスト](/v14-migration)）。初回セットアップ:
+
+```shell
+cp example-foundry-config.yaml foundry-config.yaml
+# foundry-config.yaml の installPath を自分のFoundryインストール先に書き換える
+npm run link:foundry   # foundry/client・foundry/common のsymlinkを作成
+npm run typecheck      # tsc --noEmit（本体ソース内の診断は除外される）
+```
 
 ## ブランチ運用
 
@@ -77,7 +84,8 @@ feat: add resonance roll dialog
 ### 自動チェック
 
 - **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。緊急時は `git commit --no-verify` でスキップできるが非推奨
-- **CI**: pushとPRで GitHub Actions が `biome ci` を実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
+- **CI**: pushとPRで GitHub Actions が Biome・ビルド・型チェック・翻訳/テンプレート整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
+  - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない
 
 ## 表記ルール
 

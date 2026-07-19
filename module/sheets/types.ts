@@ -1,8 +1,17 @@
+import type { ApplicationRenderContext, ApplicationTab } from "@client/applications/_types.mjs";
+import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
 import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 
 // Common type definitions
 export type EmotionKey = "surface" | "hidden" | "root";
+
+// renderに独自オプション（mode等）を載せて受け渡すための型
+export type EmokloreRenderOptions = HandlebarsRenderOptions & {
+  mode?: number;
+  renderContext?: string;
+  [key: string]: unknown;
+};
 
 export type SkillRow = {
   level: number;
@@ -33,7 +42,7 @@ export interface EmokloreActorSheetOptions {
   };
 }
 
-export interface EmokloreDocumentSheetContext {
+export interface EmokloreDocumentSheetContext extends ApplicationRenderContext {
   isPlay: boolean;
   owner: boolean;
   limited: boolean;
@@ -66,7 +75,7 @@ export type CharacterContext = {
   skills?: Record<string, SkillRow>;
   skillPointSum?: number;
   skillLevelOptions?: Array<{ value: string; label: string }>;
-  tabs: Record<string, unknown>;
+  tabs: Record<string, ApplicationTab>;
   tab?: unknown;
   effects?: any;
   // DocumentSheetContext properties

@@ -42,9 +42,9 @@ export const createSkillLevelOptions = (): Array<{ value: string; label: string 
 export const createEmotionOptions = (): Array<{ value: string; label: string; group: string }> => {
   return Object.entries(CONFIG.EMOKLORE.resonantEmotions).map(([value, { label, attribute }]) => ({
     value: String(value),
-    label: game.i18n.format("EMOKLORE.resonantEmotion", {
+    label: game.i18n.localize("EMOKLORE.resonantEmotion", {
       emotion: label,
-      attribute: game.i18n.format(`EMOKLORE.emotionAttributes.${String(attribute)}`),
+      attribute: game.i18n.localize(`EMOKLORE.emotionAttributes.${String(attribute)}`),
     }),
     group: game.i18n.localize(`EMOKLORE.emotionAttributes.${String(attribute)}`),
   }));

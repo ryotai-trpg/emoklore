@@ -12,7 +12,12 @@ import {
   getEmbeddedDocument,
   getEmotionAttributes,
 } from "./helpers";
-import type { CharacterContext, CharacteristicsMap, SkillRow } from "./types";
+import type {
+  CharacterContext,
+  CharacteristicsMap,
+  EmokloreRenderOptions,
+  SkillRow,
+} from "./types";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -39,7 +44,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
   };
 
-  static PARTS = {
+  static override PARTS = {
     header: {
       template: "systems/emoklore/templates/actor/header.hbs",
     },
@@ -62,7 +67,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
   };
 
-  static TABS = {
+  static override TABS = {
     primary: {
       tabs: [{ id: "skills" }, { id: "biography" }, { id: "effects" }],
       labelPrefix: "EMOKLORE.CharacterSheet.tab",
@@ -70,7 +75,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
   };
 
-  override async _prepareContext(options: Record<string, unknown>): Promise<CharacterContext> {
+  override async _prepareContext(options: EmokloreRenderOptions): Promise<CharacterContext> {
     const baseContext = await super._prepareContext(options);
     const context = baseContext as CharacterContext;
     context.config = CONFIG.EMOKLORE;
@@ -83,10 +88,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     return context;
   }
 
-  async _preparePartContext(
+  override async _preparePartContext(
     partId: string,
     context: CharacterContext,
-    options: Record<string, unknown>,
+    options: EmokloreRenderOptions,
   ): Promise<CharacterContext> {
     await super._preparePartContext(partId, context, options);
 

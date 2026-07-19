@@ -1,6 +1,10 @@
 import { defineConfig } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 
+// proxy先のFoundry本体。既定はメイン環境（30000）、検証環境に向ける場合は
+// FOUNDRY_URL=http://localhost:30014 のように上書きする
+const foundryUrl = process.env.FOUNDRY_URL ?? "http://localhost:30000";
+
 export default defineConfig({
   // publicDir: "public",
   base: "/systems/emoklore/",
@@ -8,9 +12,9 @@ export default defineConfig({
   server: {
     port: 30001,
     proxy: {
-      "^(?!/systems/emoklore)": "http://localhost:30000/",
+      "^(?!/systems/emoklore)": foundryUrl,
       "/socket.io": {
-        target: "ws://localhost:30000",
+        target: foundryUrl.replace(/^http/, "ws"),
         ws: true,
       },
     },
