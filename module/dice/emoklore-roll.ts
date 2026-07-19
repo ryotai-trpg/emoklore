@@ -1,18 +1,23 @@
 import type { RollOptions } from "@client/dice/_types.mjs";
 import { systemPath } from "../constants";
-import { countSuccesses, type ResultName, resolveResultName } from "../rules/success";
-import { formatSuccess } from "../utils/helper";
+import { type ResultName, resolveResultName } from "../rules/success";
+import type { RollSpec } from "../rules/types";
+import { SUCCESS_MODIFIER } from "./emoklore-die";
 
 export interface EmokloreRollOptions extends RollOptions {
-  successMod?: number;
   dmFormula?: string;
-  target?: number;
+  successMod?: number;
 }
 
 export class EmokloreRoll extends foundry.dice.Roll {
-  successMod: number;
+  /** チャットに出す「2DM≦6」形式の式。判定の内訳を見せるためのもので、評価には使わない */
   dmFormula: string;
-  target: number;
+
+  /**
+   * 成功数修正。式にも項として入っているので評価には要らないが、
+   * 「ダイスの成功数いくつに、いくつ足したのか」を表示するために保持する
+   */
+  successMod: number;
 
   constructor(
     formula: string = "1d10",
@@ -20,50 +25,59 @@ export class EmokloreRoll extends foundry.dice.Roll {
     options: EmokloreRollOptions = {},
   ) {
     super(formula, data, options);
-    const { successMod = 0, dmFormula = "", target = 10 } = options;
-    this.successMod = successMod;
-    this.dmFormula = dmFormula;
-    this.target = target;
+    this.dmFormula = options.dmFormula ?? "";
+    this.successMod = options.successMod ?? 0;
   }
 
-  /** results を持つのは DiceTerm だけなので、そこに絞って取り出す */
-  get #diceTerms(): foundry.dice.terms.DiceTerm[] {
-    return this.terms.filter(
-      (term): term is foundry.dice.terms.DiceTerm => term instanceof foundry.dice.terms.DiceTerm,
-    );
+  /**
+   * 判定内容からRollを組み立てる。
+   *
+   * 成功数モディファイアと成功数修正を式に含めるので、評価すると `total` が最終的な成功数になる。
+   */
+  static fromSpec(spec: RollSpec, options: EmokloreRollOptions = {}): EmokloreRoll {
+    const dice = `${spec.diceCount}d10${SUCCESS_MODIFIER}<=${spec.target}`;
+    const successMod = spec.successMod === 0 ? "" : ` ${formatTerm(spec.successMod)}`;
+
+    return new this(`${dice}${successMod}`, {}, {
+      ...options,
+      dmFormula: spec.dmFormula,
+      successMod: spec.successMod,
+    } satisfies EmokloreRollOptions);
   }
 
-  // 注意: ここで全結果に success を立てることが EmokloreDie.getResultCSS と暗黙に結合している。
-  // 本体の Die は success/failure が付いていると min/max のCSSクラスを出さないため、
-  // EmokloreDie 側でそのガードを意図的に外している。どちらかだけを変更すると出目の
-  // 強調表示が壊れるので、両方セットで見ること
-  override async evaluate(options?: Parameters<foundry.dice.Roll["evaluate"]>[0]): Promise<this> {
-    const roll = (await super.evaluate(options)) as this;
-
-    for (const term of roll.#diceTerms) {
-      term.results = term.results.map((result) => ({
-        ...result,
-        success: result.result <= this.target,
-      }));
-    }
-
-    return roll;
-  }
-
-  get diceResults(): number[] {
-    return this.#diceTerms.flatMap((term) => term.results.map((result) => result.result));
-  }
-
-  get rawResult(): number {
-    return countSuccesses(this.diceResults, this.target);
-  }
-
-  get rollResult(): number {
-    return this.rawResult + this.successMod;
+  /** 成功数。修正値まで含めた最終的な値 */
+  get successCount(): number {
+    return this.total ?? 0;
   }
 
   get resultName(): ResultName {
-    return resolveResultName(this.rollResult);
+    return resolveResultName(this.successCount);
+  }
+
+  /** 成功数修正の表示。修正がなければ空文字 */
+  get successModLabel(): string {
+    if (this.successMod === 0) return "";
+    return game.i18n.localize("EMOKLORE.successMod", { mod: formatSigned(this.successMod) });
+  }
+
+  /**
+   * ツールチップのダイス合計を「3+1」形式にする。
+   *
+   * 本体のテンプレートは各パートの `total` をそのまま出すだけなので、
+   * テンプレートを差し替えずにここで値を作り替えれば済む。
+   */
+  override async getTooltip(): Promise<string> {
+    const parts: Record<string, unknown>[] = this.dice.map((die) => ({ ...die.getTooltipData() }));
+    const [diceTerm] = parts;
+
+    if (diceTerm && this.successMod !== 0) {
+      diceTerm.total = `${diceTerm.total}${formatSigned(this.successMod)}`;
+    }
+
+    return foundry.applications.handlebars.renderTemplate(
+      (this.constructor as typeof EmokloreRoll).TOOLTIP_TEMPLATE,
+      { parts },
+    );
   }
 
   override async _prepareChatRenderContext(
@@ -72,24 +86,21 @@ export class EmokloreRoll extends foundry.dice.Roll {
     const baseContext = await super._prepareChatRenderContext(options);
     return {
       ...baseContext,
-      result: this.rollResult,
       resultName: this.resultName,
-      successMod: this.successMod,
       dmFormula: this.dmFormula,
+      successModLabel: this.successModLabel,
     };
   }
 
-  override async getTooltip(): Promise<string> {
-    const parts = this.dice.map((d) => d.getTooltipData());
-    return foundry.applications.handlebars.renderTemplate(
-      (this.constructor as typeof EmokloreRoll).TOOLTIP_TEMPLATE,
-      {
-        parts,
-        result: formatSuccess(this.rawResult, this.successMod),
-      },
-    );
-  }
-
   static override readonly CHAT_TEMPLATE = systemPath("templates/rolls/skill.hbs");
-  static override readonly TOOLTIP_TEMPLATE = systemPath("templates/rolls/tooltip.hbs");
+}
+
+/** 符号を付ける。`1` → `+1`、`-1` → `-1` */
+function formatSigned(value: number): string {
+  return value > 0 ? `+${value}` : `${value}`;
+}
+
+/** 数式の項として書ける形にする。`1` → `+ 1`、`-1` → `- 1` */
+function formatTerm(value: number): string {
+  return `${value > 0 ? "+" : "-"} ${Math.abs(value)}`;
 }

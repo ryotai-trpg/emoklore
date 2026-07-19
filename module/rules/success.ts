@@ -1,8 +1,19 @@
-/** 出目がこれ以下ならクリティカルとして成功数がもう1つ増える */
+/** 出目がこれ以下ならクリティカル。目標値によらず成功し、さらに成功数がもう1つ増える */
 export const CRITICAL_FACE = 1;
 
-/** 出目がこれ以上ならファンブルとして成功数が1つ減る */
+/** 出目がこれ以上ならファンブル。目標値によらず失敗し、成功数が1つ減る */
 export const FUMBLE_FACE = 10;
+
+/** 出目1個の判定結果 */
+export type FaceOutcome = "critical" | "success" | "failure" | "fumble";
+
+/** 出目1個が成功数に与える増減 */
+const FACE_POINTS: Record<FaceOutcome, number> = {
+  critical: 2,
+  success: 1,
+  failure: 0,
+  fumble: -1,
+};
 
 export type ResultName =
   | "fumble"
@@ -14,21 +25,20 @@ export type ResultName =
   | "catastrophe";
 
 /**
- * 出目の並びから成功数を数える。
+ * 出目1個の判定結果を決める。
  *
- * 目標値以下で1成功。加えて1はクリティカルとしてもう1成功、10はファンブルとして1減算する。
- * つまり目標値が1以上なら出目1は2カウントになる。
+ * クリティカルとファンブルは目標値より優先する。目標値が10以上でも出目10はファンブルで、
+ * 目標値が0以下でも出目1はクリティカルになる。
  */
-export function countSuccesses(diceResults: number[], target: number): number {
-  let successes = 0;
+export function classifyFace(face: number, target: number): FaceOutcome {
+  if (face >= FUMBLE_FACE) return "fumble";
+  if (face <= CRITICAL_FACE) return "critical";
+  return face <= target ? "success" : "failure";
+}
 
-  for (const result of diceResults) {
-    if (result <= target) successes += 1;
-    if (result <= CRITICAL_FACE) successes += 1;
-    if (result >= FUMBLE_FACE) successes -= 1;
-  }
-
-  return successes;
+/** 判定結果が成功数に与える増減を返す */
+export function facePoints(outcome: FaceOutcome): number {
+  return FACE_POINTS[outcome];
 }
 
 /**

@@ -83,16 +83,9 @@ export class EmokloreActor extends Actor {
     skillName: string,
     options: Record<string, unknown>,
   ): Promise<ChatMessage | undefined> {
-    const roll = await new EmokloreRoll(
-      `${spec.diceCount}d10`,
-      {},
-      {
-        ...options,
-        target: spec.target,
-        successMod: spec.successMod,
-        dmFormula: spec.dmFormula,
-      },
-    ).evaluate();
+    // 本体の evaluate() の戻り型は Roll なので、戻り値ではなくインスタンスを取り回す
+    const roll = EmokloreRoll.fromSpec(spec, options);
+    await roll.evaluate();
 
     return createRollMessage({
       actor: this,

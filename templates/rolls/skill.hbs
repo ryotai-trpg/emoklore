@@ -3,7 +3,10 @@
     <div class="dice-flavor">{{flavor}}</div>
   {{/if}}
   <div class="dice-result">
-    <div class="dice-formula">{{dmFormula}}</div>
+    <div class="dice-formula">
+      {{dmFormula}}
+      {{#if successModLabel}}<span class="success-mod">{{successModLabel}}</span>{{/if}}
+    </div>
     {{{tooltip}}}
     <h4 class="dice-total">{{localize (concat "EMOKLORE.result." resultName)}}</h4>
   </div>

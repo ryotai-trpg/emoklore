@@ -279,6 +279,7 @@
     "skill": "Skills",
     "characteristics": "Characteristics",
     "skillRoll": "{skillName} Roll",
+    "successMod": "Successes {mod}",
     "Effect": {
       "Source": "Source",
       "Temporary": "Temporary",
