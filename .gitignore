@@ -3,5 +3,6 @@ dist/
 docs/.vitepress/dist
 docs/.vitepress/cache
 
-# 各自のローカル環境メモ（docs/contributing.md「ドキュメントの方針」参照）
+# 各自のローカル環境メモ・ローカル固有スキル（docs/contributing.md「ドキュメントの方針」参照）
 CLAUDE.local.md
+.claude/skills/
