@@ -5,6 +5,7 @@ import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-ro
 import { resolveSkillRoll } from "../rules/skill-roll";
 import type { RollSpec } from "../rules/types";
 import { createRollMessage } from "../utils/chat";
+import type { EmokloreItem } from "./item";
 
 type ResourceKey = "hp" | "mp" | "resonance";
 type EmokloreActorType = "character" | "npc";
@@ -19,6 +20,9 @@ export class EmokloreActor<SubType extends EmokloreActorType = EmokloreActorType
   // スキーマ由来のプロパティは本体JSDocの型に出ないため補強する（docs/v14-migration.md「失われるもの」）
   declare name: string;
   declare flags: Record<string, unknown>;
+  // 埋め込みコレクションも同様に型に出ない
+  declare items: foundry.utils.Collection<string, EmokloreItem>;
+  declare effects: foundry.utils.Collection<string, foundry.documents.ActiveEffect>;
 
   override getRollData(): Record<string, unknown> {
     const rollData = { ...this.system, flags: this.flags, name: this.name };

@@ -2,7 +2,11 @@ import { systemPath } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
 import { calculateCharPointSum, calculateTotalSkillPoints } from "../rules/character-points";
 import { prepareActiveEffectCategories } from "../utils/effects";
-import { createDocumentData, getEmbeddedDocument } from "../utils/sheet";
+import {
+  createDocumentData,
+  getEmbeddedDocument,
+  resolveEmbeddedDocumentClass,
+} from "../utils/sheet";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import { createEmotionOptions, createSkillLevelOptions, getEmotionAttributes } from "./helpers";
@@ -106,17 +110,11 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   static async _viewDoc(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
-    const doc = getEmbeddedDocument(target, this.actor);
-    if (doc && "sheet" in doc && doc.sheet) {
-      (doc.sheet as any).render(true);
-    }
+    getEmbeddedDocument(target, this.actor)?.sheet?.render(true);
   }
 
   static async _deleteDoc(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
-    const doc = getEmbeddedDocument(target, this.actor);
-    if (doc && "delete" in doc) {
-      await (doc as any).delete();
-    }
+    await getEmbeddedDocument(target, this.actor)?.delete();
   }
 
   static async _createDoc(
@@ -125,15 +123,13 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     target: HTMLElement & { dataset: DOMStringMap },
   ) {
     const docData = createDocumentData(target, this.actor);
-    const docCls = getDocumentClass(target.dataset.documentClass! as any) as any;
+    const docCls = resolveEmbeddedDocumentClass(target.dataset.documentClass);
     await docCls.create(docData, { parent: this.actor });
   }
 
   static async _toggleEffect(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
     const effect = getEmbeddedDocument(target, this.actor);
-    if (effect && "update" in effect && "disabled" in effect) {
-      await (effect as any).update({ disabled: !(effect as any).disabled });
-    }
+    if (effect) await effect.update({ disabled: !effect.disabled });
   }
 
   static async _importCharacter(this: EmokloreCharacterSheet, event: Event, _target: HTMLElement) {
