@@ -1,0 +1,25 @@
+{{!--
+  技能1行（編集）。能力値は技能によって固定だったり選べたりする。
+
+  @param skill 技能の表示用データ
+  @param key   技能のキー
+--}}
+<div class="em-skill-row em-skill-row--edit" data-skill="{{key}}">
+  <span class="em-skill-row__name">{{skill.label}}</span>
+  {{formInput skill.field.fields.level value=skill.level}}
+  <span class="em-skill-row__target">{{skill.target}}</span>
+  {{#if skill.field.fields.characteristic.choices}}
+  <span class="em-skill-row__stat">
+    {{formInput skill.field.fields.characteristic value=skill.characteristic localize=true}}
+  </span>
+  {{else}}
+  <span class="em-skill-row__stat">{{skill.characteristicLabel}}</span>
+  {{/if}}
+  {{#if skill.field.fields.specialization}}
+  <span class="em-skill-row__spec">
+    {{formInput skill.field.fields.specialization
+      value=skill.specialization
+      placeholder=(localize "EMOKLORE.CharacterSheet.fields.specialization")}}
+  </span>
+  {{/if}}
+</div>

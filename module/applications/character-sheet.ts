@@ -57,6 +57,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         "templates/actor/base-skills.hbs",
         "templates/actor/partials/card.hbs",
         "templates/actor/partials/stat-row.hbs",
+        "templates/actor/partials/skill-row-play.hbs",
+        "templates/actor/partials/skill-row-edit.hbs",
       ].map(systemPath),
       scrollable: [""],
     },
@@ -195,6 +197,9 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
           // 順序を変えると壊れる
           characteristicLabel: characteristic
             ? (CONFIG.EMOKLORE.characteristics[characteristic]?.label ?? "")
+            : "",
+          characteristicIcon: characteristic
+            ? (CONFIG.EMOKLORE.characteristics[characteristic]?.fa ?? "")
             : "",
         };
         return obj;

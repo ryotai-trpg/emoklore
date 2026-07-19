@@ -1,0 +1,15 @@
+{{!--
+  技能1行（閲覧）。技能名がそのまま判定のトリガになる。
+
+  @param skill 技能の表示用データ
+  @param key   技能のキー
+--}}
+<div class="em-skill-row" data-skill="{{key}}">
+  <a class="em-skill-row__name" data-action="roll" data-roll-type="skill" data-skill="{{key}}">
+    {{skill.label}}{{#if skill.specialization}}{{localize "EMOKLORE.Common.colon"}}{{skill.specialization}}{{/if}}
+  </a>
+  <span>Lv.{{skill.level}}</span>
+  <progress class="em-progress em-progress--sm" value="{{skill.level}}" max="3"></progress>
+  <span class="em-skill-row__target">{{skill.target}}</span>
+  <i class="em-skill-row__stat fa-solid {{skill.characteristicIcon}}"></i>
+</div>
