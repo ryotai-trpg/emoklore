@@ -59,20 +59,11 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
 
   static async onImport(this: CharSheetImportDialog, event: Event, _target: HTMLElement) {
     event.preventDefault();
-    console.log("Import button clicked");
 
     // DEFAULT_OPTIONS の tag が "form" なので this.element 自体がフォーム要素になる
     const form = this.element.querySelector("form") ?? this.element;
-    console.log("Element:", this.element);
-    console.log("Form:", form);
-
     const textarea = form.querySelector<HTMLTextAreaElement>('textarea[name="jsonInput"]');
-
-    console.log("Textarea:", textarea);
-
     const jsonInput = textarea?.value ?? "";
-
-    console.log("JSON input length:", jsonInput?.length);
 
     if (!jsonInput || jsonInput.trim() === "") {
       ui.notifications?.error(game.i18n.localize("EMOKLORE.Import.ErrorEmptyInput"));
@@ -81,7 +72,6 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
 
     // Validate JSON
     const validation = validateCharSheetJSON(jsonInput);
-    console.log("Validation result:", validation);
 
     if (!validation.valid) {
       const errorMsg = validation.error
@@ -94,9 +84,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
 
     // Import the data
     try {
-      console.log("Starting import...");
       await importFromCharSheet(this.actor, validation.data!);
-      console.log("Import successful");
       this.close();
     } catch (error) {
       console.error("Character import error:", error);
