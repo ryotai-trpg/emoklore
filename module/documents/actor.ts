@@ -1,10 +1,7 @@
+import { promptResonanceRoll } from "../applications/dialogs/resonance-roll-dialog";
 import type { CharacterDataModel, SkillRollContext } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
-import {
-  normalizeIntensity,
-  type ResonanceMatch,
-  resolveResonanceRoll,
-} from "../rules/resonance-roll";
+import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
 import { resolveSkillRoll } from "../rules/skill-roll";
 import type { RollSpec } from "../rules/types";
 import { createRollMessage } from "../utils/chat";
@@ -45,43 +42,11 @@ export class EmokloreActor<SubType extends EmokloreActorType = EmokloreActorType
     emotionMatch?: ResonanceMatch,
     options: Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
-    // TODO: ダイアログをapplications層へ分離する
     if (intensity === undefined) {
-      try {
-        // prompt の型は config.ok を含んでおらず（本体JSDocの制約）そのままでは渡せない
-        const prompt = foundry.applications.api.DialogV2.prompt as (
-          config: Record<string, unknown>,
-        ) => Promise<[number, ResonanceMatch]>;
+      const input = await promptResonanceRoll();
+      if (!input) return;
 
-        const result = await prompt({
-          window: { title: "〈♾️共鳴〉判定" },
-          content: `
-          <div>
-          <label for="intensity">強度</label>
-          <input name="intensity" id="intensity" type="number" placeholder="1" min="1" max="9" autofocus>
-          </div>
-          <div>
-          <label><input type="radio" name="choice" value="none" checked> 一致なし</label>
-          <label><input type="radio" name="choice" value="root"> ルーツ属性一致</label>
-          <label><input type="radio" name="choice" value="completely"> 完全一致</label>
-          </div>
-          `,
-          ok: {
-            label: "ロール",
-            callback: (_event: Event, button: HTMLElement) => {
-              const form = (button as HTMLButtonElement).form as HTMLFormElement;
-              const value = (form.elements.namedItem("intensity") as HTMLInputElement)
-                .valueAsNumber;
-              const choice = (form.elements.namedItem("choice") as RadioNodeList).value;
-              return [normalizeIntensity(value), choice];
-            },
-          },
-          rejectClose: true,
-        });
-        [intensity, emotionMatch] = result;
-      } catch {
-        return;
-      }
+      ({ intensity, emotionMatch } = input);
     }
 
     const spec = resolveResonanceRoll({
