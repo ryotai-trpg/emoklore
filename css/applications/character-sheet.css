@@ -17,13 +17,15 @@
     flex: 0 0 20px;
   }
 
-  /* ヘッダ。名前・操作ボタン・リソースを横に並べ、下端で揃える */
+  /* ヘッダ。名前・操作ボタン・リソースを横に並べ、下端で揃える。
+     高さは中身なりにする。以前は .container の div に height: 100% が付いていたが、
+     親の header が高さを持たないので効いていなかった。header 自身に移すと
+     .window-content の高さに解決してしまい、ヘッダがシート全体に広がる */
   .em-sheet-header {
     display: grid;
     grid-auto-flow: column;
     justify-content: space-between;
     align-items: flex-end;
-    height: 100%;
   }
 
   .em-sheet-header__name {
