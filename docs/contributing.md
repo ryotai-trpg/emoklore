@@ -71,8 +71,13 @@ feat: add resonance roll dialog
 
 - TypeScript（strict化を目指す）。型定義の都合で `as any` が残っているが、**新規コードでは増やさない・触った箇所では減らす**
 - UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/helpers/localization.ts` の事前ローカライズ機構を通す
-- フォーマットはPrettier / ESLint（設定済み）に従う
+- フォーマット・lintは [Biome](https://biomejs.dev/)（設定: `biome.json`）。手動実行は `npm run check`（修正適用）/ `npm run lint`（検証のみ）
 - 設計の方向性・既知の構造的課題は [アーキテクチャ](/architecture) を参照
+
+### 自動チェック
+
+- **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。緊急時は `git commit --no-verify` でスキップできるが非推奨
+- **CI**: pushとPRで GitHub Actions が `biome ci` を実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
 
 ## 表記ルール
 
