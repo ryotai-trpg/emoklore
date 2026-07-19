@@ -1,0 +1,8 @@
+# pre-commitフック: stagedファイルにBiome（format+lint）を自動適用する
+# スキップしたい場合は `git commit --no-verify`（非推奨）
+pre-commit:
+  jobs:
+    - name: biome
+      glob: "*.{ts,mts,cts,js,mjs,cjs,json,jsonc,css}"
+      run: npx biome check --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true
