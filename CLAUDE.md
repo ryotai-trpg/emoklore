@@ -33,6 +33,8 @@ npm run docs:build  # VitePressビルド
 
 ## 現在の開発フェーズ
 
-1. **v14対応**（次の作業）— 状況は `docs/v14-migration.md` の「作業状況」
-2. リファクタリング — `docs/architecture.md`
+本システムは**v14専用**（`system.json` の compatibility は `minimum: 14`）。v13サポートは打ち切り済みで、実機検証もv14で行う。
+
+1. ~~v14対応~~ — 完了（2026-07-19）。経緯と非推奨APIの備忘録は `docs/v14-migration.md`
+2. **リファクタリング**（現在）— `docs/architecture.md`
 3. 新機能 — `docs/roadmap.md`
