@@ -87,7 +87,7 @@ feat: add resonance roll dialog
 
 ## コーディング方針
 
-- TypeScript（strict化を目指す）。`any` は lint で禁止している（`noExplicitAny`）。本体JSDocの型が足りない場合は、`any` で潰さず**実際に使うメンバーだけを交差型で補う**（例: `module/utils/effects.ts`、`module/applications/types.ts` の `SheetDocument`）。どうしても必要なら理由コメント付きで `biome-ignore` する
+- TypeScript（strict化を段階的に進めている。現在 `strictNullChecks` / `noUncheckedIndexedAccess` / `noImplicitAny` が有効）。`any` は lint で禁止している（`noExplicitAny`）。本体JSDocの型が足りない場合は、`any` で潰さず**実際に使うメンバーだけを交差型で補う**（例: `module/utils/effects.ts`、`module/applications/types.ts` の `SheetDocument`）。どうしても必要なら理由コメント付きで `biome-ignore` する
 - UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す
 - フォーマット・lintは [Biome](https://biomejs.dev/)（設定: `biome.json`）。手動実行は `npm run check`（修正適用）/ `npm run lint`（検証のみ）
 - 設計の方向性・既知の構造的課題は [アーキテクチャ](/architecture) を参照

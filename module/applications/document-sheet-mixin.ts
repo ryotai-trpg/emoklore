@@ -46,7 +46,7 @@ export default (base: ApplicationV2Constructor) => {
         isPlay: this.isPlayMode,
         owner: this.document.isOwner,
         limited: this.document.limited,
-        gm: game.user.isGM,
+        gm: game.user?.isGM ?? false,
         document: this.document,
         system: this.document.system,
         systemFields: this.document.system.schema.fields,

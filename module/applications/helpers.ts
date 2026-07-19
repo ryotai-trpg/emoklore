@@ -22,16 +22,23 @@ export const createEmotionOptions = (): Array<{ value: string; label: string; gr
   }));
 };
 
+/**
+ * 共鳴感情に対応する属性の言語キーを引く。
+ *
+ * 未選択や、既知でない感情が保存されている場合は空文字を返す。以前は
+ * `EMOKLORE.emotionAttributes.` という尻切れのキーを組み立てており、
+ * それがシートにそのまま表示されていた。
+ */
 export const getEmotionAttributes = (
-  emotions: Record<string, string>,
+  emotions: Record<string, string | undefined>,
   resonantEmotions: Record<string, ResonantEmotionsConfig>,
 ): Record<string, string> => {
   const emotionAttributes: Record<string, string> = {};
 
   for (const key of ["surface", "hidden", "root"]) {
     const emotionKey = emotions[key];
-    const attr = resonantEmotions[emotionKey]?.attribute ?? "";
-    emotionAttributes[key] = `EMOKLORE.emotionAttributes.${String(attr)}`;
+    const attribute = emotionKey ? resonantEmotions[emotionKey]?.attribute : undefined;
+    emotionAttributes[key] = attribute ? `EMOKLORE.emotionAttributes.${attribute}` : "";
   }
 
   return emotionAttributes;
