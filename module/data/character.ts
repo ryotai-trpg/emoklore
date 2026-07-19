@@ -2,16 +2,10 @@ import type { BaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { SkillGroupKey } from "../config/skill-groups";
 import type { SkillKey } from "../config/skills";
+import type { ModifierSet } from "../rules/types";
 import { EmokloreSystemDataModel } from "./system-model";
 
 const { HTMLField, NumberField, SchemaField, StringField, BooleanField } = foundry.data.fields;
-
-/** 技能・能力値・技能グループが共通で持つ修正値の組 */
-export type ModifierSet = {
-  bonus: number;
-  success: number;
-  target: number;
-};
 
 const defineCharacterDataModelSchema = () => {
   const schema: Record<string, foundry.data.fields.DataField> = {};
