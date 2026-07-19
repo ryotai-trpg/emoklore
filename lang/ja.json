@@ -306,6 +306,7 @@
       "JSONPlaceholder": "キャラクターシートのJSONデータをここに貼り付けてください...",
       "Hint": "https://emoklore.charasheet.jp からエクスポートしたJSONデータを貼り付けてください。",
       "Success": "{name}のデータをインポートしました",
+      "WarnUnknownEmotions": "共鳴感情「{labels}」は認識できなかったため取り込みませんでした",
       "ErrorEmptyInput": "JSONデータを入力してください",
       "ErrorInvalidJSON": "無効なJSONデータです",
       "ErrorInvalidKind": "キャラクターデータではありません",

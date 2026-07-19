@@ -152,37 +152,43 @@ const EMOTION_MAP: Record<string, string> = {
   劣等感: "inferiorityComplex",
 };
 
+type ParsedEmotions = {
+  emotions: { surface?: string; hidden?: string; root?: string };
+  /** EMOTION_MAP に無く、取り込めなかったラベル */
+  unrecognized: string[];
+};
+
+const EMOTION_PATTERNS = {
+  // 例: 共鳴感情・表: 怒り(情念)
+  surface: /共鳴感情[・·]表[:：]\s*([^(（\n]+)/,
+  hidden: /共鳴感情[・·]裏[:：]\s*([^(（\n]+)/,
+  root: /共鳴感情[・·]ルーツ[:：]\s*([^(（\n]+)/,
+} as const;
+
 /**
- * Parse emotions from the memo field
+ * memo欄から共鳴感情を取り出す。
+ *
+ * 正規のシートからのコピーであれば EMOTION_MAP に無いラベルは来ないため、
+ * 一致しないものは異常入力とみなして取り込まず、呼び出し側で警告する。
+ * 生の文字列を保存すると、シートが未解決のi18nキーを表示してしまう。
  */
-function parseEmotions(memo: string): {
-  surface?: string;
-  hidden?: string;
-  root?: string;
-} {
-  const emotions: { surface?: string; hidden?: string; root?: string } = {};
+export function parseEmotions(memo: string): ParsedEmotions {
+  const emotions: ParsedEmotions["emotions"] = {};
+  const unrecognized: string[] = [];
 
-  // Match patterns like: 共鳴感情・表: 怒り(情念)
-  const surfaceMatch = memo.match(/共鳴感情[・·]表[:：]\s*([^(（\n]+)/);
-  const hiddenMatch = memo.match(/共鳴感情[・·]裏[:：]\s*([^(（\n]+)/);
-  const rootMatch = memo.match(/共鳴感情[・·]ルーツ[:：]\s*([^(（\n]+)/);
+  for (const [key, pattern] of Object.entries(EMOTION_PATTERNS)) {
+    const label = memo.match(pattern)?.[1]?.trim();
+    if (!label) continue;
 
-  if (surfaceMatch) {
-    const emotionLabel = surfaceMatch[1].trim();
-    emotions.surface = EMOTION_MAP[emotionLabel] || emotionLabel;
+    const emotionKey = EMOTION_MAP[label];
+    if (emotionKey) {
+      emotions[key as keyof ParsedEmotions["emotions"]] = emotionKey;
+    } else {
+      unrecognized.push(label);
+    }
   }
 
-  if (hiddenMatch) {
-    const emotionLabel = hiddenMatch[1].trim();
-    emotions.hidden = EMOTION_MAP[emotionLabel] || emotionLabel;
-  }
-
-  if (rootMatch) {
-    const emotionLabel = rootMatch[1].trim();
-    emotions.root = EMOTION_MAP[emotionLabel] || emotionLabel;
-  }
-
-  return emotions;
+  return { emotions, unrecognized };
 }
 
 /**
@@ -202,9 +208,9 @@ function parseSkills(commands: string): {
   for (const line of lines) {
     // Match pattern: XDM<=Y 〈[＊★]SkillName〉
     const match = line.match(/(\d+)DM<=\d+\s*[〈<]([＊★]?)([^〉>]+)[〉>]/);
-    if (!match) continue;
+    if (!match?.[1] || !match[3]) continue;
 
-    const diceCount = parseInt(match[1], 10);
+    const diceCount = Number.parseInt(match[1], 10);
     const marker = match[2];
     const skillName = match[3].trim();
 
@@ -295,17 +301,13 @@ export async function importFromCharSheet(
   }
 
   // Import emotions from memo
+  const unrecognizedEmotions: string[] = [];
   if (data.memo) {
-    const emotions = parseEmotions(data.memo);
-    if (emotions.surface) {
-      updateData["system.emotions.surface"] = emotions.surface;
+    const { emotions, unrecognized } = parseEmotions(data.memo);
+    for (const [key, value] of Object.entries(emotions)) {
+      updateData[`system.emotions.${key}`] = value;
     }
-    if (emotions.hidden) {
-      updateData["system.emotions.hidden"] = emotions.hidden;
-    }
-    if (emotions.root) {
-      updateData["system.emotions.root"] = emotions.root;
-    }
+    unrecognizedEmotions.push(...unrecognized);
 
     // Store the full memo in biography notes
     updateData["system.biography.note"] = data.memo;
@@ -349,6 +351,15 @@ export async function importFromCharSheet(
       name: data.name || actor.name,
     }),
   );
+
+  // 取り込めなかった共鳴感情は黙って捨てず知らせる（表記ゆれの発見に必要）
+  if (unrecognizedEmotions.length > 0) {
+    ui.notifications?.warn(
+      game.i18n.localize("EMOKLORE.Import.WarnUnknownEmotions", {
+        labels: unrecognizedEmotions.join("、"),
+      }),
+    );
+  }
 }
 
 /**
