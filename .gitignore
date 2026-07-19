@@ -3,6 +3,10 @@ dist/
 docs/.vitepress/dist
 docs/.vitepress/cache
 
+# FoundryVTT本体ソースへの参照（型チェック用。docs/contributing.md参照）
+foundry/
+foundry-config.yaml
+
 # 各自のローカル環境メモ・ローカル固有スキル（docs/contributing.md「ドキュメントの方針」参照）
 CLAUDE.local.md
 .claude/skills/
