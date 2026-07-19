@@ -1,8 +1,13 @@
+import type { EmotionAttributeKey, EmotionAttributesConfig } from "../config/emotion-attributes";
 import type { ResonantEmotionsConfig } from "../config/resonant-emotions";
+import type { EmotionKey, EmotionRow } from "./types";
+
 /**
  * シートのテンプレートに渡す選択肢やラベルを組み立てる。
  * ルール計算は module/rules/ に、DOM操作は module/utils/sheet.ts にある。
  */
+
+const EMOTION_KEYS: readonly EmotionKey[] = ["surface", "hidden", "root"];
 
 export const createSkillLevelOptions = (): Array<{ value: string; label: string }> => {
   return Object.entries(CONFIG.EMOKLORE.skillLevel).map(([value, { label }]) => ({
@@ -12,34 +17,44 @@ export const createSkillLevelOptions = (): Array<{ value: string; label: string 
 };
 
 export const createEmotionOptions = (): Array<{ value: string; label: string; group: string }> => {
-  return Object.entries(CONFIG.EMOKLORE.resonantEmotions).map(([value, { label, attribute }]) => ({
-    value: String(value),
-    label: game.i18n.localize("EMOKLORE.resonantEmotion", {
-      emotion: label,
-      attribute: game.i18n.localize(`EMOKLORE.emotionAttributes.${String(attribute)}`),
-    }),
-    group: game.i18n.localize(`EMOKLORE.emotionAttributes.${String(attribute)}`),
-  }));
+  return Object.entries(CONFIG.EMOKLORE.resonantEmotions).map(([value, { label, attribute }]) => {
+    const attributeLabel =
+      CONFIG.EMOKLORE.emotionAttributes[attribute as EmotionAttributeKey]?.label ?? "";
+    return {
+      value,
+      label: game.i18n.localize("EMOKLORE.resonantEmotion", {
+        emotion: label,
+        attribute: attributeLabel,
+      }),
+      group: attributeLabel,
+    };
+  });
 };
 
 /**
- * 共鳴感情に対応する属性の言語キーを引く。
+ * 共鳴感情の表示名と、対応する属性の表示名を引く。
  *
- * 未選択や、既知でない感情が保存されている場合は空文字を返す。以前は
- * `EMOKLORE.emotionAttributes.` という尻切れのキーを組み立てており、
- * それがシートにそのまま表示されていた。
+ * どちらの label も i18nInit の performPreLocalization で翻訳済みなので、ここでは
+ * 参照するだけでよい。以前は `EMOKLORE.emotionAttributes.` という言語キーを組み立てており、
+ * 感情が未選択のときに尻切れのキーがそのままシートに表示されていた。キーを作らない形に
+ * したので、未選択・未知の感情はどちらも空文字になる。
+ *
+ * game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
  */
-export const getEmotionAttributes = (
+export const getEmotionRows = (
   emotions: Record<string, string | undefined>,
   resonantEmotions: Record<string, ResonantEmotionsConfig>,
-): Record<string, string> => {
-  const emotionAttributes: Record<string, string> = {};
+  emotionAttributes: Record<string, EmotionAttributesConfig>,
+): Record<EmotionKey, EmotionRow> => {
+  const rows = {} as Record<EmotionKey, EmotionRow>;
 
-  for (const key of ["surface", "hidden", "root"]) {
+  for (const key of EMOTION_KEYS) {
     const emotionKey = emotions[key];
-    const attribute = emotionKey ? resonantEmotions[emotionKey]?.attribute : undefined;
-    emotionAttributes[key] = attribute ? `EMOKLORE.emotionAttributes.${attribute}` : "";
+    const emotion = emotionKey ? resonantEmotions[emotionKey] : undefined;
+    const attribute = emotion ? emotionAttributes[emotion.attribute] : undefined;
+
+    rows[key] = { label: emotion?.label ?? "", attribute: attribute?.label ?? "" };
   }
 
-  return emotionAttributes;
+  return rows;
 };

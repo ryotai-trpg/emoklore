@@ -10,7 +10,7 @@ import {
 } from "../utils/sheet";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
-import { createEmotionOptions, createSkillLevelOptions, getEmotionAttributes } from "./helpers";
+import { createEmotionOptions, createSkillLevelOptions, getEmotionRows } from "./helpers";
 import type {
   CharacterContext,
   CharacteristicsMap,
@@ -80,9 +80,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     const baseContext = await super._prepareContext(options);
     const context = baseContext as unknown as CharacterContext;
     context.config = CONFIG.EMOKLORE;
-    context.emotionAttributes = getEmotionAttributes(
+    context.emotionRows = getEmotionRows(
       context.system.emotions,
       context.config.resonantEmotions,
+      context.config.emotionAttributes,
     );
 
     context.emotionOptions = createEmotionOptions();
