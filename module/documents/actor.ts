@@ -102,7 +102,9 @@ function formatSkillName(
   { base }: { base: boolean },
 ): string {
   const prefix = base ? "＊" : isExtra ? "★" : "";
-  const suffix = specialization ? `${game.i18n.localize("colon")}${specialization}` : "";
+  const suffix = specialization
+    ? `${game.i18n.localize("EMOKLORE.Common.colon")}${specialization}`
+    : "";
 
   return `${prefix}${label}${suffix}`;
 }
