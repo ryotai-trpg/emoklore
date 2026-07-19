@@ -17,8 +17,9 @@
 ## よく使うコマンド（詳細と前提: docs/contributing.md）
 
 ```shell
-ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm install
+npm install
 npm run dev         # vite build --watch（localhost:30001でFoundryにproxy）
+npm run typecheck   # 型チェック（要 foundry/ symlink。セットアップ: docs/contributing.md）
 npm run docs:dev    # VitePressプレビュー
 npm run docs:build  # VitePressビルド
 ```

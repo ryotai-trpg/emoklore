@@ -8,29 +8,19 @@ FoundryVTT v14（build 365 stable）の本体ソース（ローカルインス�
 
 ## 作業状況（2026-07-19時点）
 
-- 基盤整備（ドキュメント体系・Biome / lefthookフック・CI）は `chore/dev-foundation` ブランチで完了し、`develop` へのPRを準備中。**v14移行の実装は未着手**
-- 次の作業: 基盤整備PRのマージ後に新規ブランチ `feat/v14` を切り、型定義戦略の切り替え（下記「移行タスク」）から着手する。着手前にプランを立てる
-- 注意: Biomeは `vcs.useIgnoreFile` で `.gitignore` と連動している。`foundry/` symlinkを作る際は**先に `.gitignore` へ追加**しないと本体ソースがlint対象に入ってしまう
-
-実装に向けた現状確認の結果:
-
-- `npx tsc --noEmit` は現状**0エラー**（strict: false + fvtt-types）。切り替え後も0エラーが合格ライン
-- fvtt-types固有型の使用は2箇所のみ:
-  - `module/dice/emoklore-roll.ts:4` — `foundry.dice.Roll.Options` をextends → 本体 `@client/dice/_types.mjs` のtypedefへ置換
-  - `module/documents/actor.ts:8` — `Actor.SubType` ジェネリック + conditional typeで `system` を型分岐 → 自前の `"character" | "npc"` ユニオンへ書き換え
-- レガシーグローバルの使用は4種のみ（shimは小さい）: `Hooks`（emoklore.ts）、`Actor`（emoklore.ts / documents/actor.ts）、`Item`（documents/item.ts）、`ChatMessage`（documents/actor.ts）。v14での実体は `foundry.helpers.Hooks` / `foundry.documents.*`（client.mjs:161-162で確認済み）。`game` / `CONFIG` / `getDocumentClass` は本体の `global.d.mts` に宣言済みでshim不要
-- `CONFIG.EMOKLORE` の型付けは `module/types/emoklore.d.ts` が `namespace CONFIG` 拡張で行っている（fvtt-types前提の手法）→ `declare module "@client/config.mjs"` 方式へ書き換え。`EmokloreConfig` インターフェース定義は流用可
-- tsconfigの `include` は `vite.config.ts` も含む。`types: ["fvtt-types"]` を外す際は `process.env` 用に `types: ["node"]` を検討（`@types/node` は導入済み）
-- `.gitignore` に `foundry/` と `foundry-config.yaml` の追加が必要
-- `vite.config.ts` のproxy先はハードコード（`localhost:30000`）→ 環境変数 `FOUNDRY_URL`（既定 `http://localhost:30000`）で上書きできるようにする。`foundry-config.yaml` に `installPath` / `dataPath` / `port` を集約し、symlinkスクリプト・起動スクリプト・viteが共有する構成も検討
-- `as any` は50箇所（リファクタリングPhaseの削減指標として記録）
+- v14移行は `feat/v14` ブランチで**実装完了**。型定義戦略の切り替え・compatibility更新・viteのFOUNDRY_URL対応・CI型チェックジョブ・ドキュメント追従まで実施済み
+- v14実機検証（build 365、ポート30014、dev-data-v14）済み: シート描画（Play/Edit両モード）・技能判定・基本技能判定・共鳴判定・イニシアチブロールが正常、コンソールのエラー・非推奨警告ともゼロ
+- 残タスク:
+  - リポジトリsecretsへの `FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD` 登録（メンテナ操作）とCI型チェックジョブの実走確認
+  - ココフォリアインポートとActiveEffectの手動確認（自動検証に含まれていない）
+- `as any` は約50箇所（リファクタリングPhaseの削減指標として記録）
 
 ## 必須
 
-- [ ] `system.json`: `compatibility` を `{ "minimum": 14, "verified": 14 }` に（v14専用に移行、v13サポート打ち切り）
+- [x] `system.json`: `compatibility` を `{ "minimum": 14, "verified": 14 }` に（v14専用に移行、v13サポート打ち切り）
   - 補足: v14では compatibility の比較セマンティクスが変わり、整数値（`"14"`）は世代単位、小数点付き（`"14.361"`）は完全一致でマッチする
-- [ ] v14環境で起動し、コンソールに非推奨警告が出ないことを確認
-- [ ] 主要動作確認: 技能判定・共鳴判定・シートのPlay/Edit切替・ココフォリアインポート・ActiveEffect
+- [x] v14環境で起動し、コンソールに非推奨警告が出ないことを確認（console.warnフックで検証、警告ゼロ）
+- [ ] 主要動作確認: 技能判定・共鳴判定・シートのPlay/Edit切替は確認済み。**ココフォリアインポート・ActiveEffectが未確認**
 
 ## 非推奨API（v16で削除予定）— 現状使用なし、今後のコードで注意
 
@@ -53,6 +43,7 @@ FoundryVTT v14（build 365 stable）の本体ソース（ローカルインス�
 - 更新の特殊キー `{"-=key": null}` / `{"==key": value}` → 新 `DataFieldOperator` 機構へ
 - Handlebarsヘルパー `{{filePicker}}` / `{{rangePicker}}` → `<file-picker>` / `<range-picker>` カスタム要素へ
 - `DataField#migrateSource` → `DataField#_migrate`（フィールドでオーバーライドする場合のみ関係）
+- `Localization#format` は `localize(stringId, data)` に統合された（正式な非推奨化ではなくランタイムaliasとして残るが、`defineProperties` 定義のため**型には出ない**）。コードは `localize` に移行済み。今後も `format` は使わない
 
 ## 挙動変更（要テスト）
 
@@ -77,13 +68,18 @@ FoundryVTT v14（build 365 stable）の本体ソース（ローカルインス�
 
 ### 移行タスク
 
-- [ ] `fvtt-types` を package.json から削除（`npm install` のelectron回避策も不要になる）
-- [ ] リポジトリ直下にFoundry本体へのsymlink `foundry/` を作成（gitignore。draw-steelの `tools/create-symlinks.mjs` が参考）
-- [ ] `tsconfig.json`: `types: ["fvtt-types"]` を削除し、`allowJs: true` + `paths`（`@client/*` → `./foundry/client/*`、`@common/*` → `./foundry/common/*`）+ include に `foundry/client/global.d.mts`・`foundry/common/global.d.mts` を追加
-- [ ] shimファイル（自前 `.d.ts`、20〜30行）を作成:
-  - レガシーグローバル宣言（`Hooks`・`Actor`・`ChatMessage` 等は本体の `global.d.mts` に無い）。pf2eの `types/foundry/global-external.d.mts` と同じ手法（`export import Actor = foundry.documents.Actor;` 形式）。コードを `foundry.helpers.Hooks` 等の名前空間アクセスへ移行するならshimは縮小できる
-  - `CONFIG.EMOKLORE` は `declare module "@client/config.mjs"` のモジュール拡張で追加（動作検証済み）
-- [ ] `Actor.SubType` などfvtt-types固有の型の使用箇所を自前の型（`"character" | "npc"` 等）に置換
+- [x] `fvtt-types` を package.json から削除（`npm install` のelectron回避策も不要になった）
+- [x] リポジトリ直下にFoundry本体へのsymlink `foundry/` を作成（gitignore済み。`foundry-config.yaml` の `installPath` から `tools/create-symlinks.mjs`（`npm run link:foundry`）が作成する）
+- [x] `tsconfig.json`: `types: ["fvtt-types"]` → `["node"]`、`allowJs: true` + `paths`（`@client/*` → `./foundry/client/*`、`@common/*` → `./foundry/common/*`）+ include に `foundry/client/global.d.mts`・`foundry/common/global.d.mts` を追加
+- [x] shimファイル `module/types/foundry-shim.d.ts` を作成:
+  - レガシーグローバル宣言（`Hooks` / `Actor` / `ActiveEffect` / `Item` / `ChatMessage`）。pf2eの `types/foundry/global-external.d.mts` と同じ手法（`export import Actor = foundry.documents.Actor;` 形式）。コードを `foundry.helpers.Hooks` 等の名前空間アクセスへ移行するならshimは縮小できる
+  - `CONFIG.EMOKLORE` は `module/types/emoklore.d.ts` で `declare module "@client/config.mjs"` のモジュール拡張により追加
+- [x] `Actor.SubType` などfvtt-types固有の型の使用箇所を自前の型（`"character" | "npc"` 等）に置換
+
+実装時の判明事項:
+
+- 本体JSには `this.constructor.#静的private` などTSのバインダが解釈できない記法が少数（17箇所）あり、checkJs無効・skipLibCheckでも文法カテゴリの診断 **TS1111** だけは抑制できない（TS 5.9・TS 7 nightly双方で確認）。このため `npm run typecheck`（`tools/typecheck.mjs`）が `foundry/` 内の診断を除外して判定する。自コードのエラー検出が生きていることはプローブで確認済み
+- スキーマ由来プロパティ（`name` / `flags` / `disabled` / `sort` 等）とmixin越しに消えるメンバー（`isEditable` 等）は、想定どおりサブクラスの `declare` や交差型で補強した（「失われるもの」の表を参照）
 
 ### この方式で失われるもの（fvtt-types比）と対処
 
@@ -108,9 +104,9 @@ FoundryVTT v14（build 365 stable）の本体ソース（ローカルインス�
 
 移行タスク（上記に追加）:
 
-- [ ] `tools/fetch-foundry.mjs` 作成
-- [ ] 既存の `.github/workflows/ci.yml`（Biome / build / docs / 翻訳・テンプレートチェックは導入済み）に型チェックジョブを追加（`actions/cache` + fetch-foundry + `tsc --noEmit`。将来vitestも追加）
-- [ ] リポジトリのsecretsに `FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD` を登録
+- [x] `tools/fetch-foundry.mjs` 作成
+- [x] 既存の `.github/workflows/ci.yml`（Biome / build / docs / 翻訳・テンプレートチェックは導入済み）に型チェックジョブを追加（`actions/cache` + fetch-foundry + `npm run typecheck`。将来vitestも追加）
+- [ ] リポジトリのsecretsに `FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD` を登録（メンテナ操作）し、CI実走を確認
 
 ## v14の新機能（採用検討）
 
