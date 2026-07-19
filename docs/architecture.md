@@ -71,12 +71,17 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 
 ### テンプレート
 
+<!-- Handlebarsの {{...}} をVueの補間として解釈させないため v-pre で囲む -->
+::: v-pre
+
 - 引数を取る再利用部品は `templates/<種別>/partials/` に置き、先頭のコメントに `@param` を書く
 - **入れ子のpartialもPARTSの `templates` に列挙する**。ApplicationV2 は再帰的に解決しないため、漏らすと初回描画は通って再描画で落ちる
 - TS側のパスは `systemPath()` を通す。hbs側の `{{> "systems/emoklore/..."}}` はHandlebarsからTSの定数が見えないのでフルパス直書きのまま
 - `{{lookup}}` を重ねてconfigを引くのはテンプレートでのデータ整形なので、`applications/` のコンテキスト整形側で解決する
 - `{{#each}}` の中から親のコンテキストは**見えない**（Handlebarsは親スコープへフォールバックしない）。`@root` か `../` を明示する
 - `npm run check:templates` が構文・HTMLタグの対応・partialの実在・孤児テンプレートを見る。lefthook の pre-commit でも走る
+
+:::
 
 ### 開発時の注意
 
