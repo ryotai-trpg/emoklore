@@ -13,11 +13,10 @@
    Theme Overrides
    =========================================== */
 
-.theme-dark .window-content {
-  padding-top: 0 !important;
-}
-
-.emoklore .application section.window-content {
+/* .application と .emoklore はシートのルート要素そのものに同居しているので、
+   .emoklore .application ... と書くと子孫結合子で自分自身に届かない。
+   .emoklore の子孫として .window-content を直接指す */
+.emoklore .window-content {
   padding-top: 0;
 }
 
