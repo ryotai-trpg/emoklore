@@ -8,8 +8,9 @@ FoundryVTT v14（build 365 stable）の本体ソース（ローカルインス�
 
 ## 作業状況（2026-07-19時点）
 
-- ブランチ `feat/v14` で作業中（`develop` = 7b041c9 から分岐）。ドキュメント整備まで完了、**実装は未着手**
+- ブランチ `feat/v14` で作業中（`develop` = 7b041c9 から分岐）。ドキュメント整備と開発ツールチェーン（Biome / lefthookフック / CI基盤）まで完了、**v14移行の実装は未着手**
 - 次の作業: 型定義戦略の切り替え（下記「移行タスク」）から。着手前にプランを立てる
+- 注意: Biomeは `vcs.useIgnoreFile` で `.gitignore` と連動している。`foundry/` symlinkを作る際は**先に `.gitignore` へ追加**しないと本体ソースがlint対象に入ってしまう
 
 実装に向けた現状確認の結果:
 
@@ -21,7 +22,8 @@ FoundryVTT v14（build 365 stable）の本体ソース（ローカルインス�
 - `CONFIG.EMOKLORE` の型付けは `module/types/emoklore.d.ts` が `namespace CONFIG` 拡張で行っている（fvtt-types前提の手法）→ `declare module "@client/config.mjs"` 方式へ書き換え。`EmokloreConfig` インターフェース定義は流用可
 - tsconfigの `include` は `vite.config.ts` も含む。`types: ["fvtt-types"]` を外す際は `process.env` 用に `types: ["node"]` を検討（`@types/node` は導入済み）
 - `.gitignore` に `foundry/` と `foundry-config.yaml` の追加が必要
-- `as any` は49箇所（リファクタリングPhaseの削減指標として記録）
+- `vite.config.ts` のproxy先はハードコード（`localhost:30000`）→ 環境変数 `FOUNDRY_URL`（既定 `http://localhost:30000`）で上書きできるようにする。`foundry-config.yaml` に `installPath` / `dataPath` / `port` を集約し、symlinkスクリプト・起動スクリプト・viteが共有する構成も検討
+- `as any` は50箇所（リファクタリングPhaseの削減指標として記録）
 
 ## 必須
 
@@ -107,7 +109,7 @@ FoundryVTT v14（build 365 stable）の本体ソース（ローカルインス�
 移行タスク（上記に追加）:
 
 - [ ] `tools/fetch-foundry.mjs` 作成
-- [ ] `.github/workflows/ci.yml` 作成（cache + tsc --noEmit + vite build。将来vitestを追加）
+- [ ] 既存の `.github/workflows/ci.yml`（Biome / build / docs / 翻訳・テンプレートチェックは導入済み）に型チェックジョブを追加（`actions/cache` + fetch-foundry + `tsc --noEmit`。将来vitestも追加）
 - [ ] リポジトリのsecretsに `FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD` を登録
 
 ## v14の新機能（採用検討）
