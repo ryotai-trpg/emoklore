@@ -254,6 +254,14 @@
       "ErrorMissingData": "Data not found",
       "ErrorImportFailed": "Import failed"
     },
+    "Resonance": {
+      "Name": "♾️Resonance",
+      "Intensity": "Intensity",
+      "MatchNone": "No Match",
+      "MatchRoot": "Root Attribute Match",
+      "MatchCompletely": "Perfect Match",
+      "RollButton": "Roll"
+    },
     "resonantEmotion": "{emotion} ({attribute})",
     "result": {
       "fumble": "Fumble",

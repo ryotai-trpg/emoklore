@@ -1,10 +1,11 @@
-import type { BaseSkillKey } from "../config/base-skills";
-import type { SkillKey } from "../config/skills";
-import type { CharacterDataModel } from "../data/character";
+import { promptResonanceRoll } from "../applications/dialogs/resonance-roll-dialog";
+import type { CharacterDataModel, SkillRollContext } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
-import { formatDMPart } from "../utils/helper";
+import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
+import { resolveSkillRoll } from "../rules/skill-roll";
+import type { RollSpec } from "../rules/types";
+import { createRollMessage } from "../utils/chat";
 
-type ResonanceMatch = "none" | "root" | "completely";
 type ResourceKey = "hp" | "mp" | "resonance";
 type EmokloreActorType = "character" | "npc";
 
@@ -41,129 +42,64 @@ export class EmokloreActor<SubType extends EmokloreActorType = EmokloreActorType
     emotionMatch?: ResonanceMatch,
     options: Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
-    // TODO: Refactor
-
     if (intensity === undefined) {
-      try {
-        const result = await (
-          foundry.applications.api.DialogV2.prompt as (args: {
-            window: { title: string };
-            content: string;
-            ok: {
-              label: string;
-              callback: (event: Event, button: HTMLElement) => [number, ResonanceMatch];
-            };
-            rejectClose: boolean;
-          }) => Promise<[number, ResonanceMatch]>
-        )({
-          window: { title: "〈♾️共鳴〉判定" },
-          content: `
-          <div>
-          <label for="intensity">強度</label>
-          <input name="intensity" id="intensity" type="number" placeholder="1" min="1" max="9" autofocus>
-          </div>
-          <div>
-          <label><input type="radio" name="choice" value="none" checked> 一致なし</label>
-          <label><input type="radio" name="choice" value="root"> ルーツ属性一致</label>
-          <label><input type="radio" name="choice" value="completely"> 完全一致</label>
-          </div>
-          `,
-          ok: {
-            label: "ロール",
-            callback: (_event, button) => {
-              const form = (button as any).form;
-              const value = form.elements.intensity.valueAsNumber;
-              return [Number.isNaN(value) || value <= 0 ? 1 : value, form.elements.choice.value];
-            },
-          },
-          rejectClose: true,
-        });
-        [intensity, emotionMatch] = result;
-      } catch {
-        return;
-      }
+      const input = await promptResonanceRoll();
+      if (!input) return;
+
+      ({ intensity, emotionMatch } = input);
     }
 
-    let level = this.system.resources.resonance.value;
+    const spec = resolveResonanceRoll({
+      resonanceValue: this.system.resources.resonance.value,
+      intensity,
+      emotionMatch,
+    });
 
-    if (emotionMatch === "root") {
-      level += 1;
-    } else if (emotionMatch === "completely") {
-      level *= 2;
-    }
-
-    (options as Record<string, unknown>).target = intensity;
-    (options as Record<string, unknown>).successMod = 0;
-
-    (options as Record<string, unknown>).dmFormula = `${level}DM≦${intensity}`;
-
-    const roll = await new EmokloreRoll(`${level}d10`, {}, options).evaluate();
-
-    const messageData: any = {
-      speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: game.i18n.localize("EMOKLORE.skillRoll", { skillName: "♾️共鳴" }),
-      rolls: [roll],
-      sound: (CONFIG as any).sounds.dice,
-      flags: { core: { canPopout: true } },
-    };
-
-    return (await ChatMessage.create(messageData)) as ChatMessage | undefined;
+    return this.#postRoll(spec, game.i18n.localize("EMOKLORE.Resonance.Name"), options);
   }
 
   async rollSkill(
     skill: string,
     { base = false, ...options }: { base?: boolean } & Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
-    // シートのdatasetから来る文字列なので、キーであることはここで引き受ける
-    const entry = base
-      ? this.system.baseSkills[skill as BaseSkillKey]
-      : this.system.skills[skill as SkillKey];
+    const context = this.system.getSkillRollContext(skill, { base });
+    const spec = resolveSkillRoll(context.params);
 
-    const { label, level, target: baseTarget, characteristic, group } = entry;
-
-    // isExtra / specialization は通常技能にしかない
-    const isExtra = "isExtra" in entry ? entry.isExtra : false;
-    const specialization = "specialization" in entry ? entry.specialization : undefined;
-
-    const { bonus: skillBonus, success: skillSuccessMod, target: skillTargetMod } = entry.mod;
-
-    const {
-      bonus: characteristicBonus,
-      success: characteristicSuccessMod,
-      target: characteristicTargetMod,
-    } = this.system.characteristics[characteristic].mod;
-
-    const {
-      bonus: skillGroupBonus,
-      success: skillGroupSuccessMod,
-      target: skillGroupTargetMod,
-    } = this.system.skillGroups[group].mod;
-
-    const prefix = base ? "＊" : isExtra ? "★" : "";
-
-    const targetMod = skillTargetMod + characteristicTargetMod + skillGroupTargetMod;
-    const successMod = skillSuccessMod + characteristicSuccessMod + skillGroupSuccessMod;
-    const bonus = skillBonus + characteristicBonus + skillGroupBonus;
-    const skillName = `${prefix}${label}${specialization ? `${game.i18n.localize("colon")}${specialization}` : ""}`;
-    // TODO: Refactor
-
-    const leftPart = formatDMPart(level, bonus);
-    const rightPart = formatDMPart(baseTarget, targetMod);
-
-    (options as Record<string, unknown>).dmFormula = `${leftPart}DM≦${rightPart}`;
-    (options as Record<string, unknown>).successMod = successMod;
-    (options as Record<string, unknown>).target = baseTarget + targetMod;
-
-    const roll = await new EmokloreRoll(`${level + bonus}d10`, {}, options).evaluate();
-
-    const messageData: any = {
-      speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: game.i18n.localize("EMOKLORE.skillRoll", { skillName: skillName }),
-      rolls: [roll],
-      sound: (CONFIG as any).sounds.dice,
-      flags: { core: { canPopout: true } },
-    };
-
-    return (await ChatMessage.create(messageData)) as ChatMessage | undefined;
+    return this.#postRoll(spec, formatSkillName(context, { base }), options);
   }
+
+  /** 判定内容からRollを作り、チャットに流す。判定の種類によらず共通 */
+  async #postRoll(
+    spec: RollSpec,
+    skillName: string,
+    options: Record<string, unknown>,
+  ): Promise<ChatMessage | undefined> {
+    const roll = await new EmokloreRoll(
+      `${spec.diceCount}d10`,
+      {},
+      {
+        ...options,
+        target: spec.target,
+        successMod: spec.successMod,
+        dmFormula: spec.dmFormula,
+      },
+    ).evaluate();
+
+    return createRollMessage({
+      actor: this,
+      flavor: game.i18n.localize("EMOKLORE.skillRoll", { skillName }),
+      roll,
+    });
+  }
+}
+
+/** 「＊格闘」「★技能：専門」のような判定名を組み立てる */
+function formatSkillName(
+  { label, isExtra, specialization }: SkillRollContext,
+  { base }: { base: boolean },
+): string {
+  const prefix = base ? "＊" : isExtra ? "★" : "";
+  const suffix = specialization ? `${game.i18n.localize("colon")}${specialization}` : "";
+
+  return `${prefix}${label}${suffix}`;
 }
