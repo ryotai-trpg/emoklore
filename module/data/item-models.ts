@@ -11,7 +11,7 @@ const defineBaseItemDataModelSchema = () => {
     rarity: new StringField({
       required: true,
       blank: false,
-      options: ["common", "uncommon", "rare", "legendary"],
+      choices: ["common", "uncommon", "rare", "legendary"],
       initial: "common",
     }),
     price: new NumberField({

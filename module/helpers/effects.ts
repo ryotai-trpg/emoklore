@@ -1,3 +1,6 @@
+// disabled / sort はスキーマ由来で本体JSDocの型に出ないため補強する
+type SheetActiveEffect = ActiveEffect & { disabled: boolean; sort: number };
+
 export function prepareActiveEffectCategories(
   effects: Iterable<ActiveEffect>,
 ): Record<EffectCategory["type"], EffectCategory> {
@@ -21,7 +24,7 @@ export function prepareActiveEffectCategories(
   };
 
   // Iterate over active effects, classifying them into categories
-  for (const e of effects) {
+  for (const e of effects as Iterable<SheetActiveEffect>) {
     if (e.disabled) categories.inactive.effects.push(e);
     else if (e.isTemporary) categories.temporary.effects.push(e);
     else categories.passive.effects.push(e);
@@ -37,5 +40,5 @@ export function prepareActiveEffectCategories(
 interface EffectCategory {
   type: "temporary" | "passive" | "inactive";
   label: string;
-  effects: ActiveEffect[];
+  effects: SheetActiveEffect[];
 }

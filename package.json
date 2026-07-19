@@ -3,7 +3,6 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.4",
     "@types/node": "^24.7.2",
-    "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
     "handlebars": "^4.7.9",
     "lefthook": "^2.1.10",
     "typescript": "^5.9.3",
@@ -22,6 +21,7 @@
     "prepare": "lefthook install",
     "check:lang": "node tools/check-lang.mjs",
     "check:templates": "node tools/check-templates.mjs",
-    "link:foundry": "node tools/create-symlinks.mjs"
+    "link:foundry": "node tools/create-symlinks.mjs",
+    "typecheck": "node tools/typecheck.mjs"
   }
 }

@@ -1,7 +1,7 @@
-import type { EmokloreActor } from "../documents/actor";
+import type { DataSchema } from "@common/abstract/_types.mjs";
 
-export class BaseActorDataModel<Schema extends foundry.data.fields.DataSchema> extends foundry
-  .abstract.TypeDataModel<Schema, EmokloreActor> {
+export class BaseActorDataModel<_Schema extends DataSchema = DataSchema> extends foundry.abstract
+  .TypeDataModel {
   static override defineSchema(): Record<string, foundry.data.fields.DataField> {
     const schema: Record<string, foundry.data.fields.DataField> = {};
     return schema;

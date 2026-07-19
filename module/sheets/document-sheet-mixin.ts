@@ -1,14 +1,19 @@
 import constructHTMLButton from "../helpers/construct-html-button";
 import { getSetting } from "../settings";
-import type { EmokloreDocumentSheetContext, EmokloreDocumentSheetOptions } from "./types";
+import type {
+  EmokloreDocumentSheetContext,
+  EmokloreDocumentSheetOptions,
+  EmokloreRenderOptions,
+} from "./types";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 export default (base: any) => {
   return class EmokloreDocumentSheet extends HandlebarsApplicationMixin(base) {
     declare document: any;
-    declare window: any;
-    static DEFAULT_OPTIONS: EmokloreDocumentSheetOptions = {
+    // DocumentSheetV2のgetterだが、mixinの型（typeof ApplicationV2ベース）からは見えないため補強
+    declare readonly isEditable: boolean;
+    static override DEFAULT_OPTIONS: EmokloreDocumentSheetOptions = {
       classes: ["emoklore"],
       actions: {
         toggleMode: this.#toggleMode,
@@ -21,7 +26,9 @@ export default (base: any) => {
       },
     };
 
-    async _prepareContext(options: Record<string, unknown>): Promise<EmokloreDocumentSheetContext> {
+    override async _prepareContext(
+      options: EmokloreRenderOptions,
+    ): Promise<EmokloreDocumentSheetContext> {
       const context = (await super._prepareContext(options)) as EmokloreDocumentSheetContext;
 
       Object.assign(context, {
@@ -42,10 +49,10 @@ export default (base: any) => {
       return context;
     }
 
-    _configureRenderOptions(options: Record<string, unknown>): void {
+    override _configureRenderOptions(options: EmokloreRenderOptions): void {
       super._configureRenderOptions(options);
       if (options.mode && this.isEditable) {
-        this._mode = options.mode as number;
+        this._mode = options.mode;
       }
       // New sheets should always start in edit mode
       else if (options.renderContext === `create${this.document.documentName}`) {
@@ -53,7 +60,7 @@ export default (base: any) => {
       }
     }
 
-    async _renderFrame(options: Record<string, unknown>): Promise<HTMLElement> {
+    override async _renderFrame(options: EmokloreRenderOptions): Promise<HTMLElement> {
       const frame = await super._renderFrame(options);
       const buttons = [
         constructHTMLButton({
