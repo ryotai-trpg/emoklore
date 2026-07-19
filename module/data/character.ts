@@ -2,10 +2,19 @@ import type { BaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { SkillGroupKey } from "../config/skill-groups";
 import type { SkillKey } from "../config/skills";
+import type { SkillRollParams } from "../rules/skill-roll";
 import type { ModifierSet } from "../rules/types";
 import { EmokloreSystemDataModel } from "./system-model";
 
 const { HTMLField, NumberField, SchemaField, StringField, BooleanField } = foundry.data.fields;
+
+/** 技能判定に必要な、アクターから集めた一式 */
+export type SkillRollContext = {
+  params: SkillRollParams;
+  label: string;
+  isExtra: boolean;
+  specialization?: string;
+};
 
 const defineCharacterDataModelSchema = () => {
   const schema: Record<string, foundry.data.fields.DataField> = {};
@@ -274,6 +283,46 @@ export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataMod
     this.resources.resonance.value = Math.max(this.resources.resonance.value, 1);
 
     this.initiative = this.characteristics.physical.value + this.skills.speed.level;
+  }
+
+  /**
+   * 技能判定に必要な値をアクターから集める。
+   *
+   * 判定式そのものは rules/skill-roll.ts が持つ。ここはあくまで
+   * 「どの値を渡すか」を決めるだけで、表示用の整形は呼び出し側に任せる。
+   */
+  getSkillRollContext(skill: string, { base = false } = {}): SkillRollContext {
+    // シートのdatasetから来る文字列なので、キーであることはここで引き受ける
+    if (base) {
+      // 基本技能に isExtra / specialization はない
+      const entry = this.baseSkills[skill as BaseSkillKey];
+      return { params: this.#toRollParams(entry), label: entry.label, isExtra: false };
+    }
+
+    const entry = this.skills[skill as SkillKey];
+    return {
+      params: this.#toRollParams(entry),
+      label: entry.label,
+      isExtra: entry.isExtra,
+      specialization: entry.specialization,
+    };
+  }
+
+  /** 技能・基本技能に共通する、判定に効く値の取り出し */
+  #toRollParams(entry: {
+    level: number;
+    target: number;
+    characteristic: CharacteristicKey;
+    group: SkillGroupKey;
+    mod: ModifierSet;
+  }): SkillRollParams {
+    return {
+      level: entry.level,
+      baseTarget: entry.target,
+      skillMod: entry.mod,
+      characteristicMod: this.characteristics[entry.characteristic].mod,
+      skillGroupMod: this.skillGroups[entry.group].mod,
+    };
   }
 
   modifyRollData(rollData: Record<string, unknown>): void {
