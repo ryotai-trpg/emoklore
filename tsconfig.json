@@ -9,6 +9,7 @@
     "noEmit": true,
 
     "strict": false,
+    "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
