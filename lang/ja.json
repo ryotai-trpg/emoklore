@@ -290,6 +290,7 @@
     "skill": "技能",
     "characteristics": "能力値",
     "skillRoll": "〈{skillName}〉判定",
+    "successMod": "成功数{mod}",
     "resonantEmotion": "{emotion}（{attribute}）",
     "Effect": {
       "Source": "ソース",

@@ -648,9 +648,9 @@
   text-shadow: 0 0 6px currentColor;
 }
 
-/* 結果名の横に添える成功数 */
-.dice-roll .dice-total .success-count {
+/* 式の行に添える成功数修正。式本体より控えめにする */
+.dice-roll .dice-formula .success-mod {
   margin-left: 0.4rem;
-  opacity: 0.65;
-  font-size: var(--font-size-16);
+  opacity: 0.7;
+  font-size: var(--font-size-12);
 }
