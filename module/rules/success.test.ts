@@ -1,38 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { countSuccesses, resolveResultName } from "./success";
+import { classifyFace, facePoints, resolveResultName } from "./success";
 
-describe("countSuccesses", () => {
-  it("目標値以下の出目が成功になる", () => {
-    expect(countSuccesses([3, 5, 7], 5)).toBe(2);
+describe("classifyFace", () => {
+  it.each([
+    [1, "critical"],
+    [2, "success"],
+    [5, "success"],
+    [6, "failure"],
+    [9, "failure"],
+    [10, "fumble"],
+  ])("目標値5のとき出目%iは%s", (face, expected) => {
+    expect(classifyFace(face, 5)).toBe(expected);
   });
 
-  it("目標値を超えた出目は数えない", () => {
-    expect(countSuccesses([7, 8, 9], 5)).toBe(0);
+  it("目標値が10以上でも出目10はファンブル", () => {
+    expect(classifyFace(10, 10)).toBe("fumble");
   });
 
-  it("出目1はクリティカルとして2カウントされる", () => {
-    expect(countSuccesses([1], 5)).toBe(2);
+  it("目標値が0以下でも出目1はクリティカル", () => {
+    expect(classifyFace(1, 0)).toBe("critical");
   });
+});
 
-  it("出目10はファンブルとして1減算される", () => {
-    expect(countSuccesses([10], 5)).toBe(-1);
-  });
-
-  it("クリティカルとファンブルは相殺する", () => {
-    expect(countSuccesses([1, 10], 5)).toBe(1);
-  });
-
-  it("目標値が10のときは出目10が成功と減算の両方に数えられて相殺する", () => {
-    // EmokloreRoll の target 既定値が10のため実際に起きうる
-    expect(countSuccesses([10], 10)).toBe(0);
-  });
-
-  it("目標値が0なら出目1はクリティカル分のみ数える", () => {
-    expect(countSuccesses([1], 0)).toBe(1);
-  });
-
-  it("ダイスがなければ0", () => {
-    expect(countSuccesses([], 5)).toBe(0);
+describe("facePoints", () => {
+  it.each([
+    ["critical", 2],
+    ["success", 1],
+    ["failure", 0],
+    ["fumble", -1],
+  ] as const)("%sは成功数%i", (outcome, expected) => {
+    expect(facePoints(outcome)).toBe(expected);
   });
 });
 
