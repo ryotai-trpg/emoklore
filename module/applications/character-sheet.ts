@@ -157,15 +157,22 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     );
   }
 
+  /**
+   * 技能の表示用データ。
+   *
+   * label / isExtra はアクターに保存せず CONFIG.EMOKLORE 側の定義なので、ここで合流させる。
+   */
   _getSkills(): Record<string, unknown> {
     const data = this.actor;
-    return Object.keys(CONFIG.EMOKLORE.skills).reduce(
-      (obj, chc) => {
-        const value = foundry.utils.getProperty(data, `system.skills.${chc}`) as
+    return Object.entries(CONFIG.EMOKLORE.skills).reduce(
+      (obj, [key, { label, isExtra }]) => {
+        const value = foundry.utils.getProperty(data, `system.skills.${key}`) as
           | Record<string, unknown>
           | undefined;
-        (obj as Record<string, unknown>)[chc] = {
-          field: this.actor.system.schema.getField(["skills", chc]),
+        (obj as Record<string, unknown>)[key] = {
+          field: this.actor.system.schema.getField(["skills", key]),
+          label,
+          isExtra: isExtra ?? false,
           ...(value ?? {}),
         };
         return obj;

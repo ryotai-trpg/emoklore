@@ -72,24 +72,6 @@ Hooks.once("i18nInit", () => {
         field.label = label;
       }
     }
-
-    const skillsSchema = (model as any).schema.getField("skills");
-    if (skillsSchema) {
-      for (const [skill, { label }] of Object.entries(CONFIG.EMOKLORE.skills)) {
-        const field = skillsSchema.getField(`${skill}`);
-        if (!field) continue;
-        field.fields.label.initial = label;
-      }
-    }
-
-    const baseSkillsSchema = (model as any).schema.getField("baseSkills");
-    if (baseSkillsSchema) {
-      for (const [skill, { label }] of Object.entries(CONFIG.EMOKLORE.baseSkills)) {
-        const field = baseSkillsSchema.getField(`${skill}`);
-        if (!field) continue;
-        field.fields.label.initial = label;
-      }
-    }
   }
 });
 

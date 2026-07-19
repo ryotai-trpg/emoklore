@@ -5,7 +5,7 @@
     data-action="roll" 
     data-roll-type="base-skill" 
     data-skill="{{key}}">
-    {{baseSkill.label}} | {{baseSkill.target}}
+    {{lookup (lookup ../config.baseSkills key) 'label'}} | {{baseSkill.target}}
     <i class="characteristic fa-solid {{lookup (lookup ../config.characteristics baseSkill.characteristic) 'fa'}}"></i>
   </button>
   {{/each}}

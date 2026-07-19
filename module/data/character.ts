@@ -6,7 +6,7 @@ import type { SkillRollParams } from "../rules/skill-roll";
 import type { ModifierSet } from "../rules/types";
 import { EmokloreSystemDataModel } from "./system-model";
 
-const { HTMLField, NumberField, SchemaField, StringField, BooleanField } = foundry.data.fields;
+const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 /** 技能判定に必要な、アクターから集めた一式 */
 export type SkillRollContext = {
@@ -62,13 +62,7 @@ const defineCharacterDataModelSchema = () => {
 
   schema.skills = new SchemaField(
     Object.entries(CONFIG.EMOKLORE.skills).reduce(
-      (
-        obj,
-        [
-          skill,
-          { characteristic, label, characteristicOptions, group, isExtra, hasSpecialization },
-        ],
-      ) => {
+      (obj, [skill, { characteristic, characteristicOptions, hasSpecialization }]) => {
         (obj as Record<string, foundry.data.fields.DataField>)[skill] = new SchemaField({
           level: new NumberField({
             min: 0,
@@ -92,10 +86,7 @@ const defineCharacterDataModelSchema = () => {
                 }
               : {}),
           }),
-          label: new StringField({ initial: label }),
-          group: new StringField({ initial: group }),
-          isExtra: new BooleanField({ initial: isExtra ?? false }),
-          hasSpecialization: new BooleanField({ initial: hasSpecialization ?? false }),
+          // label / group / isExtra は CONFIG.EMOKLORE から引けるので保存しない
           ...(hasSpecialization ? { specialization: new StringField({ initial: "" }) } : {}),
           mod: new SchemaField({
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
@@ -111,7 +102,7 @@ const defineCharacterDataModelSchema = () => {
 
   schema.baseSkills = new SchemaField(
     Object.entries(CONFIG.EMOKLORE.baseSkills).reduce(
-      (obj, [skill, { characteristic, label, group }]) => {
+      (obj, [skill, { characteristic }]) => {
         (obj as Record<string, foundry.data.fields.DataField>)[skill] = new SchemaField({
           level: new NumberField({
             min: 1,
@@ -125,8 +116,7 @@ const defineCharacterDataModelSchema = () => {
             required: true,
             initial: characteristic,
           }),
-          label: new StringField({ initial: label }),
-          group: new StringField({ initial: group }),
+          // label / group は CONFIG.EMOKLORE から引けるので保存しない
           mod: new SchemaField({
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
             success: new NumberField({ required: true, integer: true, initial: 0 }),
@@ -141,9 +131,10 @@ const defineCharacterDataModelSchema = () => {
 
   schema.skillGroups = new SchemaField(
     Object.entries(CONFIG.EMOKLORE.skillGroups).reduce(
-      (obj, [group, { label }]) => {
+      (obj, [group]) => {
         (obj as Record<string, foundry.data.fields.DataField>)[group] = new SchemaField({
-          label: new StringField({ initial: game.i18n.localize(label) }),
+          // label は保存しない。ここで game.i18n.localize した結果を initial に焼き込んでいたため、
+          // アクター作成後に言語を切り替えても古いラベルが残っていた
           mod: new SchemaField({
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
             success: new NumberField({ required: true, integer: true, initial: 0 }),
@@ -188,10 +179,6 @@ export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataMod
     {
       level: number;
       characteristic: CharacteristicKey;
-      label: string;
-      group: SkillGroupKey;
-      isExtra: boolean;
-      hasSpecialization: boolean;
       specialization?: string;
       mod: ModifierSet;
       target: number;
@@ -203,8 +190,6 @@ export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataMod
     {
       level: number;
       characteristic: CharacteristicKey;
-      label: string;
-      group: SkillGroupKey;
       mod: ModifierSet;
       target: number;
     }
@@ -227,7 +212,6 @@ export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataMod
   declare skillGroups: Record<
     SkillGroupKey,
     {
-      label: string;
       mod: ModifierSet;
     }
   >;
@@ -294,34 +278,44 @@ export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataMod
   getSkillRollContext(skill: string, { base = false } = {}): SkillRollContext {
     // シートのdatasetから来る文字列なので、キーであることはここで引き受ける
     if (base) {
+      const key = skill as BaseSkillKey;
+      const { label, group } = CONFIG.EMOKLORE.baseSkills[key];
       // 基本技能に isExtra / specialization はない
-      const entry = this.baseSkills[skill as BaseSkillKey];
-      return { params: this.#toRollParams(entry), label: entry.label, isExtra: false };
+      return { params: this.#toRollParams(this.baseSkills[key], group), label, isExtra: false };
     }
 
-    const entry = this.skills[skill as SkillKey];
+    const key = skill as SkillKey;
+    const { label, group, isExtra } = CONFIG.EMOKLORE.skills[key];
+    const entry = this.skills[key];
+
     return {
-      params: this.#toRollParams(entry),
-      label: entry.label,
-      isExtra: entry.isExtra,
+      params: this.#toRollParams(entry, group),
+      label,
+      isExtra: isExtra ?? false,
       specialization: entry.specialization,
     };
   }
 
-  /** 技能・基本技能に共通する、判定に効く値の取り出し */
-  #toRollParams(entry: {
-    level: number;
-    target: number;
-    characteristic: CharacteristicKey;
-    group: SkillGroupKey;
-    mod: ModifierSet;
-  }): SkillRollParams {
+  /**
+   * 技能・基本技能に共通する、判定に効く値の取り出し。
+   *
+   * 技能グループは保存データではなく CONFIG.EMOKLORE 側の定義なので引数で受ける。
+   */
+  #toRollParams(
+    entry: {
+      level: number;
+      target: number;
+      characteristic: CharacteristicKey;
+      mod: ModifierSet;
+    },
+    group: string,
+  ): SkillRollParams {
     return {
       level: entry.level,
       baseTarget: entry.target,
       skillMod: entry.mod,
       characteristicMod: this.characteristics[entry.characteristic].mod,
-      skillGroupMod: this.skillGroups[entry.group].mod,
+      skillGroupMod: this.skillGroups[group as SkillGroupKey].mod,
     };
   }
 
