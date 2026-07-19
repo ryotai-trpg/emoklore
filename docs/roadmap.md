@@ -25,7 +25,7 @@ v14専用に移行します（v13サポートは打ち切り）。
     - `game.i18n` への定義時依存と `i18nInit` からのパッチは解消。キー集合を得るための `CONFIG.EMOKLORE` 参照は残っており、`TypedObjectField` の採用で外せないか要検討
 - [x] `EmokloreActor` から判定計算・ダイアログ・チャット生成を分離
 - [x] シート層に混ざったルール計算を data 層へ移動
-- [ ] `as any` の削減（着手時55箇所）
+- [x] `as any` の削減（着手時55箇所 → 0。`noExplicitAny` を lint で `error` に）
 - [x] 純粋関数（判定計算など）への vitest テスト導入
 
 参考: dnd5e の module 構成（applications / data / dice / documents / config / utils）

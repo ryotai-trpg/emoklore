@@ -13,6 +13,10 @@
       "DeveloperMode": {
         "Name": "Developer Mode",
         "Hint": "test"
+      },
+      "DeveloperActorId": {
+        "Name": "Actor ID to Open on Startup",
+        "Hint": "When developer mode is enabled, automatically open this actor's sheet on startup. Leave blank to do nothing."
       }
     }
   },

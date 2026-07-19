@@ -4,13 +4,24 @@ import type {
   EmokloreDocumentSheetContext,
   EmokloreDocumentSheetOptions,
   EmokloreRenderOptions,
+  SheetDocument,
 } from "./types";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
-export default (base: any) => {
+/**
+ * 本体の HandlebarsApplicationMixin と同じ制約（`@param {Constructor<ApplicationV2>}`）。
+ *
+ * コンストラクタ引数はサブクラスごとに異なるため、mixinの制約としては any[] にするしかない
+ * （unknown[] だと引数を持つクラスを受け付けられない）。
+ */
+// biome-ignore lint/suspicious/noExplicitAny: mixinのコンストラクタ制約には any[] が必要
+type ApplicationV2Constructor = new (...args: any[]) => foundry.applications.api.ApplicationV2;
+
+// base を any にすると extends any になり、このファイル全体の型チェックが効かなくなる
+export default (base: ApplicationV2Constructor) => {
   return class EmokloreDocumentSheet extends HandlebarsApplicationMixin(base) {
-    declare document: any;
+    declare document: SheetDocument;
     // DocumentSheetV2のgetterだが、mixinの型（typeof ApplicationV2ベース）からは見えないため補強
     declare readonly isEditable: boolean;
     static override DEFAULT_OPTIONS: EmokloreDocumentSheetOptions = {

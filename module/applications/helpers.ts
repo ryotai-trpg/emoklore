@@ -1,3 +1,4 @@
+import type { ResonantEmotionsConfig } from "../config/resonant-emotions";
 /**
  * シートのテンプレートに渡す選択肢やラベルを組み立てる。
  * ルール計算は module/rules/ に、DOM操作は module/utils/sheet.ts にある。
@@ -23,7 +24,7 @@ export const createEmotionOptions = (): Array<{ value: string; label: string; gr
 
 export const getEmotionAttributes = (
   emotions: Record<string, string>,
-  resonantEmotions: Record<string, any>,
+  resonantEmotions: Record<string, ResonantEmotionsConfig>,
 ): Record<string, string> => {
   const emotionAttributes: Record<string, string> = {};
 

@@ -342,11 +342,11 @@ export async function importFromCharSheet(
   }
 
   // Apply all updates to the actor
-  await (actor as any).update(updateData);
+  await actor.update(updateData);
 
   ui.notifications?.info(
     game.i18n.localize("EMOKLORE.Import.Success", {
-      name: data.name || (actor as any).name,
+      name: data.name || actor.name,
     }),
   );
 }

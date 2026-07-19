@@ -92,7 +92,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
     }
   }
 
-  static async onSubmit(_event: Event, _form: HTMLFormElement, _formData: any): Promise<void> {
+  static async onSubmit(_event: Event, _form: HTMLFormElement, _formData: unknown): Promise<void> {
     // This is called when the form is submitted via the import button
     // The actual import logic is handled by onImport
   }
