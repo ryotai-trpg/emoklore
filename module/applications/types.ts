@@ -189,6 +189,8 @@ export type CharacterContext = {
   characteristics?: CharacteristicsMap;
   charPointSum?: number;
   charPointMax?: number;
+  /** サイドバーを畳んでいるか。トグルの aria-expanded に使う */
+  sidebarCollapsed?: boolean;
   skills?: Record<string, SkillRow>;
   baseSkills?: BaseSkillRow[];
   skillPointSum?: number;

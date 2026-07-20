@@ -3,6 +3,8 @@ import { systemID } from "./constants";
 interface EmokloreSettings {
   developerMode: boolean;
   developerActorId: string;
+  /** キャラクターシートのサイドバーを畳んでいるか。表示状態なのでユーザーごとに持つ */
+  sidebarCollapsed: boolean;
 }
 
 /**
@@ -13,7 +15,8 @@ interface EmokloreSettings {
  * そのため型変換はこのファイルの `register` に1箇所だけ閉じ込めている。
  */
 type SettingRegistration = {
-  name: string;
+  /** 設定画面に出す名前。`config: false` の内部状態には要らない */
+  name?: string;
   hint?: string;
   scope: "world" | "client" | "user";
   config: boolean;
@@ -48,8 +51,24 @@ export function registerSystemSettings(): void {
     type: String,
     default: "",
   });
+
+  // シートの表示状態なので設定画面には出さない。ユーザーごとに閉じるので client スコープ。
+  // アクターのフラグにするとGMが畳んだ状態がプレイヤーにも伝わってしまう
+  register("sidebarCollapsed", {
+    scope: "client",
+    config: false,
+    type: Boolean,
+    default: false,
+  });
 }
 
 export function getSetting<K extends keyof EmokloreSettings>(key: K): EmokloreSettings[K] {
   return game.settings.get(systemID, key) as EmokloreSettings[K];
+}
+
+export async function setSetting<K extends keyof EmokloreSettings>(
+  key: K,
+  value: EmokloreSettings[K],
+): Promise<void> {
+  await game.settings.set(systemID, key, value);
 }

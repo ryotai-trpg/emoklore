@@ -1,20 +1,84 @@
 /* タブ共通のサイドバー。立ち絵と能力値のカードを載せる。
 
-   タブとの間隔もサイドバー自身が持つ。グリッド側に column-gap を置くと、
-   カードの有無にかかわらず隙間が固定されてしまう */
+   畳んだときに場所を1pxも残さないため、寸法も余白もすべてサイドバー自身が持つ。
+   グリッド側に column-gap を置くと、幅が0になっても隙間だけが残ってしまう。
+
+   切り抜きもしない。中身は translateX でシートの左外へ送り出し、
+   .window-content の overflow: hidden に任せる。こうするとトグルを
+   サイドバーの外に出しても切られない */
 
 .emoklore {
   .em-sidebar {
     position: relative;
     width: var(--emoklore-sheet-sidebar-width);
+    /* タブとの間隔もここが持つ。畳めば一緒に消える。
+       トグルがちょうど収まる幅（シート端の余白と同じ）にしてある */
     margin-inline-end: var(--spacer-16);
+    transition:
+      width 300ms ease,
+      margin-inline-end 300ms ease;
   }
 
-  /* 幅を固定しておく。親の都合でカードが潰れない。
+  /* 幅を固定しておく。親が縮んでもカードが潰れず、そのまま左へ滑る。
      scrollbar-width は本体が * に thin を当てているので指定しない */
   .em-sidebar__scroll {
     width: var(--emoklore-sheet-sidebar-width);
     height: 100%;
     overflow: hidden auto;
+    transition: transform 300ms ease;
+  }
+
+  /* カードの右肩からはみ出させる。サイドバーの幅の外にいるので、畳んで
+     幅が0になっても消えない（left: 100% がそのまま左端に来る）。
+
+     幅はシート端の余白（タブの区切り線と枠の間隔）と同じ。カード側に
+     めり込ませないよう、右だけ角を丸める。
+
+     色は本体のサイドバーの開閉ボタンに倣い、薄いグレーからホバーで
+     濃いグレーへ。地と枠はシートの面に合わせる */
+  .em-sidebar__toggle {
+    --control-bg-color: var(--emoklore-surface-sunken);
+    --control-border-color: var(--color-border);
+    --control-hover-bg-color: var(--emoklore-hover-surface);
+    --control-hover-border-color: var(--color-border);
+    --control-icon-color: var(--color-text-subtle);
+    --control-hover-icon-color: var(--color-text-emphatic);
+
+    position: absolute;
+    /* カードの角丸と重ならないよう、自分の高さの半分だけ下げる */
+    top: var(--spacer-16);
+    left: 100%;
+    width: var(--spacer-16);
+    height: 2rem;
+    /* 本体のボタンが持つ padding を残すと、border-box でも
+       padding + border より細くならず幅が合わない */
+    padding: 0;
+    border-radius: 0 4px 4px 0;
+    font-size: var(--font-size-12);
+    transition: transform 300ms ease;
+  }
+}
+
+/* 畳んだ状態。ルート要素に付くクラスで切り替える（character-sheet.ts の
+   _applySidebarState）。再描画を挟まないので、押した瞬間に反応する。
+
+   幅も余白も0にするので、タブ側はシートいっぱいに広がる。
+   トグルは絶対配置なので幅の外に居続ける */
+.emoklore.em-sidebar-collapsed {
+  .em-sidebar {
+    width: 0;
+    margin-inline-end: 0;
+  }
+
+  /* 自分の幅だけでは .window-content の内側の縁で止まり、シート端の余白の
+     ぶんが帯として残る。その余白も足して完全に外へ送り出す */
+  .em-sidebar__scroll {
+    transform: translateX(calc(-100% - var(--spacer-16)));
+  }
+
+  /* サイドバーに追従して余白の中まで下がる。ここまで来ると、
+     ボタンがちょうどシート端の余白を埋める */
+  .em-sidebar__toggle {
+    transform: translateX(calc(-1 * var(--spacer-16)));
   }
 }
