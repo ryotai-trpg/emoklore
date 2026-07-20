@@ -68,11 +68,15 @@ Foundryは `Document#update` をサーバ側で権限検査するので、OWNER�
 ## 既知の構造的課題
 
 1. **スキーマ定義が `CONFIG.EMOKLORE` に依存**: `module/data/character.ts` がキー集合を得るために定義時点で `CONFIG.EMOKLORE` を読む。`CONFIG.EMOKLORE` を設定するのは自分の `init` フックなので制御下にあるが、他モジュールが `init` 中に `Actor.dataModels.character.schema` へ触ると壊れうる。`TypedObjectField` での解消は検討したうえで見送った（下記）
-2. **NPCの扱いが未定**: `EmokloreActor` は `system` を `CharacterDataModel` として扱っており、判定やリソース操作をNPCに対して呼ぶと実行時に壊れる。NPC用シートの実装（Phase 3）で判定まわりごと決める
+2. **NPCの扱いが未定**: `NpcDataModel` は `wickedness` しか持たず、シートも判定もない。登録を外したので型の上での嘘は消えたが、NPCをどう表現するかは未決のまま。NPC用シートの実装（Phase 3）で判定まわりごと決める。戻すときは `EmokloreActor#system` が union になるので、NPCで壊れる箇所は型チェックが教えてくれる
 3. **`config/` の副作用**: `module/config/index.ts` が import 時に `preLocalize` を呼び、`performPreLocalization` が `CONFIG.EMOKLORE` を破壊的に書き換える。この表の「`config/` に置かないもの」に反するが、dnd5e / draw-steel 由来の確立したパターンなので当面は踏襲する
-4. **`npc` が到達不能**: `emoklore.ts` は `CONFIG.Actor.dataModels.npc` を登録しているが、`system.json` の `documentTypes.Actor` は `character` しか宣言していない。Foundryは manifest に無い種別を作らせないため、`module/data/npc.ts` は**現状どうやっても到達できない**（実機で `game.documentTypes.Actor` が `["base", "character"]` を返し、`Actor.create({type:"npc"})` が失敗することを確認済み）。**起動時の警告は一切出ない**ので気付けない。あわせて `CONFIG.Actor.trackableAttributes.npc` は `resources.hp` / `resources.mp` を指すが、`NpcDataModel` が持つのは `wickedness` だけで整合していない。NPCは Phase 3 で扱うため、いまは事実の記録にとどめている
+4. **`documents/` から `applications/` への逆依存**: `module/documents/actor.ts` が `promptResonanceRoll` をimportし、`rollResonance` の中で呼んでいる。「引数が無ければUIを開く」という判断はプレゼンテーションの決定なので、下の表の「`documents/` に置かないもの: ダイアログ」に反する。シート側で入力を解決してから渡す形にすれば矢印が反転する
+5. **`utils/` が雑多**: 純粋なパーサ（`charsheet-importer`）、i18n機構（`localization`）、チャットI/O（`chat`）、DOM・Documentのアダプタ（`sheet` `targets` `queries`）が同居している。特に `queries.ts` は `actor.applyDamage()` を呼ぶオーケストレータで、ユーティリティではない。**この逆依存は `import type` のせいでimportグラフに現れない**
+6. **攻撃技能の引き方が3箇所で食い違う**: 未知の技能キーに対し `data/item-models.ts` は `attackSkills.fight`（近接・d3）に倒れるが、`data/messages/weapon-card.ts` は `base: false` / `damageDie: null`（遠隔相当）になる。同じ入力に別の答えを返す。`resolveAttackSkill()` に寄せれば重複と食い違いが同時に消える
+7. **同じ定数を2箇所で宣言**: 技能レベルの範囲は `data/character.ts` の `SKILL_LEVEL_MIN` / `SKILL_LEVEL_MAX` が正のはずだが、`utils/charsheet-importer.ts` がローカルに同じ値を持っている。シート側は正しくimportしている
+8. **CIの穴**: 型チェックジョブはフォークからのPRで実行されない（Actions cacheがフォークから復元できるため）。lefthookにも型チェックは入っていないので、**フォークからのPRは型チェックを一度も通さずに緑になれる**（Issue #7 の範囲）
 
-   `weapon` も同じ状態だったが、`documentTypes.Item.weapon` の宣言で解消した（`game.documentTypes.Item` が `["base", "weapon"]` を返すことを実機で確認済み）。**新しい種別を足すときは、データモデルの登録だけでなく `system.json` の宣言が要る。**
+`weapon` は `documentTypes.Item.weapon` の宣言で到達可能にした（`game.documentTypes.Item` が `["base", "weapon"]` を返すことを実機で確認済み）。**新しい種別を足すときは、データモデルの登録だけでなく `system.json` の宣言が要る。**
 
 Phase 2 で解消したもの:
 
@@ -86,9 +90,17 @@ Phase 2 で解消したもの:
 Phase 2 のあとに解消したもの:
 
 - ~~**`prepareDerivedData` にルール計算**~~: 技能目標値・HP最大・MP最大・共鳴の下限・行動値の算術を `rules/derived-values.ts` へ出し、`data/` は配線だけにした。〈手当〉の半減がループの後段で目標値を上書きする順序依存だったのも解消した
-- ~~**`as unknown as` の二重キャスト**~~: `character-sheet.ts` の5箇所を解消し、`tools/no-double-cast.grit`（BiomeのGritQLプラグイン）で再発を禁止した。本体APIとの境界に残る4箇所は理由付きで個別抑制している
+- ~~**`as unknown as` の二重キャスト**~~: `character-sheet.ts` の5箇所を解消し、`tools/no-double-cast.grit`（BiomeのGritQLプラグイン）で再発を禁止した。本体APIとの境界に残る5箇所は理由付きで個別抑制している
 - ~~**`strict: false`**~~: 全フラグを計測したところエラー0件だったので `strict: true` にし、`noImplicitReturns` / `exactOptionalPropertyTypes` / `noUnusedLocals` / `noUnusedParameters` も足した
 - ~~**`rules/` から `utils/` への逆依存**~~: `formatDMPart` を `rules/skill-roll.ts` に取り込み、`rules/` を自己完結させた。`documents/` にあった表示整形（`formatSkillName`）は `utils/chat.ts` へ移した
+
+型設計の見直しで解消したもの（規約は [コード設計の規約](/code-design) が正）:
+
+- ~~**configの値が `string`**~~: 技能・基本技能・共鳴感情が参照する能力値名・技能グループ名・感情属性名を key union にした。表と表のあいだの参照整合性が型で見られるようになり、下流のキャストも消えた
+- ~~**効いていない型引数**~~: `EmokloreSystemDataModel<_Schema>` の型引数はクラス本体で使われておらず、渡していた型の実体も `Record<string, DataField>` で情報が無かった。本体のフィールドクラスがジェネリックでない以上（`@template` を持つのは `ArrayField` だけ）将来効くこともないので、4つの未使用エイリアスごと畳んだ
+- ~~**`npc` が到達不能なのに登録されていた**~~: `system.json` の `documentTypes.Actor` に無いので作成できず、それでも `CONFIG.Actor.dataModels` に登録していたため `EmokloreActor#system` の型（`CharacterDataModel`）が嘘になっていた。実装側が `resources?.hp` と防御していたのはそのため。登録と `trackableAttributes.npc`（`NpcDataModel` が持たない `resources` を指していた）を外し、宣言を実態に合わせた
+- ~~**キーを確かめずに名乗る**~~: DOMのdatasetから来た文字列を `as SkillKey` と名乗り、その先の分割代入で `TypeError` になりうる形だった。型述語と判別可能union（`SkillRef`）に置き換え、検証を入口1箇所に寄せた
+- ~~**キャストの散在**~~: `Object.entries` がキーを `string` に潰すぶんを `typedEntries` に閉じ込め、種別の確認と絞り込みを型述語（`isWeapon`）に統合した。キャストは76 → 58箇所、非nullアサーションは8 → 5箇所になった
 
 ## 目指す層分離
 
@@ -105,6 +117,12 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 | `utils/` | 汎用ユーティリティ、i18n機構、チャット生成、インポータ | ルール計算 |
 | `templates/` | 表示のみ。コンテキストの配列を回して並べる | lookup の組み立て、ルール判断 |
 | `css/` | 部品（components）と配置（applications）の2層 | 部品側での位置決め |
+
+層どうしのimportの方向（どの層がどこを読んでよいか）は [コード設計の規約](/code-design) が正。上の表は責務と「置かないもの」を決めるもので、矢印までは決めていない。
+
+## 型とモジュールの規約
+
+[コード設計の規約](/code-design)を参照。型の置き場所、`interface` と `type` の使い分け、命名、アサーションの使いどころ、DataModelのスキーマの書き方、見送った厳格フラグの記録はそちらが正。
 
 ## スタイルとテンプレートの規約
 

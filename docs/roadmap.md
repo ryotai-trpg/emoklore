@@ -57,6 +57,7 @@ v14専用に移行します（v13サポートは打ち切り）。
     - 防具。ルールブックに防具・防御力の規定が無いので、ハウスルールとして持つかを決めるところから
 - NPC, 怪異用のキャラクターシート実装
     - 仕様を要検討
+    - **`CONFIG.Actor.dataModels` への `npc` の登録を戻す**。`system.json` の `documentTypes.Actor` にも宣言が要る。いまは作成できない種別を登録すると `EmokloreActor#system` の型が嘘になるため外してある（`module/data/npc.ts` は残っている）。戻すと `system` が union になるので、NPCで壊れる箇所は型チェックが教えてくれる
 - ハウリングカード実装
 - イニシアチブ管理
 - FoundryVTT公式に登録
