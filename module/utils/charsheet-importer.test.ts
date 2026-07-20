@@ -15,7 +15,7 @@ const skillIndex = {
     taste: { label: "毒見" },
     strongLuck: { label: "強運" },
     specializedKnowledge: { label: "専門知識" },
-    rangedAttack: { label: "射撃" },
+    secretTechnique: { label: "奥義" },
   }),
   baseSkills: buildLabelIndex({
     investigation: { label: "調査" },
@@ -88,24 +88,31 @@ describe("parseSkills", () => {
     expect(parseSkills("1DM<=5 〈＊調査〉", skillIndex).baseSkills).toEqual({ investigation: 1 });
   });
 
-  it("特化名を技能名から切り離す", () => {
-    const result = parseSkills("3DM<=8 〈専門知識：考古学〉", skillIndex);
+  // 保管所の出力は全角括弧、シートの表示はコロン。どちらも受ける
+  it.each([
+    ["全角括弧（保管所の実際の出力）", "3DM<=8 〈専門知識（考古学）〉"],
+    ["半角括弧", "3DM<=8 〈専門知識(考古学)〉"],
+    ["全角コロン（シートの表示形式）", "3DM<=8 〈専門知識：考古学〉"],
+    ["半角コロン", "3DM<=8 〈専門知識:考古学〉"],
+  ])("特化名を技能名から切り離す（%s）", (_name, line) => {
+    const result = parseSkills(line, skillIndex);
 
     expect(result.skills).toEqual({ specializedKnowledge: 3 });
     expect(result.specializations).toEqual({ specializedKnowledge: "考古学" });
   });
 
   it("記号と特化名が両方付いていても引ける", () => {
-    const result = parseSkills("2DM<=7 〈★射撃：拳銃〉", skillIndex);
+    const result = parseSkills("3DM<=8 〈★奥義（ああ）〉", skillIndex);
 
-    expect(result.skills).toEqual({ rangedAttack: 2 });
-    expect(result.specializations).toEqual({ rangedAttack: "拳銃" });
+    expect(result.skills).toEqual({ secretTechnique: 3 });
+    expect(result.specializations).toEqual({ secretTechnique: "ああ" });
   });
 
-  it("半角コロンの特化名も切り離す", () => {
-    expect(parseSkills("3DM<=8 〈専門知識:考古学〉", skillIndex).specializations).toEqual({
-      specializedKnowledge: "考古学",
-    });
+  it("特化名が空でも技能は取り込む", () => {
+    const result = parseSkills("3DM<=8 〈専門知識（）〉", skillIndex);
+
+    expect(result.skills).toEqual({ specializedKnowledge: 3 });
+    expect(result.specializations).toEqual({});
   });
 
   it("技能レベルは0〜3に丸める", () => {

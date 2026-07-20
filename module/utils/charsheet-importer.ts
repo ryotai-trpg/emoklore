@@ -90,8 +90,14 @@ export function parseEmotions(memo: string, index: Record<string, string>): Pars
   return { emotions, unrecognized };
 }
 
-/** 技能名と特化名を分ける区切り。〈専門知識：考古学〉の「：」 */
-const SPECIALIZATION_SEPARATOR = /[：:]/;
+/**
+ * 技能名から特化名を切り出す。
+ *
+ * 保管所の出力は〈専門知識（デザイン）〉のように括弧で括る。シート側の表示は
+ * 〈専門知識：考古学〉とコロン区切りなので、どちらの表記でも拾えるようにしている。
+ * 全角・半角も両方受ける。
+ */
+const SPECIALIZATION_PATTERN = /^(.+?)\s*(?:[（(]\s*(.*?)\s*[）)]|[：:]\s*(.*))$/;
 
 /** 技能レベルの下限・上限。スキーマの skills.*.level と揃える */
 const SKILL_LEVEL_MIN = 0;
@@ -158,11 +164,13 @@ export function parseSkills(
   return { skills, specializations, baseSkills, unrecognized };
 }
 
-/** 〈専門知識：考古学〉のような表記を技能名と特化名に分ける */
+/** 〈専門知識（デザイン）〉のような表記を技能名と特化名に分ける */
 function splitSpecialization(raw: string): [name: string, specialization?: string | undefined] {
-  const at = raw.search(SPECIALIZATION_SEPARATOR);
-  if (at < 0) return [raw];
-  return [raw.slice(0, at).trim(), raw.slice(at + 1).trim() || undefined];
+  const match = raw.match(SPECIALIZATION_PATTERN);
+  if (!match?.[1]) return [raw];
+
+  // 括弧とコロンのどちらで書かれていても、中身は同じ位置に入る
+  return [match[1], (match[2] ?? match[3])?.trim() || undefined];
 }
 
 /**
