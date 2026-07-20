@@ -44,7 +44,8 @@ export const BIOGRAPHY_PAIRED_COUNT = 2;
  */
 export const buildBiographyRows = (
   fields: Record<string, { label?: string }>,
-  values: Record<string, string>,
+  // 経歴の各項目は任意なので、保存値は string | undefined になる
+  values: Record<string, string | undefined>,
   enriched: Record<string, string> = {},
 ): BiographyRow[] =>
   BIOGRAPHY_FIELDS.map(({ key, inline, html }) => ({

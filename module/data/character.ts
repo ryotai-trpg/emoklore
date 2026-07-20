@@ -2,6 +2,15 @@ import type { BaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { SkillGroupKey } from "../config/skill-groups";
 import type { SkillKey } from "../config/skills";
+import {
+  calculateBaseSkillTarget,
+  calculateInitiative,
+  calculateMaxHp,
+  calculateMaxMp,
+  calculateSkillTarget,
+  clampToMax,
+  normalizeResonance,
+} from "../rules/derived-values";
 import type { SkillRollParams } from "../rules/skill-roll";
 import type { ModifierSet } from "../rules/types";
 import { EmokloreSystemDataModel } from "./system-model";
@@ -252,26 +261,35 @@ export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataMod
     super.prepareDerivedData();
 
     for (const skill of Object.values(this.skills)) {
-      skill.target = skill.level + this.characteristics[skill.characteristic].value;
+      skill.target = calculateSkillTarget(
+        skill.level,
+        this.characteristics[skill.characteristic].value,
+      );
     }
 
-    for (const skill of Object.values(this.baseSkills)) {
-      skill.target = this.characteristics[skill.characteristic].value;
+    // 〈手当〉の半減は calculateBaseSkillTarget が引き受ける。
+    // ここで後から目標値を上書きしないので、ループを触っても連動して壊れない
+    for (const [key, skill] of Object.entries(this.baseSkills)) {
+      skill.target = calculateBaseSkillTarget(
+        key,
+        this.characteristics[skill.characteristic].value,
+      );
     }
 
-    // 〈手当〉のみ能力値の半分（切り上げ）が目標値になる
-    this.baseSkills.treatment.target = Math.ceil(this.baseSkills.treatment.target / 2);
+    const { hp, mp, resonance } = this.resources;
+    hp.max = calculateMaxHp(this.characteristics.physical.value);
+    hp.value = clampToMax(hp.value, hp.max);
+    mp.max = calculateMaxMp(
+      this.characteristics.mentality.value,
+      this.characteristics.intelligence.value,
+    );
+    mp.value = clampToMax(mp.value, mp.max);
+    resonance.value = normalizeResonance(resonance.value);
 
-    this.resources.hp.max = 10 + this.characteristics.physical.value;
-    this.resources.hp.value = Math.min(this.resources.hp.value, this.resources.hp.max);
-
-    this.resources.mp.max =
-      this.characteristics.mentality.value + this.characteristics.intelligence.value;
-    this.resources.mp.value = Math.min(this.resources.mp.value, this.resources.mp.max);
-
-    this.resources.resonance.value = Math.max(this.resources.resonance.value, 1);
-
-    this.initiative = this.characteristics.physical.value + this.skills.speed.level;
+    this.initiative = calculateInitiative(
+      this.characteristics.physical.value,
+      this.skills.speed.level,
+    );
   }
 
   /**

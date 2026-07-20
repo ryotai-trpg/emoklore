@@ -1,4 +1,5 @@
 import type { CharacteristicKey } from "../config/characteristics";
+import type { SkillKey } from "../config/skills";
 import { systemPath } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
 import {
@@ -26,6 +27,7 @@ import type {
   CharacterContext,
   CharacteristicsMap,
   EmokloreRenderOptions,
+  LabeledField,
   SkillRow,
 } from "./types";
 
@@ -101,7 +103,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     // 基底のコンテキストはドキュメント種別を問わない形なので、
     // characterシートであることが分かっているここで1回だけ絞る
     const baseContext = await super._prepareContext(options);
-    const context = baseContext as unknown as CharacterContext;
+    const context = baseContext as CharacterContext;
     context.config = CONFIG.EMOKLORE;
     context.emotionRows = getEmotionRows(
       context.system.emotions,
@@ -171,19 +173,16 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
    * アイコンは CONFIG.EMOKLORE 側の定義なので、テンプレートで二重の lookup を
    * 組まずに済むようここで引いておく。
    */
-  _getCharacteristics(): Record<string, unknown> {
-    const data = this.actor;
-    return Object.entries(CONFIG.EMOKLORE.characteristics).reduce(
-      (obj, [chc, { fa }]) => {
-        const value = foundry.utils.getProperty(data, `system.characteristics.${chc}.value`);
-        (obj as Record<string, unknown>)[chc] = {
+  _getCharacteristics(): CharacteristicsMap {
+    return Object.fromEntries(
+      Object.entries(CONFIG.EMOKLORE.characteristics).map(([chc, { fa }]) => [
+        chc,
+        {
           field: this.actor.system.schema.getField(["characteristics", chc]),
-          value: value ?? 0,
+          value: this.actor.system.characteristics[chc as CharacteristicKey]?.value ?? 0,
           icon: fa,
-        };
-        return obj;
-      },
-      {} as Record<string, unknown>,
+        },
+      ]),
     );
   }
 
@@ -194,31 +193,27 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
    * 能力値ラベルも同様に引いておく。CONFIG の label は i18nInit の performPreLocalization で
    * 翻訳済みなので、テンプレート側で言語キーを組み立てる必要はない。
    */
-  _getSkills(): Record<string, unknown> {
-    const data = this.actor;
-    return Object.entries(CONFIG.EMOKLORE.skills).reduce(
-      (obj, [key, { label, isExtra }]) => {
-        const value = foundry.utils.getProperty(data, `system.skills.${key}`) as
-          | Record<string, unknown>
-          | undefined;
-        const characteristic = value?.characteristic as CharacteristicKey | undefined;
-        (obj as Record<string, unknown>)[key] = {
-          field: this.actor.system.schema.getField(["skills", key]),
-          label,
-          isExtra: isExtra ?? false,
-          ...(value ?? {}),
-          // spreadより後に置く。保存値には characteristicLabel がないので上書きされないが、
-          // 順序を変えると壊れる
-          characteristicLabel: characteristic
-            ? (CONFIG.EMOKLORE.characteristics[characteristic]?.label ?? "")
-            : "",
-          characteristicIcon: characteristic
-            ? (CONFIG.EMOKLORE.characteristics[characteristic]?.fa ?? "")
-            : "",
-        };
-        return obj;
-      },
-      {} as Record<string, unknown>,
+  _getSkills(): Record<string, SkillRow> {
+    return Object.fromEntries(
+      Object.entries(CONFIG.EMOKLORE.skills).map(([key, { label, isExtra }]) => {
+        const entry = this.actor.system.skills[key as SkillKey];
+        const characteristic = CONFIG.EMOKLORE.characteristics[entry.characteristic];
+        return [
+          key,
+          {
+            field: this.actor.system.schema.getField(["skills", key]),
+            label,
+            isExtra: isExtra ?? false,
+            level: entry.level,
+            target: entry.target,
+            characteristic: entry.characteristic,
+            specialization: entry.specialization,
+            mod: entry.mod,
+            characteristicLabel: characteristic?.label ?? "",
+            characteristicIcon: characteristic?.fa ?? "",
+          },
+        ];
+      }),
     );
   }
 
@@ -240,10 +235,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   private _prepareSkillsContext(context: CharacterContext): void {
-    context.characteristics = this._getCharacteristics() as unknown as CharacteristicsMap;
+    context.characteristics = this._getCharacteristics();
     context.charPointSum = calculateCharPointSum(context.characteristics);
     context.charPointMax = CHARACTERISTIC_POINT_MAX;
-    context.skills = this._getSkills() as unknown as Record<string, SkillRow>;
+    context.skills = this._getSkills();
     context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills);
     context.skillPointMax = SKILL_POINT_MAX;
     context.baseSkills = this._getBaseSkills();
@@ -271,8 +266,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     ]) as foundry.data.fields.SchemaField;
 
     const rows = buildBiographyRows(
-      biography.fields as unknown as Record<string, { label?: string }>,
-      this.actor.system.biography as unknown as Record<string, string>,
+      biography.fields as Record<string, LabeledField>,
+      this.actor.system.biography,
       { note: noteHTML },
     );
 
@@ -287,7 +282,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   private _calculateSkillPointSumFromContext(skills: Record<string, SkillRow>): number {
-    const skillsObject = Object.values(skills) as Array<{ level: number; isExtra?: boolean }>;
+    const skillsObject = Object.values(skills);
     const exSkillsObject = skillsObject.filter((skill) => skill.isExtra);
     return calculateTotalSkillPoints(skillsObject, exSkillsObject);
   }

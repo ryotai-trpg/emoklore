@@ -1,7 +1,9 @@
 import type { ApplicationRenderContext, ApplicationTab } from "@client/applications/_types.mjs";
 import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
+import type { CharacteristicKey } from "../config/characteristics";
 import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
+import type { ModifierSet } from "../rules/types";
 
 // Common type definitions
 export type EmotionKey = "surface" | "hidden" | "root";
@@ -16,13 +18,38 @@ export type EmokloreRenderOptions = HandlebarsRenderOptions & {
   [key: string]: unknown;
 };
 
+/** 技能1行の表示用データ。保存値と CONFIG.EMOKLORE 側の定義を合流させたもの */
 export type SkillRow = {
+  /**
+   * スキーマのフィールド。編集モードで formInput に渡す。
+   *
+   * `schema.getField()` は見つからなければ undefined を返す。スキーマは
+   * CONFIG.EMOKLORE と同じキー集合から作るので実際には引けるが、型のうえでは
+   * 落ちうるものとして扱う（テンプレート側は未定義なら描画しないだけで済む）。
+   */
+  field: foundry.data.fields.DataField | undefined;
+  /** 翻訳済みの表示名 */
+  label: string;
   level: number;
-  isExtra?: boolean;
+  target: number;
+  characteristic: CharacteristicKey;
+  specialization?: string;
+  mod: ModifierSet;
+  isExtra: boolean;
   /** 能力値の表示名。CONFIG.EMOKLORE から引いた翻訳済みの文字列 */
   characteristicLabel: string;
-  [key: string]: unknown;
+  /** 能力値のFont Awesomeアイコンクラス */
+  characteristicIcon: string;
 };
+
+/**
+ * label を持つスキーマフィールド。
+ *
+ * 本体の DataField は label を options から動的に載せており、クラスのプロパティ
+ * として宣言していない（common/data/fields.mjs の `_defaults`）。そのため型には
+ * 出てこないので、実際に使うメンバーだけを交差型で補う。
+ */
+export type LabeledField = foundry.data.fields.DataField & { label?: string };
 
 /** 経歴の項目の定義。並び順と見せ方だけを持ち、値は持たない */
 export type BiographyFieldDef = {
@@ -58,7 +85,13 @@ export type BaseSkillRow = {
 
 export type CharacteristicsMap = Record<
   string,
-  { field: foundry.data.fields.DataField; value: number }
+  {
+    /** スキーマのフィールド。引けない場合があるのは SkillRow#field と同じ */
+    field: foundry.data.fields.DataField | undefined;
+    value: number;
+    /** 能力値のFont Awesomeアイコンクラス */
+    icon: string;
+  }
 >;
 
 export type EmokloreActorSheetActions = {
@@ -119,6 +152,14 @@ export interface EmokloreDocumentSheetOptions {
   };
 }
 
+/**
+ * characterシートのコンテキスト。
+ *
+ * 基底（EmokloreDocumentSheetContext）は継承しない。継承すると基底の
+ * `[key: string]: unknown` まで引き継いでしまい、`context.charPintSum = 1` のような
+ * 打ち間違いが素通りするため。閉じた型のままでも `_prepareContext` のキャストは
+ * 素の as 1つで通る（アサーションの比較可能性は代入可能性より緩いため）。
+ */
 export type CharacterContext = {
   config: typeof CONFIG.EMOKLORE;
   system: CharacterDataModel;
