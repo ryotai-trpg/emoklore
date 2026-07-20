@@ -1,5 +1,7 @@
-<div class="charsheet-import-dialog">
-  <div class="form-group">
+{{! ApplicationV2 は1パーツにつきルート要素1つを要求するので、この div は必須。
+    アプリの classes と同名にすると二重に付いて紛らわしいので名前は持たせない }}
+<div>
+  <div class="form-group stacked">
     <label for="jsonInput">{{localize "EMOKLORE.Import.PasteJSON"}}</label>
     <textarea
       name="jsonInput"
@@ -8,13 +10,10 @@
       placeholder="{{localize 'EMOKLORE.Import.JSONPlaceholder'}}"
       autofocus
     ></textarea>
-  </div>
-
-  <div class="form-group stacked">
     <p class="hint">{{localize "EMOKLORE.Import.Hint"}}</p>
   </div>
 
-  <footer class="form-footer flexrow">
+  <footer class="form-footer">
     <button type="button" data-action="import" class="default">
       <i class="fa-solid fa-file-import"></i>
       {{localize "EMOKLORE.Import.ImportButton"}}
