@@ -18,6 +18,7 @@ export default defineConfig({
         text: "機能",
         items: [
           { text: "キャラクターシート", link: "/character-sheet" },
+          { text: "キャラクターのインポート", link: "/character-import" },
           { text: "効果（ActiveEffect）", link: "/active-effect" },
         ],
       },
