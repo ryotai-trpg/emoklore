@@ -76,5 +76,7 @@ export async function renderWeaponCard(
       state.successCount !== null &&
       canRollDamage(state.successCount) &&
       state.damageTotal === null,
+    // 適用は何度でも押せるようにしておく。狙いを変えて続けて当てることがある
+    canApplyDamage: state.damageTotal !== null,
   });
 }

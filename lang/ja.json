@@ -73,7 +73,11 @@
         "Damage": "ダメージ",
         "NoActor": "持ち主のいない武器は使えません。",
         "ActorMissing": "この武器を使ったキャラクターが見つかりません。",
-        "ActionFailed": "武器カードの操作に失敗しました。"
+        "ActionFailed": "武器カードの操作に失敗しました。",
+        "Apply": "ダメージを適用",
+        "NoTarget": "ターゲットがいません。対象のトークンをターゲットしてください。",
+        "NoGM": "権限のないキャラクターに適用するにはGMの接続が必要です。",
+        "Applied": "{name} HP: {before} → {after}"
       }
     },
     "SHEET.ToggleMode": "プレイ・編集モード切替",
