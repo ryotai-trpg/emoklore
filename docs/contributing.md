@@ -8,7 +8,7 @@
 
 必要なもの:
 
-- Node.js（v22以降推奨）
+- Node.js v24以降（`package.json` の `engines` とCIの実行環境がv24。それ未満は検証していない）
 - FoundryVTT 本体 v14（動作確認・型チェック用。ライセンスが必要）
 
 ```shell
@@ -93,9 +93,10 @@ feat: add resonance roll dialog
 
 ### 自動チェック
 
-- **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。緊急時は `git commit --no-verify` でスキップできるが非推奨
+- **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。`.hbs` を触れば `check:templates`、`lang/*.json` を触れば `check:lang` も走る。緊急時は `git commit --no-verify` でスキップできるが非推奨
 - **CI**: pushとPRで GitHub Actions が Biome・テスト・ビルド・型チェック・翻訳/テンプレート整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
   - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない
+- **依存の更新**: DependabotがnpmとGitHub Actionsを週次で見る（`.github/dependabot.yml`）。パッチとマイナーは1本にまとめ、メジャーは個別にPRが立つ。**Biomeだけは3箇所（`package.json` / `biome.json` の `$schema` / `ci.yml` の `setup-biome`）を揃える必要がある**ので、Dependabotが上げてきたら残り2つを手で追従させる
 
 ## 表記ルール
 
