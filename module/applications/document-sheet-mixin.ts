@@ -1,5 +1,6 @@
 import { getSetting } from "../settings";
 import type {
+  ApplicationV2Statics,
   EmokloreDocumentSheetContext,
   EmokloreDocumentSheetOptions,
   EmokloreRenderOptions,
@@ -17,9 +18,19 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 // biome-ignore lint/suspicious/noExplicitAny: mixinのコンストラクタ制約には any[] が必要
 type ApplicationV2Constructor = new (...args: any[]) => foundry.applications.api.ApplicationV2;
 
+/**
+ * 本体の `User` は `ClientDocumentMixin(BaseUser)` を継承しており、mixinの引数型が
+ * インスタンス側しか宣言していないため `BaseUser` のゲッターが型から落ちる
+ * （`isGM` の実体は `common/documents/user.mjs:124`）。使う1つだけ交差型で足す。
+ */
+type GameUser = NonNullable<typeof game.user> & { isGM: boolean };
+
 // base を any にすると extends any になり、このファイル全体の型チェックが効かなくなる
 export default (base: ApplicationV2Constructor) => {
-  return class EmokloreDocumentSheet extends HandlebarsApplicationMixin(base) {
+  return class EmokloreDocumentSheet extends (HandlebarsApplicationMixin(base) as ReturnType<
+    typeof HandlebarsApplicationMixin
+  > &
+    ApplicationV2Statics) {
     declare document: SheetDocument;
     // DocumentSheetV2のgetterだが、mixinの型（typeof ApplicationV2ベース）からは見えないため補強
     declare readonly isEditable: boolean;
@@ -45,7 +56,7 @@ export default (base: ApplicationV2Constructor) => {
         isPlay: this.isPlayMode,
         owner: this.document.isOwner,
         limited: this.document.limited,
-        gm: game.user?.isGM ?? false,
+        gm: (game.user as GameUser | null)?.isGM ?? false,
         document: this.document,
         system: this.document.system,
         systemFields: this.document.system.schema.fields,

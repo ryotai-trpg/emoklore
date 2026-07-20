@@ -134,6 +134,10 @@ FoundryVTT本体はJSDocで型を持つが、実行時に定義されるプロ�
 - **スキーマ由来のプロパティは `declare` で補う**。`declare system: CharacterDataModel;` のように、サブクラスで宣言し直す
 - **足りないメンバーは交差型で補う**。`any` で潰さず、**実際に使うメンバーだけ**を足す。`type CardMessage = ChatMessage & { rolls: Roll[]; update: ... }` のように、必要な分だけ書く
 
+**mixinを通すと、インスタンス側だけでなく静的側も落ちる。** 本体のmixinは JSDoc の引数型が `@param {Constructor<ApplicationV2>}` のようにインスタンス側しか宣言していないため、返り値の型から基底クラスの静的メンバーが消える。`DEFAULT_OPTIONS` / `TABS` を `override` で名乗ると TS4113 になるのがこれで、`ApplicationV2Statics` を交差させて補ってある。同じ理由で `User` は `ClientDocumentMixin(BaseUser)` 由来の `isGM` を型に持たない。
+
+この2つは TypeScript 7 で初めて表面化した。**5.9 では通っていたので、通っていることは正しさの証明にならない**。あわせて `EmokloreActor` の `declare sheet` / `declare isOwner` のように、本体が getter で持っているものを `declare` で宣言し直していた箇所も TS7 が検出した（TS2610）。本体側に実体があるものは補わず消す。
+
 `declare` で名乗るということは「実体がこの形であることを人が保証する」ということなので、**保証できる根拠を一緒に書く**。たとえば武器シートの `item` を武器に絞れるのは、`registerSheet` に `types: ["weapon"]` を渡しているからで、それをコメントに書いておく。
 
 ## DataModelのスキーマ
