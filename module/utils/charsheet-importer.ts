@@ -4,13 +4,18 @@ import { typedEntries } from "./object";
 /**
  * キャラクター保管所（emoklore.charasheet.jp）が出力するJSONの形。
  * CCFOLIA形式でコピーしたものを想定している
+ *
+ * ユーザーが貼り付けた文字列を JSON.parse しただけのものなので、**どの項目も
+ * 実際には無いことがある**。必須として宣言すると、取り込み側で確かめないまま
+ * 回してしまう（実際 params がそれで、壊れたJSONを貼ると例外になっていた）。
+ * 型の側で任意にしておけば、確かめないと通らない。
  */
 interface CharSheetJSON {
   kind: "character";
   data: {
-    name: string;
-    params: Array<{ label: string; value: string }>;
-    status: Array<{ label: string; value: number | string; max: number | string }>;
+    name?: string;
+    params?: Array<{ label: string; value: string }>;
+    status?: Array<{ label: string; value: number | string; max: number | string }>;
     initiative?: number;
     memo?: string;
     externalUrl?: string;
@@ -195,10 +200,12 @@ export async function importFromCharSheet(
   }
 
   // 能力値
-  for (const param of data.params) {
-    const key = index.characteristics[param.label];
-    if (key) {
-      updateData[`system.characteristics.${key}.value`] = Number.parseInt(param.value, 10);
+  if (Array.isArray(data.params)) {
+    for (const param of data.params) {
+      const key = index.characteristics[param.label];
+      if (key) {
+        updateData[`system.characteristics.${key}.value`] = Number.parseInt(param.value, 10);
+      }
     }
   }
 
