@@ -14,7 +14,6 @@ import {
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
   createEmotionOptions,
-  createSkillLevelOptions,
   getEmotionRows,
 } from "./helpers";
 import type {
@@ -240,7 +239,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     context.charPointSum = calculateCharPointSum(context.characteristics);
     context.skills = this._getSkills() as unknown as Record<string, SkillRow>;
     context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills);
-    context.skillLevelOptions = createSkillLevelOptions();
     context.baseSkills = this._getBaseSkills();
   }
 

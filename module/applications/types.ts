@@ -130,7 +130,6 @@ export type CharacterContext = {
   skills?: Record<string, SkillRow>;
   baseSkills?: BaseSkillRow[];
   skillPointSum?: number;
-  skillLevelOptions?: Array<{ value: string; label: string }>;
   // 経歴は横並びの組（年齢・性別）と、それ以降を分けて渡す
   biographyPairedRows?: BiographyRow[];
   biographyRows?: BiographyRow[];

@@ -45,12 +45,6 @@
       "relationship": "Relationship",
       "wound": "Wound"
     },
-    "skillLevel": {
-      "0": "Lv.0",
-      "1": "Lv.1",
-      "2": "Lv.2",
-      "3": "Lv.3"
-    },
     "resonantEmotions": {
       "selfAssertion": "SelfAssertion",
       "possession": "Possession",
