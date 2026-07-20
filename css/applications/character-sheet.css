@@ -78,6 +78,25 @@
     min-width: 0;
   }
 
+  /* アイテムタブは名前より式のほうが長いので、部品の既定（2fr 1fr 1fr）から
+     配分を変える。列の内訳は置く側が決める（部品は位置決めを持たない） */
+  .tab.items {
+    .em-data-table__head,
+    .em-data-table__row {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) minmax(0, 1fr) 70px;
+    }
+
+    /* ダメージ式は途中で折り返すと読めなくなるので、切り詰めて全文はツールチップに任せる */
+    .em-data-table__cell {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: block;
+      text-align: center;
+    }
+  }
+
   /* 経歴タブの入力フォーム。本体の form-group を縦積みに寄せる */
   .tab.biography {
     div.flexrow {

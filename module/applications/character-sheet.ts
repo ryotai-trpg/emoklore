@@ -7,7 +7,9 @@ import {
   SKILL_LEVEL_MAX,
   SKILL_LEVEL_MIN,
 } from "../data/character";
+import type { WeaponDataModel } from "../data/item-models";
 import type { EmokloreActor } from "../documents/actor";
+import type { EmokloreItem } from "../documents/item";
 import {
   CHARACTERISTIC_POINT_MAX,
   calculateCharPointSum,
@@ -28,6 +30,8 @@ import {
   buildBiographyRows,
   buildValueSegments,
   createEmotionOptions,
+  formatDamagePreview,
+  formatRangeLabel,
   getEmotionRows,
 } from "./helpers";
 import type {
@@ -117,6 +121,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       templates: ["templates/actor/partials/field.hbs"].map(systemPath),
       scrollable: [""],
     },
+    items: {
+      template: systemPath("templates/actor/items.hbs"),
+      scrollable: [""],
+    },
     effects: {
       template: systemPath("templates/actor/effects.hbs"),
       scrollable: [""],
@@ -125,7 +133,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
 
   static override TABS = {
     primary: {
-      tabs: [{ id: "skills" }, { id: "biography" }, { id: "effects" }],
+      tabs: [{ id: "skills" }, { id: "biography" }, { id: "items" }, { id: "effects" }],
       labelPrefix: "EMOKLORE.CharacterSheet.tab",
       initial: "skills",
     },
@@ -163,6 +171,9 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         break;
       case "biography":
         await this._prepareBiographyContext(context);
+        break;
+      case "items":
+        this._prepareItemsContext(context);
         break;
       case "effects":
         this._prepareEffectsContext(context);
@@ -404,6 +415,31 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     // 先頭の数件は横並びの組にするので、テンプレート側で分けて回せるよう2つに割る
     context.biographyPairedRows = rows.slice(0, BIOGRAPHY_PAIRED_COUNT);
     context.biographyRows = rows.slice(BIOGRAPHY_PAIRED_COUNT);
+  }
+
+  /**
+   * アイテムの表示用データ。
+   *
+   * 間合いとダメージ式は武器の派生値（参照技能から引いたもの）なので、ここでは
+   * 表示用に整えるだけ。アイテムタブは読むだけの一覧で、値の編集は武器シートが持つ。
+   * 同じ `name` の入力を2箇所に描くとフォームの送信が壊れるため、ここに入力は置かない。
+   */
+  private _prepareItemsContext(context: CharacterContext): void {
+    // itemTypes は本体が Record<string, Item[]> で型付けており、実装クラスまでは絞られない
+    const weapons = (this.actor.itemTypes.weapon ?? []) as EmokloreItem[];
+
+    context.weapons = weapons.map((item) => {
+      const system = item.system as WeaponDataModel;
+
+      return {
+        // 保存済みの埋め込みドキュメントなので id は必ずある
+        id: item.id!,
+        name: item.name,
+        img: item.img,
+        rangeLabel: formatRangeLabel(system.rangeType, system.range),
+        damagePreview: formatDamagePreview(system.damageDie, system.attackPower),
+      };
+    });
   }
 
   private _prepareEffectsContext(context: CharacterContext): void {
