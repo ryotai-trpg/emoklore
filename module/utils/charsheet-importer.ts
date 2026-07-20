@@ -295,26 +295,42 @@ export async function importFromCharSheet(
 }
 
 /**
+ * 検証の結果。
+ *
+ * 判別可能unionにしてあるので、`valid` を見れば `data` と `error` の
+ * どちらがあるかが型で決まる。`{ valid: boolean; data?: T; error?: string }`
+ * だと、valid を確かめたあとでも data が任意のままで、呼び出し側が
+ * `data!` と書くしかなかった。
+ */
+export type CharSheetValidation =
+  | { valid: true; data: CharSheetJSON }
+  | { valid: false; error: string };
+
+/**
  * 貼り付けられた文字列が保管所のJSONとして妥当かを調べる
  */
-export function validateCharSheetJSON(jsonString: string): {
-  valid: boolean;
-  data?: CharSheetJSON;
-  error?: string;
-} {
+export function validateCharSheetJSON(jsonString: string): CharSheetValidation {
+  let parsed: unknown;
   try {
-    const data = JSON.parse(jsonString) as CharSheetJSON;
-
-    if (data.kind !== "character") {
-      return { valid: false, error: "EMOKLORE.Import.ErrorInvalidKind" };
-    }
-
-    if (!data.data || typeof data.data !== "object") {
-      return { valid: false, error: "EMOKLORE.Import.ErrorMissingData" };
-    }
-
-    return { valid: true, data };
+    parsed = JSON.parse(jsonString);
   } catch (_error) {
     return { valid: false, error: "EMOKLORE.Import.ErrorInvalidJSON" };
   }
+
+  if (typeof parsed !== "object" || parsed === null) {
+    return { valid: false, error: "EMOKLORE.Import.ErrorInvalidKind" };
+  }
+
+  // ここまでで object であることしか分かっていない。中身の有無はこの下で見る
+  const json = parsed as Partial<CharSheetJSON>;
+
+  if (json.kind !== "character") {
+    return { valid: false, error: "EMOKLORE.Import.ErrorInvalidKind" };
+  }
+
+  if (!json.data || typeof json.data !== "object") {
+    return { valid: false, error: "EMOKLORE.Import.ErrorMissingData" };
+  }
+
+  return { valid: true, data: { kind: json.kind, data: json.data } };
 }

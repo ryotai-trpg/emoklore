@@ -80,17 +80,13 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
     const validation = validateCharSheetJSON(jsonInput);
 
     if (!validation.valid) {
-      const errorMsg = validation.error
-        ? game.i18n.localize(validation.error)
-        : game.i18n.localize("EMOKLORE.Import.ErrorInvalidJSON");
-
-      ui.notifications?.error(errorMsg);
+      ui.notifications?.error(game.i18n.localize(validation.error));
       return;
     }
 
     // 取り込む
     try {
-      await importFromCharSheet(this.actor, validation.data!);
+      await importFromCharSheet(this.actor, validation.data);
       this.close();
     } catch (error) {
       console.error("emoklore | キャラクターの取り込みに失敗しました", error);

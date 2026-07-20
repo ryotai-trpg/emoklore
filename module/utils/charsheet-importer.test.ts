@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildLabelIndex, parseEmotions, parseSkills } from "./charsheet-importer";
+import {
+  buildLabelIndex,
+  parseEmotions,
+  parseSkills,
+  validateCharSheetJSON,
+} from "./charsheet-importer";
 
 // CONFIG.EMOKLORE の一部を模したもの。実物と同じく label は翻訳済みの文字列が入る
 const emotions = buildLabelIndex({
@@ -142,5 +147,56 @@ describe("parseSkills", () => {
       baseSkills: {},
       unrecognized: [],
     });
+  });
+});
+
+describe("validateCharSheetJSON", () => {
+  it("JSONとして壊れていれば弾く", () => {
+    expect(validateCharSheetJSON("{ではない")).toEqual({
+      valid: false,
+      error: "EMOKLORE.Import.ErrorInvalidJSON",
+    });
+  });
+
+  it("オブジェクトでなければ弾く", () => {
+    expect(validateCharSheetJSON('"文字列"')).toEqual({
+      valid: false,
+      error: "EMOKLORE.Import.ErrorInvalidKind",
+    });
+    expect(validateCharSheetJSON("null")).toEqual({
+      valid: false,
+      error: "EMOKLORE.Import.ErrorInvalidKind",
+    });
+  });
+
+  it("kind が character でなければ弾く", () => {
+    expect(validateCharSheetJSON('{"kind":"memo","data":{}}')).toEqual({
+      valid: false,
+      error: "EMOKLORE.Import.ErrorInvalidKind",
+    });
+  });
+
+  it("data が無ければ弾く", () => {
+    expect(validateCharSheetJSON('{"kind":"character"}')).toEqual({
+      valid: false,
+      error: "EMOKLORE.Import.ErrorMissingData",
+    });
+  });
+
+  it("kind と data があれば通す", () => {
+    const json = '{"kind":"character","data":{"name":"名無し"}}';
+
+    expect(validateCharSheetJSON(json)).toEqual({
+      valid: true,
+      data: { kind: "character", data: { name: "名無し" } },
+    });
+  });
+
+  // params や status は保管所の出力に必ずあるとは限らない。ここで弾かずに通し、
+  // 取り込み側が持っているものだけ拾う（無い項目で例外にしない）
+  it("params や status が無くても通す", () => {
+    const result = validateCharSheetJSON('{"kind":"character","data":{}}');
+
+    expect(result.valid).toBe(true);
   });
 });
