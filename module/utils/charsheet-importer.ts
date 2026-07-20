@@ -18,144 +18,42 @@ interface CharSheetJSON {
 }
 
 /**
- * 能力値の日本語ラベル → システム内のキー
+ * 表示名 → キー の逆引き索引。
+ *
+ * `CONFIG.EMOKLORE` のラベルは `i18nInit` の `performPreLocalization` で翻訳済みの
+ * 日本語文字列になっているので、そこから引き直せばベタ書きの対応表は要らない。
+ * 技能を足したときに取り込み側の更新を忘れる、という事故を構造的に防ぐ。
  */
-const CHARACTERISTIC_MAP: Record<string, string> = {
-  身体: "physical",
-  器用: "dexterity",
-  精神: "mentality",
-  五感: "sensitivity",
-  知力: "intelligence",
-  魅力: "charisma",
-  社会: "sociality",
-  運勢: "fortune",
+export function buildLabelIndex(config: Record<string, { label: string }>): Record<string, string> {
+  return Object.fromEntries(Object.entries(config).map(([key, { label }]) => [label, key]));
+}
+
+/** 取り込みに使う逆引き索引一式 */
+export type ImportIndexes = {
+  characteristics: Record<string, string>;
+  skills: Record<string, string>;
+  baseSkills: Record<string, string>;
+  emotions: Record<string, string>;
 };
 
 /**
- * 技能の日本語ラベル（記号込み） → システム内のキー
+ * `CONFIG.EMOKLORE` から索引を作る。
+ *
+ * ここだけが CONFIG に触れる。以下の解析関数は索引を引数で受け取るので、
+ * Foundryを起動せずに単体テストできる。
  */
-const SKILL_MAP: Record<string, string> = {
-  検索: "search",
-  洞察: "insight",
-  マッピング: "mapping",
-  直感: "instinct",
-  鑑定: "appraisal",
-  観察眼: "keenObservation",
-  聞き耳: "listen",
-  毒味: "taste",
-  危機察知: "threatDetection",
-  霊感: "spiritualSense",
-  社交術: "etiquette",
-  ディベート: "debate",
-  魅了: "charm",
-  心理: "psychology",
-  専門知識: "specializedKnowledge",
-  事情通: "insider",
-  業界: "industryKnowledge",
-  スピード: "speed",
-  ストレングス: "strength",
-  アクロバット: "acrobatics",
-  ダイブ: "dive",
-  武術: "martialArt",
-  奥義: "secretTechnique",
-  射撃: "rangedAttack",
-  耐久: "endurance",
-  根性: "grit",
-  医術: "medicine",
-  蘇生: "resurrection",
-  技巧: "technique",
-  芸術: "art",
-  操縦: "pilot",
-  暗号: "cipher",
-  電脳: "computer",
-  隠匿: "stealth",
-  強運: "strongLuck",
-};
-
-/**
- * 基本技能の日本語ラベル（＊付き） → システム内のキー
- */
-const BASE_SKILL_MAP: Record<string, string> = {
-  調査: "investigation",
-  知覚: "perception",
-  交渉: "negotiations",
-  知識: "knowledge",
-  ニュース: "news",
-  運動: "athletic",
-  格闘: "fight",
-  投擲: "throw",
-  生存: "survival",
-  自我: "self",
-  手当て: "treatment",
-  細工: "handiwork",
-  幸運: "luck",
-};
-
-/**
- * 共鳴感情の日本語ラベル → システム内のキー
- */
-const EMOTION_MAP: Record<string, string> = {
-  // 欲望 (Desire)
-  自己顕示: "selfAssertion",
-  所有: "possession",
-  本能: "instinct",
-  破壊: "destruction",
-  優越感: "superiority",
-  怠惰: "sloth",
-  逃避: "escape",
-  好奇心: "curiosity",
-  スリル: "thrill",
-
-  // 情念 (Passion)
-  喜び: "joy",
-  怒り: "anger",
-  哀しみ: "sorrow",
-  幸福: "happiness",
-  不安: "anxiety",
-  嫌悪: "disgust",
-  恐怖: "fear",
-  嫉妬: "jealousy",
-  恨み: "grudge",
-
-  // 理想 (Ideal)
-  正義: "justice",
-  崇拝: "worship",
-  善悪: "goodAndEvil",
-  希望: "hope",
-  向上: "aspiration",
-  理性: "reason",
-  勝利: "victory",
-  秩序: "order",
-  憧憬: "admiration",
-  無我: "selflessness",
-
-  // 関係 (Relationship)
-  友情: "friendship",
-  愛: "love",
-  恋: "romance",
-  依存: "dependence",
-  尊敬: "respect",
-  軽蔑: "contempt",
-  庇護: "protection",
-  支配: "domination",
-  奉仕: "service",
-  甘え: "indulgence",
-
-  // 傷 (Wound)
-  後悔: "regret",
-  孤独: "loneliness",
-  諦観: "resignation",
-  絶望: "despair",
-  否定: "denial",
-  疑念: "doubt",
-  罪悪感: "guilt",
-  狂気: "madness",
-  劣等感: "inferiorityComplex",
-};
+export function buildImportIndexes(): ImportIndexes {
+  return {
+    characteristics: buildLabelIndex(CONFIG.EMOKLORE.characteristics),
+    skills: buildLabelIndex(CONFIG.EMOKLORE.skills),
+    baseSkills: buildLabelIndex(CONFIG.EMOKLORE.baseSkills),
+    emotions: buildLabelIndex(CONFIG.EMOKLORE.resonantEmotions),
+  };
+}
 
 type ParsedEmotions = {
   emotions: { surface?: string; hidden?: string; root?: string };
-  /** EMOTION_MAP に無く、取り込めなかったラベル */
+  /** 索引に無く、取り込めなかったラベル */
   unrecognized: string[];
 };
 
@@ -169,11 +67,11 @@ const EMOTION_PATTERNS = {
 /**
  * memo欄から共鳴感情を取り出す。
  *
- * 正規のシートからのコピーであれば EMOTION_MAP に無いラベルは来ないため、
+ * 正規のシートからのコピーであれば索引に無いラベルは来ないため、
  * 一致しないものは異常入力とみなして取り込まず、呼び出し側で警告する。
  * 生の文字列を保存すると、シートが未解決のi18nキーを表示してしまう。
  */
-export function parseEmotions(memo: string): ParsedEmotions {
+export function parseEmotions(memo: string, index: Record<string, string>): ParsedEmotions {
   const emotions: ParsedEmotions["emotions"] = {};
   const unrecognized: string[] = [];
 
@@ -181,7 +79,7 @@ export function parseEmotions(memo: string): ParsedEmotions {
     const label = memo.match(pattern)?.[1]?.trim();
     if (!label) continue;
 
-    const emotionKey = EMOTION_MAP[label];
+    const emotionKey = index[label];
     if (emotionKey) {
       emotions[key as keyof ParsedEmotions["emotions"]] = emotionKey;
     } else {
@@ -193,64 +91,86 @@ export function parseEmotions(memo: string): ParsedEmotions {
 }
 
 /**
- * commands 欄のチャットパレットから技能を読み取る
- * Format: "2DM<=4 〈検索〉" or "1DM<=3 〈＊調査〉"
+ * 技能名から特化名を切り出す。
+ *
+ * 保管所の出力は〈専門知識（デザイン）〉のように括弧で括る。シート側の表示は
+ * 〈専門知識：考古学〉とコロン区切りなので、どちらの表記でも拾えるようにしている。
+ * 全角・半角も両方受ける。
  */
-function parseSkills(commands: string): {
+const SPECIALIZATION_PATTERN = /^(.+?)\s*(?:[（(]\s*(.*?)\s*[）)]|[：:]\s*(.*))$/;
+
+/** 技能レベルの下限・上限。スキーマの skills.*.level と揃える */
+const SKILL_LEVEL_MIN = 0;
+const SKILL_LEVEL_MAX = 3;
+
+export type ParsedSkills = {
+  /** 技能キー → レベル */
   skills: Record<string, number>;
+  /** 技能キー → 特化名。特化を持つ技能だけ入る */
+  specializations: Record<string, string>;
+  /** 基本技能キー → レベル（常に1） */
   baseSkills: Record<string, number>;
-} {
+  /** 索引に無く、取り込めなかった技能名 */
+  unrecognized: string[];
+};
+
+/**
+ * commands 欄のチャットパレットから技能を読み取る。
+ *
+ * 「2DM<=4 〈検索〉」「1DM<=3 〈＊調査〉」「3DM<=8 〈専門知識：考古学〉」の形。
+ * ＊は基本技能、★はエクストラ技能の目印で、どちらも技能名からは外して引く。
+ *
+ * ダイス数がそのまま技能レベルになる。判定式が「ダイス数 = 技能レベル + ボーナス」
+ * なので、ボーナスの無いチャットパレットではダイス数と技能レベルが一致する
+ * （保管所の実データで確認済み。Issue #14）。
+ */
+export function parseSkills(
+  commands: string,
+  index: Pick<ImportIndexes, "skills" | "baseSkills">,
+): ParsedSkills {
   const skills: Record<string, number> = {};
+  const specializations: Record<string, string> = {};
   const baseSkills: Record<string, number> = {};
+  const unrecognized: string[] = [];
 
-  // 1行1コマンドとして処理する
-  const lines = commands.split("\n");
-
-  for (const line of lines) {
-    // 「XDM<=Y 〈［＊★］技能名〉」の形に一致させる
+  for (const line of commands.split("\n")) {
     const match = line.match(/(\d+)DM<=\d+\s*[〈<]([＊★]?)([^〉>]+)[〉>]/);
     if (!match?.[1] || !match[3]) continue;
 
     const diceCount = Number.parseInt(match[1], 10);
     const marker = match[2];
-    const skillName = match[3].trim();
+    const [name, specialization] = splitSpecialization(match[3].trim());
 
-    // 基本技能は＊が頭に付く
     if (marker === "＊") {
-      const baseSkillKey = BASE_SKILL_MAP[skillName];
-      if (baseSkillKey) {
-        baseSkills[baseSkillKey] = 1; // 基本技能のレベルは常に1
+      const key = index.baseSkills[name];
+      if (key) {
+        baseSkills[key] = 1; // 基本技能のレベルは常に1
+      } else {
+        unrecognized.push(`＊${name}`);
       }
-    } else {
-      // 通常技能はダイス数からレベルを求める
-      const skillKey = SKILL_MAP[skillName];
-      if (skillKey) {
-        // ここは未解決。ダイス数は「技能レベル＋能力値」の合計なので、本来は
-        // 能力値を引かないとレベルが出ない。今はダイス数をそのまま入れている。
-        // 正しい算出方法はルールブックで要確認（Issue #14）
-        skills[skillKey] = diceCount;
-      }
+      continue;
     }
+
+    const key = index.skills[name];
+    if (!key) {
+      unrecognized.push(name);
+      continue;
+    }
+
+    skills[key] = Math.max(SKILL_LEVEL_MIN, Math.min(SKILL_LEVEL_MAX, diceCount));
+    if (specialization) specializations[key] = specialization;
   }
 
-  return { skills, baseSkills };
+  return { skills, specializations, baseSkills, unrecognized };
 }
 
-/**
- * ダイス数から技能レベルを求める。
- *
- * 未完成。現状はダイス数をそのままレベルとして扱っており、能力値を考慮していない。
- * 引数の能力値・技能キー・技能定義は、正しい算出に必要になる想定で受けているが
- * まだ使っていない（Issue #14）。
- */
-function calculateSkillLevel(
-  diceCount: number,
-  _characteristicValue: number,
-  _skillKey: string,
-  _skillConfig: typeof CONFIG.EMOKLORE.skills,
-): number {
-  // 技能レベルの上限は3、下限は0
-  return Math.max(0, Math.min(3, diceCount));
+/** 〈専門知識（デザイン）〉のような表記を技能名と特化名に分ける */
+function splitSpecialization(raw: string): [name: string, specialization?: string | undefined] {
+  const match = raw.match(SPECIALIZATION_PATTERN);
+  if (!match?.[1]) return [raw];
+
+  // 括弧とコロンのどちらで書かれていても、中身は同じ位置に入る
+  return [match[1], (match[2] ?? match[3])?.trim() || undefined];
 }
 
 /**
@@ -266,6 +186,7 @@ export async function importFromCharSheet(
 
   const { data } = jsonData;
   const updateData: Record<string, unknown> = {};
+  const index = buildImportIndexes();
 
   // 名前
   if (data.name) {
@@ -273,11 +194,9 @@ export async function importFromCharSheet(
   }
 
   // 能力値
-  const characteristics: Record<string, number> = {};
   for (const param of data.params) {
-    const key = CHARACTERISTIC_MAP[param.label];
+    const key = index.characteristics[param.label];
     if (key) {
-      characteristics[key] = Number.parseInt(param.value, 10);
       updateData[`system.characteristics.${key}.value`] = Number.parseInt(param.value, 10);
     }
   }
@@ -306,7 +225,7 @@ export async function importFromCharSheet(
   // 共鳴感情はメモ欄から拾う
   const unrecognizedEmotions: string[] = [];
   if (data.memo) {
-    const { emotions, unrecognized } = parseEmotions(data.memo);
+    const { emotions, unrecognized } = parseEmotions(data.memo, index.emotions);
     for (const [key, value] of Object.entries(emotions)) {
       updateData[`system.emotions.${key}`] = value;
     }
@@ -317,27 +236,21 @@ export async function importFromCharSheet(
   }
 
   // 技能はチャットパレットから拾う
+  const unrecognizedSkills: string[] = [];
   if (data.commands) {
-    const { skills } = parseSkills(data.commands);
+    const { skills, specializations, unrecognized } = parseSkills(data.commands, index);
+    unrecognizedSkills.push(...unrecognized);
 
-    // 見つかった技能ごとにレベルを決めて入れる
-    for (const [skillKey, diceCount] of Object.entries(skills)) {
-      const skillInfo = CONFIG.EMOKLORE.skills[skillKey as keyof typeof CONFIG.EMOKLORE.skills];
-      if (!skillInfo) continue;
+    for (const [key, level] of Object.entries(skills)) {
+      updateData[`system.skills.${key}.level`] = level;
+    }
 
-      // その技能が使う能力値を引く
-      const charKey = skillInfo.characteristicOptions?.[0] || skillInfo.characteristic;
-      if (!charKey) continue;
-
-      const charValue = characteristics[charKey] || 1;
-      const skillLevel = calculateSkillLevel(
-        diceCount,
-        charValue,
-        skillKey,
-        CONFIG.EMOKLORE.skills,
-      );
-
-      updateData[`system.skills.${skillKey}.level`] = skillLevel;
+    // 特化名はスキーマに specialization を持つ技能にだけ入れる
+    for (const [key, specialization] of Object.entries(specializations)) {
+      const config = CONFIG.EMOKLORE.skills[key as keyof typeof CONFIG.EMOKLORE.skills];
+      if (config?.hasSpecialization) {
+        updateData[`system.skills.${key}.specialization`] = specialization;
+      }
     }
   }
 
@@ -355,11 +268,19 @@ export async function importFromCharSheet(
     }),
   );
 
-  // 取り込めなかった共鳴感情は黙って捨てず知らせる（表記ゆれの発見に必要）
+  // 取り込めなかったものは黙って捨てず知らせる（表記ゆれの発見に必要）
   if (unrecognizedEmotions.length > 0) {
     ui.notifications?.warn(
       game.i18n.localize("EMOKLORE.Import.WarnUnknownEmotions", {
         labels: unrecognizedEmotions.join("、"),
+      }),
+    );
+  }
+
+  if (unrecognizedSkills.length > 0) {
+    ui.notifications?.warn(
+      game.i18n.localize("EMOKLORE.Import.WarnUnknownSkills", {
+        labels: unrecognizedSkills.join("、"),
       }),
     );
   }
