@@ -1,4 +1,5 @@
 import { preLocalize } from "../utils/localization";
+import { attackSkills } from "./attack-skills";
 import { baseSkills } from "./base-skills";
 import { characteristics } from "./characteristics";
 import { emotionAttributes } from "./emotion-attributes";
@@ -11,6 +12,7 @@ export const EMOKLORE = {
   skillGroups,
   baseSkills,
   skills,
+  attackSkills,
   emotionAttributes,
   resonantEmotions,
 };
@@ -26,3 +28,6 @@ preLocalize("baseSkills", { keys: ["label"] });
 preLocalize("skills", { keys: ["label"] });
 preLocalize("emotionAttributes", { keys: ["label"] });
 preLocalize("resonantEmotions", { keys: ["label"] });
+// attackSkills は意図的に対象外。label がそのまま武器スキーマの choices に入るため、
+// i18nInit で書き換わると「スキーマ定義とi18nInitのどちらが先か」で値が変わってしまう。
+// 描画時に formInput の localize が解決する（module/config/attack-skills.ts を参照）
