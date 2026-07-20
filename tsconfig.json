@@ -8,12 +8,12 @@
     "outDir": "dist",
     "noEmit": true,
 
-    "strict": false,
-    "strictNullChecks": true,
+    "strict": true,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
-    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "exactOptionalPropertyTypes": true,
 
     "esModuleInterop": true,
     "skipLibCheck": true,

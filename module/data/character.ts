@@ -22,7 +22,7 @@ export type SkillRollContext = {
   params: SkillRollParams;
   label: string;
   isExtra: boolean;
-  specialization?: string;
+  specialization?: string | undefined;
 };
 
 const defineCharacterDataModelSchema = () => {

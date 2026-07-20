@@ -15,7 +15,6 @@ export type EmotionRow = { label: string; attribute: string };
 export type EmokloreRenderOptions = HandlebarsRenderOptions & {
   mode?: number;
   renderContext?: string;
-  [key: string]: unknown;
 };
 
 /** 技能1行の表示用データ。保存値と CONFIG.EMOKLORE 側の定義を合流させたもの */
@@ -33,7 +32,7 @@ export type SkillRow = {
   level: number;
   target: number;
   characteristic: CharacteristicKey;
-  specialization?: string;
+  specialization?: string | undefined;
   mod: ModifierSet;
   isExtra: boolean;
   /** 能力値の表示名。CONFIG.EMOKLORE から引いた翻訳済みの文字列 */
@@ -137,7 +136,6 @@ export interface EmokloreDocumentSheetContext extends ApplicationRenderContext {
   system: unknown;
   systemFields: Record<string, foundry.data.fields.DataField>;
   flags: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 // window / form はサブクラス側で省略できる（mixinのDEFAULT_OPTIONSがマージされるため）
@@ -155,10 +153,11 @@ export interface EmokloreDocumentSheetOptions {
 /**
  * characterシートのコンテキスト。
  *
- * 基底（EmokloreDocumentSheetContext）は継承しない。継承すると基底の
- * `[key: string]: unknown` まで引き継いでしまい、`context.charPintSum = 1` のような
- * 打ち間違いが素通りするため。閉じた型のままでも `_prepareContext` のキャストは
- * 素の as 1つで通る（アサーションの比較可能性は代入可能性より緩いため）。
+ * 基底（EmokloreDocumentSheetContext）は継承せず、必要なプロパティを並べ直している。
+ * 継承しても型は通るが、`context.charPintSum = 1` のような打ち間違いを捕まえるには
+ * 閉じた型のほうが確実で、シート側は全プロパティを明示して代入しているため困らない。
+ * `_prepareContext` のキャストは閉じた型のままでも素の as 1つで通る
+ * （アサーションの比較可能性は代入可能性より緩いため）。
  */
 export type CharacterContext = {
   config: typeof CONFIG.EMOKLORE;

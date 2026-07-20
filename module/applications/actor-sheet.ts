@@ -27,6 +27,10 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
         return this.actor.rollSkill(dataset.skill!, { base: true });
       case "resonance":
         return this.actor.rollResonance();
+      default:
+        // 未知の data-roll-type は何もしない。テンプレート側の記述ミスなので、
+        // ここで握り潰していること自体は別途見直す余地がある
+        return undefined;
     }
   }
 }
