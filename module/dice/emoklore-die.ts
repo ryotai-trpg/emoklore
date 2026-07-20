@@ -35,6 +35,10 @@ export class EmokloreDie extends foundry.dice.terms.Die {
       result.success = outcome === "critical" || outcome === "success";
       result.failure = outcome === "fumble";
     }
+
+    // 本体のmodifierは false を返したときだけ失敗扱いになる。
+    // 成功時は undefined を返すのが規約なので、明示して返す
+    return undefined;
   }
 
   /**

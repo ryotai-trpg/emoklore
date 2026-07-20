@@ -87,7 +87,7 @@ feat: add resonance roll dialog
 
 ## コーディング方針
 
-- TypeScript（strict化を段階的に進めている。現在 `strictNullChecks` / `noUncheckedIndexedAccess` / `noImplicitAny` が有効）。`any` は lint で禁止している（`noExplicitAny`）。本体JSDocの型が足りない場合は、`any` で潰さず**実際に使うメンバーだけを交差型で補う**（例: `module/utils/effects.ts`、`module/applications/types.ts` の `SheetDocument`）。どうしても必要なら理由コメント付きで `biome-ignore` する
+- TypeScript は **`strict: true`**。加えて `noUncheckedIndexedAccess` / `noFallthroughCasesInSwitch` / `noImplicitOverride` / `noImplicitReturns` / `exactOptionalPropertyTypes` を有効にしている。任意プロパティに `undefined` を入れうる場合は `foo?: T | undefined` と書く。`any` は lint で禁止している（`noExplicitAny`）。本体JSDocの型が足りない場合は、`any` で潰さず**実際に使うメンバーだけを交差型で補う**（例: `module/utils/effects.ts`、`module/applications/types.ts` の `SheetDocument`）。どうしても必要なら理由コメント付きで `biome-ignore` する
 - UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す
 - **`as unknown as` の二重キャストは lint で禁止**している（`tools/no-double-cast.grit`）。まず素の `as` で通るか試すこと。アサーションの判定は代入可能性より緩いので、代入で弾かれても `as` 単体なら通ることが多い。本体APIとの境界などで本当に必要なときは、直前の行に `// biome-ignore lint: 理由` を付ける
 - フォーマット・lintは [Biome](https://biomejs.dev/)（設定: `biome.json`）。手動実行は `npm run check`（修正適用）/ `npm run lint`（検証のみ）。Biomeは型アサーションの組み込みルールを持たないため、上記の禁止はGritQLプラグインで実装している

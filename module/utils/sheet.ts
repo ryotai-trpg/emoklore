@@ -53,7 +53,7 @@ type EmbeddedDocumentName = "Item" | "ActiveEffect";
  * `getDocumentClass` の戻り値の型には出てこない。
  */
 type EmbeddedDocumentClass = {
-  defaultName: (options: { type?: string; parent?: unknown }) => string;
+  defaultName: (options: { type?: string | undefined; parent?: unknown }) => string;
   create: (data: Record<string, unknown>, options?: Record<string, unknown>) => Promise<unknown>;
 };
 

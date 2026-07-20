@@ -8,7 +8,7 @@ export type ResonanceRollParams = {
   resonanceValue: number;
   /** 判定の強度（目標値になる） */
   intensity: number;
-  emotionMatch?: ResonanceMatch;
+  emotionMatch?: ResonanceMatch | undefined;
 };
 
 /**
