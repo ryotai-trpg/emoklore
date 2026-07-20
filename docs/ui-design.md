@@ -97,6 +97,21 @@ HP・MP・共鳴の3本のバーは、`.em-resources` が持つ行トラック�
 
 `--emoklore-*` の色はライトテーマの値を既定に置く。本体は `prefers-color-scheme` がライトでもダークでもない環境では `body` にテーマクラスを付けない（`client/game.mjs` の `#configureTheme`）ため、テーマ別ブロックだけに色を置くと変数が未定義になる。
 
+### テーマの判定は「一番近い宣言が勝つ」形にする
+
+シートは本体のシート設定でテーマを個別に固定できる。固定すると `DocumentSheetV2._initializeApplicationOptions` がルート要素に `themed` と `theme-light` / `theme-dark` を付ける。
+
+このとき **`.theme-dark .emoklore` のような子孫セレクタだけで書いてはいけない**。ライトに固定したシートでも `body` が `theme-dark` なら一致してしまい、本体設定を切り替えるたびにシートの色が変わる。
+
+自分でテーマを宣言している要素を除外して、近いほうの宣言が勝つようにする。
+
+```css
+.theme-dark .emoklore:not(.theme-light),
+.emoklore.theme-dark { /* ダークの値 */ }
+```
+
+なお個別テーマは**構築時に解決される**（`_initializeApplicationOptions`）。設定を変えても既存のシートインスタンスには反映されないので、確認するときはシートを開き直す。
+
 ## 操作できることを示す
 
 **クリックできるものは、ホバーで必ず反応させる**。カーソル形状だけでは弱い。

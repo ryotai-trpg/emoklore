@@ -49,7 +49,14 @@
   --emoklore-hover-surface: rgb(0 0 0 / 7%);
 }
 
-.theme-dark .emoklore,
+/* シートは本体のシート設定でテーマを個別に固定できる（DocumentSheetV2 が
+   themed と theme-light / theme-dark をルート要素に付ける）。
+
+   `.theme-dark .emoklore` だけだと、ライトに固定したシートでも body が
+   theme-dark ならこの規則に一致してしまい、本体設定を切り替えるたびに
+   色が変わる。自分でライトを宣言している要素は除外して、
+   「一番近いテーマの宣言が勝つ」形にする */
+.theme-dark .emoklore:not(.theme-light),
 .emoklore.theme-dark {
   /* 同じ色相のまま明度を上げる。地が #0F0D16 と暗いので、ライトより明るく振る */
   --emoklore-accent: #42a5f5; /* 7.28:1 */
