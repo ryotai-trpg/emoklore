@@ -100,3 +100,26 @@ export const getEmotionRows = (
 
   return rows;
 };
+
+/** 段で値を選ぶ入力の1段ぶん */
+export type ValueSegment = {
+  value: number;
+  /** いま選ばれている段 */
+  checked: boolean;
+};
+
+/**
+ * 能力値・技能レベルを段で選ぶ入力の、段の並びを作る。
+ *
+ * 塗り（どこまで色が乗るか）はCSSの `:has()` で出すので、ここでは持たない。
+ * 選択の即時反映を再描画待ちにしないため。
+ *
+ * game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
+ */
+export const buildValueSegments = (min: number, max: number, current: number): ValueSegment[] => {
+  const segments: ValueSegment[] = [];
+  for (let value = min; value <= max; value++) {
+    segments.push({ value, checked: value === current });
+  }
+  return segments;
+};

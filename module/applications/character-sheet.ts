@@ -1,6 +1,12 @@
 import type { CharacteristicKey } from "../config/characteristics";
 import type { SkillKey } from "../config/skills";
 import { systemPath } from "../constants";
+import {
+  CHARACTERISTIC_MAX,
+  CHARACTERISTIC_MIN,
+  SKILL_LEVEL_MAX,
+  SKILL_LEVEL_MIN,
+} from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import {
   CHARACTERISTIC_POINT_MAX,
@@ -19,6 +25,7 @@ import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import {
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
+  buildValueSegments,
   createEmotionOptions,
   getEmotionRows,
 } from "./helpers";
@@ -44,7 +51,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     ...super.DEFAULT_OPTIONS,
     classes: ["standard-form", "character"],
     position: {
-      width: 601,
+      // カード列は250px固定なので、広げたぶんはすべて右の技能列に回る
+      width: 760,
       height: 710,
     },
     // ウィンドウ枠の操作メニュー（⋮）に足す。本体の window.controls は継承チェーンで
@@ -67,6 +75,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       deleteDoc: this._deleteDoc,
       toggleEffect: this._toggleEffect,
       importCharacter: this._importCharacter,
+      selectSegment: this._selectSegment,
     },
   };
 
@@ -87,6 +96,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         "templates/actor/partials/stat-row.hbs",
         "templates/actor/partials/skill-row-play.hbs",
         "templates/actor/partials/skill-row-edit.hbs",
+        "templates/actor/partials/segments.hbs",
       ].map(systemPath),
       scrollable: [""],
     },
@@ -96,6 +106,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         "templates/actor/partials/card.hbs",
         "templates/actor/partials/stat-row.hbs",
         "templates/actor/partials/field.hbs",
+        "templates/actor/partials/segments.hbs",
       ].map(systemPath),
       scrollable: [""],
     },
@@ -184,6 +195,33 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   /**
+   * 段入力で、いま選ばれている段をもう一度押したときに値を戻す。
+   *
+   * ラジオは押しても外れないので、0（未修得）に戻す手段がこれしかない。
+   * 段を1つ増やして0を置く手もあるが、バーの左端が常に空いて見えるのでやめた。
+   *
+   * 選択中でない段を押したときは何もしない。ラジオの既定の動作と
+   * submitOnChange に任せる。
+   */
+  static async _selectSegment(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
+    const input = target as HTMLInputElement;
+    // 属性が無い・空なら解除できない入力（能力値は1未満にならない）。
+    // Number("") は NaN ではなく 0 なので、空文字は先に弾く
+    const raw = input.dataset.clearTo;
+    if (!raw) return;
+    const clearTo = Number(raw);
+    if (!Number.isFinite(clearTo)) return;
+
+    const current = foundry.utils.getProperty(this.actor, input.name);
+    if (Number(input.value) !== current) return;
+
+    // ラジオの既定動作を止めないと、checked が立って submitOnChange が
+    // 元の値で送られ、こちらの更新を打ち消してしまう
+    event.preventDefault();
+    await this.actor.update({ [input.name]: clearTo });
+  }
+
+  /**
    * 能力値の表示用データ。
    *
    * アイコンは CONFIG.EMOKLORE 側の定義なので、テンプレートで二重の lookup を
@@ -191,14 +229,19 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
    */
   _getCharacteristics(): CharacteristicsMap {
     return Object.fromEntries(
-      Object.entries(CONFIG.EMOKLORE.characteristics).map(([chc, { fa }]) => [
-        chc,
-        {
-          field: this.actor.system.schema.getField(["characteristics", chc]),
-          value: this.actor.system.characteristics[chc as CharacteristicKey]?.value ?? 0,
-          icon: fa,
-        },
-      ]),
+      Object.entries(CONFIG.EMOKLORE.characteristics).map(([chc, { fa }]) => {
+        const value = this.actor.system.characteristics[chc as CharacteristicKey]?.value ?? 0;
+        return [
+          chc,
+          {
+            field: this.actor.system.schema.getField(["characteristics", chc]),
+            value,
+            icon: fa,
+            name: `system.characteristics.${chc}.value`,
+            segments: buildValueSegments(CHARACTERISTIC_MIN, CHARACTERISTIC_MAX, value),
+          },
+        ];
+      }),
     );
   }
 
@@ -227,6 +270,9 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
             mod: entry.mod,
             characteristicLabel: characteristic?.label ?? "",
             characteristicIcon: characteristic?.fa ?? "",
+            name: `system.skills.${key}.level`,
+            // 段は1から。0（未修得）は段を置かず、選択中の段を押し直して戻す
+            levelSegments: buildValueSegments(SKILL_LEVEL_MIN + 1, SKILL_LEVEL_MAX, entry.level),
           },
         ];
       }),

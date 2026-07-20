@@ -4,46 +4,57 @@
    それぞれ並べる必要がある。旧Edge専用の ::-ms-fill は削除済み */
 
 .emoklore {
+  /* 外側の余白は持たない。margin は「自分をどこに置くか」なので、置く側の
+     責務になる（docs/ui-design.md の層の責務）。ここに 2px があったせいで、
+     meter は自前の margin で上書き、skill-row は 0 で打ち消し、stat-row だけ
+     素通しという食い違いが起きていた */
   .em-progress {
     height: 10px;
-    margin: 2px;
-    background-color: var(--emoklore-gray);
+    background-color: var(--emoklore-track);
     border-radius: var(--emoklore-progress-radius);
   }
 
   .em-progress::-webkit-progress-bar {
-    background-color: var(--emoklore-gray);
+    background-color: var(--emoklore-track);
     border-radius: var(--emoklore-progress-radius);
   }
 
   .em-progress::-webkit-progress-value {
-    background-color: var(--emoklore-accent-color);
+    background-color: var(--emoklore-accent);
     border-radius: var(--emoklore-progress-radius);
   }
 
   .em-progress::-moz-progress-bar {
-    background-color: var(--emoklore-accent-color);
+    background-color: var(--emoklore-accent);
     border-radius: var(--emoklore-progress-radius);
   }
 
   /* HP */
   .em-progress--hp::-webkit-progress-value {
-    background-color: var(--emoklore-green);
+    background-color: var(--emoklore-hp);
   }
   .em-progress--hp::-moz-progress-bar {
-    background-color: var(--emoklore-green);
+    background-color: var(--emoklore-hp);
   }
 
   /* MP */
   .em-progress--mp::-webkit-progress-value {
-    background-color: var(--emoklore-red);
+    background-color: var(--emoklore-mp);
   }
   .em-progress--mp::-moz-progress-bar {
-    background-color: var(--emoklore-red);
+    background-color: var(--emoklore-mp);
   }
 
-  /* 能力値・技能の行に埋める背の低いバー。角丸を控えめにする */
+  /* 能力値・技能の行に埋める背の低いバー。角丸を控えめにする。
+
+     寸法もここで持つ。progress は置換要素で grid の stretch が効かないので
+     width: 100% が要り、固有幅（既定140px）が grid item の min-width: auto と
+     して効くので min-width: 0 で外す必要がある。この2つは置く側ごとに
+     書き写していたが、どの行に埋めても同じなのでここに集約した */
   .em-progress--sm {
+    height: var(--emoklore-row-control-size);
+    width: 100%;
+    min-width: 0;
     border-radius: var(--emoklore-progress-radius-small);
   }
   .em-progress--sm::-webkit-progress-bar {

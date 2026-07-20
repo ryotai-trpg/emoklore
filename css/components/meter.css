@@ -52,11 +52,16 @@
       column-gap: var(--spacer-4);
     }
 
+    /* 本体の button.icon は --button-size で箱を決める（.inline-control の
+       既定は24px）。font-size だけ上げると字面が箱をはみ出してホバーの
+       背景が欠けるので、箱のほうを --button-size で広げる。
+       見た目とホバーは本体のアイコンボタンに任せる */
     .em-meter__action {
       grid-column: 1;
       grid-row: 1 / span 2;
       align-self: flex-start;
-      font-size: 1.8em;
+      --button-size: 2.25rem;
+      font-size: 1.5rem;
     }
 
     /* MPの数値と同じ行・同じ下端に揃える */

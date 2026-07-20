@@ -6,6 +6,7 @@
 
 /* Components — .emoklore の下で成立する部品 */
 @import url("./css/components/progress.css");
+@import url("./css/components/segments.css");
 @import url("./css/components/meter.css");
 @import url("./css/components/utilities.css");
 @import url("./css/components/card.css");

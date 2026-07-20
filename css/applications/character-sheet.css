@@ -9,12 +9,11 @@
   /* Tab Layout */
   section.tab {
     overflow: auto;
-    padding: 0.5rem;
+    padding: var(--spacer-12);
   }
 
-  /* Form Controls */
-  range-picker > input[type="number"] {
-    flex: 0 0 20px;
+  .tab.active {
+    column-gap: var(--spacer-12);
   }
 
   /* ヘッダ。名前とリソースを横に並べ、下端で揃える。

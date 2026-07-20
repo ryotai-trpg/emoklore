@@ -1,34 +1,76 @@
 /* ===========================================
    Emoklore CSS Variables
-   =========================================== */
+   ===========================================
 
-/* 色はライトテーマの値を既定に置く。本体は prefers-color-scheme がライトでも
+   考え方は docs/ui-design.md の「色」を参照。要点だけ再掲する。
+
+   - 中間色・テキスト色・境界線は本体のテーマ追従変数を使い、ここでは定義しない
+   - ここに置くのはブランドのアクセントと、本体に対応物がない意味色だけ
+   - 同じ色相のまま、ライトでは暗く・ダークでは明るくする（明度を反転させる）
+   - コントラストはテキスト4.5:1／UI要素3:1を最低線にする
+
+   色はライトテーマの値を既定に置く。本体は prefers-color-scheme がライトでも
    ダークでもない環境では body にテーマクラスを付けないため（client/game.mjs の
    #configureTheme）、テーマ別ブロックだけに色を置くと変数が未定義になる */
+
 .emoklore {
-  /* Layout Variables */
+  /* Layout */
   --emoklore-sheet-sidebar-width: 250px;
+
+  /* 一覧の行に埋め込むコントロール（バー・段入力・アイコン枠）の高さ。
+     行の高さがこれで決まるので、バーだけ・段だけを変えると揃わなくなる */
+  --emoklore-row-control-size: 1.25rem;
 
   /* Border Radius */
   --emoklore-progress-radius: 5px;
   --emoklore-progress-radius-small: 2px;
   --emoklore-card-radius: 10px;
 
-  /* Colors */
-  --emoklore-accent-color: #42a5f5; /* Material Blue 400 */
-  --emoklore-darkgray: rgb(0 0 0 / 10%);
-  --emoklore-gray: rgb(0 0 0 / 20%);
+  /* --- ブランド ---
+     青がエモクロアの主アクセント。橙はガイアケアの色で、用途が決まるまでは
+     定義だけ持たせておく（使う場所が決まってから広げる） */
+  --emoklore-accent: #0b5fa5; /* 地 #DAD8CC に対し 4.59:1 */
+  --emoklore-gaiacare: #a34400; /* 同 4.34:1 */
 
-  --emoklore-green: #43a047; /* Material Green 600, HP color */
-  --emoklore-red: #e64a19; /* Material DeepOrange 700, MP color */
+  /* --- 意味色 ---
+     リソースの種別を表す。本体に対応する変数がないので独自に持つ */
+  --emoklore-hp: #2e7d32; /* 3.58:1 */
+  --emoklore-mp: #b3300f; /* 4.39:1 */
+
+  /* --- 面 ---
+     沈んだ面（カードの地、表の見出し行）。本体の --color-cool-5-* は
+     ダーク前提の値なので、透過の黒白で持つ。
+
+     ライトの黒被せとダークの白被せは、同じ数値でも同じ強さには見えない。
+     白のほうが弱く出るので、ダーク側をやや厚くして印象を揃える */
+  --emoklore-surface-sunken: rgb(0 0 0 / 10%);
+
+  /* バーの溝。塗りと competing しない濃さに留める */
+  --emoklore-track: rgb(0 0 0 / 12%);
+
+  /* --- 操作 ---
+     ホバーで敷く地。控えめにして、文字より前に出ないようにする */
+  --emoklore-hover-surface: rgb(0 0 0 / 7%);
 }
 
-.theme-dark .emoklore,
-.emoklore.theme-dark {
-  --emoklore-accent-color: #1565c0; /* Material Blue 800 */
-  --emoklore-darkgray: rgb(255 255 255 / 10%);
-  --emoklore-gray: rgb(255 255 255 / 7%);
+/* シートは本体のシート設定でテーマを個別に固定できる（DocumentSheetV2 が
+   themed と theme-light / theme-dark をルート要素に付ける）。
 
-  --emoklore-green: #388e3c; /* Material Green 700, HP color */
-  --emoklore-red: #bf360c; /* Material DeepOrange 900, MP color */
+   `.theme-dark .emoklore` だけだと、ライトに固定したシートでも body が
+   theme-dark ならこの規則に一致してしまい、本体設定を切り替えるたびに
+   色が変わる。自分でライトを宣言している要素は除外して、
+   「一番近いテーマの宣言が勝つ」形にする */
+.theme-dark .emoklore:not(.theme-light),
+.emoklore.theme-dark {
+  /* 同じ色相のまま明度を上げる。地が #0F0D16 と暗いので、ライトより明るく振る */
+  --emoklore-accent: #42a5f5; /* 7.28:1 */
+  --emoklore-gaiacare: #f57c00; /* 7.13:1 */
+
+  --emoklore-hp: #43a047; /* 5.84:1 */
+  --emoklore-mp: #e64a19; /* 4.92:1 */
+
+  --emoklore-surface-sunken: rgb(255 255 255 / 12%);
+  --emoklore-track: rgb(255 255 255 / 14%);
+
+  --emoklore-hover-surface: rgb(255 255 255 / 10%);
 }

@@ -13,7 +13,14 @@
   <progress class="em-progress em-progress--sm" id="{{key}}" value="{{stat.value}}" max="6"></progress>
 </div>
 {{else}}
+{{! 編集も閲覧と同じ4列に載せる。値の入力だけがバーから段に変わる }}
 <div class="em-stat-row em-stat-row--edit" data-characteristic="{{key}}">
-  {{formGroup stat.field.fields.value value=stat.value placeholder="1"}}
+  <i class="fa-solid {{stat.icon}} em-stat-row__icon"></i>
+  <label for="{{key}}">{{stat.field.fields.value.label}}</label>
+  <span class="em-stat-row__value">{{stat.value}}</span>
+  {{> "systems/emoklore/templates/actor/partials/segments.hbs"
+    name=stat.name
+    segments=stat.segments
+    label=stat.field.fields.value.label}}
 </div>
 {{/if}}

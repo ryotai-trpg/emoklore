@@ -1,55 +1,117 @@
 /* 技能の一覧と各行。閲覧と編集で列構成が変わる */
 
 .emoklore {
+  /* 列トラックはリストが持ち、各行が subgrid で共有する。
+     行ごとに解決させると Lv や目標値の桁数で列位置がずれる。
+
+     名前は auto（全行の最長に揃う）。1fr にすると名前列が余白を吸って
+     Lv が遠くまで押し出される。余りはバーに回す。
+     列間の基本は詰めておき、Lvから右は要素ごとに margin で間隔を足す */
   .em-skill-list {
-    display: flex;
-    flex-direction: column;
-    padding: 8px;
+    display: grid;
+    grid-template-columns: auto auto minmax(3rem, 1fr) auto var(--emoklore-row-control-size);
+    row-gap: var(--spacer-2);
+    column-gap: var(--spacer-4);
+    padding: var(--spacer-8);
+    align-content: start;
   }
 
   /* 閲覧: 技能名・Lv・バー・目標値・能力値アイコンの5列 */
   .em-skill-row {
     display: grid;
-    grid-template-columns: 1fr 20px 115px 20px 20px;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
     align-items: center;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    /* subgrid の行に左右の padding/margin を足すとトラックがずれるので、
+       余白は縦だけにする。横の余白はリスト側の padding が持つ */
+    padding: var(--spacer-4) 0;
+    border-radius: var(--emoklore-progress-radius-small);
   }
 
-  /* 編集: 技能名・Lv入力・目標値・能力値の4列 */
-  .em-skill-row--edit {
-    grid-template-columns: 1fr 120px 20px 60px;
-    margin-top: 2px;
-    margin-bottom: 2px;
+  /* 編集は列構成が違う（技能名・分野・段入力・目標値・能力値の5列）ので、
+     リスト側のトラックを差し替える。行は閲覧と同じく subgrid で載るため、
+     能力値がselectの行とテキストの行が混在しても縦のラインが揃う。
+     段入力は 1fr で伸ばす。以前の range-picker は幅が足りず操作しづらかった */
+  .em-skill-list--edit {
+    grid-template-columns: minmax(5rem, 1fr) 1fr minmax(5rem, 1fr) auto minmax(4rem, auto);
+  }
 
-    select {
-      padding: 0;
+  /* 行の高さは中身のいちばん高いものに引きずられる。selectを持つ技能だけ
+     行が伸びて見えるのを防ぐため、フォーム部品の高さを段入力に合わせる */
+  .em-skill-row--edit {
+    padding: var(--spacer-2) 0;
+
+    select,
+    input {
+      width: 100%;
+      min-width: 0;
+      height: var(--emoklore-row-control-size);
+      padding: 0 var(--spacer-4);
+      line-height: 1;
     }
   }
 
-  .em-skill-row__target {
-    border: 1px solid;
-    border-radius: 2px;
-    text-align: center;
+  .em-skill-row__name {
+    min-width: 0;
   }
 
-  .em-skill-row--edit .em-skill-row__target {
-    margin-left: 5px;
+  /* Lvから右は、列間の基本（4px）に足して要素ごとに間隔を持たせる */
+  .em-skill-row__target {
+    border: 1px solid;
+    border-radius: var(--emoklore-progress-radius-small);
+    padding: 0 var(--spacer-4);
+    margin-inline-start: var(--spacer-4);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
   }
 
   .em-skill-row__stat {
-    margin-left: 6px;
+    display: flex;
+    justify-content: center;
+    margin-inline-start: var(--spacer-4);
   }
 
-  /* selectのときだけ左の余白を詰める */
-  .em-skill-row--edit .em-skill-row__stat:has(select) {
-    margin-left: 1px;
+  /* バーの寸法は em-progress--sm が持つ。左の余白は margin ではなく
+     Lv側の padding で作る（margin だと width: 100% のぶんトラックからはみ出す） */
+  .em-skill-row__level {
+    padding-inline-end: var(--spacer-4);
   }
 
-  /* 高さと幅だけ。角丸は .em-progress--sm 側で持つ */
-  .em-skill-row .em-progress {
-    height: 20px;
-    margin-left: 10px;
-    width: 90px;
+  /* --- 判定のトリガであることを示す ---
+
+     クリックできるのは技能名（a要素）だが、当たり判定が文字幅しかないと
+     押しづらい。擬似要素で行全体に広げ、見た目のハイライトと一致させる。
+     フォーカスはa要素に残るのでキーボード操作は壊れない */
+  .em-skill-row:not(.em-skill-row--edit) {
+    position: relative;
+    transition: background-color 80ms ease-out;
+
+    .em-skill-row__name {
+      cursor: pointer;
+      font-weight: 600;
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+      }
+    }
+
+    /* アクセント色はバーの塗りに限定する。ここは地の明るさと
+       文字の強さだけで示す */
+    &:hover {
+      background-color: var(--emoklore-hover-surface);
+
+      .em-skill-row__name {
+        color: var(--color-text-emphatic);
+      }
+    }
+
+    /* フォーカスリングは本体のボタンと同じ色を使い、シート内で見え方を揃える */
+    &:has(.em-skill-row__name:focus-visible) {
+      background-color: var(--emoklore-hover-surface);
+      outline: 2px solid var(--button-focus-outline-color);
+      outline-offset: -2px;
+    }
   }
 }

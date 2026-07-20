@@ -46,7 +46,7 @@
       "wound": "Wound"
     },
     "resonantEmotions": {
-      "selfAssertion": "SelfAssertion",
+      "selfAssertion": "Self-Assertion",
       "possession": "Possession",
       "instinct": "Instinct",
       "destruction": "Destruction",
@@ -282,7 +282,7 @@
         "cipher": "Cipher",
         "computer": "Computer",
         "stealth": "Stealth",
-        "strongLuck": "StrongLuck"
+        "strongLuck": "Strong Luck"
       }
     },
     "skillRoll": "{skillName} Roll",

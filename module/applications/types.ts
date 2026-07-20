@@ -4,6 +4,7 @@ import type { CharacteristicKey } from "../config/characteristics";
 import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import type { ModifierSet } from "../rules/types";
+import type { ValueSegment } from "./helpers";
 
 export type EmotionKey = "surface" | "hidden" | "root";
 
@@ -38,6 +39,9 @@ export type SkillRow = {
   characteristicLabel: string;
   /** 能力値のFont Awesomeアイコンクラス */
   characteristicIcon: string;
+  /** 編集モードの段入力に渡す。フォームの名前と段の並び */
+  name: string;
+  levelSegments: ValueSegment[];
 };
 
 /**
@@ -89,6 +93,9 @@ export type CharacteristicsMap = Record<
     value: number;
     /** 能力値のFont Awesomeアイコンクラス */
     icon: string;
+    /** 編集モードの段入力に渡す。フォームの名前と段の並び */
+    name: string;
+    segments: ValueSegment[];
   }
 >;
 

@@ -1,0 +1,28 @@
+{{!--
+  値を段で選ぶ入力。閲覧モードのバーと同じ見た目で、押した段の値になる。
+
+  ラジオボタンの集合なので、矢印キーでの移動もフォーム送信もブラウザ任せで済む。
+  塗りはCSSの :has() が出すので、再描画を待たずに反応する。
+
+  @param name     フォームの名前（system.characteristics.body.value など）
+  @param segments buildValueSegments が作った { value, checked } の配列
+  @param label    読み上げ用の名前
+  @param clearTo  いま選ばれている段をもう一度押したときの値。
+                  渡さなければ解除できない（能力値は1未満にならないので渡さない）
+--}}
+<div class="em-segments" role="radiogroup" aria-label="{{label}}">
+  {{#each segments}}
+  <label class="em-segment">
+    {{! data-clear-to が空なら解除しないだけなので、条件分岐は置かない }}
+    <input
+      type="radio"
+      name="{{../name}}"
+      value="{{this.value}}"
+      aria-label="{{this.value}}"
+      data-action="selectSegment"
+      data-clear-to="{{../clearTo}}"
+      {{checked this.checked}}
+    >
+  </label>
+  {{/each}}
+</div>
