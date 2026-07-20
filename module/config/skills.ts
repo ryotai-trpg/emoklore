@@ -1,8 +1,11 @@
+import type { CharacteristicKey } from "./characteristics";
+import type { SkillGroupKey } from "./skill-groups";
+
 export interface SkillConfig {
   label: string;
-  characteristic?: string;
-  characteristicOptions?: string[];
-  group: string;
+  characteristic?: CharacteristicKey;
+  characteristicOptions?: CharacteristicKey[];
+  group: SkillGroupKey;
   isExtra?: boolean;
   hasSpecialization?: boolean;
 }

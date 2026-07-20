@@ -344,14 +344,14 @@ export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataMod
       characteristic: CharacteristicKey;
       mod: ModifierSet;
     },
-    group: string,
+    group: SkillGroupKey,
   ): SkillRollParams {
     return {
       level: entry.level,
       baseTarget: entry.target,
       skillMod: entry.mod,
       characteristicMod: this.characteristics[entry.characteristic].mod,
-      skillGroupMod: this.skillGroups[group as SkillGroupKey].mod,
+      skillGroupMod: this.skillGroups[group].mod,
     };
   }
 

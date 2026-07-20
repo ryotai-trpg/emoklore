@@ -1,7 +1,10 @@
+import type { CharacteristicKey } from "./characteristics";
+import type { SkillGroupKey } from "./skill-groups";
+
 export interface BaseSkillConfig {
   label: string;
-  characteristic: string;
-  group: string;
+  characteristic: CharacteristicKey;
+  group: SkillGroupKey;
 }
 
 const definitions = {

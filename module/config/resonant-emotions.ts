@@ -1,6 +1,8 @@
+import type { EmotionAttributeKey } from "./emotion-attributes";
+
 export interface ResonantEmotionsConfig {
   label: string;
-  attribute: string;
+  attribute: EmotionAttributeKey;
 }
 
 const definitions = {
