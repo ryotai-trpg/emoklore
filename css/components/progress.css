@@ -42,8 +42,16 @@
     background-color: var(--emoklore-mp);
   }
 
-  /* 能力値・技能の行に埋める背の低いバー。角丸を控えめにする */
+  /* 能力値・技能の行に埋める背の低いバー。角丸を控えめにする。
+
+     寸法もここで持つ。progress は置換要素で grid の stretch が効かないので
+     width: 100% が要り、固有幅（既定140px）が grid item の min-width: auto と
+     して効くので min-width: 0 で外す必要がある。この2つは置く側ごとに
+     書き写していたが、どの行に埋めても同じなのでここに集約した */
   .em-progress--sm {
+    height: var(--emoklore-row-control-size);
+    width: 100%;
+    min-width: 0;
     border-radius: var(--emoklore-progress-radius-small);
   }
   .em-progress--sm::-webkit-progress-bar {

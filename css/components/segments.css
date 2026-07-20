@@ -12,7 +12,7 @@
     gap: 1px;
     width: 100%;
     min-width: 0;
-    height: 1.25rem;
+    height: var(--emoklore-row-control-size);
     background-color: var(--emoklore-track);
     border-radius: var(--emoklore-progress-radius-small);
     overflow: hidden;

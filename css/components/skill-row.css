@@ -9,7 +9,7 @@
      列間の基本は詰めておき、Lvから右は要素ごとに margin で間隔を足す */
   .em-skill-list {
     display: grid;
-    grid-template-columns: auto auto minmax(3rem, 1fr) auto 1.25rem;
+    grid-template-columns: auto auto minmax(3rem, 1fr) auto var(--emoklore-row-control-size);
     row-gap: var(--spacer-2);
     column-gap: var(--spacer-4);
     padding: var(--spacer-8);
@@ -45,7 +45,7 @@
     input {
       width: 100%;
       min-width: 0;
-      height: 1.25rem;
+      height: var(--emoklore-row-control-size);
       padding: 0 var(--spacer-4);
       line-height: 1;
     }
@@ -71,16 +71,11 @@
     margin-inline-start: var(--spacer-4);
   }
 
-  /* progress は置換要素なので grid の stretch が効かない。width: 100% で
-     トラックいっぱいにする。そのぶん左の余白は margin ではなく
-     Lv側の padding で作る（margin だとトラックからはみ出す）。
-
-     .em-progress が既定で持つ 2px の margin は、ここでの間隔の計算に
-     混ざって値がずれるので打ち消す */
+  /* 寸法は em-progress--sm が持つ。ここで打ち消すのは em-progress が既定で
+     持つ 2px の margin だけ。間隔の計算に混ざって値がずれるため。
+     バーの左の余白は margin ではなく Lv側の padding で作っている
+     （margin だと width: 100% のぶんトラックからはみ出す） */
   .em-skill-row .em-progress {
-    height: 1.25rem;
-    width: 100%;
-    min-width: 0;
     margin: 0;
   }
 

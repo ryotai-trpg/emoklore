@@ -6,7 +6,7 @@
      行ごとにずれる（英語で顕著） */
   .em-stat-list {
     display: grid;
-    grid-template-columns: 1.25rem auto auto minmax(0, 1fr);
+    grid-template-columns: var(--emoklore-row-control-size) auto auto minmax(0, 1fr);
     row-gap: var(--spacer-4);
     column-gap: var(--spacer-8);
     padding: var(--spacer-12);
@@ -33,17 +33,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* 編集も閲覧と同じ4列に載せる。バーの位置に段入力が来るだけなので、
-     モードを切り替えても行の構造が動かない */
-  .em-stat-row--edit {
-    display: grid;
-  }
-
-  /* progress は固有幅（既定140px）を持つ。grid item の min-width: auto が
-     それを最小幅として効くので、明示的に外さないとトラックからはみ出す */
-  .em-stat-row .em-progress {
-    height: 1.25rem;
-    width: 100%;
-    min-width: 0;
-  }
+  /* 編集も閲覧と同じ4列に載る。バーの位置に段入力が来るだけなので、
+     モードを切り替えても行の構造が動かない。em-stat-row の指定で足りるため
+     em-stat-row--edit 側に持たせる規則はない */
 }

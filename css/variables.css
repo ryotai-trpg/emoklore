@@ -17,6 +17,10 @@
   /* Layout */
   --emoklore-sheet-sidebar-width: 250px;
 
+  /* 一覧の行に埋め込むコントロール（バー・段入力・アイコン枠）の高さ。
+     行の高さがこれで決まるので、バーだけ・段だけを変えると揃わなくなる */
+  --emoklore-row-control-size: 1.25rem;
+
   /* Border Radius */
   --emoklore-progress-radius: 5px;
   --emoklore-progress-radius-small: 2px;

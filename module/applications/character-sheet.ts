@@ -229,20 +229,19 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
    */
   _getCharacteristics(): CharacteristicsMap {
     return Object.fromEntries(
-      Object.entries(CONFIG.EMOKLORE.characteristics).map(([chc, { fa }]) => [
-        chc,
-        {
-          field: this.actor.system.schema.getField(["characteristics", chc]),
-          value: this.actor.system.characteristics[chc as CharacteristicKey]?.value ?? 0,
-          icon: fa,
-          name: `system.characteristics.${chc}.value`,
-          segments: buildValueSegments(
-            CHARACTERISTIC_MIN,
-            CHARACTERISTIC_MAX,
-            this.actor.system.characteristics[chc as CharacteristicKey]?.value ?? 0,
-          ),
-        },
-      ]),
+      Object.entries(CONFIG.EMOKLORE.characteristics).map(([chc, { fa }]) => {
+        const value = this.actor.system.characteristics[chc as CharacteristicKey]?.value ?? 0;
+        return [
+          chc,
+          {
+            field: this.actor.system.schema.getField(["characteristics", chc]),
+            value,
+            icon: fa,
+            name: `system.characteristics.${chc}.value`,
+            segments: buildValueSegments(CHARACTERISTIC_MIN, CHARACTERISTIC_MAX, value),
+          },
+        ];
+      }),
     );
   }
 
