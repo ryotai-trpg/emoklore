@@ -38,9 +38,7 @@ const defineWeaponDataModelSchema = () => {
   };
 };
 
-export type WeaponDataModelSchema = ReturnType<typeof defineWeaponDataModelSchema>;
-
-export class WeaponDataModel extends EmokloreSystemDataModel<WeaponDataModelSchema> {
+export class WeaponDataModel extends EmokloreSystemDataModel {
   declare skill: AttackSkillKey;
   declare attackPower: string;
   declare range: string;

@@ -48,8 +48,6 @@ const defineWeaponCardSchema = () => {
   };
 };
 
-export type WeaponCardSchema = ReturnType<typeof defineWeaponCardSchema>;
-
 /**
  * 武器カードのChatMessage。
  *
@@ -61,7 +59,7 @@ export type WeaponCardSchema = ReturnType<typeof defineWeaponCardSchema>;
  * 本体は `content` に要素があれば `rolls` を自動描画しないので、ロールをメッセージに
  * 載せたまま、カード側で見出し付きに並べられる。
  */
-export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
+export class WeaponCardModel extends EmokloreSystemDataModel {
   declare weaponName: string;
   declare weaponImg: string;
   declare skill: AttackSkillKey;

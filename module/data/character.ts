@@ -196,9 +196,7 @@ const defineCharacterDataModelSchema = () => {
   return schema;
 };
 
-export type CharacterDataModelSchema = ReturnType<typeof defineCharacterDataModelSchema>;
-
-export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataModelSchema> {
+export class CharacterDataModel extends EmokloreSystemDataModel {
   // target は prepareDerivedData で必ず設定される派生値（initiative と同じ扱い）。
   // それ以外は defineCharacterDataModelSchema のスキーマと一致させること
   declare skills: Record<

@@ -23,9 +23,7 @@ const defineNpcDataModelSchema = () => {
   return schema;
 };
 
-export type NpcDataModelSchema = ReturnType<typeof defineNpcDataModelSchema>;
-
-export class NpcDataModel extends EmokloreSystemDataModel<NpcDataModelSchema> {
+export class NpcDataModel extends EmokloreSystemDataModel {
   declare wickedness: {
     value: number;
     max: number;
