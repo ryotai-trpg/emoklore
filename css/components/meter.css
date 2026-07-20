@@ -41,14 +41,15 @@
   }
 
   /* 共鳴だけは表・裏・根源の3行を抱えるので head をグリッドにする。
+     head 自身も subgrid で親（em-resources）の行を共有する。これがないと
+     Lv. の数値が独立した座標系で位置決めされ、MPの数値と数px ずれる。
      列は auto なので感情名が長くても押し出されるだけで、枠を破らない */
   .em-meter--resonance {
     .em-meter__head {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
-      grid-template-rows: repeat(3, auto);
+      grid-template-rows: subgrid;
       column-gap: var(--spacer-4);
-      align-items: center;
     }
 
     .em-meter__action {
@@ -58,20 +59,23 @@
       font-size: 1.8em;
     }
 
+    /* MPの数値と同じ行・同じ下端に揃える */
     .em-meter__value {
       grid-column: 1;
       grid-row: 3;
+      align-self: flex-end;
     }
   }
 
-  /* 感情3行。head の行トラックを subgrid で共有するので、
-     感情名と属性が必ず同じ行に載る */
+  /* 感情3行。親の行に載せると2行目（HPバーの行）が文字の高さまで広がって
+     HPの数値とバーが離れてしまうので、ここは独立した均等3行にする */
   .em-meter__emotions {
     grid-column: 2;
     grid-row: 1 / span 3;
     display: grid;
     grid-template-columns: auto auto;
-    grid-template-rows: subgrid;
+    grid-template-rows: repeat(3, 1fr);
+    align-items: center;
     justify-content: start;
     column-gap: var(--spacer-4);
     margin: 0;
