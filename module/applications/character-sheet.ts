@@ -5,7 +5,6 @@ import {
   SKILL_LEVEL_MAX,
   SKILL_LEVEL_MIN,
 } from "../data/character";
-import type { WeaponDataModel } from "../data/item-models";
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import {
@@ -423,18 +422,18 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     // itemTypes は本体が Record<string, Item[]> で型付けており、実装クラスまでは絞られない
     const weapons = (this.actor.itemTypes.weapon ?? []) as EmokloreItem[];
 
-    context.weapons = weapons.map((item) => {
-      const system = item.system as WeaponDataModel;
-
-      return {
+    // isWeapon は型述語なので、filter を通すと system が WeaponDataModel に絞られる。
+    // itemTypes.weapon の中身は元から武器だけなので、実行時のふるまいは変わらない
+    context.weapons = weapons
+      .filter((item) => item.isWeapon())
+      .map((item) => ({
         // 保存済みの埋め込みドキュメントなので id は必ずある
         id: item.id!,
         name: item.name,
         img: item.img,
-        rangeLabel: formatRangeLabel(system.rangeType, system.range),
-        damagePreview: formatDamagePreview(system.damageDie, system.attackPower),
-      };
-    });
+        rangeLabel: formatRangeLabel(item.system.rangeType, item.system.range),
+        damagePreview: formatDamagePreview(item.system.damageDie, item.system.attackPower),
+      }));
   }
 
   private _prepareEffectsContext(context: CharacterContext): void {
