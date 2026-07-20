@@ -25,16 +25,44 @@
       "colon": ": "
     },
     "SheetClass": {
-      "character": "Character Sheet"
+      "character": "Character Sheet",
+      "weapon": "Weapon Sheet"
     },
     "CharacterSheet": {
       "tab": {
         "biography": "Biography",
         "skills": "Skills",
+        "items": "Items",
         "effects": "Effects"
       },
       "fields": {
         "specialization": "Specialization"
+      }
+    },
+    "Item": {
+      "weapon": {
+        "FIELDS": {
+          "skill": {
+            "label": "Skill"
+          },
+          "attackPower": {
+            "label": "Attack Power",
+            "hint": "Accepts a flat value like \"2\" or a dice formula like \"1D6\"."
+          },
+          "range": {
+            "label": "Range"
+          },
+          "notes": {
+            "label": "Notes"
+          }
+        },
+        "RangeType": {
+          "Label": "Reach",
+          "melee": "Melee",
+          "ranged": "Ranged"
+        },
+        "Damage": "Damage",
+        "SuccessCount": "[Successes]"
       }
     },
     "SHEET.ToggleMode": "Toggle Play/Edit mode",

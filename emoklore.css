@@ -21,6 +21,7 @@
 /* Applications — module/applications/ と対で、部品の配置と寸法を持つ */
 @import url("./css/applications/document-sheet.css");
 @import url("./css/applications/character-sheet.css");
+@import url("./css/applications/weapon-sheet.css");
 @import url("./css/applications/charsheet-import-dialog.css");
 
 /* Chat — シートの外に出るチャットカード */

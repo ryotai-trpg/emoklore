@@ -27,16 +27,44 @@
       "colon": "："
     },
     "SheetClass": {
-      "character": "キャラクターシート"
+      "character": "キャラクターシート",
+      "weapon": "武器シート"
     },
     "CharacterSheet": {
       "tab": {
         "biography": "プロフィール",
         "skills": "技能",
+        "items": "アイテム",
         "effects": "効果"
       },
       "fields": {
         "specialization": "分野"
+      }
+    },
+    "Item": {
+      "weapon": {
+        "FIELDS": {
+          "skill": {
+            "label": "参照技能"
+          },
+          "attackPower": {
+            "label": "攻撃力",
+            "hint": "「2」のような固定値でも「1D6」のようなダイス式でも書ける。"
+          },
+          "range": {
+            "label": "射程"
+          },
+          "notes": {
+            "label": "備考"
+          }
+        },
+        "RangeType": {
+          "Label": "間合い",
+          "melee": "近接",
+          "ranged": "遠隔"
+        },
+        "Damage": "ダメージ",
+        "SuccessCount": "【成功数】"
       }
     },
     "SHEET.ToggleMode": "プレイ・編集モード切替",

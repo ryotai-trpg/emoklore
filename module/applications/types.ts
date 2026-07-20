@@ -2,7 +2,9 @@ import type { ApplicationRenderContext, ApplicationTab } from "@client/applicati
 import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { CharacterDataModel } from "../data/character";
+import type { WeaponDataModel } from "../data/item-models";
 import type { EmokloreActor } from "../documents/actor";
+import type { EmokloreItem } from "../documents/item";
 import type { ModifierSet } from "../rules/types";
 import type { ValueSegment } from "./helpers";
 
@@ -85,6 +87,21 @@ export type BaseSkillRow = {
   characteristicIcon: string;
 };
 
+/**
+ * 武器1行の表示用データ。アイテムタブは読むだけの一覧なので、値はすべて表示用の文字列。
+ *
+ * 間合いとダメージ式は WeaponDataModel の派生値を翻訳・整形したもの。
+ */
+export type WeaponRow = {
+  id: string;
+  name: string;
+  img: string;
+  /** 射程。近接武器と未記入の遠隔武器は間合いの表示名になる */
+  rangeLabel: string;
+  /** 「【成功数】D3 ＋ 1D3」形式のダメージ式 */
+  damagePreview: string;
+};
+
 export type CharacteristicsMap = Record<
   string,
   {
@@ -158,10 +175,14 @@ export interface EmokloreDocumentSheetContext extends ApplicationRenderContext {
   flags: Record<string, unknown>;
 }
 
-// window / form はサブクラス側で省略できる（mixinのDEFAULT_OPTIONSがマージされるため）
+// actions / window / form はサブクラス側で省略できる（mixinのDEFAULT_OPTIONSがマージされるため）
 export interface EmokloreDocumentSheetOptions {
   classes: string[];
-  actions: Record<string, (event: Event, target: HTMLElement) => Promise<unknown>>;
+  actions?: Record<string, (event: Event, target: HTMLElement) => Promise<unknown>>;
+  position?: {
+    width?: number;
+    height?: number;
+  };
   window?: {
     resizable?: boolean;
     controls?: EmokloreHeaderControl[];
@@ -200,6 +221,7 @@ export type CharacterContext = {
   biographyRows?: BiographyRow[];
   tabs: Record<string, ApplicationTab>;
   tab?: unknown;
+  weapons?: WeaponRow[];
   effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;
   // 基底の EmokloreDocumentSheetContext と対応する分
   isPlay: boolean;
@@ -207,6 +229,34 @@ export type CharacterContext = {
   limited: boolean;
   gm: boolean;
   document: EmokloreActor;
+  systemFields: Record<string, foundry.data.fields.DataField>;
+  flags: Record<string, unknown>;
+};
+
+/**
+ * 武器シートのコンテキスト。
+ *
+ * CharacterContext と同じく、基底は継承せず必要なものを並べ直している（理由は上を参照）。
+ */
+export type WeaponContext = {
+  system: WeaponDataModel;
+  /** 参照技能の翻訳済み表示名 */
+  attackSkillLabel: string;
+  /** 間合いの翻訳済み表示名。「近接」「遠隔」 */
+  rangeTypeLabel: string;
+  /** 閲覧モードで出す射程。近接武器は間合いの表示名をそのまま出す */
+  rangeLabel: string;
+  /** 射程の行を閲覧で出すか。近接武器では間合いと同じ表示になるので出さない */
+  showRange: boolean;
+  /** 「【成功数】D3 ＋ 1D3」形式のダメージ式 */
+  damagePreview: string;
+  /** enrichHTML 済みの備考 */
+  notesHTML: string;
+  isPlay: boolean;
+  owner: boolean;
+  limited: boolean;
+  gm: boolean;
+  document: EmokloreItem;
   systemFields: Record<string, foundry.data.fields.DataField>;
   flags: Record<string, unknown>;
 };

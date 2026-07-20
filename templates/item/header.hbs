@@ -1,0 +1,19 @@
+{{! Item Sheet Header }}
+<header class="sheet-header em-item-header">
+  <img
+    class="em-item-header__image"
+    src="{{source.img}}"
+    alt="{{source.name}}"
+    data-edit="img"
+    data-action="editImage"
+  />
+  {{! 閲覧は切り詰めるので、全文はツールチップで見せる }}
+  {{#if isPlay}}
+    <div class="em-item-header__name" data-tooltip="{{source.name}}">{{source.name}}</div>
+  {{else}}
+    <div class="em-item-header__name">
+      {{formInput fields.name value=source.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
+      aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
+    </div>
+  {{/if}}
+</header>
