@@ -164,6 +164,43 @@ HP・MP・共鳴の3本のバーは、`.em-resources` が持つ行トラック�
 
 :::
 
+## 同じ入力を2箇所に描かない
+
+シートはルート要素が1つの `<form>` で、`submitOnChange: true` で動いている。**同じ `name` の入力を2箇所に描くと、値が壊れる。**
+
+`FormDataExtended` は可視性をまったく見ない。`#processFormFields` が除外するのは「name がない」「button」「disabled」「readOnly」だけで、`display: none` も `hidden` も `visibility` も判定しない。そして同名が2つあると `#getFieldValue` が配列にまとめるので、`StringField._cast` の `String(["4","4"])` が **`"4,4"` として保存される**。NumberField なら `Number(["4","4"])` が `NaN` になって送信全体が失敗する。**どちらも警告は出ない。**
+
+これが効いてくるのがタブだ。本体は非アクティブなタブを `.tab[data-tab]:not(.active) { display: none }` にするだけで、**DOMには残す**。つまり隠れたタブの入力も毎回まとめて送信される。
+
+- 同じデータを複数のタブに出したくなったら、**描く場所を1つに決める**
+- どうしても両方に出すなら、片方は `name` を付けない（`data-*` と手動ハンドラにする）か、`<span>` で表示するだけにする
+- 一度に1つしか出ないなら、Handlebarsの if / else で排他に描き分ける
+
+かつて立ち絵と能力値のカードを技能タブと経歴タブの両方で描いており、これに当たっていた。経歴タブ側を閲覧専用に落とすことで凌いでいたが、原因はタブではなく2回描いていたことだった。
+
+## タブに属さないパートの作り方
+
+全タブで見えていてほしいもの（サイドバーなど）は、**タブの外に独立したパートとして置く**。上の問題が原理的に起きなくなり、スクロール位置や入力中の値も保たれる。
+
+`changeTab`（`api/application.mjs`）は `render()` を呼ばず `classList.toggle("active", ...)` するだけなので、**`class="tab"` と `data-group` を持たない要素はタブ切替で一切触られない**。本体自身が `CategoryBrowser` / `JournalEntrySheet` / `ActiveEffectConfig` で同じ構造を使っている。
+
+パートは `.window-content` 直下に兄弟として並ぶ。入れ子は作れないので、**横に並べたければグリッドで配置する**。
+
+```css
+.window-content {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+.em-sheet-header, nav.tabs { grid-column: 1 / -1; }
+.em-sidebar { grid-column: 1; grid-row: 3; }
+section.tab { grid-column: 2; grid-row: 3; overflow: auto; }
+```
+
+本体が `.window-content` に `overflow: hidden` を入れているので、各パートに `overflow: auto` を置けば独立してスクロールする。スクロール位置を再描画から守るには `PARTS` の `scrollable` に宣言する。
+
+**畳んで消せるようにするなら、間隔もその要素自身に持たせる。** グリッド側の `column-gap` に置くと、幅を0にしても隙間だけが残る。
+
 ## ダイアログ
 
 ダイアログは本体のフォーム体系に乗せる。自前で組むと、本体が用意している間隔・ラベル配置・ボタン配置をすべて手で再実装することになる。
