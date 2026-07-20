@@ -1,7 +1,12 @@
 import type { CharacteristicKey } from "../config/characteristics";
 import { systemPath } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
-import { calculateCharPointSum, calculateTotalSkillPoints } from "../rules/character-points";
+import {
+  CHARACTERISTIC_POINT_MAX,
+  calculateCharPointSum,
+  calculateTotalSkillPoints,
+  SKILL_POINT_MAX,
+} from "../rules/character-points";
 import { prepareActiveEffectCategories } from "../utils/effects";
 import {
   createDocumentData,
@@ -14,7 +19,6 @@ import {
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
   createEmotionOptions,
-  createSkillLevelOptions,
   getEmotionRows,
 } from "./helpers";
 import type {
@@ -238,9 +242,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   private _prepareSkillsContext(context: CharacterContext): void {
     context.characteristics = this._getCharacteristics() as unknown as CharacteristicsMap;
     context.charPointSum = calculateCharPointSum(context.characteristics);
+    context.charPointMax = CHARACTERISTIC_POINT_MAX;
     context.skills = this._getSkills() as unknown as Record<string, SkillRow>;
     context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills);
-    context.skillLevelOptions = createSkillLevelOptions();
+    context.skillPointMax = SKILL_POINT_MAX;
     context.baseSkills = this._getBaseSkills();
   }
 

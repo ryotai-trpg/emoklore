@@ -4,7 +4,6 @@ import { characteristics } from "./characteristics";
 import { emotionAttributes } from "./emotion-attributes";
 import { resonantEmotions } from "./resonant-emotions";
 import { skillGroups } from "./skill-groups";
-import { skillLevels } from "./skill-levels";
 import { skills } from "./skills";
 
 export const EMOKLORE = {
@@ -12,7 +11,6 @@ export const EMOKLORE = {
   skillGroups,
   baseSkills,
   skills,
-  skillLevel: skillLevels,
   emotionAttributes,
   resonantEmotions,
 };
@@ -26,6 +24,5 @@ preLocalize("characteristics", { keys: ["label"] });
 preLocalize("skillGroups", { keys: ["label"] });
 preLocalize("baseSkills", { keys: ["label"] });
 preLocalize("skills", { keys: ["label"] });
-preLocalize("skillLevel", { keys: ["label"] });
 preLocalize("emotionAttributes", { keys: ["label"] });
 preLocalize("resonantEmotions", { keys: ["label"] });

@@ -49,13 +49,6 @@
       "wound": "傷"
     },
 
-    "skillLevel": {
-      "0": "Lv.0",
-      "1": "Lv.1",
-      "2": "Lv.2",
-      "3": "Lv.3"
-    },
-
     "resonantEmotions": {
       "selfAssertion": "自己顕示",
       "possession": "所有",

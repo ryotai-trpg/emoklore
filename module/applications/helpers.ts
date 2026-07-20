@@ -57,13 +57,6 @@ export const buildBiographyRows = (
     html: html ?? false,
   }));
 
-export const createSkillLevelOptions = (): Array<{ value: string; label: string }> => {
-  return Object.entries(CONFIG.EMOKLORE.skillLevel).map(([value, { label }]) => ({
-    value,
-    label,
-  }));
-};
-
 export const createEmotionOptions = (): Array<{ value: string; label: string; group: string }> => {
   return Object.entries(CONFIG.EMOKLORE.resonantEmotions).map(([value, { label, attribute }]) => {
     const attributeLabel =
