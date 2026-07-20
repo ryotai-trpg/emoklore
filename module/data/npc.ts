@@ -2,10 +2,8 @@ import { EmokloreSystemDataModel } from "./system-model";
 
 const { NumberField, SchemaField } = foundry.data.fields;
 
-const defineNpcDataModelSchema = () => {
-  const schema: Record<string, foundry.data.fields.DataField> = {};
-
-  schema.wickedness = new SchemaField({
+const defineNpcDataModelSchema = () => ({
+  wickedness: new SchemaField({
     value: new NumberField({
       required: true,
       integer: true,
@@ -18,10 +16,8 @@ const defineNpcDataModelSchema = () => {
       min: 0,
       initial: 100,
     }),
-  });
-
-  return schema;
-};
+  }),
+});
 
 export class NpcDataModel extends EmokloreSystemDataModel {
   declare wickedness: {
