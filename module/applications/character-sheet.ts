@@ -1,5 +1,3 @@
-import type { CharacteristicKey } from "../config/characteristics";
-import type { SkillKey } from "../config/skills";
 import { systemPath } from "../constants";
 import {
   CHARACTERISTIC_MAX,
@@ -7,7 +5,6 @@ import {
   SKILL_LEVEL_MAX,
   SKILL_LEVEL_MIN,
 } from "../data/character";
-import type { WeaponDataModel } from "../data/item-models";
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import {
@@ -18,6 +15,7 @@ import {
 } from "../rules/character-points";
 import { getSetting, setSetting } from "../settings";
 import { prepareActiveEffectCategories } from "../utils/effects";
+import { typedEntries } from "../utils/object";
 import {
   createDocumentData,
   getEmbeddedDocument,
@@ -297,8 +295,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
    */
   _getCharacteristics(): CharacteristicsMap {
     return Object.fromEntries(
-      Object.entries(CONFIG.EMOKLORE.characteristics).map(([chc, { fa }]) => {
-        const value = this.actor.system.characteristics[chc as CharacteristicKey]?.value ?? 0;
+      typedEntries(CONFIG.EMOKLORE.characteristics).map(([chc, { fa }]) => {
+        const value = this.actor.system.characteristics[chc].value;
         return [
           chc,
           {
@@ -322,8 +320,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
    */
   _getSkills(): Record<string, SkillRow> {
     return Object.fromEntries(
-      Object.entries(CONFIG.EMOKLORE.skills).map(([key, { label, isExtra }]) => {
-        const entry = this.actor.system.skills[key as SkillKey];
+      typedEntries(CONFIG.EMOKLORE.skills).map(([key, { label, isExtra }]) => {
+        const entry = this.actor.system.skills[key];
         const characteristic = CONFIG.EMOKLORE.characteristics[entry.characteristic];
         return [
           key,
@@ -336,8 +334,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
             characteristic: entry.characteristic,
             specialization: entry.specialization,
             mod: entry.mod,
-            characteristicLabel: characteristic?.label ?? "",
-            characteristicIcon: characteristic?.fa ?? "",
+            characteristicLabel: characteristic.label,
+            characteristicIcon: characteristic.fa,
             name: `system.skills.${key}.level`,
             // 段は1から。0（未修得）は段を置かず、選択中の段を押し直して戻す
             levelSegments: buildValueSegments(SKILL_LEVEL_MIN + 1, SKILL_LEVEL_MAX, entry.level),
@@ -353,15 +351,12 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
    * 目標値と能力値はアクターに、表示名は CONFIG.EMOKLORE にあるので、ここで合流させる。
    */
   _getBaseSkills(): BaseSkillRow[] {
-    return Object.entries(this.actor.system.baseSkills).map(
-      ([key, { characteristic, target }]) => ({
-        key,
-        label:
-          CONFIG.EMOKLORE.baseSkills[key as keyof typeof CONFIG.EMOKLORE.baseSkills]?.label ?? "",
-        target,
-        characteristicIcon: CONFIG.EMOKLORE.characteristics[characteristic]?.fa ?? "",
-      }),
-    );
+    return typedEntries(this.actor.system.baseSkills).map(([key, { characteristic, target }]) => ({
+      key,
+      label: CONFIG.EMOKLORE.baseSkills[key].label,
+      target,
+      characteristicIcon: CONFIG.EMOKLORE.characteristics[characteristic].fa,
+    }));
   }
 
   /**
@@ -427,18 +422,18 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     // itemTypes は本体が Record<string, Item[]> で型付けており、実装クラスまでは絞られない
     const weapons = (this.actor.itemTypes.weapon ?? []) as EmokloreItem[];
 
-    context.weapons = weapons.map((item) => {
-      const system = item.system as WeaponDataModel;
-
-      return {
+    // isWeapon は型述語なので、filter を通すと system が WeaponDataModel に絞られる。
+    // itemTypes.weapon の中身は元から武器だけなので、実行時のふるまいは変わらない
+    context.weapons = weapons
+      .filter((item) => item.isWeapon())
+      .map((item) => ({
         // 保存済みの埋め込みドキュメントなので id は必ずある
         id: item.id!,
         name: item.name,
         img: item.img,
-        rangeLabel: formatRangeLabel(system.rangeType, system.range),
-        damagePreview: formatDamagePreview(system.damageDie, system.attackPower),
-      };
-    });
+        rangeLabel: formatRangeLabel(item.system.rangeType, item.system.range),
+        damagePreview: formatDamagePreview(item.system.damageDie, item.system.attackPower),
+      }));
   }
 
   private _prepareEffectsContext(context: CharacterContext): void {

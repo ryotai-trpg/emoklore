@@ -71,6 +71,7 @@
         "Damage": "Damage",
         "NoActor": "A weapon with no owner cannot be used.",
         "ActorMissing": "The character who used this weapon could not be found.",
+        "UnknownSkill": "This weapon references an unknown skill, so the attack cannot be rolled.",
         "ActionFailed": "The weapon card action failed.",
         "Apply": "Apply Damage",
         "NoTarget": "No target. Target a token first.",

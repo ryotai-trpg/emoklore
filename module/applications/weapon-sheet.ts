@@ -14,7 +14,9 @@ import type { EmokloreRenderOptions, WeaponContext } from "./types";
 export class EmokloreWeaponSheet extends EmokloreDocumentSheetMixin(
   foundry.applications.sheets.ItemSheetV2,
 ) {
-  declare item: EmokloreItem;
+  // このシートは registerSheet で types: ["weapon"] に限って登録しているので、
+  // item は必ず武器。種別ごとのデータモデルは本体の型に出ないのでここで宣言する
+  declare item: EmokloreItem & { system: WeaponDataModel };
 
   // classes / window / form は mixin 側の DEFAULT_OPTIONS が継承チェーン経由でマージされる。
   // standard-form は本体の .form-group のレイアウト規則が必要なので自分で足す
@@ -39,7 +41,7 @@ export class EmokloreWeaponSheet extends EmokloreDocumentSheetMixin(
     // weaponシートであることが分かっているここで1回だけ絞る
     const baseContext = await super._prepareContext(options);
     const context = baseContext as WeaponContext;
-    const system = this.item.system as WeaponDataModel;
+    const system = this.item.system;
 
     context.attackSkillLabel = localizeAttackSkill(system.skill);
     context.rangeTypeLabel = localizeRangeType(system.rangeType);

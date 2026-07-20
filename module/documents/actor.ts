@@ -1,5 +1,5 @@
 import { promptResonanceRoll } from "../applications/dialogs/resonance-roll-dialog";
-import type { CharacterDataModel } from "../data/character";
+import type { CharacterDataModel, SkillRef } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
 import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
 import { resolveSkillRoll } from "../rules/skill-roll";
@@ -15,10 +15,13 @@ export type HpChange = { before: number; after: number };
 /**
  * system を CharacterDataModel として扱う。
  *
- * 判定・リソース操作はいずれもcharacterのスキーマ前提で書かれており、NPCに対して
- * 呼ぶと実行時に壊れる。型引数で character / npc を出し分ける形も試したが、
- * クラス本体では条件型が解決されず union のままになるため実益がなかった。
- * NPC用シートの実装（ロードマップ Phase 3）で判定まわりの扱いごと見直す。
+ * `system.json` の documentTypes が character しか宣言しておらず、emoklore.ts も
+ * character しか登録していないので、この宣言は実態と一致している。以前は npc を
+ * 登録したまま character 固定で宣言しており、判定・リソース操作が `resources?.hp`
+ * のように「型が持たないはずの undefined」を防御する形になっていた。
+ *
+ * NPCを足すときは system が union になるので、型が絞り込みを要求してくる。
+ * どこがNPCで壊れるかはそのとき型チェックが教えてくれる（ロードマップ Phase 3）。
  */
 export class EmokloreActor extends Actor {
   declare system: CharacterDataModel;
@@ -36,9 +39,7 @@ export class EmokloreActor extends Actor {
   override getRollData(): Record<string, unknown> {
     const rollData = { ...this.system, flags: this.flags, name: this.name };
 
-    if (this.system.modifyRollData instanceof Function) {
-      this.system.modifyRollData(rollData);
-    }
+    this.system.modifyRollData(rollData);
 
     return rollData;
   }
@@ -57,10 +58,7 @@ export class EmokloreActor extends Actor {
     amount: number,
     { reduction = 0 }: { reduction?: number } = {},
   ): Promise<HpChange | undefined> {
-    // NPCなどHPを持たないスキーマに対して呼ばれても壊れないようにする
-    const hp = this.system.resources?.hp;
-    if (!hp) return;
-
+    const hp = this.system.resources.hp;
     const before = hp.value;
     const applied = Math.max(0, amount - reduction);
     const updates = {
@@ -77,7 +75,7 @@ export class EmokloreActor extends Actor {
   }
 
   async adjustResource(resource: ResourceKey, point: number): Promise<this | undefined> {
-    const newvalue = (this.system.resources[resource]?.value ?? 0) + point;
+    const newvalue = this.system.resources[resource].value + point;
     return (await this.update({ [`system.resources.${resource}.value`]: newvalue })) as
       | this
       | undefined;
@@ -105,10 +103,10 @@ export class EmokloreActor extends Actor {
   }
 
   async rollSkill(
-    skill: string,
-    options: { base?: boolean } & Record<string, unknown> = {},
+    ref: SkillRef,
+    options: Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
-    const { roll, flavor } = await this.buildSkillRoll(skill, options);
+    const { roll, flavor } = await this.buildSkillRoll(ref, options);
 
     return createRollMessage({ actor: this, flavor, roll });
   }
@@ -120,15 +118,15 @@ export class EmokloreActor extends Actor {
    * 攻撃判定は技能判定そのものなので、専用のロジックを別に持つ必要がない。
    */
   async buildSkillRoll(
-    skill: string,
-    { base = false, ...options }: { base?: boolean } & Record<string, unknown> = {},
+    ref: SkillRef,
+    options: Record<string, unknown> = {},
   ): Promise<{ roll: EmokloreRoll; flavor: string }> {
-    const context = this.system.getSkillRollContext(skill, { base });
+    const context = this.system.getSkillRollContext(ref);
     const spec = resolveSkillRoll(context.params);
 
     return {
       roll: await this.#buildRoll(spec, options),
-      flavor: EmokloreActor.formatRollFlavor(formatSkillName(context, { base })),
+      flavor: EmokloreActor.formatRollFlavor(formatSkillName(context)),
     };
   }
 

@@ -1,7 +1,7 @@
-import type { BaseSkillKey } from "../config/base-skills";
+import { type BaseSkillKey, isBaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { SkillGroupKey } from "../config/skill-groups";
-import type { SkillKey } from "../config/skills";
+import { isSkillKey, type SkillKey } from "../config/skills";
 import {
   calculateBaseSkillTarget,
   calculateInitiative,
@@ -13,6 +13,7 @@ import {
 } from "../rules/derived-values";
 import type { SkillRollParams } from "../rules/skill-roll";
 import type { ModifierSet } from "../rules/types";
+import { typedEntries } from "../utils/object";
 import { EmokloreSystemDataModel } from "./system-model";
 
 const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
@@ -28,18 +29,64 @@ export const CHARACTERISTIC_MAX = 6;
 export const SKILL_LEVEL_MIN = 0;
 export const SKILL_LEVEL_MAX = 3;
 
+/**
+ * どの技能を振るか。
+ *
+ * 技能と基本技能は別の表にあり、キーの集合も違う。かつては
+ * `(skill: string, { base: boolean })` の組で渡していたが、これだと
+ * 「base: true に通常技能のキー」という有り得ない組み合わせが型で作れてしまい、
+ * 受け取った側は as で名乗り直すしかなかった。判別可能unionにして、
+ * 種別とキーが必ず対応するようにする。
+ */
+export type SkillRef = { kind: "skill"; key: SkillKey } | { kind: "base"; key: BaseSkillKey };
+
+/**
+ * 外から来た文字列を SkillRef に変える。キーとして通らなければ null。
+ *
+ * 種別が実行時にしか決まらない呼び出し側（武器カードなど）が使う。
+ * どちらの表を見るか静的に分かっているなら、型述語を直に使えばよい。
+ */
+export const resolveSkillRef = (key: string, { base }: { base: boolean }): SkillRef | null => {
+  if (base) return isBaseSkillKey(key) ? { kind: "base", key } : null;
+  return isSkillKey(key) ? { kind: "skill", key } : null;
+};
+
 /** 技能判定に必要な、アクターから集めた一式 */
 export type SkillRollContext = {
   params: SkillRollParams;
   label: string;
+  /** 基本技能なら true。チャットの見出しに「＊」を付けるかがこれで決まる */
+  isBase: boolean;
   isExtra: boolean;
   specialization?: string | undefined;
 };
 
-const defineCharacterDataModelSchema = () => {
-  const schema: Record<string, foundry.data.fields.DataField> = {};
+/**
+ * 技能・能力値・技能グループが共通で持つ修正値の組。
+ *
+ * 型の側は rules/types.ts の ModifierSet が持っている。スキーマ側だけ4箇所に
+ * コピーされていたので、対応が1対1になるようここへ寄せた。
+ */
+const modifierField = () =>
+  new SchemaField({
+    bonus: new NumberField({ required: true, integer: true, initial: 0 }),
+    success: new NumberField({ required: true, integer: true, initial: 0 }),
+    target: new NumberField({ required: true, integer: true, initial: 0 }),
+  });
 
-  schema.resources = new SchemaField({
+// 能力値の NumberField に渡す共通オプション。技能側で分割代入する
+// characteristic（能力値キーの文字列）とは別物なので名前を分けている
+const characteristicFieldOptions = {
+  min: CHARACTERISTIC_MIN,
+  max: CHARACTERISTIC_MAX,
+  initial: 1,
+  integer: true,
+  required: true,
+  nullable: false,
+};
+
+const defineCharacterDataModelSchema = () => ({
+  resources: new SchemaField({
     hp: new SchemaField({
       value: new NumberField({ required: true, integer: true, initial: 11 }),
       max: new NumberField({ required: true, integer: true, initial: 11 }),
@@ -52,85 +99,67 @@ const defineCharacterDataModelSchema = () => {
       value: new NumberField({ required: true, integer: true, initial: 1 }),
       max: new NumberField({ required: true, integer: true, initial: 9 }),
     }),
-  });
+  }),
 
-  // 能力値の NumberField に渡す共通オプション。技能側で分割代入する
-  // characteristic（能力値キーの文字列）とは別物なので名前を分けている
-  const characteristicFieldOptions = {
-    min: CHARACTERISTIC_MIN,
-    max: CHARACTERISTIC_MAX,
-    initial: 1,
-    integer: true,
-    required: true,
-    nullable: false,
-  };
-
-  schema.characteristics = new SchemaField(
-    Object.entries(CONFIG.EMOKLORE.characteristics).reduce(
-      (obj, [chc]) => {
-        (obj as Record<string, foundry.data.fields.DataField>)[chc] = new SchemaField({
+  characteristics: new SchemaField(
+    Object.fromEntries(
+      typedEntries(CONFIG.EMOKLORE.characteristics).map(([chc]) => [
+        chc,
+        new SchemaField({
           // label は指定しない。定義時に設定すると localizeSchema の `this.label ||= ...` に
           // 勝ってしまい、ja.json の FIELDS 側の指定が効かなくなる
           value: new NumberField({ ...characteristicFieldOptions }),
-          mod: new SchemaField({
-            bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-            success: new NumberField({ required: true, integer: true, initial: 0 }),
-            target: new NumberField({ required: true, integer: true, initial: 0 }),
-          }),
-        });
-        return obj;
-      },
-      {} as Record<string, foundry.data.fields.DataField>,
+          mod: modifierField(),
+        }),
+      ]),
     ),
-  );
+  ),
 
-  schema.skills = new SchemaField(
-    Object.entries(CONFIG.EMOKLORE.skills).reduce(
-      (obj, [skill, { characteristic, characteristicOptions, hasSpecialization }]) => {
-        (obj as Record<string, foundry.data.fields.DataField>)[skill] = new SchemaField({
-          level: new NumberField({
-            min: SKILL_LEVEL_MIN,
-            max: SKILL_LEVEL_MAX,
-            initial: 0,
-            integer: true,
-            required: true,
-            nullable: false,
+  skills: new SchemaField(
+    Object.fromEntries(
+      typedEntries(CONFIG.EMOKLORE.skills).map(
+        ([skill, { characteristic, characteristicOptions, hasSpecialization }]) => [
+          skill,
+          new SchemaField({
+            level: new NumberField({
+              min: SKILL_LEVEL_MIN,
+              max: SKILL_LEVEL_MAX,
+              initial: 0,
+              integer: true,
+              required: true,
+              nullable: false,
+            }),
+            characteristic: new StringField({
+              required: true,
+              initial: characteristicOptions?.[0] ?? characteristic,
+              // choices の値は翻訳済み文字列ではなくi18nキーを入れる。テンプレートが
+              // formInput に localize=true を渡しており、描画時に本体が解決する。
+              // ここで localize すると、スキーマ定義時に game.i18n へ依存してしまう
+              ...(characteristicOptions
+                ? {
+                    choices: Object.fromEntries(
+                      characteristicOptions.map((key) => [
+                        key,
+                        `EMOKLORE.Actor.characteristics.${key}`,
+                      ]),
+                    ),
+                  }
+                : {}),
+            }),
+            // label / group / isExtra は CONFIG.EMOKLORE から引けるので保存しない
+            ...(hasSpecialization ? { specialization: new StringField({ initial: "" }) } : {}),
+            mod: modifierField(),
           }),
-          characteristic: new StringField({
-            required: true,
-            initial: characteristicOptions?.[0] ?? characteristic,
-            // choices の値は翻訳済み文字列ではなくi18nキーを入れる。テンプレートが
-            // formInput に localize=true を渡しており、描画時に本体が解決する。
-            // ここで localize すると、スキーマ定義時に game.i18n へ依存してしまう
-            ...(characteristicOptions
-              ? {
-                  choices: Object.fromEntries(
-                    characteristicOptions.map((key) => [
-                      key,
-                      `EMOKLORE.Actor.characteristics.${key}`,
-                    ]),
-                  ),
-                }
-              : {}),
-          }),
-          // label / group / isExtra は CONFIG.EMOKLORE から引けるので保存しない
-          ...(hasSpecialization ? { specialization: new StringField({ initial: "" }) } : {}),
-          mod: new SchemaField({
-            bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-            success: new NumberField({ required: true, integer: true, initial: 0 }),
-            target: new NumberField({ required: true, integer: true, initial: 0 }),
-          }),
-        });
-        return obj;
-      },
-      {} as Record<string, foundry.data.fields.DataField>,
+        ],
+      ),
     ),
-  );
+  ),
 
-  schema.baseSkills = new SchemaField(
-    Object.entries(CONFIG.EMOKLORE.baseSkills).reduce(
-      (obj, [skill, { characteristic }]) => {
-        (obj as Record<string, foundry.data.fields.DataField>)[skill] = new SchemaField({
+  baseSkills: new SchemaField(
+    Object.fromEntries(
+      typedEntries(CONFIG.EMOKLORE.baseSkills).map(([skill, { characteristic }]) => [
+        skill,
+        new SchemaField({
           level: new NumberField({
             min: 1,
             max: 1,
@@ -144,43 +173,32 @@ const defineCharacterDataModelSchema = () => {
             initial: characteristic,
           }),
           // label / group は CONFIG.EMOKLORE から引けるので保存しない
-          mod: new SchemaField({
-            bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-            success: new NumberField({ required: true, integer: true, initial: 0 }),
-            target: new NumberField({ required: true, integer: true, initial: 0 }),
-          }),
-        });
-        return obj;
-      },
-      {} as Record<string, foundry.data.fields.DataField>,
+          mod: modifierField(),
+        }),
+      ]),
     ),
-  );
+  ),
 
-  schema.skillGroups = new SchemaField(
-    Object.entries(CONFIG.EMOKLORE.skillGroups).reduce(
-      (obj, [group]) => {
-        (obj as Record<string, foundry.data.fields.DataField>)[group] = new SchemaField({
+  skillGroups: new SchemaField(
+    Object.fromEntries(
+      typedEntries(CONFIG.EMOKLORE.skillGroups).map(([group]) => [
+        group,
+        new SchemaField({
           // label は保存しない。ここで game.i18n.localize した結果を initial に焼き込んでいたため、
           // アクター作成後に言語を切り替えても古いラベルが残っていた
-          mod: new SchemaField({
-            bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-            success: new NumberField({ required: true, integer: true, initial: 0 }),
-            target: new NumberField({ required: true, integer: true, initial: 0 }),
-          }),
-        });
-        return obj;
-      },
-      {} as Record<string, foundry.data.fields.DataField>,
+          mod: modifierField(),
+        }),
+      ]),
     ),
-  );
+  ),
 
-  schema.emotions = new SchemaField({
+  emotions: new SchemaField({
     surface: new StringField(),
     hidden: new StringField(),
     root: new StringField(),
-  });
+  }),
 
-  schema.biography = new SchemaField({
+  biography: new SchemaField({
     age: new StringField(),
     gender: new StringField(),
     occupation: new StringField(),
@@ -191,14 +209,10 @@ const defineCharacterDataModelSchema = () => {
     importantPeople: new StringField(),
     likesAndDislikes: new StringField(),
     note: new HTMLField({ required: true, blank: true }),
-  });
+  }),
+});
 
-  return schema;
-};
-
-export type CharacterDataModelSchema = ReturnType<typeof defineCharacterDataModelSchema>;
-
-export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataModelSchema> {
+export class CharacterDataModel extends EmokloreSystemDataModel {
   // target は prepareDerivedData で必ず設定される派生値（initiative と同じ扱い）。
   // それ以外は defineCharacterDataModelSchema のスキーマと一致させること
   declare skills: Record<
@@ -311,22 +325,25 @@ export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataMod
    * 判定式そのものは rules/skill-roll.ts が持つ。ここはあくまで
    * 「どの値を渡すか」を決めるだけで、表示用の整形は呼び出し側に任せる。
    */
-  getSkillRollContext(skill: string, { base = false } = {}): SkillRollContext {
-    // シートのdatasetから来る文字列なので、キーであることはここで引き受ける
-    if (base) {
-      const key = skill as BaseSkillKey;
-      const { label, group } = CONFIG.EMOKLORE.baseSkills[key];
+  getSkillRollContext(ref: SkillRef): SkillRollContext {
+    if (ref.kind === "base") {
+      const { label, group } = CONFIG.EMOKLORE.baseSkills[ref.key];
       // 基本技能に isExtra / specialization はない
-      return { params: this.#toRollParams(this.baseSkills[key], group), label, isExtra: false };
+      return {
+        params: this.#toRollParams(this.baseSkills[ref.key], group),
+        label,
+        isBase: true,
+        isExtra: false,
+      };
     }
 
-    const key = skill as SkillKey;
-    const { label, group, isExtra } = CONFIG.EMOKLORE.skills[key];
-    const entry = this.skills[key];
+    const { label, group, isExtra } = CONFIG.EMOKLORE.skills[ref.key];
+    const entry = this.skills[ref.key];
 
     return {
       params: this.#toRollParams(entry, group),
       label,
+      isBase: false,
       isExtra: isExtra ?? false,
       specialization: entry.specialization,
     };
@@ -344,14 +361,14 @@ export class CharacterDataModel extends EmokloreSystemDataModel<CharacterDataMod
       characteristic: CharacteristicKey;
       mod: ModifierSet;
     },
-    group: string,
+    group: SkillGroupKey,
   ): SkillRollParams {
     return {
       level: entry.level,
       baseTarget: entry.target,
       skillMod: entry.mod,
       characteristicMod: this.characteristics[entry.characteristic].mod,
-      skillGroupMod: this.skillGroups[group as SkillGroupKey].mod,
+      skillGroupMod: this.skillGroups[group].mod,
     };
   }
 

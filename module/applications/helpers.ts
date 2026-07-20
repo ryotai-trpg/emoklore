@@ -1,4 +1,4 @@
-import type { EmotionAttributeKey, EmotionAttributesConfig } from "../config/emotion-attributes";
+import type { EmotionAttributesConfig } from "../config/emotion-attributes";
 import type { ResonantEmotionsConfig } from "../config/resonant-emotions";
 import type { BiographyFieldDef, BiographyRow, EmotionKey, EmotionRow } from "./types";
 
@@ -60,8 +60,7 @@ export const buildBiographyRows = (
 
 export const createEmotionOptions = (): Array<{ value: string; label: string; group: string }> => {
   return Object.entries(CONFIG.EMOKLORE.resonantEmotions).map(([value, { label, attribute }]) => {
-    const attributeLabel =
-      CONFIG.EMOKLORE.emotionAttributes[attribute as EmotionAttributeKey]?.label ?? "";
+    const attributeLabel = CONFIG.EMOKLORE.emotionAttributes[attribute].label;
     return {
       value,
       label: game.i18n.localize("EMOKLORE.resonantEmotion", {

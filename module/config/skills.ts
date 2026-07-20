@@ -1,8 +1,11 @@
+import type { CharacteristicKey } from "./characteristics";
+import type { SkillGroupKey } from "./skill-groups";
+
 export interface SkillConfig {
   label: string;
-  characteristic?: string;
-  characteristicOptions?: string[];
-  group: string;
+  characteristic?: CharacteristicKey;
+  characteristicOptions?: CharacteristicKey[];
+  group: SkillGroupKey;
   isExtra?: boolean;
   hasSpecialization?: boolean;
 }
@@ -209,3 +212,9 @@ export type SkillKey = keyof typeof definitions;
 // satisfies だけだと各値が個別の狭い型に推論されるため、値の型は SkillConfig に揃える。
 // キーは literal のまま保たれるので SkillKey が使える
 export const skills: Record<SkillKey, SkillConfig> = definitions;
+
+/**
+ * 技能キーかどうか。DOMのdatasetや保存データなど、外から来た文字列を
+ * SkillKey として扱う前に必ずここを通す。
+ */
+export const isSkillKey = (value: string): value is SkillKey => value in skills;

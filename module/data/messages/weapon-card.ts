@@ -10,6 +10,7 @@ import {
   resolveCardButtons,
   type WeaponCardState,
 } from "../../utils/weapon";
+import { resolveSkillRef } from "../character";
 import { EmokloreSystemDataModel } from "../system-model";
 
 const { DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
@@ -48,8 +49,6 @@ const defineWeaponCardSchema = () => {
   };
 };
 
-export type WeaponCardSchema = ReturnType<typeof defineWeaponCardSchema>;
-
 /**
  * 武器カードのChatMessage。
  *
@@ -61,7 +60,7 @@ export type WeaponCardSchema = ReturnType<typeof defineWeaponCardSchema>;
  * 本体は `content` に要素があれば `rolls` を自動描画しないので、ロールをメッセージに
  * 載せたまま、カード側で見出し付きに並べられる。
  */
-export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
+export class WeaponCardModel extends EmokloreSystemDataModel {
   declare weaponName: string;
   declare weaponImg: string;
   declare skill: AttackSkillKey;
@@ -112,7 +111,15 @@ export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
     const config = { skill: this.skill, base: attackSkills[this.skill]?.base ?? false };
     if (Hooks.call("emoklore.preRollAttack", this.message, config) === false) return;
 
-    const { roll } = await actor.buildSkillRoll(config.skill, { base: config.base });
+    // skill はカードに焼き込んだ保存データで、フックで差し替えられてもいる。
+    // 宣言した型（AttackSkillKey）を裏切りうるので、判定に渡す前に確かめる
+    const ref = resolveSkillRef(config.skill, { base: config.base });
+    if (!ref) {
+      ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.UnknownSkill", { localize: true });
+      return;
+    }
+
+    const { roll } = await actor.buildSkillRoll(ref);
     await this.#applyRoll([roll], { successCount: roll.successCount });
 
     Hooks.callAll("emoklore.rollAttack", this.message, roll);

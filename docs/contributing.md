@@ -87,10 +87,9 @@ feat: add resonance roll dialog
 
 ## コーディング方針
 
-- TypeScript は **`strict: true`**。加えて `noUncheckedIndexedAccess` / `noFallthroughCasesInSwitch` / `noImplicitOverride` / `noImplicitReturns` / `exactOptionalPropertyTypes` を有効にしている。任意プロパティに `undefined` を入れうる場合は `foo?: T | undefined` と書く。`any` は lint で禁止している（`noExplicitAny`）。本体JSDocの型が足りない場合は、`any` で潰さず**実際に使うメンバーだけを交差型で補う**（例: `module/utils/effects.ts`、`module/applications/types.ts` の `SheetDocument`）。どうしても必要なら理由コメント付きで `biome-ignore` する
+- TypeScript は **`strict: true`** に加えていくつかのフラグを有効にしている（一覧は `tsconfig.json`）。**型・命名・層のimport方向の規約は [コード設計の規約](/code-design) が正**。`any` の禁止、`as` の使いどころ、本体の型が足りないときの補い方もそちらにある
 - UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す
-- **`as unknown as` の二重キャストは lint で禁止**している（`tools/no-double-cast.grit`）。まず素の `as` で通るか試すこと。アサーションの判定は代入可能性より緩いので、代入で弾かれても `as` 単体なら通ることが多い。本体APIとの境界などで本当に必要なときは、直前の行に `// biome-ignore lint: 理由` を付ける
-- フォーマット・lintは [Biome](https://biomejs.dev/)（設定: `biome.json`）。手動実行は `npm run check`（修正適用）/ `npm run lint`（検証のみ）。Biomeは型アサーションの組み込みルールを持たないため、上記の禁止はGritQLプラグインで実装している
+- フォーマット・lintは [Biome](https://biomejs.dev/)（設定: `biome.json`）。手動実行は `npm run check`（修正適用）/ `npm run lint`（検証のみ）。Biomeは型アサーションの組み込みルールを持たないため、二重キャストの禁止はGritQLプラグイン（`tools/no-double-cast.grit`）で実装している
 - 設計の方向性・既知の構造的課題は [アーキテクチャ](/architecture) を参照
 
 ### 自動チェック
@@ -127,6 +126,7 @@ feat: add resonance roll dialog
 |---|---|
 | セットアップ・開発フロー・各種規約 | `docs/contributing.md`（このページ） |
 | 設計方針・アーキテクチャ・既知の構造的課題 | `docs/architecture.md` |
+| コード設計の規約（型・命名・層のimport方向） | `docs/code-design.md` |
 | UI設計の規約（CSS・テンプレート・ダイアログ） | `docs/ui-design.md` |
 | 開発フェーズ計画 | `docs/roadmap.md` |
 | v14移行の状況・チェックリスト | `docs/v14-migration.md` |

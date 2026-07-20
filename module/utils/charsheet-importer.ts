@@ -1,15 +1,21 @@
 import type { EmokloreActor } from "../documents/actor";
+import { typedEntries } from "./object";
 
 /**
  * キャラクター保管所（emoklore.charasheet.jp）が出力するJSONの形。
  * CCFOLIA形式でコピーしたものを想定している
+ *
+ * ユーザーが貼り付けた文字列を JSON.parse しただけのものなので、**どの項目も
+ * 実際には無いことがある**。必須として宣言すると、取り込み側で確かめないまま
+ * 回してしまう（実際 params がそれで、壊れたJSONを貼ると例外になっていた）。
+ * 型の側で任意にしておけば、確かめないと通らない。
  */
 interface CharSheetJSON {
   kind: "character";
   data: {
-    name: string;
-    params: Array<{ label: string; value: string }>;
-    status: Array<{ label: string; value: number | string; max: number | string }>;
+    name?: string;
+    params?: Array<{ label: string; value: string }>;
+    status?: Array<{ label: string; value: number | string; max: number | string }>;
     initiative?: number;
     memo?: string;
     externalUrl?: string;
@@ -75,13 +81,13 @@ export function parseEmotions(memo: string, index: Record<string, string>): Pars
   const emotions: ParsedEmotions["emotions"] = {};
   const unrecognized: string[] = [];
 
-  for (const [key, pattern] of Object.entries(EMOTION_PATTERNS)) {
+  for (const [key, pattern] of typedEntries(EMOTION_PATTERNS)) {
     const label = memo.match(pattern)?.[1]?.trim();
     if (!label) continue;
 
     const emotionKey = index[label];
     if (emotionKey) {
-      emotions[key as keyof ParsedEmotions["emotions"]] = emotionKey;
+      emotions[key] = emotionKey;
     } else {
       unrecognized.push(label);
     }
@@ -194,10 +200,12 @@ export async function importFromCharSheet(
   }
 
   // 能力値
-  for (const param of data.params) {
-    const key = index.characteristics[param.label];
-    if (key) {
-      updateData[`system.characteristics.${key}.value`] = Number.parseInt(param.value, 10);
+  if (Array.isArray(data.params)) {
+    for (const param of data.params) {
+      const key = index.characteristics[param.label];
+      if (key) {
+        updateData[`system.characteristics.${key}.value`] = Number.parseInt(param.value, 10);
+      }
     }
   }
 
@@ -287,26 +295,42 @@ export async function importFromCharSheet(
 }
 
 /**
+ * 検証の結果。
+ *
+ * 判別可能unionにしてあるので、`valid` を見れば `data` と `error` の
+ * どちらがあるかが型で決まる。`{ valid: boolean; data?: T; error?: string }`
+ * だと、valid を確かめたあとでも data が任意のままで、呼び出し側が
+ * `data!` と書くしかなかった。
+ */
+export type CharSheetValidation =
+  | { valid: true; data: CharSheetJSON }
+  | { valid: false; error: string };
+
+/**
  * 貼り付けられた文字列が保管所のJSONとして妥当かを調べる
  */
-export function validateCharSheetJSON(jsonString: string): {
-  valid: boolean;
-  data?: CharSheetJSON;
-  error?: string;
-} {
+export function validateCharSheetJSON(jsonString: string): CharSheetValidation {
+  let parsed: unknown;
   try {
-    const data = JSON.parse(jsonString) as CharSheetJSON;
-
-    if (data.kind !== "character") {
-      return { valid: false, error: "EMOKLORE.Import.ErrorInvalidKind" };
-    }
-
-    if (!data.data || typeof data.data !== "object") {
-      return { valid: false, error: "EMOKLORE.Import.ErrorMissingData" };
-    }
-
-    return { valid: true, data };
+    parsed = JSON.parse(jsonString);
   } catch (_error) {
     return { valid: false, error: "EMOKLORE.Import.ErrorInvalidJSON" };
   }
+
+  if (typeof parsed !== "object" || parsed === null) {
+    return { valid: false, error: "EMOKLORE.Import.ErrorInvalidKind" };
+  }
+
+  // ここまでで object であることしか分かっていない。中身の有無はこの下で見る
+  const json = parsed as Partial<CharSheetJSON>;
+
+  if (json.kind !== "character") {
+    return { valid: false, error: "EMOKLORE.Import.ErrorInvalidKind" };
+  }
+
+  if (!json.data || typeof json.data !== "object") {
+    return { valid: false, error: "EMOKLORE.Import.ErrorMissingData" };
+  }
+
+  return { valid: true, data: { kind: json.kind, data: json.data } };
 }

@@ -4,7 +4,6 @@ import { EMOKLORE } from "./module/config/index";
 import { CharacterDataModel } from "./module/data/character";
 import { WeaponDataModel } from "./module/data/item-models";
 import { WeaponCardModel } from "./module/data/messages/weapon-card";
-import { NpcDataModel } from "./module/data/npc";
 import { EmokloreDie } from "./module/dice/emoklore-die";
 import { EmokloreRoll } from "./module/dice/emoklore-roll";
 import { EmokloreActor } from "./module/documents/actor";
@@ -27,12 +26,15 @@ Hooks.once("init", () => {
   CONFIG.Actor.documentClass = EmokloreActor;
   CONFIG.Item.documentClass = EmokloreItem;
 
-  // system配下のデータモデルを登録する
+  // system配下のデータモデルを登録する。
   // TypeDataModel のコンストラクタ型はジェネリクスが開いたままなので、ModelData を
   // 固定したサブクラスは代入互換にならない。登録先の型として明示する
+  //
+  // npc は system.json の documentTypes に無く作成できないため登録しない。登録だけ
+  // 残すと EmokloreActor#system の型（CharacterDataModel）が嘘になる。
+  // NPCシートを実装する Phase 3 で、判定まわりの扱いごと決めて戻す
   CONFIG.Actor.dataModels = {
     character: CharacterDataModel,
-    npc: NpcDataModel,
   } as typeof CONFIG.Actor.dataModels;
   CONFIG.Item.dataModels = {
     weapon: WeaponDataModel,
@@ -48,10 +50,6 @@ Hooks.once("init", () => {
   CONFIG.Actor.trackableAttributes = {
     character: {
       bar: ["resources.hp", "resources.mp", "resources.resonance"],
-      value: [],
-    },
-    npc: {
-      bar: ["resources.hp", "resources.mp"],
       value: [],
     },
   };
