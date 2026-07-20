@@ -8,6 +8,19 @@ import type { EmokloreItem } from "../documents/item";
 import type { ModifierSet } from "../rules/types";
 import type { ValueSegment } from "./helpers";
 
+/**
+ * `HandlebarsApplicationMixin` の返り値に足りない静的メンバー。
+ *
+ * 本体のJSDocは `@param {Constructor<ApplicationV2>}` とインスタンス側しか宣言していないので
+ * （`client/applications/api/handlebars-application.mjs:32`）、mixinを通すと `ApplicationV2` の
+ * 静的メンバーが型から落ち、`DEFAULT_OPTIONS` / `TABS` を `override` で名乗れなくなる（TS4113）。
+ * 実際に override しているものだけ交差型で足す。本体が静的側を持つようになったら消せる。
+ */
+export type ApplicationV2Statics = Pick<
+  typeof foundry.applications.api.ApplicationV2,
+  "DEFAULT_OPTIONS" | "TABS"
+>;
+
 export type EmotionKey = "surface" | "hidden" | "root";
 
 /** 共鳴感情の表示用データ。どちらも翻訳済みの文字列で、未選択なら空文字 */

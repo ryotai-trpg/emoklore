@@ -3,6 +3,9 @@ import type { HandlebarsRenderOptions } from "@client/applications/api/handlebar
 import { systemPath } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
 import { importFromCharSheet, validateCharSheetJSON } from "../utils/charsheet-importer";
+import type { ApplicationV2Statics } from "./types";
+
+const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 type CharSheetImportDialogContext = ApplicationRenderContext & {
   jsonInput: string;
@@ -13,9 +16,9 @@ type CharSheetImportDialogContext = ApplicationRenderContext & {
 /**
  * キャラクター保管所のJSONを貼り付けて取り込むダイアログ
  */
-export class CharSheetImportDialog extends foundry.applications.api.HandlebarsApplicationMixin(
+export class CharSheetImportDialog extends (HandlebarsApplicationMixin(
   foundry.applications.api.ApplicationV2,
-) {
+) as ReturnType<typeof HandlebarsApplicationMixin> & ApplicationV2Statics) {
   static override DEFAULT_OPTIONS = {
     id: "charsheet-import-{id}",
     // emoklore は変数の定義スコープ、charsheet-import-dialog はこのダイアログの

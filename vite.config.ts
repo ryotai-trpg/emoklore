@@ -19,11 +19,16 @@ export default defineConfig({
       },
     },
   },
-  esbuild: { keepNames: true },
   build: {
     outDir: "dist",
     emptyOutDir: false,
     sourcemap: true,
+    // Vite 8 のバンドラは rolldown で、変換は esbuild ではなく oxc が行う。
+    // 旧 `esbuild: { keepNames: true }` は黙って無視され、クラス名が1文字に潰れる。
+    // 本体はシート登録やデータモデルの識別にクラス名を使うので、出力側で保つ
+    rollupOptions: {
+      output: { keepNames: true },
+    },
     lib: {
       name: "emoklore",
       entry: "emoklore.mjs",
@@ -34,24 +39,15 @@ export default defineConfig({
   },
   plugins: [
     viteStaticCopy({
+      // v4 はコピー元の相対パスを保つので、dest はすべて dist 直下（""）でよい。
+      // v3 の `lang/*` + `dest: "lang"` は v4 では dist/lang/lang/ に二重に入る。
+      // また v4 の `*` はディレクトリに一致しないため、ディレクトリごと指定する
       targets: [
         { src: "system.json", dest: "" },
-        {
-          src: "lang/*",
-          dest: "lang",
-        },
-        {
-          src: "LICENSE",
-          dest: "",
-        },
-        {
-          src: "assets/*",
-          dest: "assets",
-        },
-        {
-          src: "templates/*",
-          dest: "templates",
-        },
+        { src: "LICENSE", dest: "" },
+        { src: "lang", dest: "" },
+        { src: "assets", dest: "" },
+        { src: "templates", dest: "" },
       ],
     }),
   ],

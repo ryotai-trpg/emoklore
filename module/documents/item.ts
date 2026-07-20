@@ -12,7 +12,6 @@ export class EmokloreItem extends Item {
   declare name: string;
   declare img: string;
   declare type: string;
-  declare isOwner: boolean;
   declare getRollData: () => Record<string, unknown>;
 
   /**
