@@ -3,6 +3,7 @@ import { EmokloreWeaponSheet } from "./module/applications/weapon-sheet";
 import { EMOKLORE } from "./module/config/index";
 import { CharacterDataModel } from "./module/data/character";
 import { WeaponDataModel } from "./module/data/item-models";
+import { WeaponCardModel } from "./module/data/messages/weapon-card";
 import { NpcDataModel } from "./module/data/npc";
 import { EmokloreDie } from "./module/dice/emoklore-die";
 import { EmokloreRoll } from "./module/dice/emoklore-roll";
@@ -32,6 +33,9 @@ Hooks.once("init", () => {
   CONFIG.Item.dataModels = {
     weapon: WeaponDataModel,
   } as typeof CONFIG.Item.dataModels;
+  CONFIG.ChatMessage.dataModels = {
+    weapon: WeaponCardModel,
+  } as typeof CONFIG.ChatMessage.dataModels;
 
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;
@@ -76,6 +80,13 @@ Hooks.once("init", () => {
     },
   );
 });
+// チャットカードのボタンを繋ぐ。本体のチャットログは自前のアクション表しか見ないので、
+// システム側のボタンはメッセージが描かれるたびに自分で拾う必要がある
+Hooks.on("renderChatMessageHTML", (message: ChatMessage, html: HTMLElement) => {
+  const system = (message as { system?: { addListeners?: (html: HTMLElement) => void } }).system;
+  system?.addListeners?.(html);
+});
+
 Hooks.once("i18nInit", () => {
   // CONFIG.EMOKLORE のラベル（i18nキー）をその場で翻訳文字列に置き換える。
   // スキーマのラベルは LOCALIZATION_PREFIXES 経由で本体が処理するため、ここでは触らない

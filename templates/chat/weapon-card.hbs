@@ -1,0 +1,50 @@
+{{! Weapon Card }}
+<div class="em-weapon-card">
+  <header class="em-weapon-card__head">
+    <img class="em-weapon-card__image" src="{{weaponImg}}" height="36" width="36" alt="" />
+    <div class="em-weapon-card__title">
+      <div class="em-weapon-card__name">{{weaponName}}</div>
+      <div class="em-weapon-card__meta">
+        {{rangeLabel}}
+        <span class="em-weapon-card__sep">/</span>
+        {{skillLabel}}
+        {{#if attackPower}}
+          <span class="em-weapon-card__sep">/</span>
+          {{attackPower}}
+        {{/if}}
+      </div>
+    </div>
+  </header>
+
+  {{! ロールは本体の描画をそのまま埋める。content に要素があるので二重には描かれない }}
+  {{#if attackHTML}}
+    <section class="em-weapon-card__roll">
+      <h4 class="em-weapon-card__roll-label">{{localize "EMOKLORE.ChatMessage.weapon.Attack"}}</h4>
+      {{{attackHTML}}}
+    </section>
+  {{/if}}
+
+  {{#if damageHTML}}
+    <section class="em-weapon-card__roll">
+      <h4 class="em-weapon-card__roll-label">{{localize "EMOKLORE.ChatMessage.weapon.Damage"}}</h4>
+      {{{damageHTML}}}
+    </section>
+  {{/if}}
+
+  {{#if (or canRollAttack canRollDamage)}}
+    <footer class="em-weapon-card__buttons">
+      {{#if canRollAttack}}
+        <button type="button" data-action="rollAttack">
+          <i class="fa-solid fa-hand-fist" inert></i>
+          <span>{{localize "EMOKLORE.ChatMessage.weapon.Attack"}}</span>
+        </button>
+      {{/if}}
+      {{#if canRollDamage}}
+        <button type="button" data-action="rollDamage">
+          <i class="fa-solid fa-burst" inert></i>
+          <span>{{localize "EMOKLORE.ChatMessage.weapon.Damage"}}</span>
+        </button>
+      {{/if}}
+    </footer>
+  {{/if}}
+</div>

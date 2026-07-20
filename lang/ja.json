@@ -67,6 +67,15 @@
         "SuccessCount": "【成功数】"
       }
     },
+    "ChatMessage": {
+      "weapon": {
+        "Attack": "攻撃判定",
+        "Damage": "ダメージ",
+        "NoActor": "持ち主のいない武器は使えません。",
+        "ActorMissing": "この武器を使ったキャラクターが見つかりません。",
+        "ActionFailed": "武器カードの操作に失敗しました。"
+      }
+    },
     "SHEET.ToggleMode": "プレイ・編集モード切替",
 
     "emotionAttributes": {

@@ -2,8 +2,8 @@ import { attackSkills } from "../config/attack-skills";
 import { systemPath } from "../constants";
 import type { WeaponDataModel } from "../data/item-models";
 import type { EmokloreItem } from "../documents/item";
+import { formatDamagePreview, formatRangeLabel, localizeRangeType } from "../utils/weapon";
 import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
-import { formatDamagePreview, formatRangeLabel, localizeRangeType } from "./helpers";
 import type { EmokloreRenderOptions, WeaponContext } from "./types";
 
 /**
