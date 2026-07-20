@@ -1,6 +1,16 @@
+import { systemPath } from "../constants";
 import type { SkillRollContext } from "../data/character";
 import type { EmokloreRoll } from "../dice/emoklore-roll";
 import type { EmokloreActor } from "../documents/actor";
+
+const DAMAGE_APPLIED_TEMPLATE = systemPath("templates/chat/damage-applied.hbs");
+
+/** ダメージを適用した1体ぶんの結果 */
+export type DamageApplied = {
+  name: string;
+  before: number;
+  after: number;
+};
 
 export type RollMessageData = {
   actor: EmokloreActor;
@@ -24,6 +34,33 @@ export async function createRollMessage({
     flavor,
     rolls: [roll],
     sound: CONFIG.sounds.dice,
+    flags: { core: { canPopout: true } },
+  });
+
+  return created as ChatMessage | undefined;
+}
+
+/**
+ * ダメージ適用の結果をチャットに流す。「アクター名 HP: 15 → 12」を対象の数だけ並べる。
+ *
+ * 適用した本人にしか見えない通知ではなく、卓の全員が経過を追えるようにチャットへ出す。
+ *
+ * TODO: 敵のHPが全員に見えてしまう。本来はPLに伏せたい情報で、GMだけに見せるか、
+ * 見せる範囲を設定で選べるようにしたい。まずは動きが分かることを優先して全公開にしている。
+ * 対応するときは `ChatMessage` の whisper とロールモードの扱いを一緒に決めること
+ * （秘匿判定に対応していない Issue #16 と同じ話になる）。
+ */
+export async function createDamageAppliedMessage(
+  applied: DamageApplied[],
+): Promise<ChatMessage | undefined> {
+  const lines = applied.map(({ name, before, after }) =>
+    game.i18n.localize("EMOKLORE.ChatMessage.weapon.Applied", { name, before, after }),
+  );
+
+  const created = await ChatMessage.create({
+    content: await foundry.applications.handlebars.renderTemplate(DAMAGE_APPLIED_TEMPLATE, {
+      lines,
+    }),
     flags: { core: { canPopout: true } },
   });
 
