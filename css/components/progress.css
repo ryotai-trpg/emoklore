@@ -7,39 +7,39 @@
   .em-progress {
     height: 10px;
     margin: 2px;
-    background-color: var(--emoklore-gray);
+    background-color: var(--emoklore-track);
     border-radius: var(--emoklore-progress-radius);
   }
 
   .em-progress::-webkit-progress-bar {
-    background-color: var(--emoklore-gray);
+    background-color: var(--emoklore-track);
     border-radius: var(--emoklore-progress-radius);
   }
 
   .em-progress::-webkit-progress-value {
-    background-color: var(--emoklore-accent-color);
+    background-color: var(--emoklore-accent);
     border-radius: var(--emoklore-progress-radius);
   }
 
   .em-progress::-moz-progress-bar {
-    background-color: var(--emoklore-accent-color);
+    background-color: var(--emoklore-accent);
     border-radius: var(--emoklore-progress-radius);
   }
 
   /* HP */
   .em-progress--hp::-webkit-progress-value {
-    background-color: var(--emoklore-green);
+    background-color: var(--emoklore-hp);
   }
   .em-progress--hp::-moz-progress-bar {
-    background-color: var(--emoklore-green);
+    background-color: var(--emoklore-hp);
   }
 
   /* MP */
   .em-progress--mp::-webkit-progress-value {
-    background-color: var(--emoklore-red);
+    background-color: var(--emoklore-mp);
   }
   .em-progress--mp::-moz-progress-bar {
-    background-color: var(--emoklore-red);
+    background-color: var(--emoklore-mp);
   }
 
   /* 能力値・技能の行に埋める背の低いバー。角丸を控えめにする */

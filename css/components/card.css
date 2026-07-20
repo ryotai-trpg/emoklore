@@ -2,7 +2,7 @@
 
 .emoklore {
   .em-card {
-    background: var(--emoklore-darkgray);
+    background: var(--emoklore-surface-sunken);
     display: flex;
     flex-direction: column;
     border-radius: var(--emoklore-card-radius);
