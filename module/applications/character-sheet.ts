@@ -75,6 +75,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       deleteDoc: this._deleteDoc,
       toggleEffect: this._toggleEffect,
       importCharacter: this._importCharacter,
+      selectSegment: this._selectSegment,
     },
   };
 
@@ -194,6 +195,33 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   /**
+   * 段入力で、いま選ばれている段をもう一度押したときに値を戻す。
+   *
+   * ラジオは押しても外れないので、0（未修得）に戻す手段がこれしかない。
+   * 段を1つ増やして0を置く手もあるが、バーの左端が常に空いて見えるのでやめた。
+   *
+   * 選択中でない段を押したときは何もしない。ラジオの既定の動作と
+   * submitOnChange に任せる。
+   */
+  static async _selectSegment(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
+    const input = target as HTMLInputElement;
+    // 属性が無い・空なら解除できない入力（能力値は1未満にならない）。
+    // Number("") は NaN ではなく 0 なので、空文字は先に弾く
+    const raw = input.dataset.clearTo;
+    if (!raw) return;
+    const clearTo = Number(raw);
+    if (!Number.isFinite(clearTo)) return;
+
+    const current = foundry.utils.getProperty(this.actor, input.name);
+    if (Number(input.value) !== current) return;
+
+    // ラジオの既定動作を止めないと、checked が立って submitOnChange が
+    // 元の値で送られ、こちらの更新を打ち消してしまう
+    event.preventDefault();
+    await this.actor.update({ [input.name]: clearTo });
+  }
+
+  /**
    * 能力値の表示用データ。
    *
    * アイコンは CONFIG.EMOKLORE 側の定義なので、テンプレートで二重の lookup を
@@ -244,7 +272,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
             characteristicLabel: characteristic?.label ?? "",
             characteristicIcon: characteristic?.fa ?? "",
             name: `system.skills.${key}.level`,
-            levelSegments: buildValueSegments(SKILL_LEVEL_MIN, SKILL_LEVEL_MAX, entry.level),
+            // 段は1から。0（未修得）は段を置かず、選択中の段を押し直して戻す
+            levelSegments: buildValueSegments(SKILL_LEVEL_MIN + 1, SKILL_LEVEL_MAX, entry.level),
           },
         ];
       }),

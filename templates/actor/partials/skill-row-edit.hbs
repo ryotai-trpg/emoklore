@@ -6,11 +6,12 @@
 --}}
 <div class="em-skill-row em-skill-row--edit" data-skill="{{key}}">
   <span class="em-skill-row__name">{{skill.label}}</span>
+  {{! Lv.0 の段は置かず、選択中の段をもう一度押すと未修得に戻す }}
   {{> "systems/emoklore/templates/actor/partials/segments.hbs"
     name=skill.name
     segments=skill.levelSegments
     label=skill.label
-    zeroBased=true}}
+    clearTo=0}}
   <span class="em-skill-row__target">{{skill.target}}</span>
   {{#if skill.field.fields.characteristic.choices}}
   <span class="em-skill-row__stat">
