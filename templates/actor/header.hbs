@@ -1,26 +1,14 @@
 {{! Sheet Header }}
 <header class="sheet-header em-sheet-header">
+  {{! 閲覧は切り詰めるので、全文はツールチップで見せる }}
+  {{#if isPlay}}
+  <div class="em-sheet-header__name" data-tooltip="{{source.name}}">{{source.name}}</div>
+  {{else}}
   <div class="em-sheet-header__name">
-    {{#if isPlay}}
-    {{source.name}}
-    {{else}}
     {{formInput fields.name value=source.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
     aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
-    {{/if}}
   </div>
-
-  {{#unless isPlay}}
-  <div class="em-toolbar">
-    <button
-      type="button"
-      class="em-toolbar__button"
-      data-action="importCharacter"
-      data-tooltip="EMOKLORE.Import.ImportTooltip"
-    >
-      <i class="fa-solid fa-file-import"></i>
-    </button>
-  </div>
-  {{/unless}}
+  {{/if}}
 
   {{#if isPlay}}
   <div class="em-resources">
@@ -50,18 +38,15 @@
         <div class="em-meter__value">
           Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
         </div>
-        <div>{{emotionRows.surface.label}}</div>
-        <div class="em-meter__sub">
-          {{#if emotionRows.surface.attribute}}（{{emotionRows.surface.attribute}}）{{/if}}
-        </div>
-        <div>{{emotionRows.hidden.label}}</div>
-        <div class="em-meter__sub">
-          {{#if emotionRows.hidden.attribute}}（{{emotionRows.hidden.attribute}}）{{/if}}
-        </div>
-        <div>{{emotionRows.root.label}}</div>
-        <div class="em-meter__sub">
-          {{#if emotionRows.root.attribute}}（{{emotionRows.root.attribute}}）{{/if}}
-        </div>
+        {{! 表・裏・根源は「感情名: 属性」の対なので定義リストで表す }}
+        <dl class="em-meter__emotions">
+          <dt>{{emotionRows.surface.label}}</dt>
+          <dd>{{#if emotionRows.surface.attribute}}（{{emotionRows.surface.attribute}}）{{/if}}</dd>
+          <dt>{{emotionRows.hidden.label}}</dt>
+          <dd>{{#if emotionRows.hidden.attribute}}（{{emotionRows.hidden.attribute}}）{{/if}}</dd>
+          <dt>{{emotionRows.root.label}}</dt>
+          <dd>{{#if emotionRows.root.attribute}}（{{emotionRows.root.attribute}}）{{/if}}</dd>
+        </dl>
       </div>
       <progress
         class="em-progress em-progress--resonance"
