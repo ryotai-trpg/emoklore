@@ -1,10 +1,10 @@
 import { promptResonanceRoll } from "../applications/dialogs/resonance-roll-dialog";
-import type { CharacterDataModel, SkillRollContext } from "../data/character";
+import type { CharacterDataModel } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
 import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
 import { resolveSkillRoll } from "../rules/skill-roll";
 import type { RollSpec } from "../rules/types";
-import { createRollMessage } from "../utils/chat";
+import { createRollMessage, formatSkillName } from "../utils/chat";
 import type { EmokloreItem } from "./item";
 
 type ResourceKey = "hp" | "mp" | "resonance";
@@ -94,17 +94,4 @@ export class EmokloreActor extends Actor {
       roll,
     });
   }
-}
-
-/** 「＊格闘」「★技能：専門」のような判定名を組み立てる */
-function formatSkillName(
-  { label, isExtra, specialization }: SkillRollContext,
-  { base }: { base: boolean },
-): string {
-  const prefix = base ? "＊" : isExtra ? "★" : "";
-  const suffix = specialization
-    ? `${game.i18n.localize("EMOKLORE.Common.colon")}${specialization}`
-    : "";
-
-  return `${prefix}${label}${suffix}`;
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveSkillRoll } from "./skill-roll";
+import { formatDMPart, resolveSkillRoll } from "./skill-roll";
 import type { ModifierSet } from "./types";
 
 const noMod: ModifierSet = { bonus: 0, success: 0, target: 0 };
@@ -71,5 +71,19 @@ describe("resolveSkillRoll", () => {
       successMod: 0,
       dmFormula: "(3-1)DM≦(5-2)",
     });
+  });
+});
+
+describe("formatDMPart", () => {
+  it("修正値がなければ基準値だけを返す", () => {
+    expect(formatDMPart(3, 0)).toBe("3");
+  });
+
+  it("正の修正値は括弧付きで符号を添える", () => {
+    expect(formatDMPart(3, 2)).toBe("(3+2)");
+  });
+
+  it("負の修正値は括弧付きでそのまま連結する", () => {
+    expect(formatDMPart(3, -2)).toBe("(3-2)");
   });
 });
