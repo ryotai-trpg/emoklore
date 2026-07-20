@@ -27,6 +27,7 @@
     "check:lang": "node tools/check-lang.mjs",
     "check:templates": "node tools/check-templates.mjs",
     "link:foundry": "node tools/create-symlinks.mjs",
-    "typecheck": "node tools/typecheck.mjs"
+    "typecheck": "node tools/typecheck.mjs",
+    "verify:live": "node tests/live/run.mjs"
   }
 }
