@@ -19,11 +19,3 @@
 エモクロアは最近あまり遊んでないので、どんな機能が必要なのかいまいちわかってないです……
 
 オンセ工房日本支部 Foundry VTTのDiscordか、GitHubのIssueに気軽にお願いします！！
-
-<!--
-## CONTRIBUTING
-### Vite
-```shell
-npm install
-```
--->
