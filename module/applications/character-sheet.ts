@@ -132,6 +132,9 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       case "effects":
         this._prepareEffectsContext(context);
         break;
+      default:
+        // header / tabs は追加のコンテキストを必要としないので何もしない
+        break;
     }
 
     if (partId in context.tabs) context.tab = context.tabs[partId] as unknown;

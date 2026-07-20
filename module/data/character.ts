@@ -43,7 +43,9 @@ const defineCharacterDataModelSchema = () => {
     }),
   });
 
-  const characteristic = {
+  // 能力値の NumberField に渡す共通オプション。技能側で分割代入する
+  // characteristic（能力値キーの文字列）とは別物なので名前を分けている
+  const characteristicFieldOptions = {
     min: 1,
     max: 6,
     initial: 1,
@@ -58,7 +60,7 @@ const defineCharacterDataModelSchema = () => {
         (obj as Record<string, foundry.data.fields.DataField>)[chc] = new SchemaField({
           // label は指定しない。定義時に設定すると localizeSchema の `this.label ||= ...` に
           // 勝ってしまい、ja.json の FIELDS 側の指定が効かなくなる
-          value: new NumberField({ ...characteristic }),
+          value: new NumberField({ ...characteristicFieldOptions }),
           mod: new SchemaField({
             bonus: new NumberField({ required: true, integer: true, initial: 0 }),
             success: new NumberField({ required: true, integer: true, initial: 0 }),
