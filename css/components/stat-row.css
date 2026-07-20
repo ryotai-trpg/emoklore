@@ -1,24 +1,40 @@
 /* 能力値の一覧と各行 */
 
 .emoklore {
+  /* 列トラックはリストが持ち、各行が subgrid で共有する。
+     行ごとに auto で解決させると、ラベルの長さでバーの開始位置が
+     行ごとにずれる（英語で顕著） */
   .em-stat-list {
-    display: flex;
-    flex-direction: column;
-    padding: 12px;
-    padding-top: 8px;
+    display: grid;
+    grid-template-columns: 1.25rem auto auto minmax(0, 1fr);
+    row-gap: var(--spacer-4);
+    column-gap: var(--spacer-8);
+    padding: var(--spacer-12);
+    padding-top: var(--spacer-8);
 
     range-picker {
-      width: 180px;
+      width: 100%;
     }
   }
 
-  /* 閲覧: アイコン・名前・値・バーの4列 */
+  /* 閲覧: アイコン・名前・値・バーの4列。
+
+     名前列を固定幅にすると英語ラベル（Intelligence など）が数値に重なるので、
+     幅は中身なりにする。列トラックは em-stat-list が持ち、ここは subgrid で
+     それに載るだけ。こうすると全行でラベル幅とバーの開始位置が揃う */
   .em-stat-row {
     display: grid;
-    grid-template-columns: 22px 40px 20px 1fr;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
     align-items: center;
-    justify-items: center;
-    margin-top: 6px;
+  }
+
+  .em-stat-row__icon {
+    justify-self: center;
+  }
+
+  .em-stat-row__value {
+    font-variant-numeric: tabular-nums;
   }
 
   /* 編集: 入力欄だけなので横に並べるだけでよい */
@@ -27,8 +43,11 @@
     justify-content: space-around;
   }
 
-  /* 高さだけ。角丸は .em-progress--sm 側で持つ */
+  /* progress は固有幅（既定140px）を持つ。grid item の min-width: auto が
+     それを最小幅として効くので、明示的に外さないとトラックからはみ出す */
   .em-stat-row .em-progress {
-    height: 20px;
+    height: 1.25rem;
+    width: 100%;
+    min-width: 0;
   }
 }
