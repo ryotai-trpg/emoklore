@@ -1,12 +1,16 @@
+{{! 基本技能。修得していなくても振れるので、閲覧モードにボタンで並べる }}
 {{#if isPlay}}
-<div class="base-skills">
-  {{#each system.baseSkills as |baseSkill key|}}
-  <button class="base-skill label" 
-    data-action="roll" 
-    data-roll-type="base-skill" 
-    data-skill="{{key}}">
-    {{lookup (lookup ../config.baseSkills key) 'label'}} | {{baseSkill.target}}
-    <i class="characteristic fa-solid {{lookup (lookup ../config.characteristics baseSkill.characteristic) 'fa'}}"></i>
+<div class="em-chip-list">
+  {{#each baseSkills as |baseSkill|}}
+  <button
+    type="button"
+    class="em-chip"
+    data-action="roll"
+    data-roll-type="base-skill"
+    data-skill="{{baseSkill.key}}"
+  >
+    {{baseSkill.label}} | {{baseSkill.target}}
+    <i class="em-chip__icon fa-solid {{baseSkill.characteristicIcon}}"></i>
   </button>
   {{/each}}
 </div>

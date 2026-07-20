@@ -1,36 +1,17 @@
-<div class="skills">
+<div class="em-skill-list">
   {{#unless isPlay}}
-  <div class="cap">
+  <div class="em-cap">
     {{skillPointSum}} / 30
   </div>
   {{/unless}}
   {{#each skills as |skill key|}}
-  {{#if ../isPlay}}
-  {{#if skill.level}}
-  <div class="skill play" data-skill="{{key}}">
-    <a class="label" data-action="roll" data-roll-type="skill" data-skill="{{key}}">
-      {{skill.label}}{{#if skill.specialization}}{{localize "EMOKLORE.Common.colon"}}{{skill.specialization}}{{/if}}
-    </a>
-    <span>Lv.{{skill.level}}</span>
-    <progress value="{{skill.level}}" max="3"></progress>
-    <span class="target">{{skill.target}}</span>
-    <i class="characteristic fa-solid {{lookup (lookup ../config.characteristics skill.characteristic) 'fa'}}"></i>
-  </div>
-  {{/if}}
-  {{else}}
-  <div class="skill" data-skill="{{key}}">
-    <span class="label">{{skill.label}}</span>
-    {{formInput skill.field.fields.level value=skill.level options=skillLevelOptions}}
-    <span class="target">{{skill.target}}</span>
-    {{#if skill.field.fields.characteristic.choices}}
-    <span class="characteristic">{{formInput skill.field.fields.characteristic value=skill.characteristic localize=true}}</span>
+    {{#if @root.isPlay}}
+      {{! 閲覧では未修得の技能を出さない }}
+      {{#if skill.level}}
+      {{> "systems/emoklore/templates/actor/partials/skill-row-play.hbs" skill=skill key=key}}
+      {{/if}}
     {{else}}
-    <span class="characteristic">{{skill.characteristicLabel}}</span>
+    {{> "systems/emoklore/templates/actor/partials/skill-row-edit.hbs" skill=skill key=key}}
     {{/if}}
-    {{#if skill.field.fields.specialization}}
-    <span class="specialization">{{formInput skill.field.fields.specialization value=skill.specialization placeholder=(localize "EMOKLORE.CharacterSheet.fields.specialization")}}</span>
-    {{/if}}
-  </div>
-  {{/if}}
   {{/each}}
 </div>

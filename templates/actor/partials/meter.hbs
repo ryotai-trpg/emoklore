@@ -1,0 +1,24 @@
+{{!--
+  リソースのメータ。アイコン・現在値/最大値・バーの3点セット。
+
+  @param key   hp | mp。CSSのmodifierと progress の id に使う
+  @param icon  Font Awesome のアイコンクラス
+  @param field 現在値の DataField
+  @param value 現在値
+  @param max   最大値
+--}}
+<div class="em-meter em-meter--{{key}}">
+  <div class="em-meter__head">
+    <i class="fa-solid {{icon}} em-meter__icon"></i>
+    <div class="em-meter__value">
+      {{formInput field value=value}}
+      <span class="em-meter__max">/{{max}}</span>
+    </div>
+  </div>
+  <progress
+    class="em-progress em-progress--{{key}}"
+    id="character-{{key}}"
+    value="{{value}}"
+    max="{{max}}"
+  ></progress>
+</div>

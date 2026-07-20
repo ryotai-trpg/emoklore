@@ -27,6 +27,10 @@ v14専用に移行します（v13サポートは打ち切り）。
 - [x] シート層に混ざったルール計算を data 層へ移動
 - [x] `as any` の削減（着手時55箇所 → 0。`noExplicitAny` を lint で `error` に）
 - [x] 純粋関数（判定計算など）への vitest テスト導入
+- [x] CSS・テンプレートのリファクタリング
+    - 656行の単一ファイルを部品（`css/components/`）と配置（`css/applications/`）の2層に分割し、`system.json` で `layer: "system"` を宣言した
+    - シート専用だったスタイルを `.emoklore` 直下の部品として切り出し、Phase 3 のアイテムタブ・NPCシートでそのまま使える形にした
+    - 重複していたテンプレートを partial にまとめ、`check-templates.mjs` にタグ対応と参照の検査を足した
 
 参考: dnd5e の module 構成（applications / data / dice / documents / config / utils）
 

@@ -1,69 +1,55 @@
-/* 技能の一覧と各行。閲覧モードと編集モードで列構成が変わる */
+/* 技能の一覧と各行。閲覧と編集で列構成が変わる */
 
-.emoklore.sheet.character {
-  .skills {
+.emoklore {
+  .em-skill-list {
     display: flex;
     flex-direction: column;
     padding: 8px;
   }
 
-  .skill {
-    progress {
-      height: 20px;
-      margin-left: 10px;
-      width: 90px;
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-
-    progress::-webkit-progress-bar {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-    progress::-webkit-progress-value {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-    progress::-moz-progress-bar {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-  }
-
-  /* Skill Layout - Play Mode */
-  .skill.play {
+  /* 閲覧: 技能名・Lv・バー・目標値・能力値アイコンの5列 */
+  .em-skill-row {
     display: grid;
     grid-template-columns: 1fr 20px 115px 20px 20px;
     align-items: center;
     margin-top: 5px;
     margin-bottom: 5px;
-
-    .target {
-      margin-left: 0px;
-    }
   }
 
-  /* Skill Layout - Edit Mode */
-  .skill {
-    display: grid;
+  /* 編集: 技能名・Lv入力・目標値・能力値の4列 */
+  .em-skill-row--edit {
     grid-template-columns: 1fr 120px 20px 60px;
-    align-items: center;
     margin-top: 2px;
     margin-bottom: 2px;
 
     select {
       padding: 0;
     }
+  }
 
-    .target {
-      border: 1px solid;
-      border-radius: 2px;
-      text-align: center;
-      margin-left: 5px;
-    }
+  .em-skill-row__target {
+    border: 1px solid;
+    border-radius: 2px;
+    text-align: center;
+  }
 
-    .characteristic {
-      margin-left: 6px;
-    }
+  .em-skill-row--edit .em-skill-row__target {
+    margin-left: 5px;
+  }
 
-    .characteristic:has(select) {
-      margin-left: 1px;
-    }
+  .em-skill-row__stat {
+    margin-left: 6px;
+  }
+
+  /* selectのときだけ左の余白を詰める */
+  .em-skill-row--edit .em-skill-row__stat:has(select) {
+    margin-left: 1px;
+  }
+
+  /* 高さと幅だけ。角丸は .em-progress--sm 側で持つ */
+  .em-skill-row .em-progress {
+    height: 20px;
+    margin-left: 10px;
+    width: 90px;
   }
 }

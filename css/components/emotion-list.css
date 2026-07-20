@@ -1,7 +1,7 @@
-/* 共鳴感情の一覧。編集モードのヘッダに出る */
+/* 共鳴感情の選択欄を縦に積む。編集モードのヘッダに出る */
 
-.emoklore.sheet.character {
-  .emotions {
+.emoklore {
+  .em-emotion-list {
     display: flex;
     flex-direction: column;
   }

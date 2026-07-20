@@ -10,8 +10,15 @@ import {
 } from "../utils/sheet";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
-import { createEmotionOptions, createSkillLevelOptions, getEmotionRows } from "./helpers";
+import {
+  BIOGRAPHY_PAIRED_COUNT,
+  buildBiographyRows,
+  createEmotionOptions,
+  createSkillLevelOptions,
+  getEmotionRows,
+} from "./helpers";
 import type {
+  BaseSkillRow,
   CharacterContext,
   CharacteristicsMap,
   EmokloreRenderOptions,
@@ -45,23 +52,35 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
 
   static override PARTS = {
     header: {
-      template: "systems/emoklore/templates/actor/header.hbs",
+      template: systemPath("templates/actor/header.hbs"),
+      // 入れ子のpartialは再帰的に解決されないので、使うものをすべて並べる
+      templates: [systemPath("templates/actor/partials/meter.hbs")],
     },
+    // 本体のテンプレートなので systemPath は通さない
     tabs: { template: "templates/generic/tab-navigation.hbs" },
     skills: {
-      template: "systems/emoklore/templates/actor/stats.hbs", // TODO: reaname
-      templates: ["card-view.hbs", "card-edit.hbs", "skills.hbs", "base-skills.hbs"].map((t) =>
-        systemPath(`templates/actor/${t}`),
-      ),
+      template: systemPath("templates/actor/skills-tab.hbs"),
+      templates: [
+        "templates/actor/skills.hbs",
+        "templates/actor/base-skills.hbs",
+        "templates/actor/partials/card.hbs",
+        "templates/actor/partials/stat-row.hbs",
+        "templates/actor/partials/skill-row-play.hbs",
+        "templates/actor/partials/skill-row-edit.hbs",
+      ].map(systemPath),
       scrollable: [""],
     },
     biography: {
-      template: "systems/emoklore/templates/actor/biography.hbs",
-      templates: ["systems/emoklore/templates/actor/card-view.hbs"],
+      template: systemPath("templates/actor/biography.hbs"),
+      templates: [
+        "templates/actor/partials/card.hbs",
+        "templates/actor/partials/stat-row.hbs",
+        "templates/actor/partials/field.hbs",
+      ].map(systemPath),
       scrollable: [""],
     },
     effects: {
-      template: "systems/emoklore/templates/actor/effects.hbs",
+      template: systemPath("templates/actor/effects.hbs"),
       scrollable: [""],
     },
   };
@@ -142,14 +161,21 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     await CharSheetImportDialog.show(this.actor);
   }
 
+  /**
+   * 能力値の表示用データ。
+   *
+   * アイコンは CONFIG.EMOKLORE 側の定義なので、テンプレートで二重の lookup を
+   * 組まずに済むようここで引いておく。
+   */
   _getCharacteristics(): Record<string, unknown> {
     const data = this.actor;
-    return Object.keys(CONFIG.EMOKLORE.characteristics).reduce(
-      (obj, chc) => {
+    return Object.entries(CONFIG.EMOKLORE.characteristics).reduce(
+      (obj, [chc, { fa }]) => {
         const value = foundry.utils.getProperty(data, `system.characteristics.${chc}.value`);
         (obj as Record<string, unknown>)[chc] = {
           field: this.actor.system.schema.getField(["characteristics", chc]),
           value: value ?? 0,
+          icon: fa,
         };
         return obj;
       },
@@ -182,10 +208,30 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
           characteristicLabel: characteristic
             ? (CONFIG.EMOKLORE.characteristics[characteristic]?.label ?? "")
             : "",
+          characteristicIcon: characteristic
+            ? (CONFIG.EMOKLORE.characteristics[characteristic]?.fa ?? "")
+            : "",
         };
         return obj;
       },
       {} as Record<string, unknown>,
+    );
+  }
+
+  /**
+   * 基本技能の表示用データ。
+   *
+   * 目標値と能力値はアクターに、表示名は CONFIG.EMOKLORE にあるので、ここで合流させる。
+   */
+  _getBaseSkills(): BaseSkillRow[] {
+    return Object.entries(this.actor.system.baseSkills).map(
+      ([key, { characteristic, target }]) => ({
+        key,
+        label:
+          CONFIG.EMOKLORE.baseSkills[key as keyof typeof CONFIG.EMOKLORE.baseSkills]?.label ?? "",
+        target,
+        characteristicIcon: CONFIG.EMOKLORE.characteristics[characteristic]?.fa ?? "",
+      }),
     );
   }
 
@@ -195,14 +241,17 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     context.skills = this._getSkills() as unknown as Record<string, SkillRow>;
     context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills);
     context.skillLevelOptions = createSkillLevelOptions();
+    context.baseSkills = this._getBaseSkills();
   }
 
   /**
-   * 経歴の備考は system.json で htmlFields に指定しているリッチテキスト。
-   * @UUID リンクやインラインロールを解決するため、描画前に enrichHTML を通す。
+   * 経歴の表示用データ。
+   *
+   * 備考は system.json で htmlFields に指定しているリッチテキストなので、
+   * @UUID リンクやインラインロールを解決するため描画前に enrichHTML を通す。
    */
   private async _prepareBiographyContext(context: CharacterContext): Promise<void> {
-    context.noteHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+    const noteHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.actor.system.biography.note,
       {
         secrets: this.actor.isOwner,
@@ -210,6 +259,21 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         rollData: this.actor.getRollData(),
       },
     );
+
+    // systemFields の型は DataField 止まりで fields に降りられないため、スキーマから引く
+    const biography = this.actor.system.schema.getField([
+      "biography",
+    ]) as foundry.data.fields.SchemaField;
+
+    const rows = buildBiographyRows(
+      biography.fields as unknown as Record<string, { label?: string }>,
+      this.actor.system.biography as unknown as Record<string, string>,
+      { note: noteHTML },
+    );
+
+    // 先頭の数件は横並びの組にするので、テンプレート側で分けて回せるよう2つに割る
+    context.biographyPairedRows = rows.slice(0, BIOGRAPHY_PAIRED_COUNT);
+    context.biographyRows = rows.slice(BIOGRAPHY_PAIRED_COUNT);
   }
 
   private _prepareEffectsContext(context: CharacterContext): void {

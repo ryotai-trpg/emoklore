@@ -1,0 +1,11 @@
+{{!--
+  ラベルと値の1項目（閲覧）。
+
+  @param row 経歴の表示用データ（label / value / inline / html）
+--}}
+<div class="em-field{{#if row.inline}} em-field--inline{{/if}}">
+  <label class="em-field__label">{{row.label}}</label>
+  <span class="em-field__value">
+    {{~#if row.html}}{{{row.display}}}{{else}}{{row.display}}{{/if~}}
+  </span>
+</div>

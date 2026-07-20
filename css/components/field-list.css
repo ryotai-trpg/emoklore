@@ -1,50 +1,27 @@
-/* ラベルと値を縦に積む項目リスト。経歴タブで使う */
+/* ラベルと値を積む項目リスト。経歴タブで使う */
 
-.emoklore.sheet.character {
-  .biographies {
+.emoklore {
+  .em-field-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
 
-  & [data-application-part="biography"] {
-    div.flexrow {
-      gap: 20px;
-    }
+  .em-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0px;
+  }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0px;
-    }
+  /* 短い値はラベルと横に並べる */
+  .em-field--inline {
+    flex-direction: row;
+    gap: 8px;
+  }
 
-    .form-group.stacked {
-      display: flex;
-      flex-direction: row;
-
-      .editor-container {
-        min-height: 150px;
-      }
-    }
-
-    .bio {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0px;
-    }
-
-    .bio.very-short,
-    .bio.short {
-      display: flex;
-      flex-direction: row;
-      gap: 8px;
-    }
-
-    .biographies label {
-      color: var(--color-form-label);
-      font-weight: bold;
-    }
+  .em-field__label {
+    color: var(--color-form-label);
+    font-weight: bold;
   }
 }

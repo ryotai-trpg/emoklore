@@ -1,53 +1,7 @@
 /* 見出し行と明細行を同じグリッドで揃える表。ActiveEffect の一覧で使う */
 
-/* .effects-header .effect-name と .effects-list .effect-name は詳細度が同じで
-   font-size がぶつかる。後に置いた .effects-list 側が勝つ順序に依存しているので、
-   このファイル内の並びを入れ替えないこと */
-
-.emoklore.sheet.character {
-  .effects-header {
-    height: 28px;
-    margin: 2px 0;
-    padding: 0;
-    align-items: center;
-    background: var(--emoklore-darkgray);
-    font-weight: bold;
-    border-radius: 3px;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 70px;
-
-    .effect-name {
-      font-size: 1.1em;
-    }
-  }
-  /* Effect List Items */
-  li.effect {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 70px;
-  }
-
-  .effect-source {
-    display: flex;
-    justify-content: center;
-  }
-
-  .effect-duration {
-    display: flex;
-    justify-content: center;
-  }
-
-  .effect-controls {
-    display: flex;
-    justify-content: center;
-  }
-
-  .effects-header > * {
-    font-size: 14px;
-    text-align: center;
-  }
-
-  /* Effects List */
-  .effects-list {
+.emoklore {
+  .em-data-table {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -55,52 +9,79 @@
     scrollbar-width: thin;
   }
 
-  .effects-list .effect-list {
+  .em-data-table__body {
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .effects-list .effect-name {
+  /* 見出しと明細で列がずれないよう、同じ定義を共有する */
+  .em-data-table__head,
+  .em-data-table__row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 70px;
+    align-items: center;
+  }
+
+  .em-data-table__head {
+    height: 28px;
+    margin: 2px 0;
+    padding: 0;
+    background: var(--emoklore-darkgray);
+    font-weight: bold;
+    border-radius: 3px;
+  }
+
+  .em-data-table__head > * {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .em-data-table__row {
+    padding: 0 2px;
+    border-bottom: 1px solid var(--emoklore-gray);
+  }
+
+  .em-data-table__row:last-child {
+    border-bottom: none;
+  }
+
+  /* 標準のセルは中央寄せ */
+  .em-data-table__cell {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* 名前だけは左寄せで、はみ出したら切る */
+  .em-data-table__name {
+    display: flex;
+    align-items: center;
     margin: 0;
     overflow: hidden;
     font-size: 13px;
     text-align: left;
-    align-items: center;
-    display: flex;
   }
 
-  .effects-list .effect-controls {
+  .em-data-table__head .em-data-table__name {
+    padding-left: 5px;
+  }
+
+  .em-data-table__controls {
     display: flex;
     justify-content: flex-end;
   }
 
-  .effects-list .effect-controls a {
+  .em-data-table__control {
     font-size: 12px;
     text-align: center;
     margin: 0 6px;
   }
 
-  .effects-list .effect {
-    align-items: center;
-    padding: 0 2px;
-    border-bottom: 1px solid var(--emoklore-gray);
-  }
-
-  .effects-list .effect:last-child {
-    border-bottom: none;
-  }
-
-  .effects-list .effect .effect-name .effect-image {
+  .em-data-table__image {
     flex: 0 0 30px;
     height: 30px;
     background-size: 30px;
     border: none;
     margin-right: 5px;
-  }
-
-  .effects-list .effects-header .effect-name {
-    padding-left: 5px;
-    text-align: left;
   }
 }

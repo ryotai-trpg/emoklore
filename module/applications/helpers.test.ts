@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { EmotionAttributesConfig } from "../config/emotion-attributes";
 import type { ResonantEmotionsConfig } from "../config/resonant-emotions";
-import { getEmotionRows } from "./helpers";
+import {
+  BIOGRAPHY_FIELDS,
+  BIOGRAPHY_PAIRED_COUNT,
+  buildBiographyRows,
+  getEmotionRows,
+} from "./helpers";
 
 // performPreLocalization 済みの CONFIG を模す。label は翻訳済みの文字列になっている
 const resonantEmotions: Record<string, ResonantEmotionsConfig> = {
@@ -51,5 +56,65 @@ describe("getEmotionRows", () => {
 
   it("3つのキーを必ず埋める", () => {
     expect(Object.keys(rowsFor({}))).toEqual(["surface", "hidden", "root"]);
+  });
+});
+
+const biographyFields = {
+  age: { label: "年齢" },
+  gender: { label: "性別" },
+  occupation: { label: "職業" },
+  note: { label: "備考" },
+};
+
+describe("buildBiographyRows", () => {
+  it("BIOGRAPHY_FIELDS の並びどおりに項目を返す", () => {
+    const rows = buildBiographyRows(biographyFields, {});
+
+    expect(rows.map((row) => row.key)).toEqual(BIOGRAPHY_FIELDS.map((field) => field.key));
+  });
+
+  it("ラベルと保存値を合流させる", () => {
+    const rows = buildBiographyRows(biographyFields, { age: "17", occupation: "高校生" });
+    const age = rows.find((row) => row.key === "age");
+
+    expect(age).toMatchObject({ label: "年齢", value: "17", display: "17" });
+  });
+
+  it("定義にない項目のラベルと値は空文字にする", () => {
+    const rows = buildBiographyRows({}, {});
+
+    expect(rows.every((row) => row.label === "" && row.value === "")).toBe(true);
+  });
+
+  it("年齢・性別・職業・出身は inline、それ以外は違う", () => {
+    const rows = buildBiographyRows(biographyFields, {});
+    const inlineKeys = rows.filter((row) => row.inline).map((row) => row.key);
+
+    expect(inlineKeys).toEqual(["age", "gender", "occupation", "hometown"]);
+  });
+
+  it("備考だけを html として扱う", () => {
+    const rows = buildBiographyRows(biographyFields, {});
+    const htmlKeys = rows.filter((row) => row.html).map((row) => row.key);
+
+    expect(htmlKeys).toEqual(["note"]);
+  });
+
+  it("enrichHTML 済みの値は display にだけ反映し、value は保存値のまま残す", () => {
+    const rows = buildBiographyRows(
+      biographyFields,
+      { note: "@UUID[Actor.x]{リンク}" },
+      { note: "<a>リンク</a>" },
+    );
+    const note = rows.find((row) => row.key === "note");
+
+    expect(note?.value).toBe("@UUID[Actor.x]{リンク}");
+    expect(note?.display).toBe("<a>リンク</a>");
+  });
+
+  it("横並びにする組は先頭の年齢と性別", () => {
+    const rows = buildBiographyRows(biographyFields, {});
+
+    expect(rows.slice(0, BIOGRAPHY_PAIRED_COUNT).map((row) => row.key)).toEqual(["age", "gender"]);
   });
 });

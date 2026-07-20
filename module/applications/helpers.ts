@@ -1,6 +1,6 @@
 import type { EmotionAttributeKey, EmotionAttributesConfig } from "../config/emotion-attributes";
 import type { ResonantEmotionsConfig } from "../config/resonant-emotions";
-import type { EmotionKey, EmotionRow } from "./types";
+import type { BiographyFieldDef, BiographyRow, EmotionKey, EmotionRow } from "./types";
 
 /**
  * シートのテンプレートに渡す選択肢やラベルを組み立てる。
@@ -8,6 +8,54 @@ import type { EmotionKey, EmotionRow } from "./types";
  */
 
 const EMOTION_KEYS: readonly EmotionKey[] = ["surface", "hidden", "root"];
+
+/**
+ * 経歴の項目の並び。
+ *
+ * inline はラベルと値を横に並べるもの、html は enrichHTML を通した文字列を
+ * そのまま流し込むもの。閲覧と編集で同じ定義を使うので、項目を足すときは
+ * ここだけを直せばよい。
+ */
+export const BIOGRAPHY_FIELDS: readonly BiographyFieldDef[] = [
+  { key: "age", inline: true },
+  { key: "gender", inline: true },
+  { key: "occupation", inline: true },
+  { key: "hometown", inline: true },
+  { key: "appearance" },
+  { key: "personality" },
+  { key: "background" },
+  { key: "importantPeople" },
+  { key: "likesAndDislikes" },
+  { key: "note", html: true },
+];
+
+/** 先頭の何件を横並びの組にするか。年齢と性別は並べて置く */
+export const BIOGRAPHY_PAIRED_COUNT = 2;
+
+/**
+ * 経歴の表示用データを組み立てる。
+ *
+ * value は保存値そのままで、編集モードの formGroup に渡す。display は閲覧モードで
+ * 出す文字列で、enrichHTML を通したものがあればそちらを使う。
+ *
+ * @param fields    systemFields.biography.fields
+ * @param values    system.biography
+ * @param enriched  enrichHTML 済みの値。閲覧時のみ values より優先する
+ */
+export const buildBiographyRows = (
+  fields: Record<string, { label?: string }>,
+  values: Record<string, string>,
+  enriched: Record<string, string> = {},
+): BiographyRow[] =>
+  BIOGRAPHY_FIELDS.map(({ key, inline, html }) => ({
+    key,
+    label: fields[key]?.label ?? "",
+    value: values[key] ?? "",
+    display: enriched[key] ?? values[key] ?? "",
+    field: fields[key],
+    inline: inline ?? false,
+    html: html ?? false,
+  }));
 
 export const createSkillLevelOptions = (): Array<{ value: string; label: string }> => {
   return Object.entries(CONFIG.EMOKLORE.skillLevel).map(([value, { label }]) => ({

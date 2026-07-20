@@ -1,5 +1,5 @@
 # gitフック定義（スキップしたい場合は `git commit --no-verify`。非推奨）
-# - pre-commit: stagedファイルにBiome（format+lint）を自動適用する
+# - pre-commit: stagedファイルにBiome（format+lint）を自動適用し、テンプレートを検査する
 # - commit-msg: コミットメッセージがdocs/contributing.mdの規約に沿うか検査する
 pre-commit:
   jobs:
@@ -7,6 +7,12 @@ pre-commit:
       glob: "*.{ts,mts,cts,js,mjs,cjs,json,jsonc,css}"
       run: npx biome check --write --no-errors-on-unmatched {staged_files}
       stage_fixed: true
+
+    # BiomeはHandlebarsを扱えないので、hbsは専用のチェックに回す。
+    # 参照の検査はリポジトリ全体を見る必要があるため {staged_files} は渡さない
+    - name: templates
+      glob: "*.hbs"
+      run: npm run check:templates
 
 commit-msg:
   jobs:

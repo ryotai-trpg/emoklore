@@ -18,12 +18,10 @@
         "noExplicitAny": "error"
       },
       "complexity": {
-        "noThisInStatic": "off",
-        "noImportantStyles": "off"
+        "noThisInStatic": "off"
       },
       "style": {
-        "noNonNullAssertion": "off",
-        "noDescendingSpecificity": "off"
+        "noNonNullAssertion": "off"
       }
     }
   },
