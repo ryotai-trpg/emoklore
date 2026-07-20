@@ -80,3 +80,6 @@ export type BaseSkillKey = keyof typeof definitions;
 // satisfies だけだと各値が個別の狭い型に推論されるため、値の型は BaseSkillConfig に揃える。
 // キーは literal のまま保たれるので BaseSkillKey が使える
 export const baseSkills: Record<BaseSkillKey, BaseSkillConfig> = definitions;
+
+/** 基本技能キーかどうか。用途は config/skills.ts の isSkillKey と同じ */
+export const isBaseSkillKey = (value: string): value is BaseSkillKey => value in baseSkills;

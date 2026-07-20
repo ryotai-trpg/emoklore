@@ -1,5 +1,5 @@
 import { promptResonanceRoll } from "../applications/dialogs/resonance-roll-dialog";
-import type { CharacterDataModel } from "../data/character";
+import type { CharacterDataModel, SkillRef } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
 import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
 import { resolveSkillRoll } from "../rules/skill-roll";
@@ -103,10 +103,10 @@ export class EmokloreActor extends Actor {
   }
 
   async rollSkill(
-    skill: string,
-    options: { base?: boolean } & Record<string, unknown> = {},
+    ref: SkillRef,
+    options: Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
-    const { roll, flavor } = await this.buildSkillRoll(skill, options);
+    const { roll, flavor } = await this.buildSkillRoll(ref, options);
 
     return createRollMessage({ actor: this, flavor, roll });
   }
@@ -118,15 +118,15 @@ export class EmokloreActor extends Actor {
    * 攻撃判定は技能判定そのものなので、専用のロジックを別に持つ必要がない。
    */
   async buildSkillRoll(
-    skill: string,
-    { base = false, ...options }: { base?: boolean } & Record<string, unknown> = {},
+    ref: SkillRef,
+    options: Record<string, unknown> = {},
   ): Promise<{ roll: EmokloreRoll; flavor: string }> {
-    const context = this.system.getSkillRollContext(skill, { base });
+    const context = this.system.getSkillRollContext(ref);
     const spec = resolveSkillRoll(context.params);
 
     return {
       roll: await this.#buildRoll(spec, options),
-      flavor: EmokloreActor.formatRollFlavor(formatSkillName(context, { base })),
+      flavor: EmokloreActor.formatRollFlavor(formatSkillName(context)),
     };
   }
 

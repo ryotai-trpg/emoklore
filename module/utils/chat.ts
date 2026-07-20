@@ -73,11 +73,13 @@ export async function createDamageAppliedMessage(
  * 基本技能は「＊」、エクストラ技能は「★」を頭に付けるのがシート表記の慣習。
  * 表示の話なのでルール層ではなく、チャットカードを作るこの層に置く。
  */
-export function formatSkillName(
-  { label, isExtra, specialization }: SkillRollContext,
-  { base }: { base: boolean },
-): string {
-  const prefix = base ? "＊" : isExtra ? "★" : "";
+export function formatSkillName({
+  label,
+  isBase,
+  isExtra,
+  specialization,
+}: SkillRollContext): string {
+  const prefix = isBase ? "＊" : isExtra ? "★" : "";
   const suffix = specialization
     ? `${game.i18n.localize("EMOKLORE.Common.colon")}${specialization}`
     : "";

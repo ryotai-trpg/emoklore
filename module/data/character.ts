@@ -1,7 +1,7 @@
-import type { BaseSkillKey } from "../config/base-skills";
+import { type BaseSkillKey, isBaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { SkillGroupKey } from "../config/skill-groups";
-import type { SkillKey } from "../config/skills";
+import { isSkillKey, type SkillKey } from "../config/skills";
 import {
   calculateBaseSkillTarget,
   calculateInitiative,
@@ -29,10 +29,34 @@ export const CHARACTERISTIC_MAX = 6;
 export const SKILL_LEVEL_MIN = 0;
 export const SKILL_LEVEL_MAX = 3;
 
+/**
+ * どの技能を振るか。
+ *
+ * 技能と基本技能は別の表にあり、キーの集合も違う。かつては
+ * `(skill: string, { base: boolean })` の組で渡していたが、これだと
+ * 「base: true に通常技能のキー」という有り得ない組み合わせが型で作れてしまい、
+ * 受け取った側は as で名乗り直すしかなかった。判別可能unionにして、
+ * 種別とキーが必ず対応するようにする。
+ */
+export type SkillRef = { kind: "skill"; key: SkillKey } | { kind: "base"; key: BaseSkillKey };
+
+/**
+ * 外から来た文字列を SkillRef に変える。キーとして通らなければ null。
+ *
+ * 種別が実行時にしか決まらない呼び出し側（武器カードなど）が使う。
+ * どちらの表を見るか静的に分かっているなら、型述語を直に使えばよい。
+ */
+export const resolveSkillRef = (key: string, { base }: { base: boolean }): SkillRef | null => {
+  if (base) return isBaseSkillKey(key) ? { kind: "base", key } : null;
+  return isSkillKey(key) ? { kind: "skill", key } : null;
+};
+
 /** 技能判定に必要な、アクターから集めた一式 */
 export type SkillRollContext = {
   params: SkillRollParams;
   label: string;
+  /** 基本技能なら true。チャットの見出しに「＊」を付けるかがこれで決まる */
+  isBase: boolean;
   isExtra: boolean;
   specialization?: string | undefined;
 };
@@ -301,22 +325,25 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
    * 判定式そのものは rules/skill-roll.ts が持つ。ここはあくまで
    * 「どの値を渡すか」を決めるだけで、表示用の整形は呼び出し側に任せる。
    */
-  getSkillRollContext(skill: string, { base = false } = {}): SkillRollContext {
-    // シートのdatasetから来る文字列なので、キーであることはここで引き受ける
-    if (base) {
-      const key = skill as BaseSkillKey;
-      const { label, group } = CONFIG.EMOKLORE.baseSkills[key];
+  getSkillRollContext(ref: SkillRef): SkillRollContext {
+    if (ref.kind === "base") {
+      const { label, group } = CONFIG.EMOKLORE.baseSkills[ref.key];
       // 基本技能に isExtra / specialization はない
-      return { params: this.#toRollParams(this.baseSkills[key], group), label, isExtra: false };
+      return {
+        params: this.#toRollParams(this.baseSkills[ref.key], group),
+        label,
+        isBase: true,
+        isExtra: false,
+      };
     }
 
-    const key = skill as SkillKey;
-    const { label, group, isExtra } = CONFIG.EMOKLORE.skills[key];
-    const entry = this.skills[key];
+    const { label, group, isExtra } = CONFIG.EMOKLORE.skills[ref.key];
+    const entry = this.skills[ref.key];
 
     return {
       params: this.#toRollParams(entry, group),
       label,
+      isBase: false,
       isExtra: isExtra ?? false,
       specialization: entry.specialization,
     };

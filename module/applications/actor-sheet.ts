@@ -1,3 +1,5 @@
+import { isBaseSkillKey } from "../config/base-skills";
+import { isSkillKey } from "../config/skills";
 import type { EmokloreActor } from "../documents/actor";
 import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
 import type { EmokloreActorSheetOptions } from "./types";
@@ -20,11 +22,18 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
     event.preventDefault();
     const dataset = (target as HTMLElement & { dataset: DOMStringMap }).dataset;
 
+    // dataset は生の文字列なので、技能キーとして通ることをここで確かめる。
+    // テンプレートの綴り間違いは、以前は as SkillKey をすり抜けて
+    // CONFIG を引いた先の分割代入で TypeError になっていた
+    const skill = dataset.skill ?? "";
+
     switch (dataset.rollType) {
       case "skill":
-        return this.actor.rollSkill(dataset.skill!);
+        if (!isSkillKey(skill)) return undefined;
+        return this.actor.rollSkill({ kind: "skill", key: skill });
       case "base-skill":
-        return this.actor.rollSkill(dataset.skill!, { base: true });
+        if (!isBaseSkillKey(skill)) return undefined;
+        return this.actor.rollSkill({ kind: "base", key: skill });
       case "resonance":
         return this.actor.rollResonance();
       case "weapon":
