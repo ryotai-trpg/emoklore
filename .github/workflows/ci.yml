@@ -5,6 +5,16 @@ on:
     branches: [develop, main]
   pull_request:
 
+# 追加の権限は要らない。読み取りだけに絞る
+permissions:
+  contents: read
+
+# 同じブランチへ続けてpushしたときは古い実行を打ち切る。
+# ただし develop / main への push は履歴として残したいので打ち切らない
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   biome:
     name: Format & Lint
@@ -39,6 +49,22 @@ jobs:
         run: npm run check:templates
       - name: Build docs
         run: npm run docs:build
+
+  audit:
+    name: Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      # 本システムは dependencies が空で、脆弱性が出るのは開発時だけに使う
+      # devDependencies（vite / rollup など）。dist に混入しないぶん実害は小さいので、
+      # 無関係な勧告でPRが止まらないよう high 以上でのみ落とす。
+      # moderate 以下は手元の `npm audit` で見る
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
 
   typecheck:
     name: Type Check
