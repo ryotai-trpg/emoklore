@@ -70,12 +70,44 @@ export class EmokloreActor extends Actor {
 
   async rollSkill(
     skill: string,
-    { base = false, ...options }: { base?: boolean } & Record<string, unknown> = {},
+    options: { base?: boolean } & Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
+    const { roll, flavor } = await this.buildSkillRoll(skill, options);
+
+    return createRollMessage({ actor: this, flavor, roll });
+  }
+
+  /**
+   * 技能判定のRollを組み立てて評価する。チャットには流さない。
+   *
+   * 武器カードのように、判定結果を自分のメッセージに抱えたい側が使う。
+   * 攻撃判定は技能判定そのものなので、専用のロジックを別に持つ必要がない。
+   */
+  async buildSkillRoll(
+    skill: string,
+    { base = false, ...options }: { base?: boolean } & Record<string, unknown> = {},
+  ): Promise<{ roll: EmokloreRoll; flavor: string }> {
     const context = this.system.getSkillRollContext(skill, { base });
     const spec = resolveSkillRoll(context.params);
 
-    return this.#postRoll(spec, formatSkillName(context, { base }), options);
+    return {
+      roll: await this.#buildRoll(spec, options),
+      flavor: EmokloreActor.formatRollFlavor(formatSkillName(context, { base })),
+    };
+  }
+
+  /** チャットの見出し。判定の種類によらず「〈○○〉判定」の形にする */
+  static formatRollFlavor(skillName: string): string {
+    return game.i18n.localize("EMOKLORE.skillRoll", { skillName });
+  }
+
+  /** 判定内容からRollを作って評価する */
+  async #buildRoll(spec: RollSpec, options: Record<string, unknown>): Promise<EmokloreRoll> {
+    // 本体の evaluate() の戻り型は Roll なので、戻り値ではなくインスタンスを取り回す
+    const roll = EmokloreRoll.fromSpec(spec, options);
+    await roll.evaluate();
+
+    return roll;
   }
 
   /** 判定内容からRollを作り、チャットに流す。判定の種類によらず共通 */
@@ -84,14 +116,10 @@ export class EmokloreActor extends Actor {
     skillName: string,
     options: Record<string, unknown>,
   ): Promise<ChatMessage | undefined> {
-    // 本体の evaluate() の戻り型は Roll なので、戻り値ではなくインスタンスを取り回す
-    const roll = EmokloreRoll.fromSpec(spec, options);
-    await roll.evaluate();
-
     return createRollMessage({
       actor: this,
-      flavor: game.i18n.localize("EMOKLORE.skillRoll", { skillName }),
-      roll,
+      flavor: EmokloreActor.formatRollFlavor(skillName),
+      roll: await this.#buildRoll(spec, options),
     });
   }
 }

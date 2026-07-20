@@ -27,6 +27,9 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
         return this.actor.rollSkill(dataset.skill!, { base: true });
       case "resonance":
         return this.actor.rollResonance();
+      case "weapon":
+        // 判定はここでは振らない。チャットに武器カードを置き、そのボタンから振らせる
+        return this.actor.items.get(dataset.itemId!)?.use();
       default:
         // 未知の data-roll-type は何もしない。テンプレート側の記述ミスなので、
         // ここで握り潰していること自体は別途見直す余地がある

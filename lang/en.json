@@ -65,6 +65,15 @@
         "SuccessCount": "[Successes]"
       }
     },
+    "ChatMessage": {
+      "weapon": {
+        "Attack": "Attack",
+        "Damage": "Damage",
+        "NoActor": "A weapon with no owner cannot be used.",
+        "ActorMissing": "The character who used this weapon could not be found.",
+        "ActionFailed": "The weapon card action failed."
+      }
+    },
     "SHEET.ToggleMode": "Toggle Play/Edit mode",
     "emotionAttributes": {
       "desire": "Desire",

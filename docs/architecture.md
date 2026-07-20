@@ -10,7 +10,7 @@
 emoklore.ts          … エントリ。CONFIG登録、configのラベル事前ローカライズ、開発用フック
 module/
   config/            … 静的なゲームルール定義（技能・特性・共鳴感情など）→ CONFIG.EMOKLORE
-  data/              … TypeDataModelスキーマ（character / npc / weapon）と派生値計算
+  data/              … TypeDataModelスキーマ（character / npc / weapon / 武器カードのChatMessage）と派生値計算
   rules/             … ゲームルールの純粋関数（判定計算・成功数）。Foundry非依存でvitest対象
   documents/         … Actor / Item 拡張。判定の入力を集めて結果を流すオーケストレーション
   applications/      … ApplicationV2シート・ダイアログ（HandlebarsApplicationMixin + Play/Editモードmixin）
@@ -25,6 +25,25 @@ css/
   chat/              … シートの外に出るチャットカード
 lang/                … ja.json が正、en.json は追従
 ```
+
+## 武器カードのフック
+
+戦闘の自動化は他モジュール（midi-qol相当のもの）が引き取れる余地を残したいので、判定とダメージの各段にフックを置いている。`pre` が付くものは `Hooks.call` で呼ぶので、`false` を返すとその場で中断する。完了の通知は `Hooks.callAll` なので戻り値を見ない。命名と使い分けはdnd5eの規約に合わせている。
+
+| フック | 引数 | 中断 |
+|---|---|---|
+| `emoklore.preUseWeapon` | `(item, messageData)` | できる |
+| `emoklore.useWeapon` | `(item, message)` | — |
+| `emoklore.preRollAttack` | `(message, config)` | できる |
+| `emoklore.rollAttack` | `(message, roll)` | — |
+| `emoklore.preRollDamage` | `(message, config)` | できる |
+| `emoklore.rollDamage` | `(message, roll)` | — |
+
+`config` はその場で組み立てた設定オブジェクトをそのまま渡しているので、フックの中で書き換えれば判定内容を差し替えられる。攻撃判定なら `skill` と `base`、ダメージなら `successCount` / `damageDie` / `attackPower` / `bonus`。
+
+カードのボタンは `WeaponCardModel.ACTIONS` の表で `data-action` から引いている。モジュールがここにキーを足せば、テンプレートを差し替えずにボタンを増やせる。
+
+〈ストレングス〉による近接武器攻撃力の加算はまだ配線していないが、`buildDamageFormula` の `bonus` が接続点になる。回避・防御・防具によるダメージ軽減も同様に、適用側で引く口を1つに寄せる方針にしている。
 
 ## 既知の構造的課題
 

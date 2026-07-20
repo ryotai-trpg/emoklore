@@ -31,10 +31,13 @@
             data-item-id="{{weapon.id}}"
             data-document-class="Item"
           >
-            {{! 列は狭いので切り詰める。全文はツールチップで見せる }}
+            {{! 列は狭いので切り詰める。全文はツールチップで見せる。
+                名前を押すとチャットに武器カードが出る（技能行と同じ作法） }}
             <div class="em-data-table__name" data-tooltip="{{weapon.name}}">
               <img class="em-data-table__image" src="{{weapon.img}}" height="24" width="24" alt="" />
-              <div>{{weapon.name}}</div>
+              <a data-action="roll" data-roll-type="weapon" data-item-id="{{weapon.id}}">
+                {{weapon.name}}
+              </a>
             </div>
             <div class="em-data-table__cell" data-tooltip="{{weapon.damagePreview}}">
               {{weapon.damagePreview}}

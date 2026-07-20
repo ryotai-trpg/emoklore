@@ -23,6 +23,7 @@ import {
   getEmbeddedDocument,
   resolveEmbeddedDocumentClass,
 } from "../utils/sheet";
+import { formatDamagePreview, formatRangeLabel } from "../utils/weapon";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import {
@@ -30,8 +31,6 @@ import {
   buildBiographyRows,
   buildValueSegments,
   createEmotionOptions,
-  formatDamagePreview,
-  formatRangeLabel,
   getEmotionRows,
 } from "./helpers";
 import type {
