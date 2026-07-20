@@ -1,10 +1,15 @@
 import { type AttackSkillKey, attackSkills } from "../../config/attack-skills";
 import type { EmokloreActor } from "../../documents/actor";
-import { buildDamageFormula, canRollDamage } from "../../rules/weapon-damage";
-import { createDamageAppliedMessage, type DamageApplied } from "../../utils/chat";
-import { requestApplyDamage } from "../../utils/queries";
+import { buildDamageFormula } from "../../rules/weapon-damage";
+import { createDamageAppliedMessage } from "../../utils/chat";
+import { applyDamageToTargets } from "../../utils/queries";
 import { resolveTargetActors } from "../../utils/targets";
-import { renderWeaponCard, type WeaponCardState } from "../../utils/weapon";
+import {
+  type CardButtons,
+  renderWeaponCard,
+  resolveCardButtons,
+  type WeaponCardState,
+} from "../../utils/weapon";
 import { EmokloreSystemDataModel } from "../system-model";
 
 const { DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
@@ -85,13 +90,9 @@ export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
     return this.message.rolls[0];
   }
 
-  get damageRoll(): foundry.dice.Roll | undefined {
-    return this.message.rolls[1];
-  }
-
-  /** ダメージを振れるか。攻撃判定が済んでいて、かつ命中していること */
-  get canRollDamage(): boolean {
-    return this.successCount !== null && canRollDamage(this.successCount);
+  /** ボタンの出し分け。描画側と同じ判定を使う */
+  get buttons(): CardButtons {
+    return resolveCardButtons(this);
   }
 
   /**
@@ -100,7 +101,7 @@ export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
    * 攻撃判定は技能判定そのものなので、アクター側の組み立てをそのまま借りる。
    */
   async rollAttack(): Promise<void> {
-    if (this.successCount !== null) return;
+    if (!this.buttons.canRollAttack) return;
 
     const actor = await this.#resolveActor();
     if (!actor) {
@@ -119,7 +120,7 @@ export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
 
   /** ダメージを振り、同じカードに書き足す */
   async rollDamage(): Promise<void> {
-    if (!this.canRollDamage || this.damageTotal !== null) return;
+    if (!this.buttons.canRollDamage) return;
 
     const config = {
       // canRollDamage が成功数の非nullを保証している
@@ -149,7 +150,9 @@ export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
    * 1体でも触れないものが混じっていればGMのクライアントにまとめて肩代わりしてもらう。
    */
   async applyDamage(): Promise<void> {
-    if (this.damageTotal === null) return;
+    // canApplyDamage と同じ条件だが、ダメージ量の型を絞るためここでは直接見る
+    const amount = this.damageTotal;
+    if (amount === null) return;
 
     const targets = resolveTargetActors();
     if (targets.length === 0) {
@@ -157,31 +160,14 @@ export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
       return;
     }
 
-    // 1体でも触れないものが混じれば、触れるものも含めてまとめてGMに預ける。
-    // 一部だけ自分で処理すると適用の記録が2件に割れるため
-    const applied = targets.every((actor) => actor.isOwner)
-      ? await this.#applyLocally(targets)
-      : await requestApplyDamage(targets, this.damageTotal);
-
+    // 権限の有無とGMへの委譲は utils/queries.ts が引き受ける
+    const applied = await applyDamageToTargets(targets, amount);
     if (!applied) {
       ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoGM", { localize: true });
       return;
     }
 
     if (applied.length > 0) await createDamageAppliedMessage(applied);
-  }
-
-  /** 自分の権限で適用する。委譲した場合と同じ形の結果を返す */
-  async #applyLocally(targets: EmokloreActor[]): Promise<DamageApplied[]> {
-    const applied: DamageApplied[] = [];
-
-    for (const actor of targets) {
-      const change = await actor.applyDamage(this.damageTotal as number);
-      // HPを持たないアクターやフックで中断された場合は結果が返らない
-      if (change) applied.push({ name: actor.name, ...change });
-    }
-
-    return applied;
   }
 
   /**

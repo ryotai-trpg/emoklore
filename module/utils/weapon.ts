@@ -21,6 +21,15 @@ export const localizeRangeType = (rangeType: RangeType): string =>
   game.i18n.localize(`EMOKLORE.Item.weapon.RangeType.${rangeType}`);
 
 /**
+ * 参照技能の表示名。
+ *
+ * attackSkills の label は preLocalize の対象外（スキーマの choices と共有しているため）
+ * なので、翻訳は引く側で行う。
+ */
+export const localizeAttackSkill = (skill: AttackSkillKey): string =>
+  game.i18n.localize(attackSkills[skill]?.label ?? "");
+
+/**
  * 武器の射程の表示。
  *
  * ルールブックに距離の規定がなく、近接武器は射程欄そのものを使わない。
@@ -54,6 +63,29 @@ export type WeaponCardState = {
   damageTotal: number | null;
 };
 
+/** カードのどのボタンが出るか。押せるかどうかの判定にも同じものを使う */
+export type CardButtons = {
+  canRollAttack: boolean;
+  canRollDamage: boolean;
+  canApplyDamage: boolean;
+};
+
+/**
+ * カードの進み具合からボタンの出し分けを決める。
+ *
+ * 描画とアクション側のガードで同じ条件が要る。別々に書くと、片方だけ直したときに
+ * 「押せるのに何も起きない」「押せないはずが実行される」という形でずれる。
+ */
+export const resolveCardButtons = (
+  state: Pick<WeaponCardState, "successCount" | "damageTotal">,
+): CardButtons => ({
+  canRollAttack: state.successCount === null,
+  canRollDamage:
+    state.successCount !== null && canRollDamage(state.successCount) && state.damageTotal === null,
+  // 適用は何度でも押せるようにしておく。狙いを変えて続けて当てることがある
+  canApplyDamage: state.damageTotal !== null,
+});
+
 /**
  * 武器カードのHTMLを組み立てる。
  *
@@ -68,15 +100,9 @@ export async function renderWeaponCard(
 
   return foundry.applications.handlebars.renderTemplate(CARD_TEMPLATE, {
     ...state,
-    skillLabel: game.i18n.localize(attackSkills[state.skill]?.label ?? ""),
+    ...resolveCardButtons(state),
+    skillLabel: localizeAttackSkill(state.skill),
     attackHTML: attackRoll ? await attackRoll.render() : "",
     damageHTML: damageRoll ? await damageRoll.render() : "",
-    canRollAttack: state.successCount === null,
-    canRollDamage:
-      state.successCount !== null &&
-      canRollDamage(state.successCount) &&
-      state.damageTotal === null,
-    // 適用は何度でも押せるようにしておく。狙いを変えて続けて当てることがある
-    canApplyDamage: state.damageTotal !== null,
   });
 }
