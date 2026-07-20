@@ -9,22 +9,8 @@ import { EmokloreSystemDataModel } from "./system-model";
 
 const { HTMLField, StringField } = foundry.data.fields;
 
-// アイテム種別に共通するフィールドはまだない。武器と防具で共通のものが出てきたらここに置く
-const defineBaseItemDataModelSchema = () => {
-  return {};
-};
-
-export type BaseItemDataModelSchema = ReturnType<typeof defineBaseItemDataModelSchema>;
-
-export class BaseItemDataModel extends EmokloreSystemDataModel<BaseItemDataModelSchema> {
-  static override defineSchema() {
-    return defineBaseItemDataModelSchema();
-  }
-}
-
 const defineWeaponDataModelSchema = () => {
   return {
-    ...defineBaseItemDataModelSchema(),
     skill: new StringField({
       required: true,
       blank: false,
@@ -54,7 +40,7 @@ const defineWeaponDataModelSchema = () => {
 
 export type WeaponDataModelSchema = ReturnType<typeof defineWeaponDataModelSchema>;
 
-export class WeaponDataModel extends BaseItemDataModel {
+export class WeaponDataModel extends EmokloreSystemDataModel<WeaponDataModelSchema> {
   declare skill: AttackSkillKey;
   declare attackPower: string;
   declare range: string;
