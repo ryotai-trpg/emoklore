@@ -1,6 +1,14 @@
 /* 武器カードはシートの外に出るため、.emoklore スコープに入れない。
    自前のクラスはすべて em- 接頭辞なので、本体や他モジュールとは衝突しない */
 
+/* ダメージ適用の結果。対象1体につき1行の一覧なので ul で組み、
+   箇条書きの記号と既定の字下げだけ落とす */
+.em-damage-applied {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .em-weapon-card {
   display: flex;
   flex-direction: column;
