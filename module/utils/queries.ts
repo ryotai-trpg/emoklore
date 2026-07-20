@@ -23,7 +23,7 @@ type ApplyDamageQuery = {
 };
 
 /** 本体の型に出ないメンバーだけを補う */
-type QueryableUser = { isSelf: boolean; query: (name: string, data: unknown) => Promise<unknown> };
+type QueryableUser = { query: (name: string, data: unknown) => Promise<unknown> };
 
 /**
  * クエリの受け口を登録する。`init` で1回だけ呼ぶ。
@@ -42,39 +42,55 @@ export function registerQueries(): void {
 }
 
 /**
- * ダメージ適用をGMに肩代わりしてもらう。
+ * ダメージを対象に適用する。
  *
- * 自分がその指名GMなら委譲せずその場で処理する。
+ * 自分の権限で書けるならその場で、1体でも触れないものが混じっていればまとめてGMに
+ * 預ける。一部だけ自分で処理すると適用の記録が2件に割れるため。
  *
- * @returns 適用結果。GMが誰も接続していなければ undefined
+ * 呼ぶ側は権限もGMの有無も気にしなくてよい。
+ *
+ * @returns 適用結果。委譲が必要なのにGMが誰も接続していなければ undefined
  */
-export async function requestApplyDamage(
+export async function applyDamageToTargets(
   actors: EmokloreActor[],
   amount: number,
 ): Promise<DamageApplied[] | undefined> {
-  const gm = game.users?.activeGM as (QueryableUser & { id: string }) | null | undefined;
+  if (actors.every((actor) => actor.isOwner)) return applyDamage(actors, amount);
+
+  // ここに来た時点で自分はGMではない。GMは常に全アクターのOWNERなので、
+  // 上の every を抜けている（common/abstract/document.mjs の testUserPermission）
+  const gm = game.users?.activeGM as QueryableUser | null | undefined;
   if (!gm) return undefined;
 
   // 非リンクトークンの合成アクターは Scene.<id>.Token.<id>.Actor.<id> というUUIDを持ち、
   // これを送ることでそのトークンだけにダメージが入る。ワールドのアクターを送ると
   // 同じ元データから置いた雑魚が全員まとめて減る
-  const actorUuids = actors.map((actor) => actor.uuid).filter((uuid): uuid is string => !!uuid);
-
-  if (gm.isSelf) return applyDamageByUuid(actorUuids, amount);
-
-  const query: ApplyDamageQuery = { type: "applyDamage", actorUuids, amount };
+  const query: ApplyDamageQuery = {
+    type: "applyDamage",
+    actorUuids: actors.map((actor) => actor.uuid).filter((uuid): uuid is string => !!uuid),
+    amount,
+  };
 
   return (await gm.query(systemID, query)) as DamageApplied[];
 }
 
-/** UUIDで引いたアクターにダメージを適用する。委譲する側とされる側で同じ処理を通す */
+/** UUIDで引いたアクターに適用する。委譲を受けた側の入口 */
 async function applyDamageByUuid(actorUuids: string[], amount: number): Promise<DamageApplied[]> {
+  const resolved = await Promise.all(
+    actorUuids.map((uuid) => foundry.utils.fromUuid(uuid) as Promise<EmokloreActor | null>),
+  );
+
+  return applyDamage(
+    resolved.filter((actor): actor is EmokloreActor => !!actor),
+    amount,
+  );
+}
+
+/** 実際にHPを減らして結果を集める。委譲する側とされる側で同じ処理を通す */
+async function applyDamage(actors: EmokloreActor[], amount: number): Promise<DamageApplied[]> {
   const applied: DamageApplied[] = [];
 
-  for (const uuid of actorUuids) {
-    const actor = (await foundry.utils.fromUuid(uuid)) as EmokloreActor | null;
-    if (!actor) continue;
-
+  for (const actor of actors) {
     const change = await actor.applyDamage(amount);
     // HPを持たないアクターやフックで中断された場合は結果が返らない
     if (change) applied.push({ name: actor.name, ...change });

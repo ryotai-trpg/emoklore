@@ -1,8 +1,7 @@
-import { attackSkills } from "../config/attack-skills";
 import { systemPath } from "../constants";
 import type { WeaponDataModel } from "../data/item-models";
 import type { EmokloreItem } from "../documents/item";
-import { formatDamagePreview, formatRangeLabel, localizeRangeType } from "../utils/weapon";
+import { formatDamagePreview, localizeAttackSkill, localizeRangeType } from "../utils/weapon";
 import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
 import type { EmokloreRenderOptions, WeaponContext } from "./types";
 
@@ -42,11 +41,10 @@ export class EmokloreWeaponSheet extends EmokloreDocumentSheetMixin(
     const context = baseContext as WeaponContext;
     const system = this.item.system as WeaponDataModel;
 
-    // label は preLocalize の対象外（スキーマの choices と共有しているため）なので、ここで翻訳する
-    context.attackSkillLabel = game.i18n.localize(attackSkills[system.skill]?.label ?? "");
+    context.attackSkillLabel = localizeAttackSkill(system.skill);
     context.rangeTypeLabel = localizeRangeType(system.rangeType);
-    context.rangeLabel = formatRangeLabel(system.rangeType, system.range);
-    // 近接武器の射程は間合いと同じ表示になるので、閲覧では出さない（同じことを2度書かない）
+    // 近接武器の射程は間合いと同じ表示になるので、閲覧では出さない（同じことを2度書かない）。
+    // 出すときは必ず記入済みの遠隔武器なので、射程はそのまま見せればよい
     context.showRange = system.rangeType === "ranged" && Boolean(system.range);
     context.damagePreview = formatDamagePreview(system.damageDie, system.attackPower);
 

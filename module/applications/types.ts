@@ -244,9 +244,7 @@ export type WeaponContext = {
   attackSkillLabel: string;
   /** 間合いの翻訳済み表示名。「近接」「遠隔」 */
   rangeTypeLabel: string;
-  /** 閲覧モードで出す射程。近接武器は間合いの表示名をそのまま出す */
-  rangeLabel: string;
-  /** 射程の行を閲覧で出すか。近接武器では間合いと同じ表示になるので出さない */
+  /** 射程の行を閲覧で出すか。近接武器と未記入の遠隔武器では間合いと重複するので出さない */
   showRange: boolean;
   /** 「【成功数】D3 ＋ 1D3」形式のダメージ式 */
   damagePreview: string;
