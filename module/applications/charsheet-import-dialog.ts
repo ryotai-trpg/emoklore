@@ -11,7 +11,7 @@ type CharSheetImportDialogContext = ApplicationRenderContext & {
 };
 
 /**
- * Dialog for importing character data from character sheet website JSON
+ * キャラクター保管所のJSONを貼り付けて取り込むダイアログ
  */
 export class CharSheetImportDialog extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.api.ApplicationV2,
@@ -74,7 +74,7 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
       return;
     }
 
-    // Validate JSON
+    // 形が妥当かを先に見る
     const validation = validateCharSheetJSON(jsonInput);
 
     if (!validation.valid) {
@@ -86,23 +86,23 @@ export class CharSheetImportDialog extends foundry.applications.api.HandlebarsAp
       return;
     }
 
-    // Import the data
+    // 取り込む
     try {
       await importFromCharSheet(this.actor, validation.data!);
       this.close();
     } catch (error) {
-      console.error("Character import error:", error);
+      console.error("emoklore | キャラクターの取り込みに失敗しました", error);
       ui.notifications?.error(game.i18n.localize("EMOKLORE.Import.ErrorImportFailed"));
     }
   }
 
   static async onSubmit(_event: Event, _form: HTMLFormElement, _formData: unknown): Promise<void> {
-    // This is called when the form is submitted via the import button
-    // The actual import logic is handled by onImport
+    // tag が "form" なので本体がsubmitハンドラを要求するが、取り込み自体は
+    // onImport が済ませているのでここですることはない
   }
 
   /**
-   * Show the import dialog for an actor
+   * 指定したアクターに対してダイアログを開く
    */
   static async show(actor: EmokloreActor): Promise<CharSheetImportDialog> {
     const dialog = new CharSheetImportDialog(actor);

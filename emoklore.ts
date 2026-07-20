@@ -17,11 +17,11 @@ Hooks.once("init", () => {
 
   registerSystemSettings();
 
-  // Configure custom Document implementations.
+  // Documentの実装クラスを差し替える
   CONFIG.Actor.documentClass = EmokloreActor;
   CONFIG.Item.documentClass = EmokloreItem;
 
-  // Configure System Data Models.
+  // system配下のデータモデルを登録する
   // TypeDataModel のコンストラクタ型はジェネリクスが開いたままなので、ModelData を
   // 固定したサブクラスは代入互換にならない。登録先の型として明示する
   CONFIG.Actor.dataModels = {
@@ -35,8 +35,7 @@ Hooks.once("init", () => {
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;
 
-  // Configure trackable attributes.
-  // TODO: Not Translated
+  // トークンのリソースバーに出せる属性
   CONFIG.Actor.trackableAttributes = {
     character: {
       bar: ["resources.hp", "resources.mp", "resources.resonance"],
@@ -49,7 +48,6 @@ Hooks.once("init", () => {
   };
 
   const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
-  // DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
 
   // ApplicationV2 のコンストラクタ型はジェネリクスが開いたままなので、
   // 具体化したサブクラスは代入互換にならない。登録先が期待する型として明示する

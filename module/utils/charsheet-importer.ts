@@ -1,7 +1,8 @@
 import type { EmokloreActor } from "../documents/actor";
 
 /**
- * Interface for the character sheet JSON format from emoklore.charasheet.jp
+ * キャラクター保管所（emoklore.charasheet.jp）が出力するJSONの形。
+ * CCFOLIA形式でコピーしたものを想定している
  */
 interface CharSheetJSON {
   kind: "character";
@@ -17,7 +18,7 @@ interface CharSheetJSON {
 }
 
 /**
- * Mapping from Japanese characteristic labels to system keys
+ * 能力値の日本語ラベル → システム内のキー
  */
 const CHARACTERISTIC_MAP: Record<string, string> = {
   身体: "physical",
@@ -31,7 +32,7 @@ const CHARACTERISTIC_MAP: Record<string, string> = {
 };
 
 /**
- * Mapping from Japanese skill labels (including markers) to system keys
+ * 技能の日本語ラベル（記号込み） → システム内のキー
  */
 const SKILL_MAP: Record<string, string> = {
   検索: "search",
@@ -72,7 +73,7 @@ const SKILL_MAP: Record<string, string> = {
 };
 
 /**
- * Mapping from Japanese base skill labels (with ＊ prefix) to system keys
+ * 基本技能の日本語ラベル（＊付き） → システム内のキー
  */
 const BASE_SKILL_MAP: Record<string, string> = {
   調査: "investigation",
@@ -91,7 +92,7 @@ const BASE_SKILL_MAP: Record<string, string> = {
 };
 
 /**
- * Mapping from Japanese emotion labels to system keys
+ * 共鳴感情の日本語ラベル → システム内のキー
  */
 const EMOTION_MAP: Record<string, string> = {
   // 欲望 (Desire)
@@ -192,7 +193,7 @@ export function parseEmotions(memo: string): ParsedEmotions {
 }
 
 /**
- * Parse skills from the commands field
+ * commands 欄のチャットパレットから技能を読み取る
  * Format: "2DM<=4 〈検索〉" or "1DM<=3 〈＊調査〉"
  */
 function parseSkills(commands: string): {
@@ -202,11 +203,11 @@ function parseSkills(commands: string): {
   const skills: Record<string, number> = {};
   const baseSkills: Record<string, number> = {};
 
-  // Split by newlines and process each command
+  // 1行1コマンドとして処理する
   const lines = commands.split("\n");
 
   for (const line of lines) {
-    // Match pattern: XDM<=Y 〈[＊★]SkillName〉
+    // 「XDM<=Y 〈［＊★］技能名〉」の形に一致させる
     const match = line.match(/(\d+)DM<=\d+\s*[〈<]([＊★]?)([^〉>]+)[〉>]/);
     if (!match?.[1] || !match[3]) continue;
 
@@ -214,19 +215,19 @@ function parseSkills(commands: string): {
     const marker = match[2];
     const skillName = match[3].trim();
 
-    // Base skills are marked with ＊
+    // 基本技能は＊が頭に付く
     if (marker === "＊") {
       const baseSkillKey = BASE_SKILL_MAP[skillName];
       if (baseSkillKey) {
-        baseSkills[baseSkillKey] = 1; // Base skills are always level 1
+        baseSkills[baseSkillKey] = 1; // 基本技能のレベルは常に1
       }
     } else {
-      // Regular skills - calculate level from dice count
+      // 通常技能はダイス数からレベルを求める
       const skillKey = SKILL_MAP[skillName];
       if (skillKey) {
-        // The skill level is typically dice count - 1, but we'll use a mapping based on the pattern
-        // This needs to account for characteristic value + skill level
-        // For now, store the dice count and we'll calculate later
+        // ここは未解決。ダイス数は「技能レベル＋能力値」の合計なので、本来は
+        // 能力値を引かないとレベルが出ない。今はダイス数をそのまま入れている。
+        // 正しい算出方法はルールブックで要確認（Issue #14）
         skills[skillKey] = diceCount;
       }
     }
@@ -236,8 +237,11 @@ function parseSkills(commands: string): {
 }
 
 /**
- * Calculate skill level from dice count and characteristic value
- * The dice count in the commands represents the skill level directly
+ * ダイス数から技能レベルを求める。
+ *
+ * 未完成。現状はダイス数をそのままレベルとして扱っており、能力値を考慮していない。
+ * 引数の能力値・技能キー・技能定義は、正しい算出に必要になる想定で受けているが
+ * まだ使っていない（Issue #14）。
  */
 function calculateSkillLevel(
   diceCount: number,
@@ -245,14 +249,12 @@ function calculateSkillLevel(
   _skillKey: string,
   _skillConfig: typeof CONFIG.EMOKLORE.skills,
 ): number {
-  // The dice count is the skill level itself
-  const skillLevel = diceCount;
-  // Clamp between 0 and 3
-  return Math.max(0, Math.min(3, skillLevel));
+  // 技能レベルの上限は3、下限は0
+  return Math.max(0, Math.min(3, diceCount));
 }
 
 /**
- * Import character data from the character sheet website JSON
+ * 保管所のJSONからアクターへ取り込む
  */
 export async function importFromCharSheet(
   actor: EmokloreActor,
@@ -265,12 +267,12 @@ export async function importFromCharSheet(
   const { data } = jsonData;
   const updateData: Record<string, unknown> = {};
 
-  // Import name
+  // 名前
   if (data.name) {
     updateData.name = data.name;
   }
 
-  // Import characteristics
+  // 能力値
   const characteristics: Record<string, number> = {};
   for (const param of data.params) {
     const key = CHARACTERISTIC_MAP[param.label];
@@ -280,7 +282,7 @@ export async function importFromCharSheet(
     }
   }
 
-  // Import resources (HP, MP, Resonance)
+  // リソース（HP / MP / 共鳴）
   if (data.status && Array.isArray(data.status)) {
     for (const status of data.status) {
       const label = status.label;
@@ -301,7 +303,7 @@ export async function importFromCharSheet(
     }
   }
 
-  // Import emotions from memo
+  // 共鳴感情はメモ欄から拾う
   const unrecognizedEmotions: string[] = [];
   if (data.memo) {
     const { emotions, unrecognized } = parseEmotions(data.memo);
@@ -310,20 +312,20 @@ export async function importFromCharSheet(
     }
     unrecognizedEmotions.push(...unrecognized);
 
-    // Store the full memo in biography notes
+    // メモ欄はそのまま経歴の備考に入れておく
     updateData["system.biography.note"] = data.memo;
   }
 
-  // Import skills from commands
+  // 技能はチャットパレットから拾う
   if (data.commands) {
     const { skills } = parseSkills(data.commands);
 
-    // For each skill found, calculate the level and set it
+    // 見つかった技能ごとにレベルを決めて入れる
     for (const [skillKey, diceCount] of Object.entries(skills)) {
       const skillInfo = CONFIG.EMOKLORE.skills[skillKey as keyof typeof CONFIG.EMOKLORE.skills];
       if (!skillInfo) continue;
 
-      // Get the characteristic this skill uses
+      // その技能が使う能力値を引く
       const charKey = skillInfo.characteristicOptions?.[0] || skillInfo.characteristic;
       if (!charKey) continue;
 
@@ -339,12 +341,12 @@ export async function importFromCharSheet(
     }
   }
 
-  // Store external URL as a flag for reference
+  // 元ページのURLはフラグに残しておく
   if (data.externalUrl) {
     updateData["flags.emoklore.externalUrl"] = data.externalUrl;
   }
 
-  // Apply all updates to the actor
+  // まとめてアクターへ反映する
   await actor.update(updateData);
 
   ui.notifications?.info(
@@ -364,7 +366,7 @@ export async function importFromCharSheet(
 }
 
 /**
- * Validate that the JSON string is valid character sheet data
+ * 貼り付けられた文字列が保管所のJSONとして妥当かを調べる
  */
 export function validateCharSheetJSON(jsonString: string): {
   valid: boolean;

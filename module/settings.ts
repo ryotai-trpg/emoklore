@@ -53,10 +53,3 @@ export function registerSystemSettings(): void {
 export function getSetting<K extends keyof EmokloreSettings>(key: K): EmokloreSettings[K] {
   return game.settings.get(systemID, key) as EmokloreSettings[K];
 }
-
-export function setSetting<K extends keyof EmokloreSettings>(
-  key: K,
-  value: EmokloreSettings[K],
-): Promise<EmokloreSettings[K]> {
-  return game.settings.set(systemID, key, value) as Promise<EmokloreSettings[K]>;
-}

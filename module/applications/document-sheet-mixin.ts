@@ -64,7 +64,7 @@ export default (base: ApplicationV2Constructor) => {
       if (options.mode && this.isEditable) {
         this._mode = options.mode;
       }
-      // New sheets should always start in edit mode
+      // 新規作成のシートは編集モードで開く
       else if (options.renderContext === `create${this.document.documentName}`) {
         this._mode = EmokloreDocumentSheet.MODES.EDIT;
       }
