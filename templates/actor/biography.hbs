@@ -1,8 +1,7 @@
 {{! Biography Tab }}
 <section class="tab biography {{tab.cssClass}}" data-group="primary" data-tab="biography">
 
-  {{! 経歴タブでは編集モードでもカードは閲覧表示にする }}
-  {{> "systems/emoklore/templates/actor/partials/card.hbs" readonly=true}}
+  {{! 立ち絵と能力値はタブ共通のサイドバー（sidebar.hbs）が持つ }}
 
   {{! 項目の並びは module/applications/helpers.ts の BIOGRAPHY_FIELDS が持つ }}
   <div class="em-field-list">

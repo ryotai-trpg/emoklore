@@ -1,0 +1,27 @@
+{{!--
+  全タブ共通のサイドバー。立ち絵と能力値を載せる。
+
+  カードは必ずここ1箇所だけで描く。タブの中に置くと、非アクティブなタブも
+  DOMに残る（本体は display: none にするだけ）ため、同じ name の入力が
+  フォームに2組並ぶ。FormDataExtended は可視性を見ずに集め、同名を配列に
+  まとめてしまうので、能力値が "4,4" のような値で保存される。
+  以前カードを2箇所で描いていたときに整合性が取れなかったのはこれが原因。
+
+  @param sidebarCollapsed 畳んでいるか。トグルの aria-expanded に使う
+--}}
+<aside class="em-sidebar">
+  <div class="em-sidebar__scroll">
+    {{> "systems/emoklore/templates/actor/partials/card.hbs"}}
+  </div>
+
+  {{! スクロール領域の外に置く。中に入れると一緒に流れて押せなくなる。
+      向き・ラベルは畳んだ状態で入れ替わる（以降は _applySidebarState が保つ） }}
+  <button
+    type="button"
+    class="ui-control plain icon fas em-sidebar__toggle
+      {{~#if sidebarCollapsed}} fa-caret-right{{else}} fa-caret-left{{/if}}"
+    data-action="toggleSidebar"
+    data-tooltip="{{#if sidebarCollapsed}}APPLICATION.ACTIONS.Expand{{else}}APPLICATION.ACTIONS.Collapse{{/if}}"
+    aria-expanded="{{#if sidebarCollapsed}}false{{else}}true{{/if}}"
+  ></button>
+</aside>

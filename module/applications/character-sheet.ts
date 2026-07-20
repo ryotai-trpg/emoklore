@@ -14,6 +14,7 @@ import {
   calculateTotalSkillPoints,
   SKILL_POINT_MAX,
 } from "../rules/character-points";
+import { getSetting, setSetting } from "../settings";
 import { prepareActiveEffectCategories } from "../utils/effects";
 import {
   createDocumentData,
@@ -76,6 +77,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       toggleEffect: this._toggleEffect,
       importCharacter: this._importCharacter,
       selectSegment: this._selectSegment,
+      toggleSidebar: this._toggleSidebar,
     },
   };
 
@@ -87,13 +89,23 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
     // 本体のテンプレートなので systemPath は通さない
     tabs: { template: "templates/generic/tab-navigation.hbs" },
+    // タブに属さないパート。class="tab" と data-group を持たないので changeTab が
+    // 触らず、タブを切り替えてもDOMごと残る（スクロール位置も入力中の値も保たれる）
+    sidebar: {
+      template: systemPath("templates/actor/sidebar.hbs"),
+      templates: [
+        "templates/actor/partials/card.hbs",
+        "templates/actor/partials/stat-row.hbs",
+        "templates/actor/partials/segments.hbs",
+      ].map(systemPath),
+      // トグルは畳んでも見えている必要があるので、内側だけをスクロールさせる
+      scrollable: [".em-sidebar__scroll"],
+    },
     skills: {
       template: systemPath("templates/actor/skills-tab.hbs"),
       templates: [
         "templates/actor/skills.hbs",
         "templates/actor/base-skills.hbs",
-        "templates/actor/partials/card.hbs",
-        "templates/actor/partials/stat-row.hbs",
         "templates/actor/partials/skill-row-play.hbs",
         "templates/actor/partials/skill-row-edit.hbs",
         "templates/actor/partials/segments.hbs",
@@ -102,12 +114,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
     biography: {
       template: systemPath("templates/actor/biography.hbs"),
-      templates: [
-        "templates/actor/partials/card.hbs",
-        "templates/actor/partials/stat-row.hbs",
-        "templates/actor/partials/field.hbs",
-        "templates/actor/partials/segments.hbs",
-      ].map(systemPath),
+      templates: ["templates/actor/partials/field.hbs"].map(systemPath),
       scrollable: [""],
     },
     effects: {
@@ -148,6 +155,9 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     await super._preparePartContext(partId, context, options);
 
     switch (partId) {
+      case "sidebar":
+        this._prepareSidebarContext(context);
+        break;
       case "skills":
         this._prepareSkillsContext(context);
         break;
@@ -219,6 +229,54 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     // 元の値で送られ、こちらの更新を打ち消してしまう
     event.preventDefault();
     await this.actor.update({ [input.name]: clearTo });
+  }
+
+  /**
+   * サイドバーの開閉。
+   *
+   * 再描画はしない。表示状態を切り替えるだけでドキュメントに触る理由がないうえ、
+   * submitOnChange の下でシート全体を描き直すとスクロール位置やフォーカスが動く。
+   * ルート要素のクラスだけを付け替える。
+   */
+  static async _toggleSidebar(this: EmokloreCharacterSheet): Promise<void> {
+    const collapsed = !getSetting("sidebarCollapsed");
+    await setSetting("sidebarCollapsed", collapsed);
+    this._applySidebarState(collapsed);
+  }
+
+  override async _onRender(
+    context: CharacterContext,
+    options: EmokloreRenderOptions,
+  ): Promise<void> {
+    await super._onRender(context, options);
+    this._applySidebarState(getSetting("sidebarCollapsed"));
+  }
+
+  private _applySidebarState(collapsed: boolean): void {
+    this.element.classList.toggle("em-sidebar-collapsed", collapsed);
+
+    // 畳んだ中身は枠の外へ送り出されて見えないだけなので、
+    // フォーカスと読み上げの対象からも外す
+    this.element.querySelector(".em-sidebar__scroll")?.toggleAttribute("inert", collapsed);
+
+    const toggle = this.element.querySelector(".em-sidebar__toggle");
+    if (!toggle) return;
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+    toggle.setAttribute(
+      "data-tooltip",
+      collapsed ? "APPLICATION.ACTIONS.Expand" : "APPLICATION.ACTIONS.Collapse",
+    );
+
+    // 三角の向きはクラスを差し替えて変える。rotate だと、本体が button に
+    // 当てている transition: 0.5s（プロパティ無指定）に巻き込まれて
+    // 途中で三角が上を向く
+    toggle.classList.toggle("fa-caret-left", !collapsed);
+    toggle.classList.toggle("fa-caret-right", collapsed);
+
+    // 閲覧専用のシートでは本体の _toggleDisabled が .window-content 内の
+    // フォーム要素をまとめて無効化する（document-sheet.mjs の _onRender）。
+    // 開閉は編集ではないので、このボタンだけは押せる状態に戻す
+    if (toggle instanceof HTMLButtonElement) toggle.disabled = false;
   }
 
   /**
@@ -296,10 +354,21 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     );
   }
 
-  private _prepareSkillsContext(context: CharacterContext): void {
+  /**
+   * サイドバーの表示用データ。
+   *
+   * 能力値はカードにしか出ないので、ここでだけ用意する。以前は技能パートが
+   * 積んだものを経歴パートが拾っており（_preparePartContext は同じ context を
+   * 共有する）、パートの順序に暗黙に依存していた。
+   */
+  private _prepareSidebarContext(context: CharacterContext): void {
     context.characteristics = this._getCharacteristics();
     context.charPointSum = calculateCharPointSum(context.characteristics);
     context.charPointMax = CHARACTERISTIC_POINT_MAX;
+    context.sidebarCollapsed = getSetting("sidebarCollapsed");
+  }
+
+  private _prepareSkillsContext(context: CharacterContext): void {
     context.skills = this._getSkills();
     context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills);
     context.skillPointMax = SKILL_POINT_MAX;
