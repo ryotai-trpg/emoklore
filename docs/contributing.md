@@ -127,7 +127,7 @@ feat: add resonance roll dialog
 |---|---|
 | セットアップ・開発フロー・各種規約 | `docs/contributing.md`（このページ） |
 | 設計方針・アーキテクチャ・既知の構造的課題 | `docs/architecture.md` |
-| CSS・テンプレートの規約（命名・分割・レイヤ） | `docs/architecture.md` |
+| UI設計の規約（CSS・テンプレート・ダイアログ） | `docs/ui-design.md` |
 | 開発フェーズ計画 | `docs/roadmap.md` |
 | v14移行の状況・チェックリスト | `docs/v14-migration.md` |
 | ユーザー向けの使い方 | `docs/getting-started.md` ほか機能ページ |

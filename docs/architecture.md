@@ -67,33 +67,7 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 
 ## スタイルとテンプレートの規約
 
-### CSS
-
-- ファイルは `emoklore.css` の `@import` で束ねる。**目次には規則を書かない**。並び順がそのままカスケードの順序になる
-- `system.json` の `styles` で `layer: "system"` を宣言する。本体は `foundry2.css` の冒頭で `reset, variables, elements, blocks, applications, compatibility, layouts, system, modules, exceptions` を宣言していて、`system` はシステム用に空けてある。`applications` より後なので本体には勝ち、`modules` には負ける
-- 自前のクラスはすべて **`em-` 接頭辞 + BEM風**（`.em-meter`, `.em-meter__value`, `.em-progress--hp`）。`.value` や `.label` のような汎用名は他モジュールのCSSと衝突するので作らない
-- **部品（`components/`）に位置決めを書かない**。`grid-row` / `grid-column` / 外側の margin / 幅は、置く側（`applications/`）から modifier セレクタで指定する。これがあるのでNPCシートやアイテムシートを足したときに同じ部品をそのまま使える
-- Foundry本体のクラス（`.window-content` `.tab` `.sheet-header` `.form-group` `.form-footer` `.flexrow` `.editor-container` `.hint` `.inline-control` `.draggable`）と、`formGroup` が生成する `span.label` はそのまま使う。**`em-` を付けてはいけない**
-- `data-*` 属性はJSのフック専用。CSSセレクタに使わない
-- `vite.config.ts` は lib mode で `cssFileName` が単一値なので、**CSSは1ファイルにしか出せない**。`styles` を複数エントリにするには `viteStaticCopy` 経由の別系統が要る
-
-### テンプレート
-
-<!-- Handlebarsの {{...}} をVueの補間として解釈させないため v-pre で囲む -->
-::: v-pre
-
-- 引数を取る再利用部品は `templates/<種別>/partials/` に置き、先頭のコメントに `@param` を書く
-- **入れ子のpartialもPARTSの `templates` に列挙する**。ApplicationV2 は再帰的に解決しないため、漏らすと初回描画は通って再描画で落ちる
-- TS側のパスは `systemPath()` を通す。hbs側の `{{> "systems/emoklore/..."}}` はHandlebarsからTSの定数が見えないのでフルパス直書きのまま
-- `{{lookup}}` を重ねてconfigを引くのはテンプレートでのデータ整形なので、`applications/` のコンテキスト整形側で解決する
-- `{{#each}}` の中から親のコンテキストは**見えない**（Handlebarsは親スコープへフォールバックしない）。`@root` か `../` を明示する
-- `npm run check:templates` が構文・HTMLタグの対応・partialの実在・孤児テンプレートを見る。lefthook の pre-commit でも走る
-
-:::
-
-### 開発時の注意
-
-`vite.config.ts` は `emptyOutDir: false` なので、テンプレートを消したり改名したりすると `dist/` に前のファイルが残る。配布物を作る前に `rm -rf dist` する。
+[UI設計の規約](/ui-design)を参照。CSSの層分け・命名、テンプレートとpartialの扱い、ダイアログの組み方はそちらが正。
 
 ### 方針
 

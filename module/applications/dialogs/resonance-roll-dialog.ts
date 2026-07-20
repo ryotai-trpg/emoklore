@@ -20,6 +20,9 @@ export async function promptResonanceRoll(): Promise<ResonanceRollInput | null> 
   // thisが外れて壊れる。必ずメソッドとして呼ぶこと。
   // キャストが要るのは、本体JSDocの引数型に config.ok が含まれていないため
   const result = await foundry.applications.api.DialogV2.prompt({
+    // DialogV2 の既定の classes は ["dialog"] だけで emoklore も standard-form も
+    // 付かない。本体のフォーム体系に乗せるには明示的に渡す必要がある
+    classes: ["emoklore", "standard-form"],
     window: {
       title: game.i18n.localize("EMOKLORE.skillRoll", {
         skillName: game.i18n.localize("EMOKLORE.Resonance.Name"),

@@ -3,37 +3,36 @@
 
   @param readonly true なら編集モードでも閲覧表示にする（経歴タブ用）
 --}}
-<div class="em-card-column">
-  <div class="em-card">
-    {{#if (or isPlay readonly)}}
-    <img
-      class="em-card__image"
-      src="{{source.img}}"
-      data-action="showPortraitArtwork"
-      data-edit="img"
-      alt="{{localize "DOCUMENT.FIELDS.img.label"}}"
-    />
-    {{else}}
-    <img
-      class="em-card__image"
-      src="{{source.img}}"
-      data-action="editImage"
-      data-edit="img"
-      alt="{{localize "DOCUMENT.FIELDS.img.label"}}"
-    />
-    {{/if}}
+{{! タブのグリッドの左列に直接載る。囲むだけのラッパは置かない }}
+<div class="em-card">
+  {{#if (or isPlay readonly)}}
+  <img
+    class="em-card__image"
+    src="{{source.img}}"
+    data-action="showPortraitArtwork"
+    data-edit="img"
+    alt="{{localize "DOCUMENT.FIELDS.img.label"}}"
+  />
+  {{else}}
+  <img
+    class="em-card__image"
+    src="{{source.img}}"
+    data-action="editImage"
+    data-edit="img"
+    alt="{{localize "DOCUMENT.FIELDS.img.label"}}"
+  />
+  {{/if}}
 
-    <div class="em-stat-list">
-      {{#unless (or isPlay readonly)}}
-      <div class="em-cap">{{charPointSum}} / {{charPointMax}}</div>
-      {{/unless}}
+  <div class="em-stat-list">
+    {{#unless (or isPlay readonly)}}
+    <div class="em-cap">{{charPointSum}} / {{charPointMax}}</div>
+    {{/unless}}
 
-      {{#each characteristics as |chr key|}}
-      {{> "systems/emoklore/templates/actor/partials/stat-row.hbs"
-        stat=chr
-        key=key
-        view=(or @root.isPlay ../readonly)}}
-      {{/each}}
-    </div>
+    {{#each characteristics as |chr key|}}
+    {{> "systems/emoklore/templates/actor/partials/stat-row.hbs"
+      stat=chr
+      key=key
+      view=(or @root.isPlay ../readonly)}}
+    {{/each}}
   </div>
 </div>

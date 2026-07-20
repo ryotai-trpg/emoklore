@@ -47,6 +47,19 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       width: 601,
       height: 710,
     },
+    // ウィンドウ枠の操作メニュー（⋮）に足す。本体の window.controls は継承チェーンで
+    // 連結されるので、ActorSheetV2 の4つ（トークン設定・立ち絵表示など）の後ろに並ぶ。
+    // シート本文にツールバーを置くとヘッダのレイアウト制約になるため、こちらに寄せている
+    window: {
+      controls: [
+        {
+          action: "importCharacter",
+          icon: "fa-solid fa-file-import",
+          label: "EMOKLORE.Import.ImportTooltip",
+          ownership: "OWNER",
+        },
+      ],
+    },
     actions: {
       ...super.DEFAULT_OPTIONS.actions,
       viewDoc: this._viewDoc,
