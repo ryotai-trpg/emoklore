@@ -31,7 +31,7 @@
     </section>
   {{/if}}
 
-  {{#if (or canRollAttack canRollDamage)}}
+  {{#if (or canRollAttack canRollDamage canApplyDamage)}}
     <footer class="em-weapon-card__buttons">
       {{#if canRollAttack}}
         <button type="button" data-action="rollAttack">
@@ -43,6 +43,13 @@
         <button type="button" data-action="rollDamage">
           <i class="fa-solid fa-burst" inert></i>
           <span>{{localize "EMOKLORE.ChatMessage.weapon.Damage"}}</span>
+        </button>
+      {{/if}}
+      {{#if canApplyDamage}}
+        {{! 対象は押した瞬間の盤面から取るので、何度でも押せる }}
+        <button type="button" data-action="applyDamage">
+          <i class="fa-solid fa-heart-crack" inert></i>
+          <span>{{localize "EMOKLORE.ChatMessage.weapon.Apply"}}</span>
         </button>
       {{/if}}
     </footer>

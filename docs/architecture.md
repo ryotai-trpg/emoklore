@@ -38,12 +38,32 @@ lang/                … ja.json が正、en.json は追従
 | `emoklore.rollAttack` | `(message, roll)` | — |
 | `emoklore.preRollDamage` | `(message, config)` | できる |
 | `emoklore.rollDamage` | `(message, roll)` | — |
+| `emoklore.preApplyDamage` | `(actor, amount, updates)` | できる |
+| `emoklore.applyDamage` | `(actor, amount)` | — |
 
-`config` はその場で組み立てた設定オブジェクトをそのまま渡しているので、フックの中で書き換えれば判定内容を差し替えられる。攻撃判定なら `skill` と `base`、ダメージなら `successCount` / `damageDie` / `attackPower` / `bonus`。
+`config` はその場で組み立てた設定オブジェクトをそのまま渡しているので、フックの中で書き換えれば判定内容を差し替えられる。攻撃判定なら `skill` と `base`、ダメージなら `successCount` / `damageDie` / `attackPower` / `bonus`。`preApplyDamage` の `updates` も同じく、そのまま `Actor#update` に渡る更新データなので書き換えが効く。
 
 カードのボタンは `WeaponCardModel.ACTIONS` の表で `data-action` から引いている。モジュールがここにキーを足せば、テンプレートを差し替えずにボタンを増やせる。
 
-〈ストレングス〉による近接武器攻撃力の加算はまだ配線していないが、`buildDamageFormula` の `bonus` が接続点になる。回避・防御・防具によるダメージ軽減も同様に、適用側で引く口を1つに寄せる方針にしている。
+〈ストレングス〉による近接武器攻撃力の加算はまだ配線していないが、`buildDamageFormula` の `bonus` が接続点になる。ダメージの軽減も `EmokloreActor#applyDamage` の `reduction` に寄せてある。〈耐久〉判定も防御判定も「受けるダメージを【成功数】点軽減する」という同じ形で、防具を入れるならそれも同じ引き算になるため、口を1つにしておく。
+
+## GMへの委譲（クエリ）
+
+Foundryは `Document#update` をサーバ側で権限検査するので、OWNER権限を持たないアクター（多くの場合、敵）はプレイヤーのクライアントからは書き換えられない。ダメージ適用はこれに当たるため、権限を持つGMのクライアントに肩代わりしてもらう。
+
+**生の `game.socket` ではなく本体のクエリ機構を使う**。`CONFIG.queries` にシステムIDで受け口を登録し、送る側は `User#query` を呼ぶ。draw-steel の `DrawSteelSocketHandler` と同じ形。
+
+生ソケットに対する利点は3つ。応答が戻るので結果の組み立てを1箇所にまとめられること、タイムアウトとエラー伝播を本体が持つこと、宛先が1人に決まるので「自分が処理すべきか」の判定が要らないこと。`system.json` の `"socket": true` も不要になる（クエリは core の `userQuery` イベントを通り、`system.<id>` の名前空間を使わない）。
+
+クエリ名は他パッケージと衝突しないようシステムIDを接頭辞にする（接頭辞なしの名前は本体の予約）。`QUERY_USER` 権限は既定でプレイヤーにも与えられている（`common/constants.mjs` の `defaultRole: USER_ROLES.PLAYER`）。
+
+宛先は `game.users.activeGM`。この getter は全クライアントで同じ1人を返すので、GMが複数いても二重に適用されない。自分がその指名GMなら委譲せずその場で処理する。
+
+やり取りするのは**トークンのアクターのUUID**。非リンクトークンの合成アクターは `Scene.<id>.Token.<id>.Actor.<id>` という形のUUIDを持ち、`fromUuid` でそのトークン専用のアクターに解決される（実機で往復を確認済み）。ワールドのアクターのUUIDを送ると、同じ元データから置いた雑魚が全員まとめて減る。
+
+非リンクトークンでも権限は変わらない。合成アクターは元のアクターの `ownership` をそのまま引き継ぐので、プレイヤーから見て敵は依然として書き換えられない。トークン経由にしても委譲は要る。
+
+1体でも触れない対象が混じっていれば、触れるものも含めてまとめてGMに預ける。一部だけ自分で処理すると適用の記録が2件に割れてしまうため。
 
 ## 既知の構造的課題
 

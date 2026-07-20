@@ -9,6 +9,9 @@ import type { EmokloreItem } from "./item";
 
 type ResourceKey = "hp" | "mp" | "resonance";
 
+/** ダメージ適用の結果。チャットに「HP: 15 → 12」と出すために使う */
+export type HpChange = { before: number; after: number };
+
 /**
  * system を CharacterDataModel として扱う。
  *
@@ -38,6 +41,39 @@ export class EmokloreActor extends Actor {
     }
 
     return rollData;
+  }
+
+  /**
+   * ダメージを受ける。
+   *
+   * `adjustResource` は素の加算で下限を持たないが、こちらは0で止める。ルール上HPは
+   * 0で【心肺停止】となり、マイナスのHPという概念がない。
+   *
+   * `reduction` は軽減量の共通の口。〈耐久〉判定・防御判定はどちらも「受けるダメージを
+   * 【成功数】点軽減する」という形で、防具を入れるならそれも同じ引き算になる。
+   * いまはどれも配線していないので常に0で呼ばれる。
+   */
+  async applyDamage(
+    amount: number,
+    { reduction = 0 }: { reduction?: number } = {},
+  ): Promise<HpChange | undefined> {
+    // NPCなどHPを持たないスキーマに対して呼ばれても壊れないようにする
+    const hp = this.system.resources?.hp;
+    if (!hp) return;
+
+    const before = hp.value;
+    const applied = Math.max(0, amount - reduction);
+    const updates = {
+      "system.resources.hp.value": Math.clamp(before - applied, 0, hp.max),
+    };
+
+    if (Hooks.call("emoklore.preApplyDamage", this, applied, updates) === false) return;
+
+    await this.update(updates);
+    Hooks.callAll("emoklore.applyDamage", this, applied);
+
+    // フックが updates を書き換えている場合があるので、結果は保存後の値から取る
+    return { before, after: this.system.resources.hp.value };
   }
 
   async adjustResource(resource: ResourceKey, point: number): Promise<this | undefined> {

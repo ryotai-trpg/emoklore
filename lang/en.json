@@ -71,7 +71,11 @@
         "Damage": "Damage",
         "NoActor": "A weapon with no owner cannot be used.",
         "ActorMissing": "The character who used this weapon could not be found.",
-        "ActionFailed": "The weapon card action failed."
+        "ActionFailed": "The weapon card action failed.",
+        "Apply": "Apply Damage",
+        "NoTarget": "No target. Target a token first.",
+        "NoGM": "A connected GM is required to apply damage to characters you do not own.",
+        "Applied": "{name} HP: {before} → {after}"
       }
     },
     "SHEET.ToggleMode": "Toggle Play/Edit mode",

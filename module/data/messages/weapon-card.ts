@@ -1,6 +1,9 @@
 import { type AttackSkillKey, attackSkills } from "../../config/attack-skills";
 import type { EmokloreActor } from "../../documents/actor";
 import { buildDamageFormula, canRollDamage } from "../../rules/weapon-damage";
+import { createDamageAppliedMessage, type DamageApplied } from "../../utils/chat";
+import { requestApplyDamage } from "../../utils/queries";
+import { resolveTargetActors } from "../../utils/targets";
 import { renderWeaponCard, type WeaponCardState } from "../../utils/weapon";
 import { EmokloreSystemDataModel } from "../system-model";
 
@@ -139,6 +142,49 @@ export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
   }
 
   /**
+   * 振ったダメージを対象に適用する。
+   *
+   * 対象は押した瞬間のターゲットだけ。敵のように自分がOWNER権限を持たないアクターは
+   * クライアントから直接書き換えられない（サーバが `Document#update` を権限検査する）ので、
+   * 1体でも触れないものが混じっていればGMのクライアントにまとめて肩代わりしてもらう。
+   */
+  async applyDamage(): Promise<void> {
+    if (this.damageTotal === null) return;
+
+    const targets = resolveTargetActors();
+    if (targets.length === 0) {
+      ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoTarget", { localize: true });
+      return;
+    }
+
+    // 1体でも触れないものが混じれば、触れるものも含めてまとめてGMに預ける。
+    // 一部だけ自分で処理すると適用の記録が2件に割れるため
+    const applied = targets.every((actor) => actor.isOwner)
+      ? await this.#applyLocally(targets)
+      : await requestApplyDamage(targets, this.damageTotal);
+
+    if (!applied) {
+      ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoGM", { localize: true });
+      return;
+    }
+
+    if (applied.length > 0) await createDamageAppliedMessage(applied);
+  }
+
+  /** 自分の権限で適用する。委譲した場合と同じ形の結果を返す */
+  async #applyLocally(targets: EmokloreActor[]): Promise<DamageApplied[]> {
+    const applied: DamageApplied[] = [];
+
+    for (const actor of targets) {
+      const change = await actor.applyDamage(this.damageTotal as number);
+      // HPを持たないアクターやフックで中断された場合は結果が返らない
+      if (change) applied.push({ name: actor.name, ...change });
+    }
+
+    return applied;
+  }
+
+  /**
    * ロールと状態をカードに書き戻す。
    *
    * `content` を毎回組み直すのは、ボタンの出し分けと結果の表示が状態と一緒に変わるため。
@@ -200,4 +246,5 @@ export class WeaponCardModel extends EmokloreSystemDataModel<WeaponCardSchema> {
 WeaponCardModel.ACTIONS = {
   rollAttack: WeaponCardModel.prototype.rollAttack,
   rollDamage: WeaponCardModel.prototype.rollDamage,
+  applyDamage: WeaponCardModel.prototype.applyDamage,
 };
