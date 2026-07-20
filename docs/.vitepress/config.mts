@@ -28,6 +28,7 @@ export default defineConfig({
           { text: "コントリビュートガイド", link: "/contributing" },
           { text: "ロードマップ", link: "/roadmap" },
           { text: "アーキテクチャ", link: "/architecture" },
+          { text: "UI設計の規約", link: "/ui-design" },
           { text: "v14移行チェックリスト", link: "/v14-migration" },
           { text: "メモ", link: "/dev-note" },
         ],
