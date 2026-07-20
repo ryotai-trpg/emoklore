@@ -1,5 +1,6 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.4/schema.json",
+  "plugins": ["./tools/no-double-cast.grit"],
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -13,7 +14,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "suspicious": {
         "noExplicitAny": "error"
       },

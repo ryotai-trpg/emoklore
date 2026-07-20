@@ -1,0 +1,14 @@
+// `x as unknown as T` を禁止する。
+//
+// Biomeには型アサーションを禁止する組み込みルールが無く、`noExplicitAny` を
+// error にしたときに `as any` の逃げ道として二重キャストが増えた経緯がある。
+// 二重が本当に必要なことは稀で、素の `as` で通ることが多い（アサーションの
+// 比較可能性は代入可能性より緩いため）。
+//
+// 本体APIとの境界などで本当に必要な場合は、直前の行に理由付きで
+// `// biome-ignore lint: 理由` を書く。
+language js
+
+`$expr as unknown as $type` where {
+  register_diagnostic(span=$expr, message="二重キャストは避ける。まず素の `as` で通るか試すこと。本体APIとの境界などで必要なら `// biome-ignore lint: 理由` を付ける", severity="error")
+}

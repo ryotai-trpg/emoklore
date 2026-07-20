@@ -11,7 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      # プラグイン（tools/*.grit）を使うのでバージョンを固定する。
+      # package.json の @biomejs/biome と揃えること
       - uses: biomejs/setup-biome@v2
+        with:
+          version: 2.5.4
       - run: biome ci .
 
   build:
