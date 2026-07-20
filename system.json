@@ -30,6 +30,9 @@
   "documentTypes": {
     "Actor": {
       "character": { "htmlFields": ["biography.note"] }
+    },
+    "Item": {
+      "weapon": { "htmlFields": ["notes"] }
     }
   },
   "background": "systems/emoklore/assets/background.webp",

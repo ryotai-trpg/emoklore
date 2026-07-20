@@ -1,4 +1,5 @@
 import * as applications from "./module/applications/character-sheet";
+import { EmokloreWeaponSheet } from "./module/applications/weapon-sheet";
 import { EMOKLORE } from "./module/config/index";
 import { CharacterDataModel } from "./module/data/character";
 import { WeaponDataModel } from "./module/data/item-models";
@@ -60,6 +61,18 @@ Hooks.once("init", () => {
       types: ["character"],
       makeDefault: true,
       label: "EMOKLORE.SheetClass.character",
+    },
+  );
+
+  DocumentSheetConfig.registerSheet(
+    Item,
+    "emoklore",
+    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
+    EmokloreWeaponSheet as unknown as typeof foundry.applications.api.ApplicationV2,
+    {
+      types: ["weapon"],
+      makeDefault: true,
+      label: "EMOKLORE.SheetClass.weapon",
     },
   );
 });

@@ -1,0 +1,37 @@
+{{! Weapon Detail }}
+<section class="em-weapon-detail">
+  {{#if isPlay}}
+    {{! ラベルは LOCALIZATION_PREFIXES 経由で本体が翻訳済みにしている。
+        間合いとダメージ式はスキーマに無い派生値なので、キーを直接引く }}
+    <div class="em-field-list">
+      <div class="em-field em-field--inline">
+        <label class="em-field__label">{{systemFields.skill.label}}</label>
+        <span class="em-field__value">{{attackSkillLabel}}</span>
+      </div>
+      <div class="em-field em-field--inline">
+        <label class="em-field__label">{{localize "EMOKLORE.Item.weapon.RangeType.Label"}}</label>
+        <span class="em-field__value">{{rangeTypeLabel}}</span>
+      </div>
+      <div class="em-field em-field--inline">
+        <label class="em-field__label">{{localize "EMOKLORE.Item.weapon.Damage"}}</label>
+        <span class="em-field__value">{{damagePreview}}</span>
+      </div>
+      {{#if showRange}}
+        <div class="em-field em-field--inline">
+          <label class="em-field__label">{{systemFields.range.label}}</label>
+          <span class="em-field__value">{{rangeLabel}}</span>
+        </div>
+      {{/if}}
+      <div class="em-field">
+        <label class="em-field__label">{{systemFields.notes.label}}</label>
+        <span class="em-field__value">{{{notesHTML}}}</span>
+      </div>
+    </div>
+  {{else}}
+    {{! choices にはi18nキーが入っているので、描画時に本体へ解決させる }}
+    {{formGroup systemFields.skill value=system.skill localize=true}}
+    {{formGroup systemFields.attackPower value=system.attackPower}}
+    {{formGroup systemFields.range value=system.range}}
+    {{formGroup systemFields.notes value=system.notes}}
+  {{/if}}
+</section>

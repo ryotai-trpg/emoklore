@@ -31,7 +31,9 @@ lang/                … ja.json が正、en.json は追従
 1. **スキーマ定義が `CONFIG.EMOKLORE` に依存**: `module/data/character.ts` がキー集合を得るために定義時点で `CONFIG.EMOKLORE` を読む。`CONFIG.EMOKLORE` を設定するのは自分の `init` フックなので制御下にあるが、他モジュールが `init` 中に `Actor.dataModels.character.schema` へ触ると壊れうる。`TypedObjectField` での解消は検討したうえで見送った（下記）
 2. **NPCの扱いが未定**: `EmokloreActor` は `system` を `CharacterDataModel` として扱っており、判定やリソース操作をNPCに対して呼ぶと実行時に壊れる。NPC用シートの実装（Phase 3）で判定まわりごと決める
 3. **`config/` の副作用**: `module/config/index.ts` が import 時に `preLocalize` を呼び、`performPreLocalization` が `CONFIG.EMOKLORE` を破壊的に書き換える。この表の「`config/` に置かないもの」に反するが、dnd5e / draw-steel 由来の確立したパターンなので当面は踏襲する
-4. **`npc` / `weapon` が到達不能**: `emoklore.ts` は `CONFIG.Actor.dataModels.npc` と `CONFIG.Item.dataModels.weapon` を登録しているが、`system.json` の `documentTypes` は `Actor.character` しか宣言していない。Foundryは manifest に無い種別を作らせないため、`module/data/npc.ts` と `module/data/item-models.ts` は**現状どうやっても到達できない**（実機で `game.documentTypes.Actor` が `["base", "character"]` を返し、`Actor.create({type:"npc"})` / `Item.create({type:"weapon"})` がどちらも失敗することを確認済み）。**起動時の警告は一切出ない**ので気付けない。あわせて `CONFIG.Actor.trackableAttributes.npc` は `resources.hp` / `resources.mp` を指すが、`NpcDataModel` が持つのは `wickedness` だけで整合していない。weapon は `feat/weapon-item` に作業中のブランチがあり、NPCは Phase 3 で扱うため、いまは事実の記録にとどめている
+4. **`npc` が到達不能**: `emoklore.ts` は `CONFIG.Actor.dataModels.npc` を登録しているが、`system.json` の `documentTypes.Actor` は `character` しか宣言していない。Foundryは manifest に無い種別を作らせないため、`module/data/npc.ts` は**現状どうやっても到達できない**（実機で `game.documentTypes.Actor` が `["base", "character"]` を返し、`Actor.create({type:"npc"})` が失敗することを確認済み）。**起動時の警告は一切出ない**ので気付けない。あわせて `CONFIG.Actor.trackableAttributes.npc` は `resources.hp` / `resources.mp` を指すが、`NpcDataModel` が持つのは `wickedness` だけで整合していない。NPCは Phase 3 で扱うため、いまは事実の記録にとどめている
+
+   `weapon` も同じ状態だったが、`documentTypes.Item.weapon` の宣言で解消した（`game.documentTypes.Item` が `["base", "weapon"]` を返すことを実機で確認済み）。**新しい種別を足すときは、データモデルの登録だけでなく `system.json` の宣言が要る。**
 
 Phase 2 で解消したもの:
 

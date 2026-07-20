@@ -1,0 +1,66 @@
+{{! Items Tab }}
+<section class="tab items {{tab.cssClass}}" data-group="primary" data-tab="items">
+  <ol class="em-data-table">
+    {{! 種別ごとに1項目。見出しと明細のolを li の中に収める（ol直下にolは置けない） }}
+    <li class="em-data-table__section" data-item-type="weapon">
+      <div class="em-data-table__head">
+        <div class="em-data-table__name">{{localize "TYPES.Item.weapon"}}</div>
+        <div class="em-data-table__cell">{{localize "EMOKLORE.Item.weapon.Damage"}}</div>
+        <div class="em-data-table__cell">{{localize "EMOKLORE.Item.weapon.FIELDS.range.label"}}</div>
+        <div class="em-data-table__controls">
+          {{#if editable}}
+            <a
+              class="em-data-table__control"
+              data-action="createDoc"
+              data-document-class="Item"
+              data-type="weapon"
+              data-tooltip='{{localize "DOCUMENT.Create" type=(localize "TYPES.Item.weapon")}}'
+            >
+              <i class="fas fa-plus"></i>
+            </a>
+          {{/if}}
+        </div>
+      </div>
+
+      {{! 値の編集は武器シートが持つ。同じ name の入力を2箇所に描くと
+          非アクティブなタブぶんも送信されてフォームが壊れるため、ここは表示だけ }}
+      <ol class="em-data-table__body">
+        {{#each weapons as |weapon|}}
+          <li
+            class="em-data-table__row draggable"
+            data-item-id="{{weapon.id}}"
+            data-document-class="Item"
+          >
+            {{! 列は狭いので切り詰める。全文はツールチップで見せる }}
+            <div class="em-data-table__name" data-tooltip="{{weapon.name}}">
+              <img class="em-data-table__image" src="{{weapon.img}}" height="24" width="24" alt="" />
+              <div>{{weapon.name}}</div>
+            </div>
+            <div class="em-data-table__cell" data-tooltip="{{weapon.damagePreview}}">
+              {{weapon.damagePreview}}
+            </div>
+            <div class="em-data-table__cell">{{weapon.rangeLabel}}</div>
+            <div class="em-data-table__controls">
+              <a
+                class="em-data-table__control"
+                data-action="viewDoc"
+                data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
+              >
+                <i class="fas fa-edit"></i>
+              </a>
+              {{#if @root.editable}}
+                <a
+                  class="em-data-table__control"
+                  data-action="deleteDoc"
+                  data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
+                >
+                  <i class="fas fa-trash"></i>
+                </a>
+              {{/if}}
+            </div>
+          </li>
+        {{/each}}
+      </ol>
+    </li>
+  </ol>
+</section>
