@@ -34,14 +34,12 @@ npm run typecheck      # tsc --noEmit（本体ソース内の診断は除外さ�
 
 ### テスト
 
-[Vitest](https://vitest.dev/) を使う。テストは対象と同じディレクトリに `*.test.ts` として置く。
+**テストの方針は [テスト方針](/testing) が正**。単体テスト（vitest）と実機検証の使い分け、置き場所、実機検証の環境変数はそちらにある。
 
 ```shell
-npm test        # 一度だけ実行
-npx vitest      # ウォッチモード
+npm test              # 単体テスト
+npm run verify:live   # 実機検証（ローカルのみ。CIでは回さない）
 ```
-
-対象は**FoundryVTT APIに依存しない純粋関数**（判定計算・ポイント計算・書式整形など）に限る。Foundry本体のクラスを継承・参照するコード（`module/dice/` やDocument・シート）はランタイムに本体が必要なため、単体テストではなく実機で確認する。逆に言えば、テストしたいロジックはFoundry非依存の形に切り出す。
 
 ## ブランチ運用
 
@@ -82,6 +80,7 @@ feat: add resonance roll dialog
 ## プルリクエスト
 
 - `develop` 宛てに作成する。**タイトル・説明は日本語推奨**（タイトルはコミットメッセージと違いprefix不要。内容が一目で分かる日本語で書く）
+- 画面やドキュメントの挙動に関わる変更は、**手元で `npm run verify:live` を通してから出す**。CIでは回らない（[理由](/testing#ciで回さない理由)）
 - マージは **merge commit**（squashしない）。PR内のコミットがそのまま履歴に残るため、コミット規約に沿っていることを確認する
 - 大きな変更は、着手前にIssueやDiscordで方向性を相談してもらえると安心です
 
@@ -114,9 +113,10 @@ feat: add resonance roll dialog
 
 ## リリース（メンテナ向け）
 
-1. `system.json` の `version` を更新する
-2. `npm run build` で `dist/` を生成し、`dist.zip` にまとめる
-3. GitHub Releaseを作成し、`system.json` と `dist.zip` を添付する（`system.json` の `manifest` / `download` URLはlatest releaseを指している）
+1. `npm run verify:live` を通す（[実機検証](/testing#実機検証)。CIでは回らないので、ここは人が確認する）
+2. `system.json` の `version` を更新する
+3. `npm run build` で `dist/` を生成し、`dist.zip` にまとめる
+4. GitHub Releaseを作成し、`system.json` と `dist.zip` を添付する（`system.json` の `manifest` / `download` URLはlatest releaseを指している）
 
 ## ドキュメントの方針（SSOT）
 
@@ -127,6 +127,7 @@ feat: add resonance roll dialog
 | セットアップ・開発フロー・各種規約 | `docs/contributing.md`（このページ） |
 | 設計方針・アーキテクチャ・既知の構造的課題 | `docs/architecture.md` |
 | コード設計の規約（型・命名・層のimport方向） | `docs/code-design.md` |
+| テスト方針（単体テスト・実機検証） | `docs/testing.md` |
 | UI設計の規約（CSS・テンプレート・ダイアログ） | `docs/ui-design.md` |
 | 開発フェーズ計画 | `docs/roadmap.md` |
 | v14移行の状況・チェックリスト | `docs/v14-migration.md` |
