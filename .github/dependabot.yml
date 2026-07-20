@@ -1,0 +1,22 @@
+version: 2
+
+# 依存の世代遅れを検知する仕組みが無く、npm も Actions も気付かないうちに
+# メジャーで2〜3世代遅れていた。人が定期的に見るのは続かないので機械に任せる。
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # devDependencies しか無いので分類は付けない。まとめて1本にすると
+    # メジャーの破壊的変更がどれ由来か分からなくなるため、パッチとマイナーだけ束ねる
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

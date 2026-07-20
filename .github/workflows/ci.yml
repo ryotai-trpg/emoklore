@@ -20,7 +20,7 @@ jobs:
     name: Format & Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       # プラグイン（tools/*.grit）を使うのでバージョンを固定する。
       # package.json の @biomejs/biome と揃えること
       - uses: biomejs/setup-biome@v2
@@ -32,8 +32,8 @@ jobs:
     name: Build & Checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -54,8 +54,8 @@ jobs:
     name: Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -75,8 +75,8 @@ jobs:
       # ローカルのFoundry本体を更新したら合わせて上げる（世代はsystem.jsonのcompatibilityと対応）
       FOUNDRY_BUILD: "365"
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -84,7 +84,7 @@ jobs:
         run: npm ci
       - name: Restore Foundry sources
         id: foundry-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: foundry
           key: foundry-types-${{ env.FOUNDRY_BUILD }}
