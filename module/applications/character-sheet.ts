@@ -32,10 +32,11 @@ import type {
 } from "./types";
 
 /**
- * Extend the basic ActorSheet with some very simple modifications
- * @extends {ActorSheetV2}
+ * characterアクターのシート。
+ *
+ * 技能・プロフィール・効果の3タブを持ち、閲覧と編集をモードで出し分ける。
+ * モード切替とコンテキストの基礎部分は document-sheet-mixin が持つ。
  */
-
 export class EmokloreCharacterSheet extends EmokloreActorSheet {
   declare actor: EmokloreActor;
 
@@ -166,7 +167,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
 
   static async _importCharacter(this: EmokloreCharacterSheet, event: Event, _target: HTMLElement) {
     event.preventDefault();
-    console.log("Opening import dialog for actor:", this.actor);
     await CharSheetImportDialog.show(this.actor);
   }
 

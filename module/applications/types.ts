@@ -5,7 +5,6 @@ import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import type { ModifierSet } from "../rules/types";
 
-// Common type definitions
 export type EmotionKey = "surface" | "hidden" | "root";
 
 /** 共鳴感情の表示用データ。どちらも翻訳済みの文字列で、未選択なら空文字 */
@@ -178,7 +177,7 @@ export type CharacterContext = {
   tabs: Record<string, ApplicationTab>;
   tab?: unknown;
   effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;
-  // DocumentSheetContext properties
+  // 基底の EmokloreDocumentSheetContext と対応する分
   isPlay: boolean;
   owner: boolean;
   limited: boolean;

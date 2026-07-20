@@ -2,10 +2,6 @@ import { EmokloreSystemDataModel } from "./system-model";
 
 const { NumberField, StringField } = foundry.data.fields;
 
-/* -------------------------------------------- */
-/*  Item Models                                 */
-/* -------------------------------------------- */
-
 const defineBaseItemDataModelSchema = () => {
   return {
     rarity: new StringField({

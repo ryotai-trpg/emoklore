@@ -1,6 +1,6 @@
 export const systemID = "emoklore" as const;
 
 /**
- * Translates repository paths to Foundry Data paths.
+ * リポジトリ内のパスを、Foundryが解決できる Data 配下のパスに変換する。
  */
 export const systemPath = (path: string): string => `systems/${systemID}/${path}`;

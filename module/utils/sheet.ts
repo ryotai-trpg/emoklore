@@ -38,7 +38,7 @@ export const getEmbeddedDocument = (
       docRow.dataset.parentId === actor.id ? actor : actor.items.get(docRow.dataset.parentId!);
     return asSheetDocument(parent?.effects.get(docRow.dataset.effectId!));
   } else {
-    console.warn("Could not find document class");
+    console.warn(`emoklore | 未対応の data-document-class: ${docRow.dataset.documentClass}`);
     return null;
   }
 };
@@ -86,13 +86,11 @@ export const createDocumentData = (
     }),
   };
 
-  // Loop through the dataset and add it to our docData
+  // dataset の中身をそのまま作成データに載せる
   for (const [dataKey, value] of Object.entries(target.dataset)) {
-    // These data attributes are reserved for the action handling
+    // この2つはアクションの解決に使う予約語なので載せない
     if (["action", "documentClass"].includes(dataKey)) continue;
-    // Nested properties require dot notation in the HTML, e.g. anything with `system`
-    // An example exists in spells.hbs, with `data-system.spell-level`
-    // which turns into the dataKey 'system.spellLevel'
+    // 入れ子のプロパティはHTML側でドット記法で書く（`data-system.foo` → `system.foo`）
     foundry.utils.setProperty(docData, dataKey, value);
   }
 
