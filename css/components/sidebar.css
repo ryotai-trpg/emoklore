@@ -1,0 +1,20 @@
+/* タブ共通のサイドバー。立ち絵と能力値のカードを載せる。
+
+   タブとの間隔もサイドバー自身が持つ。グリッド側に column-gap を置くと、
+   カードの有無にかかわらず隙間が固定されてしまう */
+
+.emoklore {
+  .em-sidebar {
+    position: relative;
+    width: var(--emoklore-sheet-sidebar-width);
+    margin-inline-end: var(--spacer-16);
+  }
+
+  /* 幅を固定しておく。親の都合でカードが潰れない。
+     scrollbar-width は本体が * に thin を当てているので指定しない */
+  .em-sidebar__scroll {
+    width: var(--emoklore-sheet-sidebar-width);
+    height: 100%;
+    overflow: hidden auto;
+  }
+}

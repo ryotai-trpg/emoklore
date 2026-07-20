@@ -87,13 +87,22 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
     // 本体のテンプレートなので systemPath は通さない
     tabs: { template: "templates/generic/tab-navigation.hbs" },
+    // タブに属さないパート。class="tab" と data-group を持たないので changeTab が
+    // 触らず、タブを切り替えてもDOMごと残る（スクロール位置も入力中の値も保たれる）
+    sidebar: {
+      template: systemPath("templates/actor/sidebar.hbs"),
+      templates: [
+        "templates/actor/partials/card.hbs",
+        "templates/actor/partials/stat-row.hbs",
+        "templates/actor/partials/segments.hbs",
+      ].map(systemPath),
+      scrollable: [".em-sidebar__scroll"],
+    },
     skills: {
       template: systemPath("templates/actor/skills-tab.hbs"),
       templates: [
         "templates/actor/skills.hbs",
         "templates/actor/base-skills.hbs",
-        "templates/actor/partials/card.hbs",
-        "templates/actor/partials/stat-row.hbs",
         "templates/actor/partials/skill-row-play.hbs",
         "templates/actor/partials/skill-row-edit.hbs",
         "templates/actor/partials/segments.hbs",
@@ -102,12 +111,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
     biography: {
       template: systemPath("templates/actor/biography.hbs"),
-      templates: [
-        "templates/actor/partials/card.hbs",
-        "templates/actor/partials/stat-row.hbs",
-        "templates/actor/partials/field.hbs",
-        "templates/actor/partials/segments.hbs",
-      ].map(systemPath),
+      templates: ["templates/actor/partials/field.hbs"].map(systemPath),
       scrollable: [""],
     },
     effects: {
@@ -148,6 +152,9 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     await super._preparePartContext(partId, context, options);
 
     switch (partId) {
+      case "sidebar":
+        this._prepareSidebarContext(context);
+        break;
       case "skills":
         this._prepareSkillsContext(context);
         break;
@@ -296,10 +303,20 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     );
   }
 
-  private _prepareSkillsContext(context: CharacterContext): void {
+  /**
+   * サイドバーの表示用データ。
+   *
+   * 能力値はカードにしか出ないので、ここでだけ用意する。以前は技能パートが
+   * 積んだものを経歴パートが拾っており（_preparePartContext は同じ context を
+   * 共有する）、パートの順序に暗黙に依存していた。
+   */
+  private _prepareSidebarContext(context: CharacterContext): void {
     context.characteristics = this._getCharacteristics();
     context.charPointSum = calculateCharPointSum(context.characteristics);
     context.charPointMax = CHARACTERISTIC_POINT_MAX;
+  }
+
+  private _prepareSkillsContext(context: CharacterContext): void {
     context.skills = this._getSkills();
     context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills);
     context.skillPointMax = SKILL_POINT_MAX;

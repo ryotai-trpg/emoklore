@@ -1,0 +1,14 @@
+{{!--
+  全タブ共通のサイドバー。立ち絵と能力値を載せる。
+
+  カードは必ずここ1箇所だけで描く。タブの中に置くと、非アクティブなタブも
+  DOMに残る（本体は display: none にするだけ）ため、同じ name の入力が
+  フォームに2組並ぶ。FormDataExtended は可視性を見ずに集め、同名を配列に
+  まとめてしまうので、能力値が "4,4" のような値で保存される。
+  以前カードを2箇所で描いていたときに整合性が取れなかったのはこれが原因。
+--}}
+<aside class="em-sidebar">
+  <div class="em-sidebar__scroll">
+    {{> "systems/emoklore/templates/actor/partials/card.hbs"}}
+  </div>
+</aside>

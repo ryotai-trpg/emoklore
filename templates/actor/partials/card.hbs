@@ -1,11 +1,12 @@
 {{!--
-  立ち絵と能力値のカード。技能タブと経歴タブの両方で使う。
+  立ち絵と能力値のカード。サイドバー（templates/actor/sidebar.hbs）から1回だけ呼ぶ。
 
-  @param readonly true なら編集モードでも閲覧表示にする（経歴タブ用）
+  以前は技能タブと経歴タブの2箇所から呼んでおり、経歴側だけ readonly=true で
+  閲覧表示に落としていた。入力が二重にならないようにするための回避策だったが、
+  サイドバーに1つだけ置く形にしたので不要になった。
 --}}
-{{! タブのグリッドの左列に直接載る。囲むだけのラッパは置かない }}
 <div class="em-card">
-  {{#if (or isPlay readonly)}}
+  {{#if isPlay}}
   <img
     class="em-card__image"
     src="{{source.img}}"
@@ -24,7 +25,7 @@
   {{/if}}
 
   <div class="em-stat-list">
-    {{#unless (or isPlay readonly)}}
+    {{#unless isPlay}}
     <div class="em-cap">{{charPointSum}} / {{charPointMax}}</div>
     {{/unless}}
 
@@ -32,7 +33,7 @@
     {{> "systems/emoklore/templates/actor/partials/stat-row.hbs"
       stat=chr
       key=key
-      view=(or @root.isPlay ../readonly)}}
+      view=@root.isPlay}}
     {{/each}}
   </div>
 </div>

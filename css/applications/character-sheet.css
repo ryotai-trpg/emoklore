@@ -6,14 +6,39 @@
 }
 
 .emoklore.sheet.character {
-  /* Tab Layout */
-  section.tab {
-    overflow: auto;
-    padding: var(--spacer-12);
+  /* パートは .window-content 直下に兄弟として並ぶ。入れ子は作れないので、
+     サイドバーと内容を横に置くにはグリッドで配置するしかない。
+
+     本体は .window-content を flex 縦積み＋overflow: hidden にしている。
+     グリッドに変えても高さの決まり方（親のflexで flex: 1）は変わらない。
+
+     3行目を minmax(0, 1fr) にするのが要点。1fr だと最小が auto になり、
+     中身の高さがそのまま行を押し広げて独立スクロールが効かなくなる */
+  .window-content {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
   }
 
-  .tab.active {
-    column-gap: var(--spacer-12);
+  .em-sheet-header,
+  nav.tabs {
+    grid-column: 1 / -1;
+  }
+
+  .em-sidebar {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  /* タブは中身だけを持つ。カードはサイドバーへ出したので2列組みは要らない。
+
+     サイドバーとの間隔はグリッドの column-gap ではなくサイドバー自身が持つ。
+     gap にすると、畳んで幅が0になっても隙間だけが残る */
+  section.tab {
+    grid-column: 2;
+    grid-row: 3;
+    overflow: auto;
+    padding: var(--spacer-12);
   }
 
   /* ヘッダ。名前とリソースを横に並べ、下端で揃える。
@@ -48,21 +73,7 @@
     }
   }
 
-  .tab.active {
-    display: grid;
-    grid-template-columns: var(--emoklore-sheet-sidebar-width) 1fr;
-  }
-
-  .effects.tab.active {
-    display: flex;
-  }
-
-  /* 左列のカード。中身なりの高さにする（既定の stretch だと列いっぱいに伸びる） */
-  .tab.active > .em-card {
-    align-self: start;
-  }
-
-  /* 右列。min-width: 0 がないと長い技能名が列を押し広げる */
+  /* min-width: 0 がないと長い技能名が列を押し広げる */
   .em-skills-column {
     min-width: 0;
   }
