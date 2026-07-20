@@ -263,16 +263,15 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       },
     );
 
-    // systemFields の型は DataField 止まりで fields に降りられないため、スキーマから引く
+    // systemFields の型は DataField 止まりで fields に降りられないため、スキーマから引く。
+    // fields の値も label を持つ形に補っておき、キャストを1回で済ませる
     const biography = this.actor.system.schema.getField([
       "biography",
-    ]) as foundry.data.fields.SchemaField;
+    ]) as foundry.data.fields.SchemaField & { fields: Record<string, LabeledField> };
 
-    const rows = buildBiographyRows(
-      biography.fields as Record<string, LabeledField>,
-      this.actor.system.biography,
-      { note: noteHTML },
-    );
+    const rows = buildBiographyRows(biography.fields, this.actor.system.biography, {
+      note: noteHTML,
+    });
 
     // 先頭の数件は横並びの組にするので、テンプレート側で分けて回せるよう2つに割る
     context.biographyPairedRows = rows.slice(0, BIOGRAPHY_PAIRED_COUNT);

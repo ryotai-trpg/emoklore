@@ -1,5 +1,4 @@
 import { getSetting } from "../settings";
-import constructHTMLButton from "../utils/construct-html-button";
 import type {
   EmokloreDocumentSheetContext,
   EmokloreDocumentSheetOptions,
@@ -73,18 +72,14 @@ export default (base: ApplicationV2Constructor) => {
 
     override async _renderFrame(options: EmokloreRenderOptions): Promise<HTMLElement> {
       const frame = await super._renderFrame(options);
-      const buttons = [
-        constructHTMLButton({
-          label: "",
-          classes: ["header-control", "icon", "fa-solid", "fa-user-lock"],
-          dataset: {
-            action: "toggleMode",
-            tooltip: "EMOKLORE.SHEET.ToggleMode",
-          },
-        }),
-      ];
 
-      this.window.controls.after(...buttons);
+      // 閲覧/編集を切り替えるボタンを、本体のウィンドウ操作列の後ろに足す
+      const toggleMode = document.createElement("button");
+      toggleMode.type = "button";
+      toggleMode.classList.add("header-control", "icon", "fa-solid", "fa-user-lock");
+      toggleMode.dataset.action = "toggleMode";
+      toggleMode.dataset.tooltip = "EMOKLORE.SHEET.ToggleMode";
+      this.window.controls.after(toggleMode);
 
       return frame;
     }
