@@ -5,6 +5,7 @@ import {
   BIOGRAPHY_FIELDS,
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
+  buildValueSegments,
   getEmotionRows,
 } from "./helpers";
 
@@ -116,5 +117,27 @@ describe("buildBiographyRows", () => {
     const rows = buildBiographyRows(biographyFields, {});
 
     expect(rows.slice(0, BIOGRAPHY_PAIRED_COUNT).map((row) => row.key)).toEqual(["age", "gender"]);
+  });
+});
+
+describe("buildValueSegments", () => {
+  it("min から max までの段を作る", () => {
+    expect(buildValueSegments(1, 6, 4).map((s) => s.value)).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+
+  it("現在値の段だけ checked になる", () => {
+    const segments = buildValueSegments(1, 6, 4);
+    expect(segments.filter((s) => s.checked).map((s) => s.value)).toEqual([4]);
+  });
+
+  it("0始まりの技能レベルも扱える", () => {
+    const segments = buildValueSegments(0, 3, 0);
+    expect(segments.map((s) => s.value)).toEqual([0, 1, 2, 3]);
+    expect(segments[0]?.checked).toBe(true);
+  });
+
+  it("範囲外の現在値ではどの段も checked にならない", () => {
+    // スキーマのバリデーションを通れば起きないが、壊れたデータで例外にはしない
+    expect(buildValueSegments(1, 6, 99).some((s) => s.checked)).toBe(false);
   });
 });

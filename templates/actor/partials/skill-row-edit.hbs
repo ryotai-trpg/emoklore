@@ -6,7 +6,11 @@
 --}}
 <div class="em-skill-row em-skill-row--edit" data-skill="{{key}}">
   <span class="em-skill-row__name">{{skill.label}}</span>
-  {{formInput skill.field.fields.level value=skill.level}}
+  {{> "systems/emoklore/templates/actor/partials/segments.hbs"
+    name=skill.name
+    segments=skill.levelSegments
+    label=skill.label
+    zeroBased=true}}
   <span class="em-skill-row__target">{{skill.target}}</span>
   {{#if skill.field.fields.characteristic.choices}}
   <span class="em-skill-row__stat">

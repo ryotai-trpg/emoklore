@@ -16,11 +16,6 @@
     column-gap: var(--spacer-12);
   }
 
-  /* Form Controls */
-  range-picker > input[type="number"] {
-    flex: 0 0 2.5rem;
-  }
-
   /* ヘッダ。名前とリソースを横に並べ、下端で揃える。
      高さは中身なりにする。以前は .container の div に height: 100% が付いていたが、
      親の header が高さを持たないので効いていなかった。header 自身に移すと

@@ -1,6 +1,12 @@
 import type { CharacteristicKey } from "../config/characteristics";
 import type { SkillKey } from "../config/skills";
 import { systemPath } from "../constants";
+import {
+  CHARACTERISTIC_MAX,
+  CHARACTERISTIC_MIN,
+  SKILL_LEVEL_MAX,
+  SKILL_LEVEL_MIN,
+} from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import {
   CHARACTERISTIC_POINT_MAX,
@@ -19,6 +25,7 @@ import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import {
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
+  buildValueSegments,
   createEmotionOptions,
   getEmotionRows,
 } from "./helpers";
@@ -44,7 +51,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     ...super.DEFAULT_OPTIONS,
     classes: ["standard-form", "character"],
     position: {
-      width: 601,
+      // カード列は250px固定なので、広げたぶんはすべて右の技能列に回る
+      width: 760,
       height: 710,
     },
     // ウィンドウ枠の操作メニュー（⋮）に足す。本体の window.controls は継承チェーンで
@@ -87,6 +95,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         "templates/actor/partials/stat-row.hbs",
         "templates/actor/partials/skill-row-play.hbs",
         "templates/actor/partials/skill-row-edit.hbs",
+        "templates/actor/partials/segments.hbs",
       ].map(systemPath),
       scrollable: [""],
     },
@@ -96,6 +105,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         "templates/actor/partials/card.hbs",
         "templates/actor/partials/stat-row.hbs",
         "templates/actor/partials/field.hbs",
+        "templates/actor/partials/segments.hbs",
       ].map(systemPath),
       scrollable: [""],
     },
@@ -197,6 +207,12 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
           field: this.actor.system.schema.getField(["characteristics", chc]),
           value: this.actor.system.characteristics[chc as CharacteristicKey]?.value ?? 0,
           icon: fa,
+          name: `system.characteristics.${chc}.value`,
+          segments: buildValueSegments(
+            CHARACTERISTIC_MIN,
+            CHARACTERISTIC_MAX,
+            this.actor.system.characteristics[chc as CharacteristicKey]?.value ?? 0,
+          ),
         },
       ]),
     );
@@ -227,6 +243,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
             mod: entry.mod,
             characteristicLabel: characteristic?.label ?? "",
             characteristicIcon: characteristic?.fa ?? "",
+            name: `system.skills.${key}.level`,
+            levelSegments: buildValueSegments(SKILL_LEVEL_MIN, SKILL_LEVEL_MAX, entry.level),
           },
         ];
       }),

@@ -17,6 +17,17 @@ import { EmokloreSystemDataModel } from "./system-model";
 
 const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
+/**
+ * 能力値と技能レベルの取りうる範囲。
+ *
+ * スキーマのバリデーションと、シートの段入力（何段出すか）の両方がこれを見る。
+ * 別々に書くと片方だけ変えたときに黙ってずれるので、ここを正にする。
+ */
+export const CHARACTERISTIC_MIN = 1;
+export const CHARACTERISTIC_MAX = 6;
+export const SKILL_LEVEL_MIN = 0;
+export const SKILL_LEVEL_MAX = 3;
+
 /** 技能判定に必要な、アクターから集めた一式 */
 export type SkillRollContext = {
   params: SkillRollParams;
@@ -46,8 +57,8 @@ const defineCharacterDataModelSchema = () => {
   // 能力値の NumberField に渡す共通オプション。技能側で分割代入する
   // characteristic（能力値キーの文字列）とは別物なので名前を分けている
   const characteristicFieldOptions = {
-    min: 1,
-    max: 6,
+    min: CHARACTERISTIC_MIN,
+    max: CHARACTERISTIC_MAX,
     initial: 1,
     integer: true,
     required: true,
@@ -78,8 +89,8 @@ const defineCharacterDataModelSchema = () => {
       (obj, [skill, { characteristic, characteristicOptions, hasSpecialization }]) => {
         (obj as Record<string, foundry.data.fields.DataField>)[skill] = new SchemaField({
           level: new NumberField({
-            min: 0,
-            max: 3,
+            min: SKILL_LEVEL_MIN,
+            max: SKILL_LEVEL_MAX,
             initial: 0,
             integer: true,
             required: true,

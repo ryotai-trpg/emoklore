@@ -1,0 +1,23 @@
+{{!--
+  値を段で選ぶ入力。閲覧モードのバーと同じ見た目で、押した段の値になる。
+
+  ラジオボタンの集合なので、矢印キーでの移動もフォーム送信もブラウザ任せで済む。
+  塗りはCSSの :has() が出すので、再描画を待たずに反応する。
+
+  @param name      フォームの名前（system.characteristics.body.value など）
+  @param segments  buildValueSegments が作った { value, checked } の配列
+  @param label     読み上げ用の名前
+  @param zeroBased 0段目が「未修得」を意味するなら true（技能レベル用）
+--}}
+<div
+  class="em-segments{{#if zeroBased}} em-segments--zero-based{{/if}}"
+  role="radiogroup"
+  aria-label="{{label}}"
+>
+  {{#each segments}}
+  <label class="em-segment">
+    <input type="radio" name="{{../name}}" value="{{this.value}}" {{checked this.checked}}>
+    <span class="em-segment__value">{{this.value}}</span>
+  </label>
+  {{/each}}
+</div>

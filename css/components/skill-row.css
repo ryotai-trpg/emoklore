@@ -25,11 +25,15 @@
     border-radius: var(--emoklore-progress-radius-small);
   }
 
-  /* 編集: 技能名・Lv入力・目標値・能力値の4列。
-     列構成が閲覧と違うので subgrid には載せず、自前のトラックを持つ */
+  /* 編集: 技能名・レベルの段入力・目標値・能力値・専門の5列。
+     列構成が閲覧と違うので subgrid には載せず、自前のトラックを持つ。
+     段入力は 1fr で伸ばす。以前の range-picker は幅が足りず操作しづらかった */
   .em-skill-row--edit {
-    grid-template-columns: minmax(0, 1fr) 120px auto 60px;
-    padding: var(--spacer-2) var(--spacer-8);
+    grid-template-columns: minmax(6rem, 1fr) minmax(6rem, 1fr) auto auto minmax(0, 1fr);
+    align-items: center;
+    /* subgrid ではなく自前のトラックなので、リスト側の column-gap は効かない */
+    column-gap: var(--spacer-8);
+    padding: var(--spacer-2) 0;
 
     select {
       padding: 0;

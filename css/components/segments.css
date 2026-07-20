@@ -1,0 +1,76 @@
+/* 値を段で選ぶ入力。閲覧モードの em-progress と同じ見た目にして、
+   モードを切り替えても同じものを見ている感じを保つ。
+
+   塗りは :has() で出す。checked の段と、それより前の段を塗る。
+   再描画を待たないので、押した瞬間に反応する */
+
+.emoklore {
+  .em-segments {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 1px;
+    width: 100%;
+    min-width: 0;
+    height: 1.25rem;
+    background-color: var(--emoklore-track);
+    border-radius: var(--emoklore-progress-radius-small);
+    overflow: hidden;
+  }
+
+  .em-segment {
+    position: relative;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    font-size: var(--font-size-12);
+    line-height: 1;
+    color: transparent;
+    transition: background-color 80ms ease-out;
+
+    /* ラジオ本体は見せないが、当たり判定とフォーカスは段いっぱいに残す */
+    input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    &:hover {
+      color: var(--color-text-emphatic);
+    }
+  }
+
+  /* checked の段と、それより前の段を塗る */
+  .em-segment:has(input:checked),
+  .em-segment:has(~ .em-segment input:checked) {
+    background-color: var(--emoklore-accent);
+  }
+
+  /* 0段目は「未修得」を選び直すための枠で、バーの一部ではない。
+     細くして左端に置き、塗りの対象からも外す。
+
+     明示トラックを1つだけ置くと、残りの段は grid-auto-columns: 1fr に載る */
+  .em-segments--zero-based {
+    grid-template-columns: 0.75rem;
+  }
+
+  /* これがないとレベル1が2ブロックに見える。
+
+     :has() は引数の詳細度を持つので、素の :first-child では上の塗り規則に負ける。
+     打ち消し側にも同じ :has() を付けて上回らせている */
+  .em-segments--zero-based .em-segment:first-child:has(input:checked),
+  .em-segments--zero-based .em-segment:first-child:has(~ .em-segment input:checked) {
+    background-color: transparent;
+  }
+
+  /* キーボードのフォーカスは段ではなく全体に出す。
+     ラジオは1つずつしかフォーカスを持たないので、段に出すと位置が飛んで見える */
+  .em-segments:has(input:focus-visible) {
+    outline: 2px solid var(--button-focus-outline-color);
+    outline-offset: 1px;
+  }
+}
