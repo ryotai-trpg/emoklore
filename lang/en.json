@@ -303,6 +303,7 @@
       "Hint": "Paste the JSON data exported from https://emoklore.charasheet.jp",
       "Success": "Imported data for {name}",
       "WarnUnknownEmotions": "Resonant emotion(s) \"{labels}\" were not recognized and have been skipped",
+      "WarnUnknownSkills": "Skill(s) \"{labels}\" were not recognized and have been skipped",
       "ErrorEmptyInput": "Please enter JSON data",
       "ErrorInvalidJSON": "Invalid JSON data",
       "ErrorInvalidKind": "Not a character data",
