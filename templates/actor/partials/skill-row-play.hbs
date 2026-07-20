@@ -8,7 +8,7 @@
   <a class="em-skill-row__name" data-action="roll" data-roll-type="skill" data-skill="{{key}}">
     {{skill.label}}{{#if skill.specialization}}{{localize "EMOKLORE.Common.colon"}}{{skill.specialization}}{{/if}}
   </a>
-  <span>Lv.{{skill.level}}</span>
+  <span class="em-skill-row__level">Lv.{{skill.level}}</span>
   <progress class="em-progress em-progress--sm" value="{{skill.level}}" max="3"></progress>
   <span class="em-skill-row__target">{{skill.target}}</span>
   <i class="em-skill-row__stat fa-solid {{skill.characteristicIcon}}"></i>
