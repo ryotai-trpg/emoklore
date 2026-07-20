@@ -25,26 +25,26 @@
     border-radius: var(--emoklore-progress-radius-small);
   }
 
-  /* 編集は列構成が違う（技能名・段入力・目標値・能力値・専門の5列）ので、
+  /* 編集は列構成が違う（技能名・分野・段入力・目標値・能力値の5列）ので、
      リスト側のトラックを差し替える。行は閲覧と同じく subgrid で載るため、
      能力値がselectの行とテキストの行が混在しても縦のラインが揃う。
      段入力は 1fr で伸ばす。以前の range-picker は幅が足りず操作しづらかった */
   .em-skill-list--edit {
-    grid-template-columns: minmax(5rem, 1fr) minmax(5rem, 1fr) auto minmax(5rem, auto) 1fr;
+    grid-template-columns: minmax(5rem, 1fr) 1fr minmax(5rem, 1fr) auto minmax(4rem, auto);
   }
 
+  /* 行の高さは中身のいちばん高いものに引きずられる。selectを持つ技能だけ
+     行が伸びて見えるのを防ぐため、フォーム部品の高さを段入力に合わせる */
   .em-skill-row--edit {
     padding: var(--spacer-2) 0;
 
-    select {
-      width: 100%;
-      padding: 0;
-    }
-
-    /* 専門の入力欄。min-width: 0 がないと固有幅が最後の列を押し広げる */
-    .em-skill-row__spec input {
+    select,
+    input {
       width: 100%;
       min-width: 0;
+      height: 1.25rem;
+      padding: 0 var(--spacer-4);
+      line-height: 1;
     }
   }
 

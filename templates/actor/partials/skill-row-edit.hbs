@@ -6,25 +6,30 @@
 --}}
 <div class="em-skill-row em-skill-row--edit" data-skill="{{key}}">
   <span class="em-skill-row__name">{{skill.label}}</span>
+
+  {{! 分野は技能によって有無が変わる。列を保つため、無い技能でも枠だけ置く }}
+  <span class="em-skill-row__spec">
+    {{#if skill.field.fields.specialization}}
+    {{formInput skill.field.fields.specialization
+      value=skill.specialization
+      placeholder=(localize "EMOKLORE.CharacterSheet.fields.specialization")}}
+    {{/if}}
+  </span>
+
   {{! Lv.0 の段は置かず、選択中の段をもう一度押すと未修得に戻す }}
   {{> "systems/emoklore/templates/actor/partials/segments.hbs"
     name=skill.name
     segments=skill.levelSegments
     label=skill.label
     clearTo=0}}
+
   <span class="em-skill-row__target">{{skill.target}}</span>
+
   {{#if skill.field.fields.characteristic.choices}}
   <span class="em-skill-row__stat">
     {{formInput skill.field.fields.characteristic value=skill.characteristic localize=true}}
   </span>
   {{else}}
   <span class="em-skill-row__stat">{{skill.characteristicLabel}}</span>
-  {{/if}}
-  {{#if skill.field.fields.specialization}}
-  <span class="em-skill-row__spec">
-    {{formInput skill.field.fields.specialization
-      value=skill.specialization
-      placeholder=(localize "EMOKLORE.CharacterSheet.fields.specialization")}}
-  </span>
   {{/if}}
 </div>
