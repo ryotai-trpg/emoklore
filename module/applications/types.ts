@@ -127,9 +127,11 @@ export type CharacterContext = {
   emotionOptions: Array<{ value: string; label: string; group: string }>;
   characteristics?: CharacteristicsMap;
   charPointSum?: number;
+  charPointMax?: number;
   skills?: Record<string, SkillRow>;
   baseSkills?: BaseSkillRow[];
   skillPointSum?: number;
+  skillPointMax?: number;
   // 経歴は横並びの組（年齢・性別）と、それ以降を分けて渡す
   biographyPairedRows?: BiographyRow[];
   biographyRows?: BiographyRow[];

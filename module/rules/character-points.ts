@@ -5,6 +5,12 @@ export const SKILL_POINT_COSTS: Record<number, number> = {
   3: 15,
 };
 
+/** キャラクター作成時に能力値へ割り振れるポイント。運勢は別枠で数えない */
+export const CHARACTERISTIC_POINT_MAX = 25;
+
+/** キャラクター作成時に技能へ割り振れるポイント */
+export const SKILL_POINT_MAX = 30;
+
 /** 能力値ポイントの計算から除外される能力値（運勢は他とは別枠のため） */
 const EXCLUDED_FROM_CHARACTERISTIC_POINTS = "fortune";
 
