@@ -69,6 +69,7 @@ export const resolveEmbeddedDocumentClass = (
     throw new Error(`emoklore | 未対応の data-document-class: ${documentClass}`);
   }
   const cls = getDocumentClass(documentClass satisfies EmbeddedDocumentName);
+  // biome-ignore lint: ClientDocumentMixin のstaticが本体の型に出ないため素の as では通らない
   return cls as unknown as EmbeddedDocumentClass;
 };
 

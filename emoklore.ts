@@ -56,6 +56,7 @@ Hooks.once("init", () => {
   DocumentSheetConfig.registerSheet(
     Actor,
     "emoklore",
+    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
     applications.EmokloreCharacterSheet as unknown as typeof foundry.applications.api.ApplicationV2,
     {
       types: ["character"],
@@ -67,6 +68,7 @@ Hooks.once("init", () => {
 Hooks.once("i18nInit", () => {
   // CONFIG.EMOKLORE のラベル（i18nキー）をその場で翻訳文字列に置き換える。
   // スキーマのラベルは LOCALIZATION_PREFIXES 経由で本体が処理するため、ここでは触らない
+  // biome-ignore lint: CONFIG.EMOKLORE は具体型なので汎用の Record へは素の as では通らない
   performPreLocalization(CONFIG.EMOKLORE as unknown as Record<string, unknown>);
 });
 

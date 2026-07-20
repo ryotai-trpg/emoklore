@@ -25,6 +25,7 @@ type SettingRegistration = {
 type CoreSettingConfig = Parameters<typeof game.settings.register>[2];
 
 const register = (key: keyof EmokloreSettings, config: SettingRegistration): void => {
+  // biome-ignore lint: 本体の SettingConfig は登録後の形なので、登録時の形とは重ならない
   game.settings.register(systemID, key, config as unknown as CoreSettingConfig);
 };
 
