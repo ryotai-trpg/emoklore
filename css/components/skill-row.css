@@ -71,14 +71,8 @@
     margin-inline-start: var(--spacer-4);
   }
 
-  /* 寸法は em-progress--sm が持つ。ここで打ち消すのは em-progress が既定で
-     持つ 2px の margin だけ。間隔の計算に混ざって値がずれるため。
-     バーの左の余白は margin ではなく Lv側の padding で作っている
-     （margin だと width: 100% のぶんトラックからはみ出す） */
-  .em-skill-row .em-progress {
-    margin: 0;
-  }
-
+  /* バーの寸法は em-progress--sm が持つ。左の余白は margin ではなく
+     Lv側の padding で作る（margin だと width: 100% のぶんトラックからはみ出す） */
   .em-skill-row__level {
     padding-inline-end: var(--spacer-4);
   }
