@@ -98,12 +98,26 @@ export type EmokloreActorSheetActions = {
   toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
 };
 
+/**
+ * ウィンドウ枠の操作メニュー（⋮）の項目。
+ *
+ * 本体の ApplicationHeaderControlsEntry のうち、実際に使うメンバーだけを並べている。
+ * `ownership` は DocumentSheetV2._getHeaderControls が testUserPermission で絞るのに使う。
+ */
+export interface EmokloreHeaderControl {
+  action: string;
+  icon: string;
+  label: string;
+  ownership?: string;
+}
+
 // window / form は mixin 側の DEFAULT_OPTIONS が継承チェーン経由でマージされるため任意
 export interface EmokloreActorSheetOptions {
   classes: string[];
   actions: EmokloreActorSheetActions;
   window?: {
-    resizable: boolean;
+    resizable?: boolean;
+    controls?: EmokloreHeaderControl[];
   };
   form?: {
     submitOnChange: boolean;
@@ -142,7 +156,8 @@ export interface EmokloreDocumentSheetOptions {
   classes: string[];
   actions: Record<string, (event: Event, target: HTMLElement) => Promise<unknown>>;
   window?: {
-    resizable: boolean;
+    resizable?: boolean;
+    controls?: EmokloreHeaderControl[];
   };
   form?: {
     submitOnChange: boolean;

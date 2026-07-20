@@ -15,7 +15,6 @@
 @import url("./css/components/chip.css");
 @import url("./css/components/field-list.css");
 @import url("./css/components/data-table.css");
-@import url("./css/components/toolbar.css");
 
 /* Applications — module/applications/ と対で、部品の配置と寸法を持つ */
 @import url("./css/applications/document-sheet.css");
