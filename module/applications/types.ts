@@ -31,8 +31,6 @@ export type CharacteristicsMap = Record<
 
 export type EmokloreActorSheetActions = {
   roll: (event: Event, target: HTMLElement) => Promise<unknown>;
-  increaseResources: (event: Event, target: HTMLElement) => Promise<unknown>;
-  decreaseResources: (event: Event, target: HTMLElement) => Promise<unknown>;
   // mixin側のDEFAULT_OPTIONSから継承チェーン経由でマージされるので、各シートでの宣言は任意
   toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
 };
@@ -100,6 +98,8 @@ export type CharacterContext = {
   skills?: Record<string, SkillRow>;
   skillPointSum?: number;
   skillLevelOptions?: Array<{ value: string; label: string }>;
+  // 経歴の備考を enrichHTML に通した結果。生の system.biography.note とは別に持つ
+  noteHTML?: string;
   tabs: Record<string, ApplicationTab>;
   tab?: unknown;
   effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;
@@ -119,8 +119,6 @@ export type EmokloreCharacterSheetActions = {
   deleteDoc: (event: Event, target: HTMLElement) => Promise<void>;
   toggleEffect: (event: Event, target: HTMLElement) => Promise<void>;
   roll: (event: Event, target: HTMLElement) => Promise<unknown>;
-  increaseResources: (event: Event, target: HTMLElement) => Promise<unknown>;
-  decreaseResources: (event: Event, target: HTMLElement) => Promise<unknown>;
   // mixin側のDEFAULT_OPTIONSから継承チェーン経由でマージされるので、各シートでの宣言は任意
   toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
 };

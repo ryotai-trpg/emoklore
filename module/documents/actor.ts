@@ -28,6 +28,7 @@ export class EmokloreActor extends Actor {
   declare effects: foundry.utils.Collection<string, foundry.documents.ActiveEffect>;
   // sheet は ClientDocumentMixin 由来でジェネリクスが消えている
   declare sheet: { render: (force?: boolean) => void } | null;
+  declare isOwner: boolean;
 
   override getRollData(): Record<string, unknown> {
     const rollData = { ...this.system, flags: this.flags, name: this.name };
@@ -101,7 +102,9 @@ function formatSkillName(
   { base }: { base: boolean },
 ): string {
   const prefix = base ? "＊" : isExtra ? "★" : "";
-  const suffix = specialization ? `${game.i18n.localize("colon")}${specialization}` : "";
+  const suffix = specialization
+    ? `${game.i18n.localize("EMOKLORE.Common.colon")}${specialization}`
+    : "";
 
   return `${prefix}${label}${suffix}`;
 }

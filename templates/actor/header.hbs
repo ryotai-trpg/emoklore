@@ -1,102 +1,99 @@
 {{! Sheet Header }}
-<div>
-  <header class="sheet-header">
-    <div class="container">
-      <div class="name">
-        {{#if isPlay}}
-        {{source.name}}
-        {{else}}
-        {{formInput fields.name value=source.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
-        aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
-        {{/if}}
-      </div>
-
-      {{#unless isPlay}}
-      <div class="header-actions">
-        <button type="button" data-action="importCharacter" data-tooltip="EMOKLORE.Import.ImportTooltip">
-          <i class="fa-solid fa-file-import"></i>
-        </button>
-      </div>
-      {{/unless}}
-
+<header class="sheet-header">
+  <div class="container">
+    <div class="name">
       {{#if isPlay}}
-      <div class="resources">
-        <div class="hp bar">
-
-          <div class="info">
-            <i class="fa-solid fa-heart label"></i>
-            <div class="value">
-              {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
-              <span class="small">/{{ system.resources.hp.max }}</span>
-            </div>
-          </div>
-
-          <progress 
-            id="character-hp"
-            value="{{ system.resources.hp.value }}" 
-            max="{{ system.resources.hp.max }}"
-            ></progress>
-        </div>
-
-        <div class="mp bar">
-          <div class="info">
-            <i class="fa-solid fa-wand-magic-sparkles label"></i>
-            <div class="value">
-              {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
-              <span class="small">/{{ system.resources.mp.max }}</span>
-            </div>
-          </div>
-          <progress 
-            id="character-mp"
-            value="{{ system.resources.mp.value }}" 
-            max="{{ system.resources.mp.max }}"
-            ></progress>
-        </div>
-
-        <div class="resonance bar">
-          <div class="info">
-            <button type="button" class="inline-control icon fa-solid fa-infinity" data-action="roll" data-roll-type="resonance"></button>
-            <div class="value">
-              Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
-            </div>
-            <div>{{emotionRows.surface.label}}</div>
-            <div class="small">
-              {{#if emotionRows.surface.attribute}}（{{emotionRows.surface.attribute}}）{{/if}}
-            </div>
-            <div>{{emotionRows.hidden.label}}</div>
-            <div class="small">
-              {{#if emotionRows.hidden.attribute}}（{{emotionRows.hidden.attribute}}）{{/if}}
-            </div>
-            <div>{{emotionRows.root.label}}</div>
-            <div class="small">
-              {{#if emotionRows.root.attribute}}（{{emotionRows.root.attribute}}）{{/if}}
-            </div>
-          </div>
-          <progress 
-            id="character-resonance"
-            value="{{ system.resources.resonance.value }}" 
-            max="{{ system.resources.resonance.max }}" 
-            ></progress>
-        </div>
-      </div>
+      {{source.name}}
       {{else}}
-      <div class="emotions">
-        {{formGroup
-        systemFields.emotions.fields.surface
-        value=system.emotions.surface
-        options=emotionOptions
-        }}
-        {{formGroup
-        systemFields.emotions.fields.hidden
-        value=system.emotions.hidden
-        options=emotionOptions
-        }}
-        {{formGroup
-        systemFields.emotions.fields.root
-        value=system.emotions.root
-        options=emotionOptions
-        }}
-      </div>
+      {{formInput fields.name value=source.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
+      aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
       {{/if}}
-  </header>
     </div>
+
+    {{#unless isPlay}}
+    <div class="header-actions">
+      <button type="button" data-action="importCharacter" data-tooltip="EMOKLORE.Import.ImportTooltip">
+        <i class="fa-solid fa-file-import"></i>
+      </button>
+    </div>
+    {{/unless}}
+
+    {{#if isPlay}}
+    <div class="resources">
+      <div class="hp bar">
+        <div class="info">
+          <i class="fa-solid fa-heart label"></i>
+          <div class="value">
+            {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
+            <span class="small">/{{ system.resources.hp.max }}</span>
+          </div>
+        </div>
+        <progress
+          id="character-hp"
+          value="{{ system.resources.hp.value }}"
+          max="{{ system.resources.hp.max }}"
+          ></progress>
+      </div>
+
+      <div class="mp bar">
+        <div class="info">
+          <i class="fa-solid fa-wand-magic-sparkles label"></i>
+          <div class="value">
+            {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
+            <span class="small">/{{ system.resources.mp.max }}</span>
+          </div>
+        </div>
+        <progress
+          id="character-mp"
+          value="{{ system.resources.mp.value }}"
+          max="{{ system.resources.mp.max }}"
+          ></progress>
+      </div>
+
+      <div class="resonance bar">
+        <div class="info">
+          <button type="button" class="inline-control icon fa-solid fa-infinity" data-action="roll" data-roll-type="resonance"></button>
+          <div class="value">
+            Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
+          </div>
+          <div>{{emotionRows.surface.label}}</div>
+          <div class="small">
+            {{#if emotionRows.surface.attribute}}（{{emotionRows.surface.attribute}}）{{/if}}
+          </div>
+          <div>{{emotionRows.hidden.label}}</div>
+          <div class="small">
+            {{#if emotionRows.hidden.attribute}}（{{emotionRows.hidden.attribute}}）{{/if}}
+          </div>
+          <div>{{emotionRows.root.label}}</div>
+          <div class="small">
+            {{#if emotionRows.root.attribute}}（{{emotionRows.root.attribute}}）{{/if}}
+          </div>
+        </div>
+        <progress
+          id="character-resonance"
+          value="{{ system.resources.resonance.value }}"
+          max="{{ system.resources.resonance.max }}"
+          ></progress>
+      </div>
+    </div>
+    {{else}}
+    <div class="emotions">
+      {{formGroup
+      systemFields.emotions.fields.surface
+      value=system.emotions.surface
+      options=emotionOptions
+      }}
+      {{formGroup
+      systemFields.emotions.fields.hidden
+      value=system.emotions.hidden
+      options=emotionOptions
+      }}
+      {{formGroup
+      systemFields.emotions.fields.root
+      value=system.emotions.root
+      options=emotionOptions
+      }}
+    </div>
+    {{/if}}
+  </div>
+</header>

@@ -22,9 +22,10 @@
     }
   },
 
-  "colon": "：",
-
   "EMOKLORE": {
+    "Common": {
+      "colon": "："
+    },
     "SheetClass": {
       "character": "キャラクターシート"
     },

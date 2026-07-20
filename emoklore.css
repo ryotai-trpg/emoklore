@@ -13,11 +13,10 @@
    Theme Overrides
    =========================================== */
 
-.theme-dark .window-content {
-  padding-top: 0 !important;
-}
-
-.emoklore .application section.window-content {
+/* .application と .emoklore はシートのルート要素そのものに同居しているので、
+   .emoklore .application ... と書くと子孫結合子で自分自身に届かない。
+   .emoklore の子孫として .window-content を直接指す */
+.emoklore .window-content {
   padding-top: 0;
 }
 
@@ -97,11 +96,6 @@
     border-radius: var(--emoklore-progress-radius);
   }
 
-  progress::-ms-fill {
-    background-color: var(--emoklore-accent-color);
-    border-radius: var(--emoklore-progress-radius);
-  }
-
   /* Resources Section */
   div.resources > div.bar > div > div > input[type="number"] {
     padding: 5px;
@@ -130,9 +124,6 @@
       progress::-moz-progress-bar {
         background-color: var(--emoklore-green);
       }
-      progress::-ms-fill {
-        background-color: var(--emoklore-green);
-      }
     }
 
     /* MP Bar */
@@ -144,9 +135,6 @@
         background-color: var(--emoklore-red);
       }
       progress::-moz-progress-bar {
-        background-color: var(--emoklore-red);
-      }
-      progress::-ms-fill {
         background-color: var(--emoklore-red);
       }
     }
@@ -244,12 +232,6 @@
     flex-direction: column;
   }
 
-  .emotions .play {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-  }
-
   /* Characteristics Section */
   .characteristics {
     display: flex;
@@ -292,9 +274,6 @@
     progress::-moz-progress-bar {
       border-radius: var(--emoklore-progress-radius-small);
     }
-    progress::-ms-fill {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
   }
 
   /* Skills Section */
@@ -319,9 +298,6 @@
       border-radius: var(--emoklore-progress-radius-small);
     }
     progress::-moz-progress-bar {
-      border-radius: var(--emoklore-progress-radius-small);
-    }
-    progress::-ms-fill {
       border-radius: var(--emoklore-progress-radius-small);
     }
   }
@@ -427,16 +403,7 @@
       gap: 8px;
     }
 
-    .bio.stacked {
-      display: flex;
-      flex-direction: row;
-    }
-
     .biographies label {
-      color: var(--color-form-label);
-      font-weight: bold;
-    }
-    .biographies .label {
       color: var(--color-form-label);
       font-weight: bold;
     }
@@ -491,7 +458,6 @@
     padding: 0;
     overflow-y: auto;
     scrollbar-width: thin;
-    color: var(--boilerplate-c-tan);
   }
 
   .effects-list .effect-list {
@@ -501,7 +467,6 @@
   }
 
   .effects-list .effect-name {
-    flex: 2;
     margin: 0;
     overflow: hidden;
     font-size: 13px;
@@ -510,16 +475,8 @@
     display: flex;
   }
 
-  .effects-list .effect-name h3,
-  .effects-list .effect-name h4 {
-    margin: 0;
-    white-space: nowrap;
-    overflow-x: hidden;
-  }
-
   .effects-list .effect-controls {
     display: flex;
-    flex: 0 0 100px;
     justify-content: flex-end;
   }
 
@@ -532,15 +489,11 @@
   .effects-list .effect {
     align-items: center;
     padding: 0 2px;
-    border-bottom: 1px solid var(--boilerplate-c-faint);
+    border-bottom: 1px solid var(--emoklore-gray);
   }
 
   .effects-list .effect:last-child {
     border-bottom: none;
-  }
-
-  .effects-list .effect .effect-name {
-    color: var(--boilerplate-c-dark);
   }
 
   .effects-list .effect .effect-name .effect-image {
@@ -551,59 +504,9 @@
     margin-right: 5px;
   }
 
-  .effects-list .effect-prop {
-    text-align: center;
-    border-left: 1px solid #c9c7b8;
-    border-right: 1px solid #c9c7b8;
-    font-size: 12px;
-  }
-
   .effects-list .effects-header .effect-name {
     padding-left: 5px;
     text-align: left;
-  }
-
-  .effect-formula {
-    flex: 0 0 200px;
-    padding: 0 8px;
-  }
-
-  .effects .item .effect-source,
-  .effects .item .effect-duration,
-  .effects .item .effect-controls {
-    text-align: center;
-    border-left: 1px solid #c9c7b8;
-    border-right: 1px solid #c9c7b8;
-    font-size: 12px;
-  }
-
-  .effects .item .effect-controls {
-    border: none;
-  }
-
-  /* ===========================================
-   Character Sheet Import Dialog
-   =========================================== */
-
-  .charsheet-import-dialog {
-    textarea {
-      width: 100%;
-      font-family: monospace;
-      font-size: 12px;
-      resize: vertical;
-    }
-
-    .hint {
-      font-size: var(--font-size-12);
-      color: var(--color-text-dark-secondary);
-      margin: 0;
-    }
-
-    .form-footer {
-      justify-content: flex-end;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
   }
 
   /* Header Actions (Import Button) */
@@ -614,7 +517,7 @@
 
     button {
       padding: 0.25rem 0.5rem;
-      background: var(--color-cool-2);
+      background: var(--color-cool-4);
       border: 1px solid var(--color-border-dark-tertiary);
       border-radius: 3px;
       cursor: pointer;
@@ -628,6 +531,33 @@
         margin: 0;
       }
     }
+  }
+}
+
+/* ===========================================
+   Character Sheet Import Dialog
+   =========================================== */
+
+/* 取り込みダイアログはシートとは別のウィンドウなので、シートのブロックの中に
+   入れてはいけない。ルート要素が .emoklore.charsheet-import-dialog になる */
+.emoklore.charsheet-import-dialog {
+  textarea {
+    width: 100%;
+    font-family: monospace;
+    font-size: 12px;
+    resize: vertical;
+  }
+
+  .hint {
+    font-size: var(--font-size-12);
+    color: var(--color-text-dark-secondary);
+    margin: 0;
+  }
+
+  .form-footer {
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
   }
 }
 
