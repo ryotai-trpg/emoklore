@@ -2,73 +2,76 @@
 <section class="tab effects {{tab.cssClass}}" data-group="primary" data-tab="effects">
   <ol class="em-data-table">
     {{#each effects as |section sid|}}
-      <li class="em-data-table__head" data-effect-type="{{section.type}}">
-        <div class="em-data-table__name">{{section.label}}</div>
-        <div class="em-data-table__cell">{{localize "EMOKLORE.Effect.Source"}}</div>
-        <div class="em-data-table__cell">{{localize "EFFECT.TABS.duration"}}</div>
-        <div class="em-data-table__controls">
-          <a
-            class="em-data-table__control"
-            data-action="createDoc"
-            data-document-class="ActiveEffect"
-            data-origin="{{@root.actor.uuid}}"
-            data-img="icons/svg/aura.svg"
-            {{#if (eq section.type "inactive")}}
-              data-disabled="true"
-            {{else if (eq section.type "temporary")}}
-              data-duration.rounds="1"
-            {{/if}}
-            data-tooltip='{{localize "DOCUMENT.Create" type=""}}'
-          >
-            <i class="fas fa-plus"></i>
-          </a>
+      {{! 区分ごとに1項目。見出しと明細のolを li の中に収める（ol直下にolは置けない） }}
+      <li class="em-data-table__section" data-effect-type="{{section.type}}">
+        <div class="em-data-table__head">
+          <div class="em-data-table__name">{{section.label}}</div>
+          <div class="em-data-table__cell">{{localize "EMOKLORE.Effect.Source"}}</div>
+          <div class="em-data-table__cell">{{localize "EFFECT.TABS.duration"}}</div>
+          <div class="em-data-table__controls">
+            <a
+              class="em-data-table__control"
+              data-action="createDoc"
+              data-document-class="ActiveEffect"
+              data-origin="{{@root.actor.uuid}}"
+              data-img="icons/svg/aura.svg"
+              {{#if (eq section.type "inactive")}}
+                data-disabled="true"
+              {{else if (eq section.type "temporary")}}
+                data-duration.rounds="1"
+              {{/if}}
+              data-tooltip='{{localize "DOCUMENT.Create" type=""}}'
+            >
+              <i class="fas fa-plus"></i>
+            </a>
+          </div>
         </div>
-      </li>
 
-      <ol class="em-data-table__body">
-        {{#each section.effects as |effect|}}
-          <li
-            class="em-data-table__row draggable"
-            data-effect-id="{{effect.id}}"
-            data-parent-id="{{effect.parent.id}}"
-            data-document-class="ActiveEffect"
-          >
-            <div class="em-data-table__name">
-              <img class="em-data-table__image" src="{{effect.img}}" height="24" width="24" />
-              <div>{{effect.name}}</div>
-            </div>
-            <div class="em-data-table__cell">{{effect.sourceName}}</div>
-            <div class="em-data-table__cell">{{effect.duration.label}}</div>
-            <div class="em-data-table__controls">
-              {{#if @root.editable}}
+        <ol class="em-data-table__body">
+          {{#each section.effects as |effect|}}
+            <li
+              class="em-data-table__row draggable"
+              data-effect-id="{{effect.id}}"
+              data-parent-id="{{effect.parent.id}}"
+              data-document-class="ActiveEffect"
+            >
+              <div class="em-data-table__name">
+                <img class="em-data-table__image" src="{{effect.img}}" height="24" width="24" />
+                <div>{{effect.name}}</div>
+              </div>
+              <div class="em-data-table__cell">{{effect.sourceName}}</div>
+              <div class="em-data-table__cell">{{effect.duration.label}}</div>
+              <div class="em-data-table__controls">
+                {{#if @root.editable}}
+                  <a
+                    class="em-data-table__control"
+                    data-action="toggleEffect"
+                    data-tooltip="EMOKLORE.Effect.Toggle"
+                  >
+                    <i class="fas {{#if effect.disabled}}fa-check{{else}}fa-times{{/if}}"></i>
+                  </a>
+                {{/if}}
                 <a
                   class="em-data-table__control"
-                  data-action="toggleEffect"
-                  data-tooltip="EMOKLORE.Effect.Toggle"
+                  data-action="viewDoc"
+                  data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
                 >
-                  <i class="fas {{#if effect.disabled}}fa-check{{else}}fa-times{{/if}}"></i>
+                  <i class="fas fa-edit"></i>
                 </a>
-              {{/if}}
-              <a
-                class="em-data-table__control"
-                data-action="viewDoc"
-                data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
-              >
-                <i class="fas fa-edit"></i>
-              </a>
-              {{#if @root.editable}}
-                <a
-                  class="em-data-table__control"
-                  data-action="deleteDoc"
-                  data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
-                >
-                  <i class="fas fa-trash"></i>
-                </a>
-              {{/if}}
-            </div>
-          </li>
-        {{/each}}
-      </ol>
+                {{#if @root.editable}}
+                  <a
+                    class="em-data-table__control"
+                    data-action="deleteDoc"
+                    data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
+                  >
+                    <i class="fas fa-trash"></i>
+                  </a>
+                {{/if}}
+              </div>
+            </li>
+          {{/each}}
+        </ol>
+      </li>
     {{/each}}
   </ol>
 </section>
