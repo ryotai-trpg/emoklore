@@ -10,6 +10,7 @@
 |---|---|
 | セットアップ・コマンド・ブランチ/コミット/PR規約・コーディング方針・参照資料 | `docs/contributing.md` |
 | 設計方針・アーキテクチャ・既知の構造的課題 | `docs/architecture.md` |
+| コード設計の規約（型・命名・層のimport方向） | `docs/code-design.md` |
 | UI設計の規約（CSS・テンプレート・ダイアログ） | `docs/ui-design.md` |
 | 開発フェーズ計画 | `docs/roadmap.md` |
 | v14移行の状況・チェックリスト・型定義戦略 | `docs/v14-migration.md` |
