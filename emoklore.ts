@@ -11,6 +11,7 @@ import { EmokloreActor } from "./module/documents/actor";
 import { EmokloreItem } from "./module/documents/item";
 import { getSetting, registerSystemSettings } from "./module/settings";
 import { performPreLocalization } from "./module/utils/localization";
+import { registerQueries } from "./module/utils/queries";
 
 Hooks.once("init", () => {
   console.log("Emo-klore TRPG | Initializing...");
@@ -18,6 +19,9 @@ Hooks.once("init", () => {
   CONFIG.EMOKLORE = EMOKLORE;
 
   registerSystemSettings();
+
+  // 権限の無いアクターへのダメージ適用をGMに肩代わりしてもらうための受け口
+  registerQueries();
 
   // Documentの実装クラスを差し替える
   CONFIG.Actor.documentClass = EmokloreActor;
