@@ -16,13 +16,16 @@
     "rules": {
       "preset": "recommended",
       "suspicious": {
-        "noExplicitAny": "error"
+        "noExplicitAny": "error",
+        "noShadow": "error"
       },
       "complexity": {
         "noThisInStatic": "off"
       },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "useDefaultSwitchClause": "error",
+        "useNumberNamespace": "error"
       }
     }
   },

@@ -275,8 +275,8 @@ export async function importFromCharSheet(
   for (const param of data.params) {
     const key = CHARACTERISTIC_MAP[param.label];
     if (key) {
-      characteristics[key] = parseInt(param.value, 10);
-      updateData[`system.characteristics.${key}.value`] = parseInt(param.value, 10);
+      characteristics[key] = Number.parseInt(param.value, 10);
+      updateData[`system.characteristics.${key}.value`] = Number.parseInt(param.value, 10);
     }
   }
 
@@ -284,8 +284,9 @@ export async function importFromCharSheet(
   if (data.status && Array.isArray(data.status)) {
     for (const status of data.status) {
       const label = status.label;
-      const value = typeof status.value === "string" ? parseInt(status.value, 10) : status.value;
-      const max = typeof status.max === "string" ? parseInt(status.max, 10) : status.max;
+      const value =
+        typeof status.value === "string" ? Number.parseInt(status.value, 10) : status.value;
+      const max = typeof status.max === "string" ? Number.parseInt(status.max, 10) : status.max;
 
       if (label === "HP") {
         updateData["system.resources.hp.value"] = value;
