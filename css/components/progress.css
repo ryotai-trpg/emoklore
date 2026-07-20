@@ -1,0 +1,25 @@
+/* progress要素の基本形。太さや色の上書きは各コンポーネント側で行う */
+
+.emoklore.sheet.character {
+  progress {
+    height: 10px;
+    margin: 2px;
+    background-color: var(--emoklore-gray);
+    border-radius: var(--emoklore-progress-radius);
+  }
+
+  progress::-webkit-progress-bar {
+    background-color: var(--emoklore-gray);
+    border-radius: var(--emoklore-progress-radius);
+  }
+
+  progress::-webkit-progress-value {
+    background-color: var(--emoklore-accent-color);
+    border-radius: var(--emoklore-progress-radius);
+  }
+
+  progress::-moz-progress-bar {
+    background-color: var(--emoklore-accent-color);
+    border-radius: var(--emoklore-progress-radius);
+  }
+}

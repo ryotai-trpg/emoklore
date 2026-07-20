@@ -1,0 +1,46 @@
+/* 能力値の一覧と各行 */
+
+.emoklore.sheet.character {
+  .characteristics {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    padding-top: 8px;
+
+    .characteristic.play {
+      display: grid;
+      grid-template-columns: 22px 40px 20px 1fr;
+      align-items: center;
+      justify-items: center;
+    }
+
+    .characteristic {
+      align-items: center;
+      display: flex;
+      margin-top: 6px;
+      justify-content: space-around;
+    }
+
+    range-picker {
+      width: 180px;
+    }
+  }
+
+  /* Characteristic Progress Bars */
+  .characteristic {
+    progress {
+      height: 20px;
+      border-radius: var(--emoklore-progress-radius-small);
+    }
+
+    progress::-webkit-progress-bar {
+      border-radius: var(--emoklore-progress-radius-small);
+    }
+    progress::-webkit-progress-value {
+      border-radius: var(--emoklore-progress-radius-small);
+    }
+    progress::-moz-progress-bar {
+      border-radius: var(--emoklore-progress-radius-small);
+    }
+  }
+}

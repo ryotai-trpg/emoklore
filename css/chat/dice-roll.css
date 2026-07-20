@@ -1,0 +1,19 @@
+/* 判定ロールのチャットカードはシートの外に出るため、.emoklore スコープに入れない。
+   .critical / .fumble は EmokloreDie が判定ロールにだけ付けるので衝突しない */
+
+/* 成功・失敗の色分け自体は本体の .success / .failure に任せ、
+   ここではクリティカル（出目1）とファンブル（出目10）を光らせて際立たせるだけにする。
+   本体が出目をすべて太字にしているので、太さでは差を付けられない。
+   影の色を固定すると本体が .success / .failure に掛ける hue-rotate で回転してしまうため、
+   currentColor にして文字色と一緒に変換させる */
+.dice-tooltip .dice-rolls .roll.critical,
+.dice-tooltip .dice-rolls .roll.fumble {
+  text-shadow: 0 0 6px currentColor;
+}
+
+/* 式の行に添える成功数修正。式本体より控えめにする */
+.dice-roll .dice-formula .success-mod {
+  margin-left: 0.4rem;
+  opacity: 0.7;
+  font-size: var(--font-size-12);
+}
