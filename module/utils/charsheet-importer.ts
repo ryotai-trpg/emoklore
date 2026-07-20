@@ -1,4 +1,5 @@
 import type { EmokloreActor } from "../documents/actor";
+import { typedEntries } from "./object";
 
 /**
  * キャラクター保管所（emoklore.charasheet.jp）が出力するJSONの形。
@@ -75,13 +76,13 @@ export function parseEmotions(memo: string, index: Record<string, string>): Pars
   const emotions: ParsedEmotions["emotions"] = {};
   const unrecognized: string[] = [];
 
-  for (const [key, pattern] of Object.entries(EMOTION_PATTERNS)) {
+  for (const [key, pattern] of typedEntries(EMOTION_PATTERNS)) {
     const label = memo.match(pattern)?.[1]?.trim();
     if (!label) continue;
 
     const emotionKey = index[label];
     if (emotionKey) {
-      emotions[key as keyof ParsedEmotions["emotions"]] = emotionKey;
+      emotions[key] = emotionKey;
     } else {
       unrecognized.push(label);
     }
