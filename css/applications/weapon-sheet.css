@@ -1,56 +1,6 @@
-/* 武器シート固有のレイアウト。部品の中身ではなく配置と寸法を持つ */
-
-.emoklore.sheet.weapon:not(.minimized, .minimizing, .maximizing) {
-  min-width: 320px;
-  min-height: 320px;
-}
+/* 武器シート固有のレイアウト。ヘッダなどアイテムシート共通のぶんは item-sheet.css が持つ */
 
 .emoklore.sheet.weapon {
-  /* 画像と名前を横に並べ、中央で揃える。
-     名前の列は minmax(0, 1fr)。grid item の既定は min-width: auto なので、
-     これがないと長い名前が列を押し広げて画像を枠外へ追い出す */
-  .em-item-header {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: var(--spacer-8);
-    padding: var(--spacer-8) 0;
-    container-type: inline-size;
-  }
-
-  /* 中身が変わらない枠なので寸法を固定する。rem にしてユーザーの
-     フォントサイズ設定に追従させる */
-  .em-item-header__image {
-    width: 3rem;
-    height: 3rem;
-    border: none;
-    border-radius: 4px;
-    object-fit: cover;
-  }
-
-  /* 画像は押すとファイルピッカーが開く。閲覧専用のときは本体が .disabled を付ける */
-  .em-item-header__image:not(.disabled) {
-    cursor: pointer;
-
-    &:hover {
-      outline: 1px solid var(--color-border-highlight);
-    }
-  }
-
-  /* 文字サイズは容器に追従させ、それでも収まらないときに切り詰める */
-  .em-item-header__name {
-    min-width: 0;
-    font-size: clamp(1rem, 8cqi, var(--font-size-24));
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    input {
-      width: 100%;
-      height: initial;
-    }
-  }
-
   .em-weapon-detail {
     padding: var(--spacer-8) 0;
 

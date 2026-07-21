@@ -20,8 +20,10 @@ export class EmokloreWeaponSheet extends EmokloreDocumentSheetMixin(
 
   // classes / window / form は mixin 側の DEFAULT_OPTIONS が継承チェーン経由でマージされる。
   // standard-form は本体の .form-group のレイアウト規則が必要なので自分で足す
+  // item はアイテムシート共通のCSS（css/applications/item-sheet.css）が掴む印。
+  // 本体は種別を表すクラスを付けないので、こちらで名乗る
   static override DEFAULT_OPTIONS = {
-    classes: ["standard-form", "weapon"],
+    classes: ["standard-form", "item", "weapon"],
     position: {
       width: 420,
       height: 480,
