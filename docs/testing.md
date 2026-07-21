@@ -94,6 +94,12 @@ tests/live/
 
 翻訳キーの検査が独立している理由は、`check:lang`（ja/enの突き合わせ）でも `check:templates`（参照の検査）でも**テンプレート側の綴り間違いは見つからない**ため。実際に描いて画面を見るしかない。
 
+### ドキュメントの検査
+
+`check:schema-doc` は [データモデル](/data-model) と [効果（ActiveEffect）](/active-effect) が並べているキーと日本語名を、`module/config/` のテーブルおよび `lang/ja.json` と突き合わせる。**コードは型で綴りを守れるが、ドキュメントには型が無い**ので、同じ間違いがドキュメント側にだけ残る。実際この検査を書いた最初の実行で、〈毒見〉を「毒味」と書いた2箇所が見つかった（コード側の同じ誤記はPR #37で直っていた）。
+
+configのテーブルは型だけをimportしていてFoundryに依存しないため、Nodeが `.ts` をそのまま読める。`erasableSyntaxOnly` が型剥がし可能であることを保証しているので、ローダもビルドも要らない。
+
 ### CIで回さない理由
 
 **技術的にできないからではない。** CIはすでに `tools/fetch-foundry.mjs` で本体を落としており（`typecheck` ジョブ）、Chromeも `ubuntu-latest` に入っている。そのうえで見送っている。

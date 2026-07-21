@@ -47,6 +47,8 @@ jobs:
         run: npm run check:lang
       - name: Check Handlebars templates
         run: npm run check:templates
+      - name: Check schema doc
+        run: npm run check:schema-doc
       - name: Build docs
         run: npm run docs:build
 

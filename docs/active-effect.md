@@ -12,6 +12,8 @@
 
 ## 属性キーの一覧
 使用を想定しているものの一覧です。現在は技能周りのみ。もっと変更できる箇所はありますが、動作確認していません。
+
+保存されている値の全体像は [データモデル](/data-model) にあります。
 ### 「【能力値】を使用する技能での判定」の修正
 `能力値`を対応する英単語に書き換えて使用してください。
 ##### ダイスボーナス：`system.characteristics.能力値.mod.bonus`
@@ -54,7 +56,7 @@
 - 鑑定：`appraisal`
 - 観察眼：`keenObservation`
 - 聞き耳：`listen`
-- 毒味：`taste`
+- 毒見：`taste`
 - 危機察知：`threatDetection`
 - 霊感：`spiritualSense`
 - 社交術：`etiquette`
