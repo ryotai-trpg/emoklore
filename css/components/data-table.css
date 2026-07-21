@@ -24,7 +24,7 @@
 
   .em-data-table__head {
     height: 28px;
-    margin: 2px 0;
+    margin: var(--spacer-2) 0;
     padding: 0;
     background: var(--emoklore-surface-sunken);
     font-weight: bold;
@@ -32,12 +32,12 @@
   }
 
   .em-data-table__head > * {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     text-align: center;
   }
 
   .em-data-table__row {
-    padding: 0 2px;
+    padding: 0 var(--spacer-2);
     border-bottom: 1px solid var(--color-border);
   }
 
@@ -57,7 +57,7 @@
     align-items: center;
     margin: 0;
     overflow: hidden;
-    font-size: 13px;
+    font-size: var(--font-size-13);
     text-align: left;
   }
 
@@ -71,7 +71,7 @@
   }
 
   .em-data-table__control {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     text-align: center;
     margin: 0 6px;
   }
