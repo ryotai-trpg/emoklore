@@ -10,11 +10,15 @@
  * 応答が戻るので結果の組み立てを1箇所にまとめられ、タイムアウトとエラー伝播も本体が持つ。
  * `system.json` の `"socket": true` も要らない（クエリは core の `userQuery` イベントを通る）。
  * draw-steel の `DrawSteelSocketHandler` と同じ形。
+ *
+ * `utils/` ではなく `documents/` に置いてあるのは、これが `actor.applyDamage()` を駆動する
+ * オーケストレータでユーティリティではないため。`utils/` にあったときは `EmokloreActor` を
+ * `import type` で借りていたので、importグラフの上では逆依存が見えなかった。
  */
 
 import { SYSTEM_ID } from "../constants";
-import type { EmokloreActor } from "../documents/actor";
-import type { DamageApplied } from "./chat";
+import type { DamageApplied } from "../utils/chat";
+import type { EmokloreActor } from "./actor";
 
 type ApplyDamageQuery = {
   type: "applyDamage";
