@@ -1,7 +1,12 @@
 import { type CharacteristicKey, isCharacteristicKey } from "../../config/characteristics";
-import { isSkillCategory, type SkillCategory } from "../../config/skill-categories";
+import {
+  isSkillCategory,
+  SKILL_CATEGORIES,
+  type SkillCategory,
+} from "../../config/skill-categories";
 import { isSkillGroupKey, type SkillGroupKey } from "../../config/skill-groups";
 import { systemPath } from "../../constants";
+import { localizeSkillCategory } from "../../utils/skill";
 
 const TEMPLATE = systemPath("templates/apps/create-skill.hbs");
 
@@ -50,9 +55,9 @@ export async function promptCreateSkill(): Promise<CreateSkillInput | null> {
 }
 
 const buildCategoryOptions = () =>
-  (["base", "normal", "extra"] satisfies SkillCategory[]).map((value) => ({
+  SKILL_CATEGORIES.map((value) => ({
     value,
-    label: game.i18n.localize(`EMOKLORE.Item.skill.Category.${value}`),
+    label: localizeSkillCategory(value),
     // 通常技能が一番多いので既定にする
     checked: value === "normal",
   }));
