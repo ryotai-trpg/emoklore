@@ -338,6 +338,16 @@
       "Inactive": "Inactive",
       "Toggle": "Toggle"
     },
+    "Status": {
+      "unconscious": "Unconscious",
+      "cardiacArrest": "Cardiac Arrest",
+      "dead": "Dead",
+      "faint": "Faint",
+      "possessed": "Possessed",
+      "deviation": "Deviation",
+      "blind": "Blind",
+      "invisible": "Invisible"
+    },
     "Import": {
       "DialogTitle": "Import Character Sheet",
       "ImportButton": "Import",

@@ -4,6 +4,7 @@ import "../css/emoklore.css";
 import * as applications from "./applications/character-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
+import { statusEffects } from "./config/status-effects";
 import { CharacterDataModel } from "./data/character";
 import { WeaponDataModel } from "./data/item-models";
 import { WeaponCardModel } from "./data/messages/weapon-card";
@@ -14,6 +15,7 @@ import { EmokloreItem } from "./documents/item";
 import { registerQueries } from "./documents/queries";
 import { getSetting, registerSystemSettings } from "./settings";
 import { performPreLocalization } from "./utils/localization";
+import { typedEntries } from "./utils/object";
 
 Hooks.once("init", () => {
   console.log("Emo-klore TRPG | Initializing...");
@@ -48,6 +50,23 @@ Hooks.once("init", () => {
 
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;
+
+  // トークンに付けられる状態をエモクロアのものに差し替える。既定はD&D風の
+  // dead/blind/prone… で、ルールブックの【気絶】【心肺停止】などが1つも無い。
+  //
+  // 配列ごと代入せず1件ずつ出し入れするのは、v14の CONFIG.statusEffects が
+  // 添字とidの両方で引けるProxyだから。代入すると素の配列に戻り、本体が使う
+  // CONFIG.statusEffects[statusId] の形（fromStatusEffect など）が通らなくなる。
+  // idでの読み書きはProxyのtrapが配列側にも反映してくれるので、これで両立する
+  for (const id of Object.keys(CONFIG.statusEffects)) delete CONFIG.statusEffects[id];
+  for (const [id, config] of typedEntries(statusEffects)) {
+    CONFIG.statusEffects[id] = { id, ...config };
+  }
+
+  // 「撃破」として扱う状態。既定値も "dead" だが、キー名がたまたま一致している
+  // ことに頼らず明示する。残りの specialStatusEffects（invisible / blind /
+  // burrow / hover / fly）は本体の視界・探知が使うので既定のままにする
+  CONFIG.specialStatusEffects.DEFEATED = "dead";
 
   // トークンのリソースバーに出せる属性
   CONFIG.Actor.trackableAttributes = {
