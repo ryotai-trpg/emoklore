@@ -38,9 +38,10 @@
       "weapon": {}
     }
   },
+  "license": "LICENSE",
   "background": "systems/emoklore/assets/background.webp",
   "grid": {
-    "distance": "1.5",
+    "distance": 1.5,
     "units": "m"
   },
   "initiative": "@initiative",

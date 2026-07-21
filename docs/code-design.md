@@ -165,7 +165,8 @@ FoundryVTT本体はJSDocで型を持つが、実行時に定義されるプロ�
 | 見送ったもの | 実測 | 理由 |
 |---|---|---|
 | `noPropertyAccessFromIndexSignature` | 28件 | ほぼ全部 `dataset.rollType` → `dataset['rollType']`。DOMのdatasetに対して読みにくくなるだけ |
-| `lib: ESNext` | 1件 | 武器カードの `parent` のキャストが comparability を失う。ES2024までは0件なので、そちらに固定している |
+| `lib: ES2025` / `ESNext` | 1件 | 武器カードの `parent` のキャストが comparability を失う（`weapon-card.ts` の `this.parent as CardMessage`）。ES2024までは0件なので、そちらに固定している。二重キャストは禁止しているので、直すなら型述語か構造の側 |
+| `checkJs` + `tools/` `tests/` を `include` | 99件 | 内訳は `tests/live/` 78件・`tools/` 21件。前者はページに注入するグローバル（`__waitFor` など）とコールバックの暗黙 `any` で、型を付けるには注入側の宣言が要る。後者には `create-symlinks.mjs` の `value` が `undefined` になりうるなど**実在する取りこぼし**も混じっているので、別途拾う価値がある |
 | `types: ["node"]` の分離 | — | ブラウザ向けコードにNodeのグローバルが載るが、ルートの `vite.config.ts` が同じ `include` にあるため tsconfig を分ける必要がある |
 | Biome `preset: all` | 700件超 | `useNamingConvention` 116 / `noMagicNumbers` 51 / `noConsole` 36 / `noTernary` 26 と、大半がノイズ |
 | Biome `noUnnecessaryConditions` | — | `actor-sheet` の `switch` を unreachable と誤検出する。Biomeは型情報を持たないため `dataset.rollType` を推論できない。**実機で3経路とも通ることを確認済み** |

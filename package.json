@@ -1,17 +1,18 @@
 {
   "type": "module",
+  "private": true,
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.4",
+    "@biomejs/biome": "2.5.4",
     "@types/node": "^26.1.1",
     "handlebars": "^4.7.9",
     "lefthook": "^2.1.10",
     "typescript": "^7.0.2",
     "vite": "^8.1.5",
     "vite-plugin-static-copy": "^4.1.1",
-    "vitepress": "^2.0.0-alpha.12",
+    "vitepress": "2.0.0-alpha.18",
     "vitest": "^4.1.10"
   },
   "scripts": {
