@@ -179,11 +179,13 @@ FoundryVTT本体はJSDocで型を持つが、実行時に定義されるプロ�
 |---|---|---|
 | `noPropertyAccessFromIndexSignature` | 28件 | ほぼ全部 `dataset.rollType` → `dataset['rollType']`。DOMのdatasetに対して読みにくくなるだけ |
 | `lib: ES2025` / `ESNext` | 1件 | 武器カードの `parent` のキャストが comparability を失う（`weapon-card.ts` の `this.parent as CardMessage`）。ES2024までは0件なので、そちらに固定している。二重キャストは禁止しているので、直すなら型述語か構造の側 |
-| `checkJs` + `tools/` `tests/` を `include` | 99件 | 内訳は `tests/live/` 78件・`tools/` 21件。前者はページに注入するグローバル（`__waitFor` など）とコールバックの暗黙 `any` で、型を付けるには注入側の宣言が要る。後者には `create-symlinks.mjs` の `value` が `undefined` になりうるなど**実在する取りこぼし**も混じっているので、別途拾う価値がある |
+| `checkJs` + `tools/` `tests/` を `include` | 99件 | 内訳は `tests/live/` 78件・`tools/` 21件（`tools/` は再計測時点で27件）。どちらもページに注入するグローバル（`__waitFor` など）とコールバックの暗黙 `any` が大半で、型を付けるには注入側の宣言が要る |
 | `types: ["node"]` の分離 | — | ブラウザ向けコードにNodeのグローバルが載るが、ルートの `vite.config.ts` が同じ `include` にあるため tsconfig を分ける必要がある |
 | Biome `preset: all` | 700件超 | `useNamingConvention` 116 / `noMagicNumbers` 51 / `noConsole` 36 / `noTernary` 26 と、大半がノイズ |
 | Biome `noUnnecessaryConditions` | — | `actor-sheet` の `switch` を unreachable と誤検出する。Biomeは型情報を持たないため `dataset.rollType` を推論できない。**実機で3経路とも通ることを確認済み** |
 | Biome `useAwait` | 7件 | 本体API契約上 `async` が必須のハンドラを咎める |
 | Biome `useImportExtensions` | 90件 | bundlerの解決方式と噛み合わない |
+
+`tools/` の `checkJs` については、かつてここに「`create-symlinks.mjs` の `value` が `undefined` になりうるなど**実在する取りこぼし**が混じっている」と書いていたが、**これは誤りだったので撤回する**。27件を1件ずつ当たった結果、内訳は暗黙 `any` の注釈不足（TS7006 が10件ほか）と `catch` の `unknown`（TS18046 が2件）と `const config = {}` の索引付け（TS2339 / TS7053）で、**実行時に壊れるものは1件も無かった**。名指しされていた `value` も、直前の正規表現が `(.+?)` でマッチ済みなので `undefined` にはならない。件数だけ見て「この中に本物がある」と推定したのが間違いで、**件数は当たるべき対象の量であって、中身の証拠ではない**。
 
 Biomeは型情報を持たないので、型に関する検査はすべて `tsc` 側にある。組み込みルールに無いものは**GritQLプラグインで書けることがある**（二重キャストの禁止がそれ）。「Biomeでは無理」と決める前にプラグインを検討すること。
