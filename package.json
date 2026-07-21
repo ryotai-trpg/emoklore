@@ -5,7 +5,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.4",
+    "@biomejs/biome": "2.5.5",
     "@types/node": "^26.1.1",
     "handlebars": "^4.7.9",
     "lefthook": "^2.1.10",
