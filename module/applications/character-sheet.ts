@@ -1,10 +1,4 @@
 import { systemPath } from "../constants";
-import {
-  CHARACTERISTIC_MAX,
-  CHARACTERISTIC_MIN,
-  SKILL_LEVEL_MAX,
-  SKILL_LEVEL_MIN,
-} from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import {
@@ -13,6 +7,12 @@ import {
   calculateTotalSkillPoints,
   SKILL_POINT_MAX,
 } from "../rules/character-points";
+import {
+  CHARACTERISTIC_MAX,
+  CHARACTERISTIC_MIN,
+  SKILL_LEVEL_MAX,
+  SKILL_LEVEL_MIN,
+} from "../rules/limits";
 import { getSetting, setSetting } from "../settings";
 import { prepareActiveEffectCategories } from "../utils/effects";
 import { typedEntries } from "../utils/object";

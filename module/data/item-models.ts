@@ -1,10 +1,10 @@
 import {
   type AttackSkillKey,
   attackSkillChoices,
-  attackSkills,
   type DamageDie,
   type RangeType,
 } from "../config/attack-skills";
+import { resolveAttackSkill } from "../utils/weapon";
 import { EmokloreSystemDataModel } from "./system-model";
 
 const { HTMLField, StringField } = foundry.data.fields;
@@ -64,9 +64,7 @@ export class WeaponDataModel extends EmokloreSystemDataModel {
   override prepareDerivedData() {
     super.prepareDerivedData();
 
-    // 技能が未知のキーなら近接の既定に倒す。choices で弾かれるはずだが、
-    // 手書きのデータやCONFIGを触るモジュールで壊れないようにしておく
-    const config = attackSkills[this.skill] ?? attackSkills.fight;
+    const config = resolveAttackSkill(this.skill);
 
     this.rangeType = config.rangeType;
     this.damageDie = config.damageDie;

@@ -56,6 +56,14 @@ const definitions = {
 
 export type AttackSkillKey = keyof typeof definitions;
 
+/**
+ * 攻撃技能のキーかどうか。
+ *
+ * 武器カードの skill は choices を持たない StringField なので、保存データやフックが
+ * 宣言した型を裏切りうる。引く前にここを通す
+ */
+export const isAttackSkillKey = (value: string): value is AttackSkillKey => value in definitions;
+
 // satisfies だけだと各値が個別の狭い型に推論されるため、値の型は AttackSkillConfig に揃える。
 // キーは literal のまま保たれるので AttackSkillKey が使える
 export const attackSkills: Record<AttackSkillKey, AttackSkillConfig> = definitions;

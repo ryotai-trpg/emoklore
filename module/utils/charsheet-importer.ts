@@ -1,4 +1,5 @@
 import type { EmokloreActor } from "../documents/actor";
+import { SKILL_LEVEL_MAX, SKILL_LEVEL_MIN } from "../rules/limits";
 import { typedEntries } from "./object";
 
 /**
@@ -104,10 +105,6 @@ export function parseEmotions(memo: string, index: Record<string, string>): Pars
  * 全角・半角も両方受ける。
  */
 const SPECIALIZATION_PATTERN = /^(.+?)\s*(?:[（(]\s*(.*?)\s*[）)]|[：:]\s*(.*))$/;
-
-/** 技能レベルの下限・上限。スキーマの skills.*.level と揃える */
-const SKILL_LEVEL_MIN = 0;
-const SKILL_LEVEL_MAX = 3;
 
 export type ParsedSkills = {
   /** 技能キー → レベル */

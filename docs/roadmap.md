@@ -73,18 +73,20 @@ v14専用に移行します（v13サポートは打ち切り）。
 | `chip.css` | 5 | 4 |
 | `character-sheet.css` | 8 | 5 |
 | `meter.css` | 11 | 4 |
-| `field-list.css` | 3 | 0 |
-| `data-table.css` | 14 | 0 |
+| `field-list.css` | 2 | 1 |
+| `data-table.css` | 12 | 5 |
+
+`field-list.css` と `data-table.css` の数字は、等値なものをトークンに置き換えたあとの再計測（`margin` / `padding` / `gap` / `font-size` を数えている）。残りは丸め先の判断が要るもの。
 
 優先度の高い順に、残っている不揃いは次のとおり。
 
-1. **フォントサイズの単位がばらばら** — `meter.css` と `data-table.css` に `1.1em` / `0.8em` / `1.5rem` / `14px` / `13px` / `12px` / `font-size: small` が混在する。4種類の単位系が同居していて、特に `small` は実寸がブラウザ依存。本体は `--font-size-10` から `--font-size-80` まで17段を持ち、`12px` / `13px` / `14px` はそのまま対応するトークンがある。機械的に置き換えられるので最初に片付けたい
-2. **角丸が本体と噛み合っていない** — 自前は 5px / 2px / 10px を定義しているが、本体で最も多いのは 4px（34箇所）、次いで 3px（26）。実際、変数を使わず直書きした2箇所（`data-table.css` の 3px、`sidebar.css` の 4px）はどちらも本体寄りの値を選んでおり、変数のほうが浮いている。値を本体に寄せるかどうかの判断が要る
-3. **`data-table.css` と `field-list.css` が丸ごと手つかず** — 効果タブと経歴タブ。`5px` / `10px` / `20px` など本体のスケール（2/4/8/12/16）に無い値が残る
-4. **経歴タブが本体と綱引きしている** — `character-sheet.css` が `.standard-form` の `.form-group` を `flex-direction: column; gap: 0px` で丸ごと打ち消している。ダイアログを `standard-form` に載せて手書きを減らしたのと逆方向の状態がここだけ残る。本体には `.form-group.stacked` があるので寄せられるかもしれない
-5. **`min-width: 601px` の根拠が不明** — 既定幅を760pxに広げ、サイドバーも畳めるようになった今、この下限が妥当かは未検証
+1. ~~**フォントサイズの単位がばらばら**~~ — 等値で置換できる分は対応済み。`data-table.css` の `14px` / `13px` / `12px` を `--font-size-14` / `-13` / `-12` にした。**残るのは `meter.css` の4件で、いずれも丸めの判断が要る**。`1.1em`（継承14pxに対し15.4px。トークンは15と16しかない）、`0.8em`（11.2px）、`small`（≒13pxだが絶対キーワードなので親の `1.1em` の影響を受けず、トークン化すると親子関係が変わる）、`1.5rem`（`--font-size-24` と等値だが直上の `--button-size: 2.25rem` と釣り合っており、トークン化すると狭幅でグリフだけ縮む）
+2. **角丸が本体と噛み合っていない** — 自前は 5px / 2px / 10px を定義しているが、本体で最も多いのは 4px（34箇所）、次いで 3px（26）、2px（16）、5px（13）、10px（3）。**本体には角丸のCSS変数が1つも無い**（`--*radius*` は0件）ので、これは他の項目と違って「本体トークンに寄せる」解が存在せず、生値を本体の分布に寄せるかどうかの判断にしかならない。分布を見ると 5px も本体に13箇所あり、浮いているのは実質 `10px` だけ。変数を使わず直書きしているのは4箇所（`data-table.css` の 3px、`sidebar.css` の 4px、`weapon-sheet.css` の 4px、`weapon-card.css` の 4px）
+3. **`data-table.css` と `field-list.css` に本体スケール外の値が残る** — 効果タブと経歴タブ。等値な `2px` / `8px` は `--spacer-2` / `-8` にしたが、`5px` / `6px` / `10px` / `20px` など本体のスケール（2/4/8/12/16）に無い値は丸め先の判断が要るので残してある。あわせて `data-table.css` の `height: 28px`（文字が入る箱の固定px）と `grid-template-columns` の `70px`（アイコンボタン2個ぶん。`--button-size` から導けるか）も判断待ち
+4. **経歴タブが本体と綱引きしている** — `character-sheet.css` が `.standard-form` の `.form-group` を `flex-direction` / `align-items` / `gap` の3プロパティで打ち消し、さらに `.form-group.stacked` で `flex-direction: row` に戻している（本体の stacked は `flex-wrap` と子の `flex: 0 0 100%` で成立するので、column にすると壊れるため）。打ち消しの打ち消しになっている。本体の `.form-group.stacked` は実在し（`formGroup` ヘルパが `stacked` を受ける）、`biography.hbs` の `formGroup` に `stacked=true` を渡せばCSSの2ブロックを丸ごと削除できる。**ただしラベルと入力の間に本体の `gap: 0.5rem`（8px）が入るので見た目が変わる**。現状10項目のうち HTMLField の `note` だけ本体が自動で stacked を付けている
+5. **`min-width: 601px` が妥当か未検証** — 根拠は履歴から判明した。`3ab0fcd`（2025-10-11）で **既定幅そのもの**として 601 が入り（当時は横に一切縮められない設定だった）、`a5070ee` で既定幅を760pxに変えたときに据え置かれた。**内容の実寸から導いた下限ではない。** サイドバー250pxと padding 32px を引くとタブ側に残るのは約317pxで、そこで破綻しないかは実機でしか決まらない
 
-`gap: 0px` が3箇所あるが、これはマジックナンバーというより本体の `standard-form` が入れる間隔を打ち消した跡で、4番と同じ話に含まれる。
+`gap: 0px` は2箇所。`character-sheet.css` のものは4番の打ち消しの一部だが、`field-list.css` にあったものは打ち消す対象が無い no-op だったので削除した。
 
 ### 正式版に向けて
 
