@@ -1,0 +1,89 @@
+{{!--
+  変更行1つ。本体の change.hbs を置き換えたもの。
+
+  属性キーは「対象」と「種類」の2つの選択から組み立てて hidden に入れる。
+  `name` を持つのはその hidden だけなので、送信されるのは常に組み立て済みのキー1つ。
+  組み立ては active-effect-config.ts の #syncKey が行う。
+
+  @param change          本体が組み立てた変更（*Path 付き）
+  @param targetGroups    対象の選択肢。optgroup ごとの配列
+  @param aspects         修正の種類（ダイスボーナス／判定値／成功数）
+  @param phases          適用の段階（initial / final）
+  @param selectedTarget  いま選ばれている対象。読み取れないキーなら rawKeyTargetId
+  @param selectedAspect  いま選ばれている種類
+  @param isRawKey        キーを直接書くモードか
+--}}
+<li class="em-effect-change" data-index="{{index}}" data-change-row>
+  {{! 送信されるのはこれだけ。2つの選択にも生入力にも name は付けない }}
+  <input type="hidden" name="{{change.keyPath}}" value="{{change.key}}" data-change-key />
+
+  <div class="em-effect-change__target">
+    <select data-change-key-part="target" aria-label='{{localize "EMOKLORE.Effect.Target"}}'>
+      {{! 足したばかりの行はここが選ばれている。選ぶまでキーは空のまま }}
+      <option value="" disabled {{#if isNew}}selected{{/if}}>
+        {{localize "EMOKLORE.Effect.TargetGroup.unselected"}}
+      </option>
+      {{#each targetGroups as |group|}}
+        <optgroup label="{{group.label}}">
+          {{#each group.options as |option|}}
+            <option
+              value="{{option.value}}"
+              {{#if (eq option.value @root.selectedTarget)}}selected{{/if}}
+            >{{option.label}}</option>
+          {{/each}}
+        </optgroup>
+      {{/each}}
+    </select>
+  </div>
+
+  <div class="em-effect-change__aspect">
+    <select
+      data-change-key-part="aspect"
+      aria-label='{{localize "EMOKLORE.Effect.Aspect.Label"}}'
+      {{#if isRawKey}}hidden{{/if}}
+    >
+      {{#each aspects as |aspect|}}
+        <option
+          value="{{aspect.value}}"
+          {{#if (eq aspect.value @root.selectedAspect)}}selected{{/if}}
+        >{{aspect.label}}</option>
+      {{/each}}
+    </select>
+
+    {{! 選択式で扱えないキー（system.initiative など）の逃げ道 }}
+    <input
+      type="text"
+      data-change-key-part="raw"
+      value="{{change.key}}"
+      aria-label='{{localize "EFFECT.FIELDS.changes.element.key.label"}}'
+      placeholder="system.initiative"
+      {{#unless isRawKey}}hidden{{/unless}}
+    />
+  </div>
+
+  <div class="em-effect-change__type">
+    {{formInput fields.type name=change.typePath value=change.type choices=changeTypes}}
+  </div>
+
+  <div class="em-effect-change__value">
+    {{formInput fields.value name=change.valuePath value=change.value elementType="input"}}
+  </div>
+
+  <div class="em-effect-change__phase">
+    {{formInput fields.phase name=change.phasePath value=change.phase choices=phases
+                labelAttr="label" valueAttr="value"}}
+  </div>
+
+  <div class="em-effect-change__priority">
+    {{formInput fields.priority name=change.priorityPath value=change.priority
+                placeholder=defaultPriority}}
+  </div>
+
+  <div class="em-effect-change__controls">
+    <button
+      type="button"
+      class="inline-control icon fa-solid fa-trash"
+      data-action="deleteChange"
+    ></button>
+  </div>
+</li>

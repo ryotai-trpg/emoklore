@@ -1,6 +1,7 @@
 // このimportがビルド時のCSS出力のトリガになる。外すと dist/emoklore.css が
 // 生成されず、system.json の styles が指す先がなくなる（型の宣言は types/css.d.ts）
 import "../css/emoklore.css";
+import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
 import * as applications from "./applications/character-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
@@ -101,6 +102,18 @@ Hooks.once("init", () => {
       types: ["weapon"],
       makeDefault: true,
       label: "EMOKLORE.Sheet.class.weapon",
+    },
+  );
+
+  // 効果の設定シート。属性キーを手打ちさせないための差し替えで、種別は base 一択
+  DocumentSheetConfig.registerSheet(
+    ActiveEffect,
+    "emoklore",
+    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
+    EmokloreActiveEffectConfig as unknown as typeof foundry.applications.api.ApplicationV2,
+    {
+      makeDefault: true,
+      label: "EMOKLORE.Sheet.class.activeEffect",
     },
   );
 });

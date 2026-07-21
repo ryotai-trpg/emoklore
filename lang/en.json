@@ -27,7 +27,8 @@
     "Sheet": {
       "class": {
         "character": "Character Sheet",
-        "weapon": "Weapon Sheet"
+        "weapon": "Weapon Sheet",
+        "activeEffect": "Effect Sheet"
       },
       "toggleMode": "Toggle Play/Edit mode",
       "character": {
@@ -336,7 +337,30 @@
       "Temporary": "Temporary",
       "Passive": "Passive",
       "Inactive": "Inactive",
-      "Toggle": "Toggle"
+      "Toggle": "Toggle",
+      "Target": "Target",
+      "TargetGroup": {
+        "global": "Global",
+        "everyRoll": "Every Roll",
+        "characteristics": "Characteristics",
+        "skillGroups": "Skill Groups",
+        "skills": "Skills",
+        "baseSkills": "Base Skills",
+        "other": "Other",
+        "rawKey": "Enter a key directly",
+        "unselected": "Choose…"
+      },
+      "Aspect": {
+        "Label": "Modifies",
+        "bonus": "Dice Bonus",
+        "target": "Target Number",
+        "success": "Successes"
+      },
+      "Phase": {
+        "Label": "Phase",
+        "initial": "Normal",
+        "final": "After Derivation"
+      }
     },
     "Status": {
       "unconscious": "Unconscious",
