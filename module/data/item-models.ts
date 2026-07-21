@@ -7,6 +7,7 @@ import {
 import { type CharacteristicKey, characteristicChoices } from "../config/characteristics";
 import { type SkillCategory, skillCategoryChoices } from "../config/skill-categories";
 import { type SkillGroupKey, skillGroupChoices } from "../config/skill-groups";
+import { calculateCustomSkillLevel } from "../rules/derived-values";
 import { SKILL_LEVEL_MAX, SKILL_LEVEL_MIN } from "../rules/limits";
 import { resolveAttackSkill } from "../utils/weapon";
 import { EmokloreSystemDataModel } from "./system-model";
@@ -161,7 +162,7 @@ export class SkillDataModel extends EmokloreSystemDataModel {
 
     this.isBase = this.category === "base";
     this.isExtra = this.category === "extra";
-    this.effectiveLevel = this.isBase ? 1 : this.level;
+    this.effectiveLevel = calculateCustomSkillLevel(this.isBase, this.level);
 
     if (!this.characteristicOptions.has(this.characteristic)) {
       // 集合が空になることは required で防いでいるが、値が無ければ既定に戻す

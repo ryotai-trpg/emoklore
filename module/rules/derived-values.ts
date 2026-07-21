@@ -30,6 +30,33 @@ export function calculateBaseSkillTarget(key: string, characteristicValue: numbe
 }
 
 /**
+ * カスタム技能の判定に使うレベル。
+ *
+ * ベース技能はレベルという概念を持たず、判定のダイス数は常に1になる。組込の基本技能が
+ * スキーマで `min: 1, max: 1` に固定しているのと同じ扱いを、区分を値で持つカスタム技能では
+ * 読む側で行う（Itemのスキーマは全インスタンス共通なので、区分ごとに範囲を変えられない）。
+ */
+export function calculateCustomSkillLevel(isBase: boolean, level: number): number {
+  return isBase ? 1 : level;
+}
+
+/**
+ * カスタム技能の目標値。
+ *
+ * ベース技能は能力値がそのまま目標値になり、それ以外は技能レベルを足す。組込の基本技能に
+ * ある〈手当〉の半減のような技能ごとの例外は持たない（区分しか持たないため表現できない）。
+ */
+export function calculateCustomSkillTarget(
+  isBase: boolean,
+  level: number,
+  characteristicValue: number,
+): number {
+  return isBase
+    ? characteristicValue
+    : calculateSkillTarget(calculateCustomSkillLevel(isBase, level), characteristicValue);
+}
+
+/**
  * HP最大値。基礎値に身体を足す。
  */
 export function calculateMaxHp(physical: number): number {

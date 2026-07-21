@@ -5,6 +5,15 @@ export type ModifierSet = {
   target: number;
 };
 
+/**
+ * 何も修正しない組。
+ *
+ * どの技能グループにも属さないカスタム技能のように、修正の出どころが存在しない
+ * 系統を合算に渡すときに使う。`resolveSkillRoll` は4系統が必ず揃っている前提なので、
+ * 呼び出し側で分岐させず「効かない修正」を渡す形にしている。
+ */
+export const NO_MODIFIER: ModifierSet = Object.freeze({ bonus: 0, success: 0, target: 0 });
+
 /** 判定1回分の確定した内容。Roll を組み立てるのに必要な値がすべて入っている */
 export type RollSpec = {
   /** 振るダイスの数 */

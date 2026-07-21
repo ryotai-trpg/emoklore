@@ -4,6 +4,8 @@ import type { SkillGroupKey } from "../config/skill-groups";
 import { isSkillKey, type SkillKey } from "../config/skills";
 import {
   calculateBaseSkillTarget,
+  calculateCustomSkillLevel,
+  calculateCustomSkillTarget,
   calculateInitiative,
   calculateMaxHp,
   calculateMaxMp,
@@ -18,11 +20,12 @@ import {
   SKILL_LEVEL_MIN,
 } from "../rules/limits";
 import type { SkillRollParams } from "../rules/skill-roll";
-import type { ModifierSet } from "../rules/types";
+import { type ModifierSet, NO_MODIFIER } from "../rules/types";
 import { typedEntries } from "../utils/object";
+import type { SkillDataModel } from "./item-models";
 import { EmokloreSystemDataModel } from "./system-model";
 
-const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
+const { HTMLField, NumberField, SchemaField, StringField, TypedObjectField } = foundry.data.fields;
 
 /**
  * どの技能を振るか。
@@ -33,7 +36,11 @@ const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields
  * 受け取った側は as で名乗り直すしかなかった。判別可能unionにして、
  * 種別とキーが必ず対応するようにする。
  */
-export type SkillRef = { kind: "skill"; key: SkillKey } | { kind: "base"; key: BaseSkillKey };
+export type SkillRef =
+  | { kind: "skill"; key: SkillKey }
+  | { kind: "base"; key: BaseSkillKey }
+  /** カスタム技能。表ではなく所持アイテムに居るので、キーではなくアイテムのidで指す */
+  | { kind: "custom"; id: string };
 
 /**
  * 外から来た文字列を SkillRef に変える。キーとして通らなければ null。
@@ -44,6 +51,37 @@ export type SkillRef = { kind: "skill"; key: SkillKey } | { kind: "base"; key: B
 export const resolveSkillRef = (key: string, { base }: { base: boolean }): SkillRef | null => {
   if (base) return isBaseSkillKey(key) ? { kind: "base", key } : null;
   return isSkillKey(key) ? { kind: "skill", key } : null;
+};
+
+/**
+ * カスタム技能1件ぶんのミラー。
+ *
+ * `data/` から `documents/` は参照しない決まりなので、元になる skill アイテムは
+ * 構造的に受ける（`SkillItemLike`）。
+ */
+export type CustomSkillEntry = {
+  /** 判定に使うレベル。ベース技能は常に1 */
+  level: number;
+  characteristic: CharacteristicKey;
+  mod: ModifierSet;
+  /** 表示名。アイテムの名前をそのまま使う */
+  label: string;
+  isBase: boolean;
+  isExtra: boolean;
+  /** どのグループにも属さないものは "" */
+  group: SkillGroupKey | "";
+  /** 選べる能力値。2件以上ならシートに選択欄が出る */
+  characteristicOptions: CharacteristicKey[];
+  /** prepareDerivedData が入れる */
+  target: number;
+};
+
+/** ミラーの元になる skill アイテム。documents/ を参照しないため構造で受ける */
+type SkillItemLike = {
+  id: string | null;
+  name: string;
+  type: string;
+  system: SkillDataModel;
 };
 
 /** 技能判定に必要な、アクターから集めた一式 */
@@ -205,6 +243,35 @@ const defineCharacterDataModelSchema = () => ({
     ),
   ),
 
+  /**
+   * カスタム技能の判定に使う値。**正はアクターではなく所持している skill アイテム**で、
+   * ここは `prepareBaseData` が毎回作り直すミラー。
+   *
+   * わざわざアクター側に写しているのは、本体が Item に `applyActiveEffects` を持たないため
+   * （`client/documents/actor.mjs` にしか無い）。効果は `actor.system.*` にしか着地できないので、
+   * 「〈忍術〉の判定に+1」を組込技能と同じように書けるようにするには受け皿がここに要る。
+   * 既存の `mod` が `persisted: false` の着地点でしかないのと同じ考え方の延長。
+   *
+   * `TypedObjectField` なのでキーを実行時に増やせる。本体の `getFieldForProperty` は
+   * `_source` を渡して解決するため、保存しないこの表でも効果は DataField 経由で乗る。
+   */
+  customSkills: new TypedObjectField(
+    new SchemaField({
+      // ベース技能は常に1が入る（calculateCustomSkillLevel が決める）
+      level: new NumberField({
+        min: SKILL_LEVEL_MIN,
+        max: SKILL_LEVEL_MAX,
+        initial: 0,
+        integer: true,
+        required: true,
+        nullable: false,
+      }),
+      characteristic: new StringField({ required: true }),
+      mod: modifierField(),
+    }),
+    { persisted: false },
+  ),
+
   skillGroups: new SchemaField(
     Object.fromEntries(
       typedEntries(CONFIG.EMOKLORE.skillGroups).map(([group]) => [
@@ -283,6 +350,14 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
     }
   >;
 
+  /**
+   * カスタム技能のミラー。キーは skill アイテムのid。
+   *
+   * `level` / `characteristic` / `mod` はスキーマにあり効果を当てられる。残りは
+   * アイテム側から写しただけの表示・計算用で、スキーマには無い（効果の対象にもならない）。
+   */
+  declare customSkills: Record<string, CustomSkillEntry>;
+
   /** 判定すべてに効く修正 */
   declare mod: ModifierSet;
 
@@ -314,8 +389,64 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
 
   static override LOCALIZATION_PREFIXES = ["EMOKLORE.Actor.character"];
 
+  /**
+   * カスタム技能のミラーを所持アイテムから作り直す。
+   *
+   * ここで作るのは、この直後の `prepareEmbeddedDocuments` が
+   * `applyActiveEffects("initial")` を走らせるため。効果が着地する時点で受け皿が
+   * 出来ていないと「〈忍術〉に+1」が行き場を失う。
+   *
+   * 毎回まっさらから作る。`prepareData` はデータモデルを作り直さないので、
+   * 前回の内容を残すと消したはずの技能が居座る。
+   */
+  override prepareBaseData() {
+    super.prepareBaseData();
+
+    this.customSkills = {};
+
+    for (const item of this.#skillItems()) {
+      // 保存済みの埋め込みアイテムなので id は必ずある
+      if (!item.id) continue;
+      const { category, characteristic, characteristicOptions, group, level } = item.system;
+      const isBase = category === "base";
+
+      this.customSkills[item.id] = {
+        level: calculateCustomSkillLevel(isBase, level),
+        characteristic,
+        mod: { bonus: 0, success: 0, target: 0 },
+        label: item.name,
+        isBase,
+        isExtra: category === "extra",
+        group,
+        characteristicOptions: [...characteristicOptions],
+        // prepareDerivedData が入れ直す
+        target: 0,
+      };
+    }
+  }
+
+  /**
+   * 所持しているカスタム技能のアイテム。
+   *
+   * `TypeDataModel#parent` は Document 止まりで埋め込みコレクションが型に出ないため、
+   * ここで1回だけ絞る（`data/messages/weapon-card.ts` の `this.parent as CardMessage` と同じ扱い）。
+   */
+  #skillItems(): SkillItemLike[] {
+    const actor = this.parent as { items?: Iterable<SkillItemLike> };
+
+    return [...(actor.items ?? [])].filter((item) => item.type === "skill");
+  }
+
   override prepareDerivedData() {
     super.prepareDerivedData();
+
+    for (const skill of Object.values(this.customSkills)) {
+      skill.target = calculateCustomSkillTarget(
+        skill.isBase,
+        skill.level,
+        this.characteristics[skill.characteristic].value,
+      );
+    }
 
     for (const skill of Object.values(this.skills)) {
       skill.target = calculateSkillTarget(
@@ -356,6 +487,19 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
    * 「どの値を渡すか」を決めるだけで、表示用の整形は呼び出し側に任せる。
    */
   getSkillRollContext(ref: SkillRef): SkillRollContext {
+    if (ref.kind === "custom") {
+      const entry = this.customSkills[ref.id];
+      // アイテムを消した直後のクリックなど、ミラーに居ないidで呼ばれうる
+      if (!entry) throw new Error(`emoklore | カスタム技能が見つかりません: ${ref.id}`);
+
+      return {
+        params: this.#toRollParams(entry, entry.group || null),
+        label: entry.label,
+        isBase: entry.isBase,
+        isExtra: entry.isExtra,
+      };
+    }
+
     if (ref.kind === "base") {
       const { label, group } = CONFIG.EMOKLORE.baseSkills[ref.key];
       // 基本技能に isExtra / specialization はない
@@ -380,9 +524,11 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
   }
 
   /**
-   * 技能・基本技能に共通する、判定に効く値の取り出し。
+   * 技能・基本技能・カスタム技能に共通する、判定に効く値の取り出し。
    *
    * 技能グループは保存データではなく CONFIG.EMOKLORE 側の定義なので引数で受ける。
+   * カスタム技能はどのグループにも属さないことがあるので `null` を許し、
+   * そのときはグループ修正の代わりに効かない組を渡す。
    */
   #toRollParams(
     entry: {
@@ -391,14 +537,14 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
       characteristic: CharacteristicKey;
       mod: ModifierSet;
     },
-    group: SkillGroupKey,
+    group: SkillGroupKey | null,
   ): SkillRollParams {
     return {
       level: entry.level,
       baseTarget: entry.target,
       skillMod: entry.mod,
       characteristicMod: this.characteristics[entry.characteristic].mod,
-      skillGroupMod: this.skillGroups[group].mod,
+      skillGroupMod: group ? this.skillGroups[group].mod : NO_MODIFIER,
       globalMod: this.mod,
     };
   }

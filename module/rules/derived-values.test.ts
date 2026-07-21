@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateBaseSkillTarget,
+  calculateCustomSkillLevel,
+  calculateCustomSkillTarget,
   calculateInitiative,
   calculateMaxHp,
   calculateMaxMp,
@@ -34,6 +36,41 @@ describe("calculateBaseSkillTarget", () => {
 
   it("〈手当〉は能力値1でも1を下回らない", () => {
     expect(calculateBaseSkillTarget("treatment", 1)).toBe(1);
+  });
+});
+
+describe("calculateCustomSkillLevel", () => {
+  it("通常・エクストラ技能は保存されているレベルをそのまま使う", () => {
+    expect(calculateCustomSkillLevel(false, 2)).toBe(2);
+    expect(calculateCustomSkillLevel(false, 0)).toBe(0);
+  });
+
+  it("ベース技能はレベルを持たないので常に1", () => {
+    expect(calculateCustomSkillLevel(true, 0)).toBe(1);
+    // 区分を通常からベースへ変えたあと、古いレベルが残っていても引きずらない
+    expect(calculateCustomSkillLevel(true, 3)).toBe(1);
+  });
+});
+
+describe("calculateCustomSkillTarget", () => {
+  it("通常・エクストラ技能は技能レベルと能力値を足す", () => {
+    expect(calculateCustomSkillTarget(false, 2, 4)).toBe(6);
+  });
+
+  it("未修得なら能力値がそのまま目標値になる", () => {
+    expect(calculateCustomSkillTarget(false, 0, 4)).toBe(4);
+  });
+
+  it("ベース技能は能力値がそのまま目標値になる", () => {
+    expect(calculateCustomSkillTarget(true, 0, 4)).toBe(4);
+  });
+
+  it("ベース技能はレベルが残っていても目標値に足さない", () => {
+    expect(calculateCustomSkillTarget(true, 3, 4)).toBe(4);
+  });
+
+  it("組込の〈手当〉のような半減は持たない", () => {
+    expect(calculateCustomSkillTarget(true, 0, 4)).toBe(4);
   });
 });
 
