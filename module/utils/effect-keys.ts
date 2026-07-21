@@ -19,6 +19,8 @@ export const MODIFIER_COLLECTIONS = [
   "skillGroups",
   "skills",
   "baseSkills",
+  // カスタム技能。キーは技能アイテムのidで、固定表と違って中身はアクターごとに変わる
+  "customSkills",
 ] as const;
 export type ModifierCollection = (typeof MODIFIER_COLLECTIONS)[number];
 
@@ -40,8 +42,10 @@ export type ModifierChangeKey = {
 /** 適用先を選択肢の値ひとつで表すときの文字列。全体は `global` */
 export const GLOBAL_TARGET_ID = "global";
 
+// キー部が数字始まりも許すのは、カスタム技能のキーが本体の16文字IDだから。
+// randomID の charset は A-Za-z0-9 で、先頭が数字になることがある
 const MODIFIER_KEY_PATTERN =
-  /^system\.(?:(characteristics|skillGroups|skills|baseSkills)\.([A-Za-z][A-Za-z0-9]*)\.)?mod\.(bonus|target|success)$/;
+  /^system\.(?:(characteristics|skillGroups|skills|baseSkills|customSkills)\.([A-Za-z0-9]+)\.)?mod\.(bonus|target|success)$/;
 
 /** `{ 適用先, 種類 }` から属性キーを組み立てる */
 export const composeModifierKey = ({ target, aspect }: ModifierChangeKey): string =>

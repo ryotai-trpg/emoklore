@@ -55,6 +55,22 @@ describe("parseModifierKey", () => {
         aspect: "bonus",
       },
     ],
+    // カスタム技能のキーは本体の16文字ID。固定表と違って綴りを検査できない
+    [
+      "system.customSkills.cI9j4anXNzVnsxK3.mod.target",
+      {
+        target: { kind: "collection", collection: "customSkills", key: "cI9j4anXNzVnsxK3" },
+        aspect: "target",
+      },
+    ],
+    // randomID の charset は A-Za-z0-9 なので先頭が数字になることがある
+    [
+      "system.customSkills.7fQ2zWm0aBcDeFgH.mod.bonus",
+      {
+        target: { kind: "collection", collection: "customSkills", key: "7fQ2zWm0aBcDeFgH" },
+        aspect: "bonus",
+      },
+    ],
   ];
 
   for (const [key, expected] of cases) {
@@ -111,5 +127,15 @@ describe("composeTargetId / parseTargetId", () => {
     expect(parseTargetId("unknownTable.foo")).toBeNull();
     expect(parseTargetId("skills")).toBeNull();
     expect(parseTargetId("")).toBeNull();
+  });
+
+  it("カスタム技能はアイテムのidをキーにして往復できる", () => {
+    const target = {
+      kind: "collection",
+      collection: "customSkills",
+      key: "cI9j4anXNzVnsxK3",
+    } as const;
+    expect(composeTargetId(target)).toBe("customSkills.cI9j4anXNzVnsxK3");
+    expect(parseTargetId("customSkills.cI9j4anXNzVnsxK3")).toEqual(target);
   });
 });
