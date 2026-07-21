@@ -271,13 +271,3 @@ export type WeaponContext = {
   systemFields: Record<string, foundry.data.fields.DataField>;
   flags: Record<string, unknown>;
 };
-
-export type EmokloreCharacterSheetActions = {
-  viewDoc: (event: Event, target: HTMLElement) => Promise<void>;
-  createDoc: (event: Event, target: HTMLElement) => Promise<void>;
-  deleteDoc: (event: Event, target: HTMLElement) => Promise<void>;
-  toggleEffect: (event: Event, target: HTMLElement) => Promise<void>;
-  roll: (event: Event, target: HTMLElement) => Promise<unknown>;
-  // mixin側のDEFAULT_OPTIONSから継承チェーン経由でマージされるので、各シートでの宣言は任意
-  toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
-};
