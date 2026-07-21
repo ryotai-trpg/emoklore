@@ -109,6 +109,19 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 | `*Ref` | 「どれを指すか」だけを持つ参照 | `SkillRef` |
 | `Emoklore*` | 本体のクラス・型を拡張したもの | `EmokloreActor` `EmokloreRoll` |
 
+## 名前の綴り
+
+**機械で守れるものはBiomeに書いてある**（`useNamingConvention` / `useFilenamingConvention`）。ここには、そのうえで人が判断する必要がある分だけ書く。
+
+- **頭字語は大文字のまま綴る**。`noteHTML` `CharSheetJSON` `formatDMPart` のように `Html` `Json` へ倒さない。本体APIが `enrichHTML` / `toJSON` / `HTMLField` と綴るので、そちらと地続きにしておくほうが読み替えが要らない。Biome側は `strictCase: false` で合わせてある
+- **ただし `id` は例外で、`Id` と綴る**（`partId` `actorId` `itemId` `effectId`）。`partId` は本体ApplicationV2の綴りで、本体もこちら側。**頭字語だから大文字、と機械的に広げないこと**
+- **モジュール定数はSCREAMING_SNAKE**（`SYSTEM_ID` `SUCCESS_MODIFIER` `SKILL_LEVEL_MAX` `HP_BASE`）。定数として並べるオブジェクトのキーも同じでよい（`{ PLAY: 1, EDIT: 2 }`）。**Biomeは `const` に camelCase も CONSTANT_CASE も許すのでこれは機械で守れない。** 人が見るしかない
+- **ファイルとディレクトリはkebab-case**。例外なく守られている（実測で違反0件）ので、`useFilenamingConvention` で固定してある
+- **`Emoklore*` を付けるのは、本体クラスを継承して本体の同名概念を置き換えるものだけ**。`EmokloreActor` `EmokloreRoll` `EmokloreCharacterSheet` がそれで、本体に `Actor` `Roll` `ActorSheet` があるから区別が要る。`CharacterDataModel` や `CharSheetImportDialog` のように本体に同名の概念が無いものには付けない
+- **`rules/` の動詞は3つに絞る**。`calculate*` は数式（`calculateMaxHp`）、`resolve*` は入力から一意に決まる導出（`resolveSkillRoll`）、`build*` は複合物の組み立て（`buildDamageFormula`）
+
+`lang/*.json` のキーは名前空間をPascalCaseで切り、その下は camelCase にする（`EMOKLORE.Sheet.character.tab`）。**ドットを含むキーを1本の文字列で書かない** — 本体は読めるが、木として辿れなくなる。configのテーブルに対応する名前空間は、テーブル名と同じ複数形にする（`Actor.skillGroups`）。
+
 ## アサーション（`as`）の使いどころ
 
 **`as` は本体APIとの境界に寄せる。** 実測でキャストは58箇所あるが、**`config/` と `rules/` には1つも無い**。これは偶然ではなく、この2層がFoundryに依存しないから起きている。逆に、純粋なはずの層にキャストが現れたら、それは型付けの失敗ではなく層の設計が崩れている合図になる。

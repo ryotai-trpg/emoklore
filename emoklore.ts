@@ -66,7 +66,7 @@ Hooks.once("init", () => {
     {
       types: ["character"],
       makeDefault: true,
-      label: "EMOKLORE.SheetClass.character",
+      label: "EMOKLORE.Sheet.class.character",
     },
   );
 
@@ -78,7 +78,7 @@ Hooks.once("init", () => {
     {
       types: ["weapon"],
       makeDefault: true,
-      label: "EMOKLORE.SheetClass.weapon",
+      label: "EMOKLORE.Sheet.class.weapon",
     },
   );
 });

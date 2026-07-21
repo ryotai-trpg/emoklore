@@ -1,6 +1,6 @@
-export const systemID = "emoklore" as const;
+export const SYSTEM_ID = "emoklore" as const;
 
 /**
  * リポジトリ内のパスを、Foundryが解決できる Data 配下のパスに変換する。
  */
-export const systemPath = (path: string): string => `systems/${systemID}/${path}`;
+export const systemPath = (path: string): string => `systems/${SYSTEM_ID}/${path}`;

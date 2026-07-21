@@ -1,4 +1,4 @@
-import { systemID } from "./constants";
+import { SYSTEM_ID } from "./constants";
 
 interface EmokloreSettings {
   developerMode: boolean;
@@ -29,7 +29,7 @@ type CoreSettingConfig = Parameters<typeof game.settings.register>[2];
 
 const register = (key: keyof EmokloreSettings, config: SettingRegistration): void => {
   // biome-ignore lint: 本体の SettingConfig は登録後の形なので、登録時の形とは重ならない
-  game.settings.register(systemID, key, config as unknown as CoreSettingConfig);
+  game.settings.register(SYSTEM_ID, key, config as unknown as CoreSettingConfig);
 };
 
 export function registerSystemSettings(): void {
@@ -63,12 +63,12 @@ export function registerSystemSettings(): void {
 }
 
 export function getSetting<K extends keyof EmokloreSettings>(key: K): EmokloreSettings[K] {
-  return game.settings.get(systemID, key) as EmokloreSettings[K];
+  return game.settings.get(SYSTEM_ID, key) as EmokloreSettings[K];
 }
 
 export async function setSetting<K extends keyof EmokloreSettings>(
   key: K,
   value: EmokloreSettings[K],
 ): Promise<void> {
-  await game.settings.set(systemID, key, value);
+  await game.settings.set(SYSTEM_ID, key, value);
 }

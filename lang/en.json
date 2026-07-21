@@ -24,19 +24,22 @@
     "Common": {
       "colon": ": "
     },
-    "SheetClass": {
-      "character": "Character Sheet",
-      "weapon": "Weapon Sheet"
-    },
-    "CharacterSheet": {
-      "tab": {
-        "biography": "Biography",
-        "skills": "Skills",
-        "items": "Items",
-        "effects": "Effects"
+    "Sheet": {
+      "class": {
+        "character": "Character Sheet",
+        "weapon": "Weapon Sheet"
       },
-      "fields": {
-        "specialization": "Specialization"
+      "toggleMode": "Toggle Play/Edit mode",
+      "character": {
+        "tab": {
+          "biography": "Biography",
+          "skills": "Skills",
+          "items": "Items",
+          "effects": "Effects"
+        },
+        "fields": {
+          "specialization": "Specialization"
+        }
       }
     },
     "Item": {
@@ -79,7 +82,6 @@
         "Applied": "{name} HP: {before} → {after}"
       }
     },
-    "SHEET.ToggleMode": "Toggle Play/Edit mode",
     "emotionAttributes": {
       "desire": "Desire",
       "passion": "Passion",
@@ -265,7 +267,7 @@
         "sociality": "Sociality",
         "fortune": "Fortune"
       },
-      "skillGroup": {
+      "skillGroups": {
         "investigation": "Investigation",
         "perception": "Perception",
         "negotiations": "Negotiations",

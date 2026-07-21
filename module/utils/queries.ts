@@ -12,7 +12,7 @@
  * draw-steel の `DrawSteelSocketHandler` と同じ形。
  */
 
-import { systemID } from "../constants";
+import { SYSTEM_ID } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
 import type { DamageApplied } from "./chat";
 
@@ -33,7 +33,7 @@ type QueryableUser = { query: (name: string, data: unknown) => Promise<unknown> 
 export function registerQueries(): void {
   const queries = CONFIG.queries as Record<string, (data: unknown) => Promise<unknown>>;
 
-  queries[systemID] = async (data) => {
+  queries[SYSTEM_ID] = async (data) => {
     const query = data as Partial<ApplyDamageQuery> | null;
     if (query?.type !== "applyDamage") return null;
 
@@ -71,7 +71,7 @@ export async function applyDamageToTargets(
     amount,
   };
 
-  return (await gm.query(systemID, query)) as DamageApplied[];
+  return (await gm.query(SYSTEM_ID, query)) as DamageApplied[];
 }
 
 /** UUIDで引いたアクターに適用する。委譲を受けた側の入口 */

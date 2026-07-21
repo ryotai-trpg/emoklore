@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { EmotionAttributesConfig } from "../config/emotion-attributes";
-import type { ResonantEmotionsConfig } from "../config/resonant-emotions";
+import type { EmotionAttributeConfig } from "../config/emotion-attributes";
+import type { ResonantEmotionConfig } from "../config/resonant-emotions";
 import {
   BIOGRAPHY_FIELDS,
   BIOGRAPHY_PAIRED_COUNT,
@@ -10,12 +10,12 @@ import {
 } from "./helpers";
 
 // performPreLocalization 済みの CONFIG を模す。label は翻訳済みの文字列になっている
-const resonantEmotions: Record<string, ResonantEmotionsConfig> = {
+const resonantEmotions: Record<string, ResonantEmotionConfig> = {
   possession: { label: "独占", attribute: "desire" },
   hope: { label: "希望", attribute: "ideal" },
 };
 
-const emotionAttributes: Record<string, EmotionAttributesConfig> = {
+const emotionAttributes: Record<string, EmotionAttributeConfig> = {
   desire: { label: "欲望" },
   ideal: { label: "理想" },
 };

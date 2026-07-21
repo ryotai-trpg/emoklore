@@ -12,7 +12,7 @@
 }
 
 /* 式の行に添える成功数修正。式本体より控えめにする */
-.dice-roll .dice-formula .success-mod {
+.dice-roll .dice-formula .em-success-mod {
   margin-left: 0.4rem;
   opacity: 0.7;
   font-size: var(--font-size-12);
