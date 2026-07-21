@@ -11,23 +11,18 @@ import {
   clampToMax,
   normalizeResonance,
 } from "../rules/derived-values";
+import {
+  CHARACTERISTIC_MAX,
+  CHARACTERISTIC_MIN,
+  SKILL_LEVEL_MAX,
+  SKILL_LEVEL_MIN,
+} from "../rules/limits";
 import type { SkillRollParams } from "../rules/skill-roll";
 import type { ModifierSet } from "../rules/types";
 import { typedEntries } from "../utils/object";
 import { EmokloreSystemDataModel } from "./system-model";
 
 const { HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
-
-/**
- * 能力値と技能レベルの取りうる範囲。
- *
- * スキーマのバリデーションと、シートの段入力（何段出すか）の両方がこれを見る。
- * 別々に書くと片方だけ変えたときに黙ってずれるので、ここを正にする。
- */
-export const CHARACTERISTIC_MIN = 1;
-export const CHARACTERISTIC_MAX = 6;
-export const SKILL_LEVEL_MIN = 0;
-export const SKILL_LEVEL_MAX = 3;
 
 /**
  * どの技能を振るか。
