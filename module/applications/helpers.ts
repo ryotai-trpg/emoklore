@@ -1,5 +1,5 @@
-import type { EmotionAttributesConfig } from "../config/emotion-attributes";
-import type { ResonantEmotionsConfig } from "../config/resonant-emotions";
+import type { EmotionAttributeConfig } from "../config/emotion-attributes";
+import type { ResonantEmotionConfig } from "../config/resonant-emotions";
 import type { BiographyFieldDef, BiographyRow, EmotionKey, EmotionRow } from "./types";
 
 /**
@@ -84,8 +84,8 @@ export const createEmotionOptions = (): Array<{ value: string; label: string; gr
  */
 export const getEmotionRows = (
   emotions: Record<string, string | undefined>,
-  resonantEmotions: Record<string, ResonantEmotionsConfig>,
-  emotionAttributes: Record<string, EmotionAttributesConfig>,
+  resonantEmotions: Record<string, ResonantEmotionConfig>,
+  emotionAttributes: Record<string, EmotionAttributeConfig>,
 ): Record<EmotionKey, EmotionRow> => {
   const rows = {} as Record<EmotionKey, EmotionRow>;
 

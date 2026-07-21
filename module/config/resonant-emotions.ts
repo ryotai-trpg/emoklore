@@ -1,6 +1,6 @@
 import type { EmotionAttributeKey } from "./emotion-attributes";
 
-export interface ResonantEmotionsConfig {
+export interface ResonantEmotionConfig {
   label: string;
   attribute: EmotionAttributeKey;
 }
@@ -198,10 +198,10 @@ const definitions = {
     label: "EMOKLORE.resonantEmotions.inferiorityComplex",
     attribute: "wound",
   },
-} satisfies Record<string, ResonantEmotionsConfig>;
+} satisfies Record<string, ResonantEmotionConfig>;
 
 export type ResonantEmotionKey = keyof typeof definitions;
 
-// satisfies だけだと各値が個別の狭い型に推論されるため、値の型は ResonantEmotionsConfig に揃える。
+// satisfies だけだと各値が個別の狭い型に推論されるため、値の型は ResonantEmotionConfig に揃える。
 // キーは literal のまま保たれるので ResonantEmotionKey が使える
-export const resonantEmotions: Record<ResonantEmotionKey, ResonantEmotionsConfig> = definitions;
+export const resonantEmotions: Record<ResonantEmotionKey, ResonantEmotionConfig> = definitions;
