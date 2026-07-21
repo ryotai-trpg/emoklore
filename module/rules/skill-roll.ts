@@ -8,12 +8,14 @@ export type SkillRollParams = {
   skillMod: ModifierSet;
   characteristicMod: ModifierSet;
   skillGroupMod: ModifierSet;
+  /** 判定すべてに効く修正。「全ての技能は判定値-2される」のような、範囲で切れないもの */
+  globalMod: ModifierSet;
 };
 
 /**
  * 技能判定の内容を決める。
  *
- * 技能・能力値・技能グループの3系統の修正値を合算し、
+ * 技能・能力値・技能グループ・全体の4系統の修正値を合算し、
  * ダイス数（レベル+ボーナス）と目標値（基準値+目標値修正）を出す。
  */
 export function resolveSkillRoll({
@@ -22,10 +24,15 @@ export function resolveSkillRoll({
   skillMod,
   characteristicMod,
   skillGroupMod,
+  globalMod,
 }: SkillRollParams): RollSpec {
-  const bonus = skillMod.bonus + characteristicMod.bonus + skillGroupMod.bonus;
-  const targetMod = skillMod.target + characteristicMod.target + skillGroupMod.target;
-  const successMod = skillMod.success + characteristicMod.success + skillGroupMod.success;
+  const mods = [skillMod, characteristicMod, skillGroupMod, globalMod];
+  const sum = (pick: (mod: ModifierSet) => number) =>
+    mods.reduce((total, mod) => total + pick(mod), 0);
+
+  const bonus = sum((mod) => mod.bonus);
+  const targetMod = sum((mod) => mod.target);
+  const successMod = sum((mod) => mod.success);
 
   return {
     diceCount: level + bonus,

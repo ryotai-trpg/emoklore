@@ -29,13 +29,21 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | パス | 型 | 既定 | 意味 |
 |---|---|---|---|
 | `resources.hp.value` | NumberField | 11 | 現在HP |
-| `resources.hp.max` | NumberField | 11 | 最大HP。**毎回上書きされる**（下の導出値を参照） |
+| `resources.hp.max` | NumberField | 11 | 最大HP。**保存しない**（下の導出値を参照） |
 | `resources.mp.value` | NumberField | 2 | 現在MP |
-| `resources.mp.max` | NumberField | 2 | 最大MP。**毎回上書きされる** |
+| `resources.mp.max` | NumberField | 2 | 最大MP。**保存しない** |
 | `resources.resonance.value` | NumberField | 1 | 共鳴値。1未満にはならない |
 | `resources.resonance.max` | NumberField | 9 | 共鳴値の上限。こちらは計算しないので手で決める |
 
-`hp.max` と `mp.max` はスキーマ上は書き込めるが、`prepareDerivedData` が能力値から計算し直すので書いた値は残らない。取り込みも書いているが、同じ理由で効いていない。
+`hp.max` と `mp.max` は `persisted: false` を付けてある。`prepareDerivedData` が能力値から計算し直すので、書いても次の準備で捨てられる値だった。スキーマには残っているので[効果](/active-effect)の適用先にはでき、`phase: "final"` なら上書きが残る。
+
+**保存しないだけで、読むぶんには普通のフィールド**。シートもトークンバーも `system.resources.hp.max` をそのまま読む。
+
+### `system.mod`
+
+判定すべてに効く修正。`mod` の3つ（`bonus` / `success` / `target`）だけを持ち、シートには出ない。
+
+ルールブックの極限共鳴（ハウリング）には「全ての技能は判定値-2される」のように、能力値でも技能でも技能グループでも切り分けられない修正が繰り返し出てくる。それを受ける場所がこれ。他の `mod` と同じく `persisted: false`。
 
 ### `system.characteristics.<能力値>`
 
@@ -46,7 +54,9 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | `characteristics.<k>.mod.success` | NumberField | 既定0 | 成功数への修正 |
 | `characteristics.<k>.mod.target` | NumberField | 既定0 | 目標値への修正 |
 
-`mod` の3つはシートから編集できない。ActiveEffectの適用先として存在している。この組は能力値・技能・基本技能・技能グループの4箇所に出てくるので `modifierField()` にまとめてある。
+`mod` の3つはシートから編集できない。ActiveEffectの適用先として存在している。この組は全体・能力値・技能・基本技能・技能グループの5箇所に出てくるので `modifierField()` にまとめてある。
+
+**`mod` は保存しない**（`persisted: false`）。効果の着地点としてしか使わないので、保存すると全部0のフィールドがアクター1体につき64組×3値ぶん並ぶだけになる。スキーマには残るので効果は本来の経路で乗り、効果値のRoll評価も整数の検証も効く。
 
 キーは8種:
 
@@ -189,7 +199,9 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 
 `hp.value` / `mp.value` は `max` を超えないよう毎回丸める。
 
-**`initiative` だけはスキーマにフィールドが無い。** `declare` で型に足しているだけだが、`system.json` の `"initiative": "@initiative"` から参照されるので、消すとイニシアチブが振れなくなる。
+導出値のうち `resources.hp.max` / `resources.mp.max` / `initiative` は**スキーマにフィールドがあり、保存だけしない**（`persisted: false`）。かつて `initiative` はスキーマに無く `declare` だけで足していたが、それだと効果を当てたとき本体が値の型を推測する経路に落ち、効果値のRoll評価も整数の検証も効かなかった。
+
+`skills.<k>.target` と `baseSkills.<k>.target` はいまもスキーマに無く `declare` だけ。効果を当てること自体はできるが、上の3つと違って検証を伴わない。
 
 ## Item `weapon`
 
