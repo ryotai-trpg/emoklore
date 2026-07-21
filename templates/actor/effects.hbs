@@ -18,7 +18,10 @@
               {{#if (eq section.type "inactive")}}
                 data-disabled="true"
               {{else if (eq section.type "temporary")}}
-                data-duration.rounds="1"
+                {{! v14 の duration は {value, units} 。rounds/turns/seconds の直指定は
+                    スキーマから消えており、data-duration.rounds では何も入らなかった }}
+                data-duration.value="1"
+                data-duration.units="rounds"
               {{/if}}
               data-tooltip='{{localize "DOCUMENT.Create" type=""}}'
             >

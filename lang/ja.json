@@ -339,6 +339,16 @@
       "Inactive": "無効",
       "Toggle": "切替"
     },
+    "Status": {
+      "unconscious": "気絶",
+      "cardiacArrest": "心肺停止",
+      "dead": "死亡",
+      "faint": "失神",
+      "possessed": "憑依",
+      "deviation": "逸脱",
+      "blind": "盲目",
+      "invisible": "不可視"
+    },
     "Import": {
       "DialogTitle": "キャラクターシートインポート",
       "ImportButton": "インポート",
