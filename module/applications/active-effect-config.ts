@@ -127,7 +127,11 @@ export class EmokloreActiveEffectConfig extends foundry.applications.sheets.Acti
     const coreRow = await super._renderChange(context);
     if (!context.changeType) return coreRow;
 
-    const parsed = parseModifierKey(context.change.key ?? "");
+    const key = context.change.key ?? "";
+    const parsed = parseModifierKey(key);
+    // 「＋」で足したばかりの行はキーが空。読み取れないからといって生入力に倒すと、
+    // 行を足すたびに選択式でない画面が出てしまう。未選択として選択式のまま出す
+    const isNew = key === "";
 
     return foundry.applications.handlebars.renderTemplate(
       systemPath("templates/apps/effect-change.hbs"),
@@ -139,11 +143,12 @@ export class EmokloreActiveEffectConfig extends foundry.applications.sheets.Acti
           label: game.i18n.localize(`EMOKLORE.Effect.Aspect.${aspect}`),
         })),
         phases: this.#buildPhaseOptions(),
-        // 読み取れないキーは選択式で表せないので、生の入力に倒す
-        selectedTarget: parsed ? composeTargetId(parsed.target) : RAW_KEY_TARGET_ID,
+        // 読み取れないキーは選択式で表せないので、生の入力に倒す。
+        // ただし空（新しい行）は「まだ選んでいない」であって「表せない」ではない
+        selectedTarget: parsed ? composeTargetId(parsed.target) : isNew ? "" : RAW_KEY_TARGET_ID,
         selectedAspect: parsed?.aspect ?? MODIFIER_ASPECTS[0],
-        isRawKey: !parsed,
-        rawKeyTargetId: RAW_KEY_TARGET_ID,
+        isRawKey: !parsed && !isNew,
+        isNew,
       },
     );
   }
@@ -196,6 +201,13 @@ export class EmokloreActiveEffectConfig extends foundry.applications.sheets.Acti
 
     if (isRaw) {
       key.value = raw.value;
+      return;
+    }
+
+    // 未選択のまま。本体は空のキーを持つ変更を適用の対象から外すので、
+    // 選ばずに保存しても何も起きない
+    if (target.value === "") {
+      key.value = "";
       return;
     }
 

@@ -347,7 +347,8 @@
         "skills": "Skills",
         "baseSkills": "Base Skills",
         "other": "Other",
-        "rawKey": "Enter a key directly"
+        "rawKey": "Enter a key directly",
+        "unselected": "Choose…"
       },
       "Aspect": {
         "Label": "Modifies",

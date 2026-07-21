@@ -19,6 +19,10 @@
 
   <div class="em-effect-change__target">
     <select data-change-key-part="target" aria-label='{{localize "EMOKLORE.Effect.Target"}}'>
+      {{! 足したばかりの行はここが選ばれている。選ぶまでキーは空のまま }}
+      <option value="" disabled {{#if isNew}}selected{{/if}}>
+        {{localize "EMOKLORE.Effect.TargetGroup.unselected"}}
+      </option>
       {{#each targetGroups as |group|}}
         <optgroup label="{{group.label}}">
           {{#each group.options as |option|}}

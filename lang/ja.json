@@ -348,7 +348,8 @@
         "skills": "技能",
         "baseSkills": "基本技能",
         "other": "その他",
-        "rawKey": "キーを直接指定"
+        "rawKey": "キーを直接指定",
+        "unselected": "選んでください"
       },
       "Aspect": {
         "Label": "修正先",
