@@ -23,7 +23,9 @@ export const getEmbeddedDocument = (
   target: HTMLElement,
   actor: EmokloreActor,
 ): EmbeddedSheetDocument | null => {
-  const docRow = target.closest("li[data-document-class]") as HTMLElement & {
+  // 要素名は問わない。アイテムタブと効果タブは li だが、技能タブの行は
+  // 技能一覧の subgrid に載るため li にできない
+  const docRow = target.closest("[data-document-class]") as HTMLElement & {
     dataset: DOMStringMap;
   };
 

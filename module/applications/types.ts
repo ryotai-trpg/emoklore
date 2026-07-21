@@ -90,6 +90,42 @@ export type BiographyRow = {
   html: boolean;
 };
 
+/**
+ * カスタム技能1行の表示用データ。
+ *
+ * 組込技能（SkillRow）と違ってスキーマのフィールドを渡さない。編集の出し分けは
+ * 「フィールドがあるか」ではなく「選べる能力値が2件以上か」で決まるため。
+ */
+export type CustomSkillRow = {
+  /** 元になる skill アイテムのid。編集・削除・判定はこれで引く */
+  id: string;
+  /** アイテムの名前をそのまま使う */
+  label: string;
+  /** 区分の印。ベースは `＊`、エクストラは `★`、通常は空 */
+  marker: string;
+  level: number;
+  target: number;
+  isBase: boolean;
+  /** 技能ポイントを倍で数えるかの判断に使う。表示側は marker を見る */
+  isExtra: boolean;
+  characteristic: CharacteristicKey;
+  /** 能力値の表示名。選べるものが1件のときに出す */
+  characteristicLabel: string;
+  /** 能力値のFont Awesomeアイコンクラス */
+  characteristicIcon: string;
+  /** 2件以上あれば選択欄を出す。1件なら表示名だけ */
+  characteristicOptions: Array<{ value: string; label: string; selected: boolean }>;
+  hasCharacteristicChoice: boolean;
+  /**
+   * 段入力のラジオをまとめる name。保存しないミラーのパスを指す。
+   *
+   * 実際の書き込みは selectSegment がアイテムへ回す。フォームに載っても
+   * `persisted: false` の枠なので本体が捨てる（保存データには出ない）
+   */
+  name: string;
+  levelSegments: ValueSegment[];
+};
+
 /** 基本技能の表示用データ。判定のトリガとして1行1ボタンで並べる */
 export type BaseSkillRow = {
   key: string;
@@ -227,6 +263,10 @@ export type CharacterContext = {
   sidebarCollapsed?: boolean;
   skills?: Record<string, SkillRow>;
   baseSkills?: BaseSkillRow[];
+  /** 技能リストに並べるカスタム技能（通常・エクストラ、編集モードではベースも） */
+  customSkills?: CustomSkillRow[];
+  /** 基本技能のチップ列に並べるカスタム技能（ベース区分のみ、閲覧モードだけ） */
+  customBaseSkills?: CustomSkillRow[];
   skillPointSum?: number;
   skillPointMax?: number;
   // 経歴は横並びの組（年齢・性別）と、それ以降を分けて渡す

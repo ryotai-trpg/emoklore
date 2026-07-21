@@ -14,4 +14,27 @@
     {{> "systems/emoklore/templates/actor/partials/skill-row-edit.hbs" skill=skill key=key}}
     {{/if}}
   {{/each}}
+
+  {{! カスタム技能は組込技能の後ろに続ける。区分ごとに別の枠へ分けないのは、
+      判定を探すときに「まず区分を思い出す」手間を作らないため }}
+  {{#each customSkills as |skill|}}
+    {{#if @root.isPlay}}
+      {{#if skill.level}}
+      {{> "systems/emoklore/templates/actor/partials/custom-skill-row-play.hbs" skill=skill}}
+      {{/if}}
+    {{else}}
+    {{> "systems/emoklore/templates/actor/partials/custom-skill-row-edit.hbs" skill=skill}}
+    {{/if}}
+  {{/each}}
 </div>
+
+{{! 作成は編集モードだけ出す。技能まわりのUIはすべてモードで絞っており、
+    権限で絞っているアイテムタブ・効果タブとは基準が別 }}
+{{#unless isPlay}}
+<div class="em-skill-list__footer">
+  <button type="button" class="em-skill-create" data-action="createSkill">
+    <i class="fa-solid fa-plus"></i>
+    {{localize "EMOKLORE.Skill.CreateButton"}}
+  </button>
+</div>
+{{/unless}}

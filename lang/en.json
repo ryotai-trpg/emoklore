@@ -437,6 +437,13 @@
       "triple": "Triple Success",
       "miracle": "Miracle Success",
       "catastrophe": "Catastrophe"
+    },
+    "Skill": {
+      "Name": "Skill Name",
+      "CreateTitle": "Create Skill",
+      "CreateButton": "Create Skill",
+      "NoLevel": "—",
+      "NamePlaceholder": "e.g. Ninjutsu"
     }
   },
   "USER": {

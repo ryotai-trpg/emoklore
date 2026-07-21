@@ -437,6 +437,13 @@
       "triple": "トリプル成功",
       "miracle": "ミラクル成功",
       "catastrophe": "カタストロフ"
+    },
+    "Skill": {
+      "Name": "技能名",
+      "CreateTitle": "技能を作成",
+      "CreateButton": "技能を作成",
+      "NoLevel": "—",
+      "NamePlaceholder": "例: 忍術"
     }
   },
   "USER": {

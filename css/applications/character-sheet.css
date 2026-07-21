@@ -78,6 +78,13 @@
     min-width: 0;
   }
 
+  /* 作成ボタンは技能リストの外側にあるので、リスト側の padding が効かない。
+     左右はリストと同じ量に合わせ、上は技能行との間を空ける */
+  .em-skill-list__footer {
+    padding: 0 var(--spacer-8) var(--spacer-8);
+    margin-block-start: var(--spacer-4);
+  }
+
   /* アイテムタブは名前より式のほうが長いので、部品の既定（2fr 1fr 1fr）から
      配分を変える。列の内訳は置く側が決める（部品は位置決めを持たない） */
   .tab.items {
