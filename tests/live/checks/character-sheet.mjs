@@ -41,8 +41,13 @@ export async function run({ page, check }) {
       async (tag) => {
         const sheet = game.actors.getName(`${tag}_char`).sheet;
         // 技能行の根っこは両モード共通で .em-skill-row。判定ボタン（data-roll-type）は
-        // 閲覧モードにしか無いので、モードを跨いで数えるにはこちらを使う
-        const count = () => sheet.element.querySelectorAll(".em-skill-row").length;
+        // 閲覧モードにしか無いので、モードを跨いで数えるにはこちらを使う。
+        //
+        // カスタム技能（.em-skill-row--custom）は組込の35件に含まれないので除く。
+        // 除かないと、このチェックより先にカスタム技能を作った検証があるかどうかで
+        // 結果が変わる（実際 custom-skill.mjs が2本作る）
+        const count = () =>
+          sheet.element.querySelectorAll(".em-skill-row:not(.em-skill-row--custom)").length;
 
         // 閲覧モードは修得済みの技能だけを出す。取得していない技能まで並べると
         // プレイ中に読めなくなるため

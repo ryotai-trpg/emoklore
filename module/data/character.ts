@@ -396,8 +396,9 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
    * `applyActiveEffects("initial")` を走らせるため。効果が着地する時点で受け皿が
    * 出来ていないと「〈忍術〉に+1」が行き場を失う。
    *
-   * 毎回まっさらから作る。`prepareData` はデータモデルを作り直さないので、
-   * 前回の内容を残すと消したはずの技能が居座る。
+   * 空の表から作り直す。実測では `prepareData` のたびにスキーマの `initialize` が
+   * 新しいオブジェクトを渡してくるので前回の内容は残らないが、それに寄りかからず
+   * 「所持しているアイテムがすべて」であることをここで明示しておく。
    */
   override prepareBaseData() {
     super.prepareBaseData();

@@ -10,6 +10,7 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 |---|---|---|
 | Actor | `character` | `CharacterDataModel` |
 | Item | `weapon` | `WeaponDataModel` |
+| Item | `skill` | `SkillDataModel` |
 | ChatMessage | `weapon` | `WeaponCardModel` |
 
 **種別は `system.json` の `documentTypes` と `CONFIG.*.dataModels` の両方に書く。** 片方だけでは噛み合わない。`documentTypes` に無い種別を `dataModels` に登録すると、作成できないのに `system` の型だけが増えて嘘になる（警告も出ない）。
@@ -150,6 +151,24 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | `handiwork` | 細工 | 器用 | 特殊 |
 | `luck` | 幸運 | 運勢 | 特殊 |
 
+### `system.customSkills.<アイテムid>`
+
+カスタム技能（Item `skill`）を判定に繋ぐための表。**保存しない**（`persisted: false`）。
+
+正はアイテム側で、ここは `prepareBaseData` が所持している skill アイテムから毎回作り直す。写しているのは、**本体が Item に `applyActiveEffects` を持たない**ため（`client/documents/actor.mjs` にしかない）。効果は `actor.system.*` にしか着地できないので、「〈忍術〉の判定に+1」を組込技能と同じように書くには受け皿がアクター側に要る。既存の `mod` が効果の着地点でしかないのと同じ考え方。
+
+`TypedObjectField` なのでキーを実行時に増やせる。本体の `getFieldForProperty` は `_source` を添えて解決するため、保存しないこの表でも効果は DataField 経由で乗る（Roll評価も整数の検証も効く）。
+
+| パス | 型 | 制約 | 意味 |
+|---|---|---|---|
+| `customSkills.<id>.level` | NumberField | 0〜3 | 判定に使うレベル。**ベース区分は常に1** |
+| `customSkills.<id>.characteristic` | StringField | | 判定に使う能力値 |
+| `customSkills.<id>.mod.*` | NumberField | 既定0 | 能力値と同じ3つ |
+
+`label` / `isBase` / `isExtra` / `group` / `characteristicOptions` / `target` もアイテムから写して載せているが、**スキーマには無い**（効果の対象にはできない）。
+
+キーがアイテムのidなので、**技能を消して作り直すと、その技能を指していた効果は宙に浮く**。
+
 ### `system.skillGroups.<グループ>`
 
 `mod` の3つだけを持つ。シートには出ず、ActiveEffectで「調査系すべてに+1」のようにまとめて修正するために存在する。
@@ -231,6 +250,34 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | `secretTechnique` | 奥義 | 近接 | d6 | 使わない |
 | `throw` | 投擲 | 遠隔 | なし | 使う |
 | `rangedAttack` | 射撃 | 遠隔 | なし | 使わない |
+
+## Item `skill`
+
+カスタム技能。ルールブックが技能一覧のページで認めている「シナリオや舞台設定などに合わせたオリジナルの技能」を置く器で、組込の35技能＋13基本技能とは別に、キャラクターごとに持つ。
+
+Itemにしてあるのは、コンペンディウムに入れて配ったり他のキャラクターへドラッグで渡したりを本体任せにできるため。**システムはコンペンディウムを同梱していない**が、ワールド内に自分で作れば配布も受け渡しも動く（`ActorSheetV2#_onDropItem` が処理する）。
+
+| パス | 型 | 制約 | 意味 |
+|---|---|---|---|
+| `category` | StringField | `base` / `normal` / `extra`、既定 `normal` | 区分 |
+| `characteristicOptions` | SetField(StringField) | 能力値8種、1件以上 | 取りうる参照能力値 |
+| `characteristic` | StringField | 能力値8種 | 判定に使う能力値 |
+| `group` | StringField | 技能グループ7種、空可 | 所属する技能グループ |
+| `level` | NumberField | 0〜3、既定0 | 技能レベル。**ベース区分では使わない** |
+| `notes` | HTMLField | | 備考。`htmlFields` に宣言済み |
+
+`characteristicOptions` が2件以上あるとシートに能力値の選択欄が出て、1件なら表示だけになる。組込技能は `choices` の有無というスキーマの形で出し分けているが、Itemのスキーマは全インスタンス共通なので技能ごとに変えられず、**件数で決める**形にしている。
+
+区分ごとに `level` の範囲を変えることもできないので、スキーマは0〜3を許したまま読む側が固定する。派生値:
+
+| 値 | 意味 |
+|---|---|
+| `effectiveLevel` | 判定に使うレベル。ベース区分は常に1 |
+| `isBase` / `isExtra` | 区分から導く。`＊` / `★` の表記と技能ポイントの倍計算に使う |
+
+`characteristic` が `characteristicOptions` の外を指していたら `prepareDerivedData` が先頭に戻す。作者が参照能力値を絞ったあとも古い値が残ると、アクターが持たない能力値を引いてしまうため。
+
+**特化（分野）は持たない。** 組込技能の8件にある `specialization` に相当するものは無い。
 
 ## ChatMessage `weapon`
 
