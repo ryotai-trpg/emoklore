@@ -131,7 +131,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   static override TABS = {
     primary: {
       tabs: [{ id: "skills" }, { id: "biography" }, { id: "items" }, { id: "effects" }],
-      labelPrefix: "EMOKLORE.CharacterSheet.tab",
+      labelPrefix: "EMOKLORE.Sheet.character.tab",
       initial: "skills",
     },
   };
