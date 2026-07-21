@@ -11,6 +11,7 @@
 //
 // 検証を足すときは checks/ にファイルを1つ作って CHECKS に並べる。
 
+import * as activeEffect from "./checks/active-effect.mjs";
 import * as characterSheet from "./checks/character-sheet.mjs";
 import * as consoleCheck from "./checks/console.mjs";
 import * as importCheck from "./checks/import.mjs";
@@ -26,7 +27,16 @@ import { createRunner, DICE, installPageHelpers, pinDice } from "./lib/harness.m
 
 // 並び順に意味がある。土台（登録・スキーマ）から先に見て、
 // 総合（エラーの有無）は全部触ったあとで見る
-const CHECKS = [registration, schema, characterSheet, skillRoll, weapon, importCheck, consoleCheck];
+const CHECKS = [
+  registration,
+  schema,
+  characterSheet,
+  skillRoll,
+  weapon,
+  activeEffect,
+  importCheck,
+  consoleCheck,
+];
 
 const log = (msg) => console.log(msg);
 
