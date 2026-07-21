@@ -6,15 +6,28 @@
  */
 
 import {
+  type AttackSkillConfig,
   type AttackSkillKey,
   attackSkills,
   type DamageDie,
+  isAttackSkillKey,
   type RangeType,
 } from "../config/attack-skills";
 import { systemPath } from "../constants";
 import { canRollDamage } from "../rules/weapon-damage";
 
 const CARD_TEMPLATE = systemPath("templates/chat/weapon-card.hbs");
+
+/**
+ * 攻撃技能の定義を引く。未知のキーは近接の既定（〈＊格闘〉）に倒す。
+ *
+ * 未知のキーが来る経路は3つある。手書き・移行データ、CONFIG.EMOKLORE.attackSkills から
+ * キーを消したモジュール、そして emoklore.preRollAttack で skill を差し替えるモジュール。
+ * かつては引く側が4箇所それぞれに ?? を書いており、同じ入力に対して base が真偽で
+ * 食い違い、damageDie が d3 と null に割れていた。倒し先はここだけが決める
+ */
+export const resolveAttackSkill = (skill: string): AttackSkillConfig =>
+  isAttackSkillKey(skill) ? attackSkills[skill] : attackSkills.fight;
 
 /** 間合いの表示名。「近接」「遠隔」 */
 export const localizeRangeType = (rangeType: RangeType): string =>
@@ -26,8 +39,8 @@ export const localizeRangeType = (rangeType: RangeType): string =>
  * attackSkills の label は preLocalize の対象外（スキーマの choices と共有しているため）
  * なので、翻訳は引く側で行う。
  */
-export const localizeAttackSkill = (skill: AttackSkillKey): string =>
-  game.i18n.localize(attackSkills[skill]?.label ?? "");
+export const localizeAttackSkill = (skill: string): string =>
+  game.i18n.localize(resolveAttackSkill(skill).label);
 
 /**
  * 武器の射程の表示。
