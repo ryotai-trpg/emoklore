@@ -53,7 +53,7 @@
 - マッピング (Mapping): 3DM<=9 → レベル3
 - 直感 (Instinct): 2DM<=5 → レベル2
 - 観察眼 (Keen Observation): 1DM<=7 → レベル1
-- 毒味 (Taste): 1DM<=7 → レベル1
+- 毒見 (Taste): 1DM<=7 → レベル1
 - 強運 (Strong Luck): 1DM<=2 → レベル1（★マークのEX技能）
 
 ### メモ

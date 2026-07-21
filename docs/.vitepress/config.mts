@@ -29,6 +29,7 @@ export default defineConfig({
           { text: "ロードマップ", link: "/roadmap" },
           { text: "アーキテクチャ", link: "/architecture" },
           { text: "コード設計の規約", link: "/code-design" },
+          { text: "データモデル", link: "/data-model" },
           { text: "テスト方針", link: "/testing" },
           { text: "UI設計の規約", link: "/ui-design" },
           { text: "v14移行チェックリスト", link: "/v14-migration" },
