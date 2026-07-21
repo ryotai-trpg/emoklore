@@ -32,12 +32,18 @@ export class EmokloreActor extends Actor {
   declare items: foundry.utils.Collection<string, EmokloreItem>;
   declare effects: foundry.utils.Collection<string, foundry.documents.ActiveEffect>;
 
+  /**
+   * `@` で参照できる値。判定式のほか、ActiveEffectの効果値の解決にも使われる
+   * （本体の `applyActiveEffects` が `replacementData` としてこれを渡す）。
+   *
+   * `system` を展開するだけでスキーマのフィールドは一通り入る。以前は
+   * `initiative` がスキーマに無く `modifyRollData` で足していたが、
+   * 実フィールドになったので中継が要らなくなった。
+   *
+   * 展開は浅いので、入れ子は参照のまま。効果の適用途中でも現在値が読める
+   */
   override getRollData(): Record<string, unknown> {
-    const rollData = { ...this.system, flags: this.flags, name: this.name };
-
-    this.system.modifyRollData(rollData);
-
-    return rollData;
+    return { ...this.system, flags: this.flags, name: this.name };
   }
 
   /**

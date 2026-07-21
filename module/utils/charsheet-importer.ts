@@ -214,12 +214,13 @@ export async function importFromCharSheet(
         typeof status.value === "string" ? Number.parseInt(status.value, 10) : status.value;
       const max = typeof status.max === "string" ? Number.parseInt(status.max, 10) : status.max;
 
+      // HP・MPの最大値は取り込まない。能力値から prepareDerivedData が出し直すので、
+      // 書いても保存されない（スキーマ側が persisted: false）。取り込み元の最大値と
+      // 食い違うなら、原因は能力値のほうにある
       if (label === "HP") {
         updateData["system.resources.hp.value"] = value;
-        updateData["system.resources.hp.max"] = max;
       } else if (label === "MP") {
         updateData["system.resources.mp.value"] = value;
-        updateData["system.resources.mp.max"] = max;
       } else if (label === "共鳴") {
         updateData["system.resources.resonance.value"] = value;
         updateData["system.resources.resonance.max"] = max;
