@@ -5,7 +5,7 @@
  */
 
 import type { CharacteristicKey } from "../config/characteristics";
-import type { SkillCategory } from "../config/skill-categories";
+import { type SkillCategory, skillCategories } from "../config/skill-categories";
 import type { SkillGroupKey } from "../config/skill-groups";
 
 /**
@@ -17,12 +17,17 @@ import type { SkillGroupKey } from "../config/skill-groups";
 export const skillMarker = (isBase: boolean, isExtra: boolean): string =>
   isBase ? "＊" : isExtra ? "★" : "";
 
-/** カスタム技能の区分の表示名 */
+/**
+ * カスタム技能の区分の表示名。
+ *
+ * `skillCategories` の label はi18nキーのまま（スキーマの choices と共有しているので
+ * preLocalize の対象にしていない）。翻訳は引く側で行う。
+ */
 export const localizeSkillCategory = (category: SkillCategory): string =>
-  game.i18n.localize(`EMOKLORE.Item.skill.Category.${category}`);
+  game.i18n.localize(skillCategories[category].label);
 
 /** 能力値の表示名。CONFIG.EMOKLORE の label は i18nInit で翻訳済み */
-export const localizeCharacteristic = (key: CharacteristicKey): string =>
+const localizeCharacteristic = (key: CharacteristicKey): string =>
   CONFIG.EMOKLORE.characteristics[key].label;
 
 /**
@@ -34,6 +39,6 @@ export const localizeCharacteristic = (key: CharacteristicKey): string =>
 export const formatCharacteristicOptions = (options: Iterable<CharacteristicKey>): string =>
   [...options].map(localizeCharacteristic).join("／");
 
-/** 技能グループの表示名。所属しないカスタム技能は「—」 */
+/** 技能グループの表示名。所属しないカスタム技能は「なし」 */
 export const formatSkillGroup = (group: SkillGroupKey | ""): string =>
   group ? CONFIG.EMOKLORE.skillGroups[group].label : game.i18n.localize("EMOKLORE.Common.none");

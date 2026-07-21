@@ -108,7 +108,6 @@ export type CustomSkillRow = {
   isBase: boolean;
   /** 技能ポイントを倍で数えるかの判断に使う。表示側は marker を見る */
   isExtra: boolean;
-  characteristic: CharacteristicKey;
   /** 能力値の表示名。選べるものが1件のときに出す */
   characteristicLabel: string;
   /** 能力値のFont Awesomeアイコンクラス */
@@ -297,7 +296,7 @@ export type SkillContext = {
   categoryLabel: string;
   /** 参照能力値。複数あるものは「身体／器用」 */
   characteristicLabel: string;
-  /** 技能グループの翻訳済み表示名。所属しなければ「—」 */
+  /** 技能グループの翻訳済み表示名。所属しなければ「なし」 */
   groupLabel: string;
   /** レベルの行を出すか。ベース技能はレベルを持たないので出さない */
   showLevel: boolean;

@@ -272,7 +272,6 @@ Itemにしてあるのは、コンペンディウムに入れて配ったり他�
 
 | 値 | 意味 |
 |---|---|
-| `effectiveLevel` | 判定に使うレベル。ベース区分は常に1 |
 | `isBase` / `isExtra` | 区分から導く。`＊` / `★` の表記と技能ポイントの倍計算に使う |
 
 `characteristic` が `characteristicOptions` の外を指していたら `prepareDerivedData` が先頭に戻す。作者が参照能力値を絞ったあとも古い値が残ると、アクターが持たない能力値を引いてしまうため。

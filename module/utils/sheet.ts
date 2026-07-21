@@ -19,6 +19,25 @@ export type EmbeddedSheetDocument = foundry.abstract.Document & {
   disabled?: boolean;
 };
 
+/** `enrichHTML` に渡せるドキュメント。アクターでもアイテムでも同じ形で足りる */
+type EnrichSource = {
+  isOwner: boolean;
+  getRollData: () => Record<string, unknown>;
+};
+
+/**
+ * `system.json` の `htmlFields` に宣言したリッチテキストを、描画できる形にする。
+ *
+ * `@UUID` リンクやインラインロールは保存時には解決されないので、描く直前に通す。
+ * 渡すオプションはドキュメントの種別によらず同じなので、ここに1本だけ置く。
+ */
+export const enrichDocumentHTML = (doc: EnrichSource, value: string): Promise<string> =>
+  foundry.applications.ux.TextEditor.implementation.enrichHTML(value, {
+    secrets: doc.isOwner,
+    relativeTo: doc,
+    rollData: doc.getRollData(),
+  });
+
 export const getEmbeddedDocument = (
   target: HTMLElement,
   actor: EmokloreActor,

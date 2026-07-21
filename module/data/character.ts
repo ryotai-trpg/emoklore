@@ -80,7 +80,6 @@ export type CustomSkillEntry = {
 type SkillItemLike = {
   id: string | null;
   name: string;
-  type: string;
   system: SkillDataModel;
 };
 
@@ -429,13 +428,17 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
   /**
    * 所持しているカスタム技能のアイテム。
    *
+   * 種別で絞るのは本体の `itemTypes` に任せる。埋め込みコレクション側でメモ化されており
+   * （`common/abstract/embedded-collection.mjs` の `documentsByType`）、自前で毎回
+   * 全アイテムを回すより、何より「どれが技能か」を決める場所が増えない。
+   *
    * `TypeDataModel#parent` は Document 止まりで埋め込みコレクションが型に出ないため、
    * ここで1回だけ絞る（`data/messages/weapon-card.ts` の `this.parent as CardMessage` と同じ扱い）。
    */
   #skillItems(): SkillItemLike[] {
-    const actor = this.parent as { items?: Iterable<SkillItemLike> };
+    const actor = this.parent as { itemTypes?: { skill?: SkillItemLike[] } };
 
-    return [...(actor.items ?? [])].filter((item) => item.type === "skill");
+    return actor.itemTypes?.skill ?? [];
   }
 
   override prepareDerivedData() {
@@ -490,11 +493,12 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
   getSkillRollContext(ref: SkillRef): SkillRollContext {
     if (ref.kind === "custom") {
       const entry = this.customSkills[ref.id];
-      // アイテムを消した直後のクリックなど、ミラーに居ないidで呼ばれうる
+      // 呼び出し側がミラーに居ることを確かめてから来る決まり。破れたら黙って
+      // 変な判定を振るより、どのidで来たかを言って止まるほうがよい
       if (!entry) throw new Error(`emoklore | カスタム技能が見つかりません: ${ref.id}`);
 
       return {
-        params: this.#toRollParams(entry, entry.group || null),
+        params: this.#toRollParams(entry, entry.group),
         label: entry.label,
         isBase: entry.isBase,
         isExtra: entry.isExtra,
@@ -528,7 +532,7 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
    * 技能・基本技能・カスタム技能に共通する、判定に効く値の取り出し。
    *
    * 技能グループは保存データではなく CONFIG.EMOKLORE 側の定義なので引数で受ける。
-   * カスタム技能はどのグループにも属さないことがあるので `null` を許し、
+   * カスタム技能はどのグループにも属さないことがあるので `""` を許し、
    * そのときはグループ修正の代わりに効かない組を渡す。
    */
   #toRollParams(
@@ -538,7 +542,7 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
       characteristic: CharacteristicKey;
       mod: ModifierSet;
     },
-    group: SkillGroupKey | null,
+    group: SkillGroupKey | "",
   ): SkillRollParams {
     return {
       level: entry.level,

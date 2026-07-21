@@ -42,10 +42,14 @@ export type ModifierChangeKey = {
 /** 適用先を選択肢の値ひとつで表すときの文字列。全体は `global` */
 export const GLOBAL_TARGET_ID = "global";
 
+// 表の名前は MODIFIER_COLLECTIONS から組み立てる。パターンに直書きすると、表を1つ
+// 増やすたびに2箇所を揃えることになる（customSkills を足したときに実際そうなった）。
+//
 // キー部が数字始まりも許すのは、カスタム技能のキーが本体の16文字IDだから。
 // randomID の charset は A-Za-z0-9 で、先頭が数字になることがある
-const MODIFIER_KEY_PATTERN =
-  /^system\.(?:(characteristics|skillGroups|skills|baseSkills|customSkills)\.([A-Za-z0-9]+)\.)?mod\.(bonus|target|success)$/;
+const MODIFIER_KEY_PATTERN = new RegExp(
+  `^system\\.(?:(${MODIFIER_COLLECTIONS.join("|")})\\.([A-Za-z0-9]+)\\.)?mod\\.(bonus|target|success)$`,
+);
 
 /** `{ 適用先, 種類 }` から属性キーを組み立てる */
 export const composeModifierKey = ({ target, aspect }: ModifierChangeKey): string =>

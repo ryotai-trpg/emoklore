@@ -1,5 +1,5 @@
-/* アイテムシート共通のレイアウト。templates/item/header.hbs を使うシートで成立する。
-   種別固有の中身は weapon-sheet.css / skill-sheet.css が持つ */
+/* アイテムシート共通のレイアウト。templates/item/header.hbs と、
+   種別ごとの詳細（.em-item-detail）を使うシートで成立する */
 
 .emoklore.sheet.item:not(.minimized, .minimizing, .maximizing) {
   min-width: 320px;
@@ -49,6 +49,21 @@
     input {
       width: 100%;
       height: initial;
+    }
+  }
+
+  /* 種別ごとの詳細。並ぶ項目は違うが、器の余白と折り返しは共通 */
+  .em-item-detail {
+    padding: var(--spacer-8) 0;
+
+    /* 備考は長さが読めないので、折り返して器の中に収める */
+    .em-field__value {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .form-group.stacked .editor-container {
+      min-height: 8rem;
     }
   }
 }

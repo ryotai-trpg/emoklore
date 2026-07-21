@@ -6,6 +6,7 @@ import {
 } from "../../config/skill-categories";
 import { isSkillGroupKey, type SkillGroupKey } from "../../config/skill-groups";
 import { systemPath } from "../../constants";
+import { typedEntries } from "../../utils/object";
 import { localizeSkillCategory } from "../../utils/skill";
 
 const TEMPLATE = systemPath("templates/apps/create-skill.hbs");
@@ -63,7 +64,7 @@ const buildCategoryOptions = () =>
   }));
 
 const buildCharacteristicOptions = () =>
-  Object.entries(CONFIG.EMOKLORE.characteristics).map(([value, { label, fa }]) => ({
+  typedEntries(CONFIG.EMOKLORE.characteristics).map(([value, { label, fa }]) => ({
     value,
     label,
     icon: fa,
@@ -72,7 +73,7 @@ const buildCharacteristicOptions = () =>
   }));
 
 const buildGroupOptions = () =>
-  Object.entries(CONFIG.EMOKLORE.skillGroups).map(([value, { label }]) => ({ value, label }));
+  typedEntries(CONFIG.EMOKLORE.skillGroups).map(([value, { label }]) => ({ value, label }));
 
 /**
  * フォームの入力を読む。

@@ -171,6 +171,46 @@ export async function run({ page, check }) {
     ),
   );
 
+  await check("参照能力値の選択がアイテムに書かれ、目標値が付いてくる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_char`);
+        const sheet = actor.sheet;
+        const item = actor.itemTypes.skill.find((i) => i.name === `${tag}_忍術`);
+
+        await window.__setMode(sheet, "edit");
+        const select = sheet.element.querySelector(
+          `.em-skill-row--custom[data-item-id="${item.id}"] select[data-skill-characteristic]`,
+        );
+        if (!select) throw new Error("参照能力値の選択欄が出ていない（2件以上のはず）");
+
+        const before = actor.items.get(item.id).system.characteristic;
+        const next = [...select.options].map((o) => o.value).find((v) => v !== before);
+
+        // 本体のフォームの change を _onChangeForm で拾う経路。actions（クリック）には載らない
+        select.value = next;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        await window.__waitFor(() => actor.items.get(item.id).system.characteristic === next, {
+          label: "参照能力値の書き込み",
+        });
+
+        const entry = actor.system.customSkills[item.id];
+        const expected = entry.level + actor.system.characteristics[next].value;
+        await window.__setMode(sheet, "play");
+
+        const ok = entry.characteristic === next && entry.target === expected;
+        return {
+          ok,
+          detail: ok
+            ? `${before} → ${next}（目標値${entry.target}）`
+            : `ミラー=${entry.characteristic} 目標値${entry.target} 期待${expected}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
   await check("技能名をクリックすると判定が飛び、見出しに区分の印が付く", () =>
     assertInPage(
       page,
