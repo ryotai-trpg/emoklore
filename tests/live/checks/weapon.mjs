@@ -170,4 +170,54 @@ export async function run({ page, check }) {
   );
 
   await pinDice(page, DICE.alwaysHit);
+
+  // base は skill から引き直さないと、フックが技能を差し替えたときに
+  // 差し替え前の base と組み合わされる（docs/architecture.md の武器カードのフック）。
+  // 通常技能から基本技能へまたぐ差し替えでしか出ないので、境界をまたがせる
+  await check("フックが技能を差し替えても基本技能の別が食い違わない", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        // 刀は martialArt（通常技能）。これを throw（基本技能）に差し替える
+        const hookId = Hooks.on("emoklore.preRollAttack", (_message, config) => {
+          config.skill = "throw";
+        });
+
+        try {
+          const msg = await a.items.getName(`${tag}_刀`).use();
+          const id = msg.id;
+          await window.__waitFor(() => game.messages.get(id), { label: "武器カードの作成" });
+
+          await game.messages.get(id).system.rollAttack();
+          const card = await window.__waitFor(
+            () => {
+              const sys = game.messages.get(id).system;
+              return sys.successCount === null ? null : sys;
+            },
+            { soft: true, label: "差し替え後の攻撃判定" },
+          );
+
+          if (!card) {
+            // 差し替え前の base（false）で基本技能の表を引けず、判定が飛ばなかった
+            return { ok: false, detail: "差し替え後に判定が飛ばず successCount が null のまま" };
+          }
+
+          const roll = game.messages.get(id).rolls.at(-1);
+          const expected = a.system.baseSkills.throw.target;
+          // em はカスタムDieの修飾子なので、目標値の指定だけを見る
+          const ok = roll.terms[0].faces === 10 && roll.formula.endsWith(`<=${expected}`);
+          return {
+            ok,
+            detail: ok
+              ? `〈＊投擲〉の目標値${expected}で振られた（${roll.formula}）`
+              : `目標値が基本技能側でない: ${roll.formula}（期待 <=${expected}）`,
+          };
+        } finally {
+          Hooks.off("emoklore.preRollAttack", hookId);
+        }
+      },
+      TAG,
+    ),
+  );
 }
