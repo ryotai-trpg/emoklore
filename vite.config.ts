@@ -31,7 +31,7 @@ export default defineConfig({
     },
     lib: {
       name: "emoklore",
-      entry: "emoklore.mjs",
+      entry: "module/emoklore.ts",
       formats: ["es"],
       fileName: () => "emoklore.mjs",
       cssFileName: "emoklore",

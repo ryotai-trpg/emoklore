@@ -1,0 +1,29 @@
+/* emoklore のスタイルの目次。ここには @import だけを置き、規則は書かない。
+   並び順がそのままカスケードの順序になる（変数 → 部品 → アプリケーション → チャット）。
+   viteが @import を解決して dist/emoklore.css の1枚に展開する */
+
+@import url("./variables.css");
+
+/* Components — .emoklore の下で成立する部品 */
+@import url("./components/progress.css");
+@import url("./components/segments.css");
+@import url("./components/meter.css");
+@import url("./components/utilities.css");
+@import url("./components/card.css");
+@import url("./components/sidebar.css");
+@import url("./components/emotion-list.css");
+@import url("./components/stat-row.css");
+@import url("./components/skill-row.css");
+@import url("./components/chip.css");
+@import url("./components/field-list.css");
+@import url("./components/data-table.css");
+
+/* Applications — module/applications/ と対で、部品の配置と寸法を持つ */
+@import url("./applications/document-sheet.css");
+@import url("./applications/character-sheet.css");
+@import url("./applications/weapon-sheet.css");
+@import url("./applications/charsheet-import-dialog.css");
+
+/* Chat — シートの外に出るチャットカード */
+@import url("./chat/dice-roll.css");
+@import url("./chat/weapon-card.css");
