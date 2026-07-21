@@ -5,7 +5,8 @@
       "npc": "NPC"
     },
     "Item": {
-      "weapon": "武器"
+      "weapon": "武器",
+      "skill": "カスタム技能"
     }
   },
   "SETTINGS": {
@@ -22,13 +23,15 @@
   },
   "EMOKLORE": {
     "Common": {
-      "colon": "："
+      "colon": "：",
+      "none": "なし"
     },
     "Sheet": {
       "class": {
         "character": "キャラクターシート",
         "weapon": "武器シート",
-        "activeEffect": "効果シート"
+        "activeEffect": "効果シート",
+        "skill": "技能シート"
       },
       "toggleMode": "プレイ・編集モード切替",
       "character": {
@@ -67,6 +70,35 @@
         },
         "Damage": "ダメージ",
         "SuccessCount": "【成功数】"
+      },
+      "skill": {
+        "FIELDS": {
+          "category": {
+            "label": "区分"
+          },
+          "characteristicOptions": {
+            "label": "参照能力値",
+            "hint": "複数選ぶと、シートで判定に使う能力値を選べるようになる。"
+          },
+          "characteristic": {
+            "label": "判定に使う能力値"
+          },
+          "group": {
+            "label": "技能グループ",
+            "hint": "「交渉系すべてに+1」のような効果を受けるかどうかが決まる。"
+          },
+          "level": {
+            "label": "技能レベル"
+          },
+          "notes": {
+            "label": "備考"
+          }
+        },
+        "Category": {
+          "base": "ベース技能",
+          "normal": "通常技能",
+          "extra": "エクストラ技能"
+        }
       }
     },
     "ChatMessage": {

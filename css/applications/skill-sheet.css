@@ -1,0 +1,17 @@
+/* カスタム技能シート固有のレイアウト。ヘッダは item-sheet.css が持つ */
+
+.emoklore.sheet.skill {
+  .em-skill-detail {
+    padding: var(--spacer-8) 0;
+
+    /* 備考は長さが読めないので、折り返して器の中に収める */
+    .em-field__value {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .form-group.stacked .editor-container {
+      min-height: 8rem;
+    }
+  }
+}
