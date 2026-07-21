@@ -1,8 +1,8 @@
 import type { AttackSkillKey } from "../../config/attack-skills";
 import type { EmokloreActor } from "../../documents/actor";
+import { applyDamageToTargets } from "../../documents/queries";
 import { buildDamageFormula } from "../../rules/weapon-damage";
 import { createDamageAppliedMessage } from "../../utils/chat";
-import { applyDamageToTargets } from "../../utils/queries";
 import { resolveTargetActors } from "../../utils/targets";
 import {
   type CardButtons,
@@ -171,7 +171,7 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
       return;
     }
 
-    // 権限の有無とGMへの委譲は utils/queries.ts が引き受ける
+    // 権限の有無とGMへの委譲は documents/queries.ts が引き受ける
     const applied = await applyDamageToTargets(targets, amount);
     if (!applied) {
       ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoGM", { localize: true });

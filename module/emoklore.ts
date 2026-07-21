@@ -11,9 +11,9 @@ import { EmokloreDie } from "./dice/emoklore-die";
 import { EmokloreRoll } from "./dice/emoklore-roll";
 import { EmokloreActor } from "./documents/actor";
 import { EmokloreItem } from "./documents/item";
+import { registerQueries } from "./documents/queries";
 import { getSetting, registerSystemSettings } from "./settings";
 import { performPreLocalization } from "./utils/localization";
-import { registerQueries } from "./utils/queries";
 
 Hooks.once("init", () => {
   console.log("Emo-klore TRPG | Initializing...");
