@@ -27,7 +27,8 @@
     "Sheet": {
       "class": {
         "character": "キャラクターシート",
-        "weapon": "武器シート"
+        "weapon": "武器シート",
+        "activeEffect": "効果シート"
       },
       "toggleMode": "プレイ・編集モード切替",
       "character": {
@@ -337,7 +338,29 @@
       "Temporary": "一時的効果",
       "Passive": "永続的効果",
       "Inactive": "無効",
-      "Toggle": "切替"
+      "Toggle": "切替",
+      "Target": "対象",
+      "TargetGroup": {
+        "global": "全体",
+        "everyRoll": "すべての判定",
+        "characteristics": "能力値",
+        "skillGroups": "技能グループ",
+        "skills": "技能",
+        "baseSkills": "基本技能",
+        "other": "その他",
+        "rawKey": "キーを直接指定"
+      },
+      "Aspect": {
+        "Label": "修正先",
+        "bonus": "ダイスボーナス",
+        "target": "判定値",
+        "success": "成功数"
+      },
+      "Phase": {
+        "Label": "段階",
+        "initial": "通常",
+        "final": "計算後"
+      }
     },
     "Status": {
       "unconscious": "気絶",
