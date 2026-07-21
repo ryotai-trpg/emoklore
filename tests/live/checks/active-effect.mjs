@@ -248,6 +248,183 @@ export async function run({ page, check }) {
     ),
   );
 
+  await check("差し替えた効果シートが使われる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        // 登録表ではなく、実際に効果が開くシートを見る。
+        // getSheetClassesForSubType が返すのは id とラベルで、クラスではない
+        const a = game.actors.getName(`${tag}_char`);
+        const [effect] = await a.createEmbeddedDocuments("ActiveEffect", [
+          { name: `${tag}_sheet`, system: { changes: [] } },
+        ]);
+        const name = effect.sheet?.constructor?.name;
+        await effect.delete();
+
+        const ok = name === "EmokloreActiveEffectConfig";
+        return { ok, detail: ok ? name : `使われたシート=${name}` };
+      },
+      TAG,
+    ),
+  );
+
+  await check("修正のキーが対象と種類の選択に分解される", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        const [effect] = await a.createEmbeddedDocuments("ActiveEffect", [
+          {
+            name: `${tag}_sheet`,
+            system: {
+              changes: [
+                {
+                  key: "system.characteristics.mentality.mod.bonus",
+                  type: "add",
+                  value: 1,
+                  phase: "initial",
+                },
+              ],
+            },
+          },
+        ]);
+        try {
+          await effect.sheet.render(true);
+          await window.__waitFor(() => effect.sheet.element?.querySelector("[data-change-row]"), {
+            label: "変更行の描画",
+          });
+          const row = effect.sheet.element.querySelector("[data-change-row]");
+          const target = row.querySelector("[data-change-key-part=target]");
+          const aspect = row.querySelector("[data-change-key-part=aspect]");
+          const raw = row.querySelector("[data-change-key-part=raw]");
+          const phase = row.querySelector("[name$='.phase']");
+
+          const ok =
+            target?.value === "characteristics.mentality" &&
+            aspect?.value === "bonus" &&
+            raw?.hidden === true &&
+            // 本体は phase を hidden でしか持たない。選べることがこの差し替えの主眼
+            phase?.tagName === "SELECT";
+
+          return {
+            ok,
+            detail: ok
+              ? `対象=${target.value} 種類=${aspect.value} 段階は${phase.tagName}で選べる`
+              : `対象=${target?.value} 種類=${aspect?.value} 生入力hidden=${raw?.hidden} 段階=${phase?.tagName}`,
+          };
+        } finally {
+          await effect.sheet.close();
+          await effect.delete();
+        }
+      },
+      TAG,
+    ),
+  );
+
+  await check("選択を変えると属性キーが組み立て直される", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        const [effect] = await a.createEmbeddedDocuments("ActiveEffect", [
+          {
+            name: `${tag}_sheet`,
+            system: {
+              changes: [{ key: "system.mod.bonus", type: "add", value: 1, phase: "initial" }],
+            },
+          },
+        ]);
+        try {
+          await effect.sheet.render(true);
+          await window.__waitFor(() => effect.sheet.element?.querySelector("[data-change-row]"), {
+            label: "変更行の描画",
+          });
+          const row = effect.sheet.element.querySelector("[data-change-row]");
+          const target = row.querySelector("[data-change-key-part=target]");
+          const aspect = row.querySelector("[data-change-key-part=aspect]");
+          const key = row.querySelector("[data-change-key]");
+
+          const before = key.value;
+          target.value = "skills.search";
+          target.dispatchEvent(new Event("change", { bubbles: true }));
+          aspect.value = "success";
+          aspect.dispatchEvent(new Event("change", { bubbles: true }));
+          const after = key.value;
+
+          // 生入力へ倒したら、そちらの値がそのままキーになる
+          target.value = "__raw";
+          target.dispatchEvent(new Event("change", { bubbles: true }));
+          const rawInput = row.querySelector("[data-change-key-part=raw]");
+          rawInput.value = "system.initiative";
+          rawInput.dispatchEvent(new Event("change", { bubbles: true }));
+          const rawKey = key.value;
+
+          const ok =
+            before === "system.mod.bonus" &&
+            after === "system.skills.search.mod.success" &&
+            rawKey === "system.initiative" &&
+            rawInput.hidden === false;
+
+          return {
+            ok,
+            detail: ok
+              ? `${before} → ${after} → ${rawKey}（生入力）`
+              : `前=${before} 後=${after} 生=${rawKey} hidden=${rawInput.hidden}`,
+          };
+        } finally {
+          await effect.sheet.close();
+          await effect.delete();
+        }
+      },
+      TAG,
+    ),
+  );
+
+  await check("選択式で扱えないキーは生入力に倒れる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        const [effect] = await a.createEmbeddedDocuments("ActiveEffect", [
+          {
+            name: `${tag}_sheet`,
+            system: {
+              changes: [{ key: "system.initiative", type: "add", value: 2, phase: "final" }],
+            },
+          },
+        ]);
+        try {
+          await effect.sheet.render(true);
+          await window.__waitFor(() => effect.sheet.element?.querySelector("[data-change-row]"), {
+            label: "変更行の描画",
+          });
+          const row = effect.sheet.element.querySelector("[data-change-row]");
+          const target = row.querySelector("[data-change-key-part=target]");
+          const raw = row.querySelector("[data-change-key-part=raw]");
+          const aspect = row.querySelector("[data-change-key-part=aspect]");
+
+          // ここを塞ぐと、載っている有効な効果が編集できなくなる
+          const ok =
+            target?.value === "__raw" &&
+            raw?.value === "system.initiative" &&
+            raw?.hidden === false &&
+            aspect?.hidden === true;
+
+          return {
+            ok,
+            detail: ok
+              ? `対象=その他 生入力=${raw.value}`
+              : `対象=${target?.value} 生入力=${raw?.value} hidden=${raw?.hidden}`,
+          };
+        } finally {
+          await effect.sheet.close();
+          await effect.delete();
+        }
+      },
+      TAG,
+    ),
+  );
+
   await check("一時的効果の作成が duration を持つ", () =>
     assertInPage(
       page,
