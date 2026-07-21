@@ -51,6 +51,35 @@ lang/                … ja.json が正、en.json は追従
 
 〈ストレングス〉による近接武器攻撃力の加算はまだ配線していないが、`buildDamageFormula` の `bonus` が接続点になる。ダメージの軽減も `EmokloreActor#applyDamage` の `reduction` に寄せてある。〈耐久〉判定も防御判定も「受けるダメージを【成功数】点軽減する」という同じ形で、防具を入れるならそれも同じ引き算になるため、口を1つにしておく。
 
+## 効果（ActiveEffect）の載せ方
+
+v14 の ActiveEffect は v13 から作り直されている。`changes` が `effect.system.changes` へ移り、適用モードが `change.mode`（数値）から `change.type`（文字列）になり、**適用が2フェーズになった**。設計に効いているのは最後の1つ。
+
+`prepareData()` は `prepareBaseData` → `prepareEmbeddedDocuments`（ここで `applyActiveEffects("initial")`）→ `prepareDerivedData` → `applyActiveEffects("final")` の順に進む（`client/documents/actor.mjs` の `:431` と `:468`）。つまり **`final` は派生値の計算が終わったあとに走る**。
+
+この2つを次のように使い分けている。
+
+- **`initial`** — 通常。`mod.*` と、能力値・技能レベルのような素の値。ここに乗せたものは `prepareDerivedData` の入力になるので、HP最大値や目標値まで連動する
+- **`final`** — 派生値そのものを動かしたいときだけ。`initiative` や `hp.max` は `prepareDerivedData` が毎回入れ直すので、`initial` に乗せても消える
+
+**判定の修正は `mod.*` に寄せる。** 目標値を `final` で直接書いても結果は同じだが、`resolveSkillRoll` を通らないぶんチャットの式に内訳（`(5-2)DM≦`）が出ない。修正は4系統（全体・能力値・技能グループ・技能）を合算する形になっている。
+
+### 保存しないフィールド
+
+`mod.*` と `hp.max` / `mp.max` / `initiative` は `persisted: false` にしてある。前者は効果の着地点としてしか使わず、後者は `prepareDerivedData` が毎回入れ直すので、どちらも保存する意味が無い。
+
+**スキーマには残す。** これが要点で、スキーマにあるフィールドへの効果は `DataField#applyChange` を通り、効果値の Roll 評価（`"@skills.strength.level"` が書ける）と `clean`/`validate`（範囲外は端に丸められる）が効く。スキーマに無いキーは本体が値の型を推測する経路に落ち、どちらも効かない。`initiative` を `declare` だけの派生値からスキーマのフィールドに変えたのはこのため。
+
+dnd5e は同じ用途に `persisted: false` を使っている（旧来の「スキーマ外キーを特別扱いする」方式は 6.0 で非推奨になった）。ただし順序問題の解き方は違っていて、あちらは `FormulaField` に `@` を文字列のまま持たせて評価を後段へ遅らせており、`phase` は使っていない。エモクロアはダイス項を含むボーナスがルールに無く、ダイスボーナスは「振る個数」＝整数なので、式文字列のフィールドは持ち込んでいない。
+
+### 属性キーの選択
+
+`EmokloreActiveEffectConfig` が本体の設定シートの変更行だけを差し替え、属性キーを「対象 × 修正先」の2つの選択から組み立てる。合成と読み取りは `utils/effect-keys.ts` の純粋関数で、`CONFIG` を読まないので単体テストできる。
+
+**読み取れないキーは生の入力に倒す。** `system.initiative` のように選択肢に無いキーも効果としては有効なので、塞ぐと編集できなくなる。
+
+あわせて `phase` を選べるようにしている。本体のシートは `phase` を hidden でしか持たないので、これが無いと `final` を選ぶ手段自体が無い。
+
 ## GMへの委譲（クエリ）
 
 Foundryは `Document#update` をサーバ側で権限検査するので、OWNER権限を持たないアクター（多くの場合、敵）はプレイヤーのクライアントからは書き換えられない。ダメージ適用はこれに当たるため、権限を持つGMのクライアントに肩代わりしてもらう。

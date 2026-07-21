@@ -248,6 +248,53 @@ export async function run({ page, check }) {
     ),
   );
 
+  await check("範囲外の効果は捨てられず端に丸められる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        // 能力値は1〜6、技能レベルは0〜3。スキーマにあるフィールドへの効果は
+        // DataField 経由で clean を通るので、はみ出しても捨てられずクランプされる。
+        // docs/active-effect.md がこの挙動を前提に書いてある
+        const physicalBefore = a.system.characteristics.physical.value;
+        const [effect] = await a.createEmbeddedDocuments("ActiveEffect", [
+          {
+            name: `${tag}_clamp`,
+            system: {
+              changes: [
+                {
+                  key: "system.characteristics.physical.mod.bonus",
+                  type: "add",
+                  value: 99,
+                  phase: "initial",
+                },
+                {
+                  key: "system.characteristics.physical.value",
+                  type: "add",
+                  value: 99,
+                  phase: "initial",
+                },
+              ],
+            },
+          },
+        ]);
+        const clamped = a.system.characteristics.physical.value;
+        // mod には範囲を付けていないので、そちらは素通しで足される
+        const unbounded = a.system.characteristics.physical.mod.bonus;
+        await effect.delete();
+
+        const ok = clamped === 6 && unbounded === 99;
+        return {
+          ok,
+          detail: ok
+            ? `【身体】${physicalBefore}+99 → 6（上限で丸め）、範囲の無い mod は 99 のまま`
+            : `能力値=${clamped}（期待6） mod=${unbounded}（期待99）`,
+        };
+      },
+      TAG,
+    ),
+  );
+
   await check("差し替えた効果シートが使われる", () =>
     assertInPage(
       page,
