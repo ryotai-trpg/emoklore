@@ -63,11 +63,17 @@ export type SkillRollContext = {
  * コピーされていたので、対応が1対1になるようここへ寄せた。
  */
 const modifierField = () =>
-  new SchemaField({
-    bonus: new NumberField({ required: true, integer: true, initial: 0 }),
-    success: new NumberField({ required: true, integer: true, initial: 0 }),
-    target: new NumberField({ required: true, integer: true, initial: 0 }),
-  });
+  new SchemaField(
+    {
+      bonus: new NumberField({ required: true, integer: true, initial: 0 }),
+      success: new NumberField({ required: true, integer: true, initial: 0 }),
+      target: new NumberField({ required: true, integer: true, initial: 0 }),
+    },
+    // 保存しない。この組はシートから編集できず、ActiveEffectの着地点としてだけ存在する。
+    // スキーマには残るので効果は DataField 経由で乗り、効果値のRoll評価も整数の検証も効く。
+    // 保存対象から外れることで、アクター1体につき 64組×3値 が保存データから消える
+    { persisted: false },
+  );
 
 // 能力値の NumberField に渡す共通オプション。技能側で分割代入する
 // characteristic（能力値キーの文字列）とは別物なので名前を分けている
@@ -80,21 +86,46 @@ const characteristicFieldOptions = {
   nullable: false,
 };
 
+// HP・MPの最大値は毎回 prepareDerivedData が能力値から出し直すので保存しない。
+// 保存しても次の準備で捨てられる値で、スキーマに居座ると「書けるのに残らない」
+// フィールドになる。効果を当てたいときは phase: "final" で上書きする
+const derivedMaxField = (initial: number) =>
+  new NumberField({ required: true, integer: true, initial, persisted: false });
+
 const defineCharacterDataModelSchema = () => ({
   resources: new SchemaField({
     hp: new SchemaField({
       value: new NumberField({ required: true, integer: true, initial: 11 }),
-      max: new NumberField({ required: true, integer: true, initial: 11 }),
+      max: derivedMaxField(11),
     }),
     mp: new SchemaField({
       value: new NumberField({ required: true, integer: true, initial: 2 }),
-      max: new NumberField({ required: true, integer: true, initial: 2 }),
+      max: derivedMaxField(2),
     }),
     resonance: new SchemaField({
       value: new NumberField({ required: true, integer: true, initial: 1 }),
+      // 共鳴値の上限だけは計算せず手で決めるので、こちらは保存する
       max: new NumberField({ required: true, integer: true, initial: 9 }),
     }),
   }),
+
+  /**
+   * 判定すべてに効く修正。
+   *
+   * ルールブックの「全ての技能は判定値-2される」のように、能力値でも技能でも
+   * 技能グループでも切り分けられない修正がハウリング表に多くあり、これまで
+   * 表現する場所が無かった。他の mod と同じ3値を持つ
+   */
+  mod: modifierField(),
+
+  /**
+   * 行動値。身体＋〈スピード〉のレベルで、prepareDerivedData が毎回入れ直す。
+   *
+   * 保存しないがスキーマには置く。`system.json` の `"initiative": "@initiative"` が
+   * 参照するうえ、ここに無いとActiveEffectを当てたとき本体が型を推測する経路に落ちて、
+   * 効果値のRoll評価も整数の検証も効かなくなる
+   */
+  initiative: new NumberField({ required: true, integer: true, initial: 0, persisted: false }),
 
   characteristics: new SchemaField(
     Object.fromEntries(
@@ -252,6 +283,12 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
     }
   >;
 
+  /** 判定すべてに効く修正 */
+  declare mod: ModifierSet;
+
+  /** 行動値。prepareDerivedData が毎回入れ直す */
+  declare initiative: number;
+
   declare emotions: {
     surface?: string;
     hidden?: string;
@@ -270,8 +307,6 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
     likesAndDislikes?: string;
     note: string;
   };
-
-  declare initiative: number;
 
   static override defineSchema() {
     return defineCharacterDataModelSchema();
@@ -364,10 +399,7 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
       skillMod: entry.mod,
       characteristicMod: this.characteristics[entry.characteristic].mod,
       skillGroupMod: this.skillGroups[group].mod,
+      globalMod: this.mod,
     };
-  }
-
-  modifyRollData(rollData: Record<string, unknown>): void {
-    rollData.initiative = this.initiative;
   }
 }
