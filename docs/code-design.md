@@ -80,7 +80,7 @@ export type SkillRef =
 
 | 置き場所 | 使うとき | 例 |
 |---|---|---|
-| `module/types/*.d.ts` | アンビエント宣言・本体へのモジュール拡張 | `emoklore.d.ts`（`CONFIG.EMOKLORE`）、`foundry-shim.d.ts` |
+| `module/types/*.d.ts` | アンビエント宣言・本体へのモジュール拡張 | `emoklore.d.ts`（`CONFIG.EMOKLORE`）、`foundry-shim.d.ts`、`css.d.ts` |
 | 層ごとの `types.ts` | その層の複数ファイルが共有する型 | `rules/types.ts`、`applications/types.ts` |
 | 定義したファイルの中 | その型を作る・返す関数と同じ場所 | `config/*.ts` の `*Config`、`data/character.ts` の `SkillRef` |
 

@@ -4,11 +4,13 @@
 
 ## 現状の構造
 
-エントリは `emoklore.ts`。`init` フックでDocumentクラス・DataModel・シート・ダイス関連を `CONFIG` に登録する。
+エントリは `module/emoklore.ts`。`init` フックでDocumentクラス・DataModel・シート・ダイス関連を `CONFIG` に登録する。
+
+ビルドの入口も同じファイル。viteの `lib.entry` がここを指し、出力は `dist/emoklore.mjs` と `dist/emoklore.css`（`system.json` が指す先）。CSSの目次を先頭でimportしているのがCSS出力のトリガで、これを外すと `dist/emoklore.css` が生成されない。
 
 ```
-emoklore.ts          … エントリ。CONFIG登録、configのラベル事前ローカライズ、開発用フック
 module/
+  emoklore.ts        … エントリ。CSS目次のimport、CONFIG登録、configのラベル事前ローカライズ、開発用フック
   config/            … 静的なゲームルール定義（技能・特性・共鳴感情など）→ CONFIG.EMOKLORE
   data/              … TypeDataModelスキーマ（character / npc / weapon / 武器カードのChatMessage）と派生値計算
   rules/             … ゲームルールの純粋関数（判定計算・成功数）。Foundry非依存でvitest対象
@@ -17,8 +19,8 @@ module/
   dice/              … カスタムRoll / Die（成功数判定: 1d10≦目標値、1クリティカル / 10ファンブル）
   utils/             … i18n事前ローカライズ、ActiveEffect整理、チャット生成、ココフォリアインポートなど
 templates/           … Handlebarsテンプレート。partials/ は引数を取る再利用部品
-emoklore.css         … @importを並べるだけの目次。規則は書かない
 css/
+  emoklore.css       … @importを並べるだけの目次。規則は書かない
   variables.css      … CSS変数。色はライトを既定にダークだけ上書きする
   components/        … .emoklore の下で成立する部品。位置決めを持たない
   applications/      … module/applications/ と対。部品の配置と寸法

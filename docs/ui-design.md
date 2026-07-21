@@ -6,7 +6,7 @@ CSS・テンプレート・ダイアログの規約と、その背後にある�
 
 ## 層の責務
 
-`emoklore.css` は `@import` の目次で、並び順がそのままカスケードの順序になる。**目次には規則を書かない**。
+`css/emoklore.css` は `@import` の目次で、並び順がそのままカスケードの順序になる。**目次には規則を書かない**。
 
 | 層 | 持つもの | 持ってはいけないもの |
 |---|---|---|
@@ -17,7 +17,7 @@ CSS・テンプレート・ダイアログの規約と、その背後にある�
 
 **部品に位置決めを書かない**。`grid-row` / `grid-column` / 外側の margin / 幅は、置く側（`applications/`）から modifier セレクタで指定する。これがあるのでNPCシートやアイテムシートを足したときに同じ部品をそのまま使える。
 
-`system.json` の `styles` で `layer: "system"` を宣言する。本体は `foundry2.css` の冒頭で `reset, variables, elements, blocks, applications, compatibility, layouts, system, modules, exceptions` を宣言していて、`system` はシステム用に空けてある。`applications` より後なので本体には勝ち、`modules` には負ける。本体側は `@import "..." layer(system)` の形で読み込む（`templates/views/layouts/main.hbs`）ため、`emoklore.css` の中で `@layer` を書けば `system` の副レイヤになる。
+`system.json` の `styles` で `layer: "system"` を宣言する。本体は `foundry2.css` の冒頭で `reset, variables, elements, blocks, applications, compatibility, layouts, system, modules, exceptions` を宣言していて、`system` はシステム用に空けてある。`applications` より後なので本体には勝ち、`modules` には負ける。本体側は `@import "..." layer(system)` の形で読み込む（`templates/views/layouts/main.hbs`）ため、`css/emoklore.css` の中で `@layer` を書けば `system` の副レイヤになる。
 
 ## 寸法の決め方
 

@@ -1,16 +1,19 @@
-import * as applications from "./module/applications/character-sheet";
-import { EmokloreWeaponSheet } from "./module/applications/weapon-sheet";
-import { EMOKLORE } from "./module/config/index";
-import { CharacterDataModel } from "./module/data/character";
-import { WeaponDataModel } from "./module/data/item-models";
-import { WeaponCardModel } from "./module/data/messages/weapon-card";
-import { EmokloreDie } from "./module/dice/emoklore-die";
-import { EmokloreRoll } from "./module/dice/emoklore-roll";
-import { EmokloreActor } from "./module/documents/actor";
-import { EmokloreItem } from "./module/documents/item";
-import { getSetting, registerSystemSettings } from "./module/settings";
-import { performPreLocalization } from "./module/utils/localization";
-import { registerQueries } from "./module/utils/queries";
+// このimportがビルド時のCSS出力のトリガになる。外すと dist/emoklore.css が
+// 生成されず、system.json の styles が指す先がなくなる（型の宣言は types/css.d.ts）
+import "../css/emoklore.css";
+import * as applications from "./applications/character-sheet";
+import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
+import { EMOKLORE } from "./config/index";
+import { CharacterDataModel } from "./data/character";
+import { WeaponDataModel } from "./data/item-models";
+import { WeaponCardModel } from "./data/messages/weapon-card";
+import { EmokloreDie } from "./dice/emoklore-die";
+import { EmokloreRoll } from "./dice/emoklore-roll";
+import { EmokloreActor } from "./documents/actor";
+import { EmokloreItem } from "./documents/item";
+import { getSetting, registerSystemSettings } from "./settings";
+import { performPreLocalization } from "./utils/localization";
+import { registerQueries } from "./utils/queries";
 
 Hooks.once("init", () => {
   console.log("Emo-klore TRPG | Initializing...");
