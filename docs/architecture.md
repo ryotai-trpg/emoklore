@@ -74,9 +74,8 @@ Foundryは `Document#update` をサーバ側で権限検査するので、OWNER�
 1. **スキーマ定義が `CONFIG.EMOKLORE` に依存**: `module/data/character.ts` がキー集合を得るために定義時点で `CONFIG.EMOKLORE` を読む。`CONFIG.EMOKLORE` を設定するのは自分の `init` フックなので制御下にあるが、他モジュールが `init` 中に `Actor.dataModels.character.schema` へ触ると壊れうる。`TypedObjectField` での解消は検討したうえで見送った（下記）
 2. **NPCの扱いが未定**: `NpcDataModel` は `wickedness` しか持たず、シートも判定もない。登録を外したので型の上での嘘は消えたが、NPCをどう表現するかは未決のまま。NPC用シートの実装（Phase 3）で判定まわりごと決める。戻すときは `EmokloreActor#system` が union になるので、NPCで壊れる箇所は型チェックが教えてくれる
 3. **`config/` の副作用**: `module/config/index.ts` が import 時に `preLocalize` を呼び、`performPreLocalization` が `CONFIG.EMOKLORE` を破壊的に書き換える。この表の「`config/` に置かないもの」に反するが、dnd5e / draw-steel 由来の確立したパターンなので当面は踏襲する
-4. **`documents/` から `applications/` への逆依存**: `module/documents/actor.ts` が `promptResonanceRoll` をimportし、`rollResonance` の中で呼んでいる。「引数が無ければUIを開く」という判断はプレゼンテーションの決定なので、下の表の「`documents/` に置かないもの: ダイアログ」に反する。シート側で入力を解決してから渡す形にすれば矢印が反転する
-5. **`utils/` が雑多**: 純粋なパーサ（`charsheet-importer`）、i18n機構（`localization`）、チャットI/O（`chat`）、DOM・Documentのアダプタ（`sheet` `targets` `queries`）が同居している。特に `queries.ts` は `actor.applyDamage()` を呼ぶオーケストレータで、ユーティリティではない。**この逆依存は `import type` のせいでimportグラフに現れない**
-6. **CIの穴**: 型チェックジョブはフォークからのPRで実行されない。理由は2つ重なっており、Actions cacheがフォークから復元できないことと、secretsがフォークPRに渡らないのでキャッシュミス時の `tools/fetch-foundry.mjs` 経路も成立しないこと。lefthookには型チェックもテストも入っていない（`pre-push` 自体が無い）ので、**フォークからのPRは型チェックを一度も通さずに緑になれる**（Issue #7 の範囲）
+4. **`utils/` が雑多**: 純粋なパーサ（`charsheet-importer`）、i18n機構（`localization`）、チャットI/O（`chat`）、DOM・Documentのアダプタ（`sheet` `targets` `queries`）が同居している。特に `queries.ts` は `actor.applyDamage()` を呼ぶオーケストレータで、ユーティリティではない。**この逆依存は `import type` のせいでimportグラフに現れない**
+5. **CIの穴**: 型チェックジョブはフォークからのPRで実行されない。理由は2つ重なっており、Actions cacheがフォークから復元できないことと、secretsがフォークPRに渡らないのでキャッシュミス時の `tools/fetch-foundry.mjs` 経路も成立しないこと。lefthookには型チェックもテストも入っていない（`pre-push` 自体が無い）ので、**フォークからのPRは型チェックを一度も通さずに緑になれる**（Issue #7 の範囲）
 
 `weapon` は `documentTypes.Item.weapon` の宣言で到達可能にした（`game.documentTypes.Item` が `["base", "weapon"]` を返すことを実機で確認済み）。**新しい種別を足すときは、データモデルの登録だけでなく `system.json` の宣言が要る。**
 
@@ -96,6 +95,7 @@ Phase 2 のあとに解消したもの:
 - ~~**`strict: false`**~~: 全フラグを計測したところエラー0件だったので `strict: true` にし、`noImplicitReturns` / `exactOptionalPropertyTypes` / `noUnusedLocals` / `noUnusedParameters` も足した
 - ~~**`rules/` から `utils/` への逆依存**~~: `formatDMPart` を `rules/skill-roll.ts` に取り込み、`rules/` を自己完結させた。`documents/` にあった表示整形（`formatSkillName`）は `utils/chat.ts` へ移した
 - ~~**攻撃技能の引き方が食い違う**~~: 未知のキーに対する倒し先が4箇所（`data/item-models.ts`、`data/messages/weapon-card.ts` の2箇所、`utils/weapon.ts`）でばらばらで、`base` は真偽が逆、`damageDie` は `d3` と `null` に割れていた。`utils/weapon.ts` の `resolveAttackSkill()` に寄せ、型述語 `isAttackSkillKey` を表の隣（`config/`）に置いた
+- ~~**`documents/` から `applications/` への逆依存**~~: `documents/actor.ts` が `promptResonanceRoll` をimportし、`rollResonance` の中で「引数が無ければダイアログを開く」と判断していた。入力を集める入口を `applications/rolls.ts` に置き、`rollResonance` は検証済みの強度と一致度を必須引数で受ける形にした（`rollSkill` が `SkillRef` を受けるのと同じ形）。**シートの共鳴ボタンを押すとダイアログが出る挙動は変えていない。**変えたのはその判断をどの層が持つかだけ
 - ~~**同じ定数を2箇所で宣言**~~: 技能レベルの範囲を `utils/charsheet-importer.ts` がローカルに書き写していた。`rules/limits.ts` を新設して能力値と技能レベルの範囲をまとめ、`data/` `applications/` `utils/` の3層が同じ源を引くようにした。`data/` に置いたままでは層のimport方向（`utils/` → `data/` は型のみ）に阻まれて取り込み側が値を引けないのが、書き写しの原因だった
 
 型設計の見直しで解消したもの（規約は [コード設計の規約](/code-design) が正）:

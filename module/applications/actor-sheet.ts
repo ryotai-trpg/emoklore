@@ -2,6 +2,7 @@ import { isBaseSkillKey } from "../config/base-skills";
 import { isSkillKey } from "../config/skills";
 import type { EmokloreActor } from "../documents/actor";
 import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
+import { requestResonanceRoll } from "./rolls";
 import type { EmokloreActorSheetOptions } from "./types";
 
 export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
@@ -35,7 +36,8 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
         if (!isBaseSkillKey(skill)) return undefined;
         return this.actor.rollSkill({ kind: "base", key: skill });
       case "resonance":
-        return this.actor.rollResonance();
+        // 強度と一致度をダイアログで尋ねてから振る
+        return requestResonanceRoll(this.actor);
       case "weapon":
         // 判定はここでは振らない。チャットに武器カードを置き、そのボタンから振らせる
         return this.actor.items.get(dataset.itemId!)?.use();

@@ -1,4 +1,3 @@
-import { promptResonanceRoll } from "../applications/dialogs/resonance-roll-dialog";
 import type { CharacterDataModel, SkillRef } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
 import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
@@ -78,18 +77,17 @@ export class EmokloreActor extends Actor {
       | undefined;
   }
 
+  /**
+   * 共鳴判定。強度と一致度は検証済みの値を必須で受ける。
+   *
+   * ダイアログで尋ねる入口は `applications/rolls.ts` の `requestResonanceRoll`。
+   * 「引数が無ければ開く」という判断をここに置くと `applications/` への逆依存になる
+   */
   async rollResonance(
-    intensity?: number,
-    emotionMatch?: ResonanceMatch,
+    intensity: number,
+    emotionMatch: ResonanceMatch,
     options: Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
-    if (intensity === undefined) {
-      const input = await promptResonanceRoll();
-      if (!input) return;
-
-      ({ intensity, emotionMatch } = input);
-    }
-
     const spec = resolveResonanceRoll({
       resonanceValue: this.system.resources.resonance.value,
       intensity,

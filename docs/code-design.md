@@ -21,7 +21,9 @@ TypeScriptの型と、モジュールの分け方に関する規約はここが�
 - **`rules/` は何にも依存しない**。Foundry APIもi18nもUIも触らない。だから `vitest` の `environment: "node"` でそのまま動く。逆に言えば、テストしたいロジックはこの層に切り出す
 - **`import type` は依存の矢印を消さない**。型だけのimportはビルド後に消えるので、importグラフ上は逆依存が見えなくなる。`utils/queries.ts` が `actor.applyDamage()` を呼んでいるのがこれで、型だけ借りているように見えて実際は上の層を動かしている。**型だけ借りているのか、動かしているのかは分けて考えること**
 
-現状の例外は2つあり、どちらも [アーキテクチャ](/architecture) の「既知の構造的課題」に記録してある。`documents/actor.ts` がダイアログを開くために `applications/` を、`config/index.ts` が事前ローカライズの登録のために `utils/` をimportしている。
+現状の例外は1つで、[アーキテクチャ](/architecture) の「既知の構造的課題」に記録してある。`config/index.ts` が事前ローカライズの登録のために `utils/` をimportしている。
+
+**ダイアログを開くかどうかは `applications/` が決める。** `documents/` のメソッドは検証済みの値を必須引数で受け、ダイアログを知らない。入力を集めてから呼ぶ入口は `applications/rolls.ts` にある。dnd5e は `Actor5e#rollSkill(config, dialog, message)` のようにDocument側がダイアログの可否まで持つが、あちらのダイアログは組み上がったロールを構成し直すもの（有利/不利・状況ボーナス）で、共鳴判定のように `rules/` への入力そのものを尋ねるものとは役割が違う。前者を足すときは `dice/` 側に置く。
 
 ## 文字列で持たない
 

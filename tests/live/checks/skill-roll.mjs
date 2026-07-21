@@ -118,13 +118,17 @@ export async function run({ page, check }) {
     ),
   );
 
-  await check("共鳴判定のダイアログが開く", () =>
+  await check("共鳴判定はダイアログを開き、閉じれば振らない", () =>
     assertInPage(
       page,
       async (tag) => {
         const a = game.actors.getName(`${tag}_char`);
         const el = a.sheet.element.querySelector("[data-roll-type=resonance]");
         if (!el) return { ok: false, detail: "共鳴判定のボタンが無い" };
+
+        // クリックからダイアログまで。強度と一致度は rules/ への入力なので、
+        // 答えを得ずに振ってしまうと共鳴値も目標値も嘘になる
+        const beforeCancel = game.messages.size;
         el.click();
         const findDialog = () =>
           [...foundry.applications.instances.values()].find((x) =>
@@ -138,16 +142,24 @@ export async function run({ page, check }) {
           await dlg.close();
           await window.__waitFor(() => !findDialog(), { soft: true, label: "ダイアログが閉じる" });
         }
+        // キャンセル後の判定は非同期に着弾するので、その場で数えると競合する。
+        // 「増えないこと」の確認なので、増えるのを待って時間切れになるのが正常
+        const cancelled =
+          (await window.__waitFor(
+            () => (game.messages.size > beforeCancel ? game.messages.size - beforeCancel : null),
+            { soft: true, timeout: 1000, label: "キャンセル後の判定" },
+          )) ?? 0;
 
+        // 引数付きの直接呼び出しはダイアログを踏まない
         const before = game.messages.size;
         await a.rollResonance(3, "none");
         const m = game.messages.contents.at(-1);
-        const ok = Boolean(dlg) && game.messages.size === before + 1;
+        const ok = Boolean(dlg) && cancelled === 0 && game.messages.size === before + 1;
         return {
           ok,
           detail: ok
-            ? `ダイアログ→${m.rolls[0].formula}`
-            : `dialog=${Boolean(dlg)} 増分${game.messages.size - before}`,
+            ? `ダイアログ→キャンセルで0件→${m.rolls[0].formula}`
+            : `dialog=${Boolean(dlg)} キャンセル時${cancelled}件 増分${game.messages.size - before}`,
         };
       },
       TAG,
