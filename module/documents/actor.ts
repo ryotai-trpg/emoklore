@@ -15,9 +15,9 @@ export type HpChange = { before: number; after: number };
  * system を CharacterDataModel として扱う。
  *
  * `system.json` の documentTypes が character しか宣言しておらず、emoklore.ts も
- * character しか登録していないので、この宣言は実態と一致している。以前は npc を
- * 登録したまま character 固定で宣言しており、判定・リソース操作が `resources?.hp`
- * のように「型が持たないはずの undefined」を防御する形になっていた。
+ * character しか登録していないので、この宣言は実態と一致している。作成できない種別を
+ * 登録したまま固定で宣言すると型が嘘になり、判定・リソース操作に `resources?.hp` の
+ * ような「型が持たないはずの undefined」への防御が要るようになる。
  *
  * NPCを足すときは system が union になるので、型が絞り込みを要求してくる。
  * どこがNPCで壊れるかはそのとき型チェックが教えてくれる（ロードマップ Phase 3）。
@@ -36,9 +36,8 @@ export class EmokloreActor extends Actor {
    * `@` で参照できる値。判定式のほか、ActiveEffectの効果値の解決にも使われる
    * （本体の `applyActiveEffects` が `replacementData` としてこれを渡す）。
    *
-   * `system` を展開するだけでスキーマのフィールドは一通り入る。以前は
-   * `initiative` がスキーマに無く `modifyRollData` で足していたが、
-   * 実フィールドになったので中継が要らなくなった。
+   * `system` を展開するだけでスキーマのフィールドは一通り入る。`initiative` も
+   * 実フィールドなので、個別に足す中継は要らない。
    *
    * 展開は浅いので、入れ子は参照のまま。効果の適用途中でも現在値が読める
    */

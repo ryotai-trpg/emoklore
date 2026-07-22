@@ -77,9 +77,9 @@ export const createEmotionOptions = (): Array<{ value: string; label: string; gr
  * 共鳴感情の表示名と、対応する属性の表示名を引く。
  *
  * どちらの label も i18nInit の performPreLocalization で翻訳済みなので、ここでは
- * 参照するだけでよい。以前は `EMOKLORE.emotionAttributes.` という言語キーを組み立てており、
- * 感情が未選択のときに尻切れのキーがそのままシートに表示されていた。キーを作らない形に
- * したので、未選択・未知の感情はどちらも空文字になる。
+ * 参照するだけでよい。言語キーをここで組み立てると、感情が未選択のときに尻切れのキー
+ * （`EMOKLORE.emotionAttributes.`）がそのままシートに出る。キーを作らないので、
+ * 未選択・未知の感情はどちらも空文字になる。
  *
  * game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
  */

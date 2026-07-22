@@ -1,7 +1,7 @@
 // 効果。状態異常の登録と、効果タブから作られる効果の中身を見る。
 //
-// どちらもv14で形が変わったところ。statusEffects は本体既定を丸ごと置き換えており、
-// duration は {value, units} になって rounds/turns の直指定がスキーマから消えた。
+// statusEffects は本体既定を丸ごと置き換えている。duration のスキーマは {value, units} で、
+// rounds/turns の直指定は無い。
 import { TAG } from "../lib/config.mjs";
 import { assertInPage } from "../lib/harness.mjs";
 
@@ -539,8 +539,8 @@ export async function run({ page, check }) {
           label: "一時的効果の作成",
         });
         const effect = a.effects.contents.at(-1);
-        // v14 のスキーマは {value, units}。data-duration.rounds を渡していたころは
-        // どこにも入らず、作った効果が「恒常」の側に並んでいた
+        // duration のスキーマは {value, units}。rounds を直に渡すとどこにも入らず、
+        // 作った効果が「恒常」の側に並ぶ
         const { value, units } = effect?.duration ?? {};
         const ok = value === 1 && units === "rounds" && effect?.isTemporary === true;
         const detail = ok
