@@ -22,7 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       # プラグイン（tools/*.grit）を使うのでバージョンを固定する。
-      # package.json の @biomejs/biome と揃えること
+      # package.json / biome.json の $schema と揃えること
+      # （buildジョブの check:biome-version が3箇所の一致を見ている）
       - uses: biomejs/setup-biome@v2
         with:
           version: 2.5.5
@@ -43,6 +44,8 @@ jobs:
         run: npm test
       - name: Build system
         run: npm run build
+      - name: Check Biome version sync
+        run: npm run check:biome-version
       - name: Check lang key parity
         run: npm run check:lang
       - name: Check Handlebars templates
