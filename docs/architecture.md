@@ -105,7 +105,7 @@ Foundryは `Document#update` をサーバ側で権限検査するので、OWNER�
 3. **`config/` の副作用**: `module/config/index.ts` が import 時に `preLocalize` を呼び、`performPreLocalization` が `CONFIG.EMOKLORE` を破壊的に書き換える。この表の「`config/` に置かないもの」に反するが、dnd5e / draw-steel 由来の確立したパターンなので当面は踏襲する
 4. **`utils/charsheet-importer.ts` が2つの顔を持つ**: 純粋なパーサ（`parseSkills` / `parseEmotions` / `validateCharSheetJSON`、単体テスト済み）と、`actor.update()` と `ui.notifications` を持つ適用部（`importFromCharSheet`）が同じファイルにある。後者は `EmokloreActor` を `import type` で借りているので、**この逆依存はimportグラフに現れない**。分割は20〜30行規模だが、`buildImportIndexes()` が `CONFIG.EMOKLORE` を読むため、パーサを完全に純粋化するなら索引を引数で渡す形への変更が要る
 5. **`data/messages/weapon-card.ts` がオーケストレータ**: カードのボタンハンドラ（`rollAttack` / `rollDamage` / `applyDamage`）が `actor.buildSkillRoll()` と `applyDamageToTargets()` を駆動し、`ui.notifications` とフックも持つ。`data/` の「置かないもの: UI、チャット生成」に反する。層表の `data/` の行に `documents/` を足して解決してはいけない（表が `documents/` → `data/` を許しているので、相互依存を許可することになる）。直すならハンドラの置き場所のほう
-6. **CIの穴**: 型チェックジョブはフォークからのPRで実行されない。理由は2つ重なっており、Actions cacheがフォークから復元できないことと、secretsがフォークPRに渡らないのでキャッシュミス時の `tools/fetch-foundry.mjs` 経路も成立しないこと。lefthookには型チェックもテストも入っていない（`pre-push` 自体が無い）ので、**フォークからのPRは型チェックを一度も通さずに緑になれる**（Issue #7 の範囲）
+6. **CIの穴**: 型チェックジョブはフォークからのPRで実行されない。理由は本体ソースの調達手段が無くなることで、secretsがフォークPRに渡らないため、キャッシュミス時のフォールバックである `tools/fetch-foundry.mjs` が成立しない。**Actions cache そのものはフォークPRからでもbase/デフォルトブランチのぶんをrestoreできる**（できないのは新規cacheの保存のほう）ので、ミスしなければ動きうるが、ミスしたときに落ちるだけのジョブは置いていない。lefthookには型チェックもテストも入っていない（`pre-push` 自体が無い）ので、**フォークからのPRは型チェックを一度も通さずに緑になれる**（Issue #56）
 
 `weapon` は `documentTypes.Item.weapon` の宣言で到達可能にした（`game.documentTypes.Item` が `["base", "weapon"]` を返すことを実機で確認済み）。**新しい種別を足すときは、データモデルの登録だけでなく `system.json` の宣言が要る。**
 
