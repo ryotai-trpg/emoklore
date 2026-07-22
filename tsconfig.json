@@ -32,6 +32,12 @@
       "@common/*": ["./foundry/common/*"]
     }
   },
-  "include": ["*.ts", "module/**/*", "foundry/client/global.d.mts", "foundry/common/global.d.mts"],
+  "include": [
+    "*.ts",
+    "module/**/*",
+    "tools/*.ts",
+    "foundry/client/global.d.mts",
+    "foundry/common/global.d.mts"
+  ],
   "exclude": ["node_modules", "dist"]
 }
