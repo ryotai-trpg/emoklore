@@ -22,7 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       # プラグイン（tools/*.grit）を使うのでバージョンを固定する。
-      # package.json の @biomejs/biome と揃えること
+      # package.json / biome.json の $schema と揃えること
+      # （buildジョブの check:biome-version が3箇所の一致を見ている）
       - uses: biomejs/setup-biome@v2
         with:
           version: 2.5.5
@@ -43,6 +44,8 @@ jobs:
         run: npm test
       - name: Build system
         run: npm run build
+      - name: Check Biome version sync
+        run: npm run check:biome-version
       - name: Check lang key parity
         run: npm run check:lang
       - name: Check Handlebars templates
@@ -71,7 +74,10 @@ jobs:
   typecheck:
     name: Type Check
     runs-on: ubuntu-latest
-    # 公開リポジトリのActions cacheはフォークPRからrestoreできるため、フォークPRでは実行しない
+    # フォークPRにはsecretsが渡らないので、キャッシュミス時に fetch-foundry.mjs へ倒せない。
+    # 本体ソースを用意する手段が無くなるため、ジョブごと実行しない。
+    # cache自体はフォークPRからでもbase/デフォルトブランチのぶんをrestoreできるが、
+    # ミスしたときに落ちるだけのジョブは置かない
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     env:
       # ローカルのFoundry本体を更新したら合わせて上げる（世代はsystem.jsonのcompatibilityと対応）

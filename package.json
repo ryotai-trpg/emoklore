@@ -26,6 +26,7 @@
     "lint": "biome check .",
     "test": "vitest run",
     "prepare": "lefthook install",
+    "check:biome-version": "node tools/check-biome-version.mjs",
     "check:lang": "node tools/check-lang.mjs",
     "check:templates": "node tools/check-templates.mjs",
     "check:schema-doc": "node tools/check-schema-doc.mjs",
