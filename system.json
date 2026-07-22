@@ -2,7 +2,7 @@
   "id": "emoklore",
   "title": "Emo-klore TRPG",
   "description": "An unofficial system for the Emo-klore TRPG",
-  "version": "0.0.2",
+  "version": "0.0.99",
   "compatibility": {
     "minimum": 14,
     "verified": 14
