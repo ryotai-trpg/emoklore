@@ -1,0 +1,98 @@
+# main宛のPRではリリース候補として検査し、GitHubでReleaseをpublishすると成果物を添付する。
+# Release（とタグ）を作るのは人で、ワークフローは成果物を載せるだけ。
+# draw-steel / ryuutama と同じ形。手順は docs/contributing.md の「リリース」
+name: Release
+
+on:
+  # develop → main が通常だが hotfix → main もありうるので、headではなくbaseで絞る
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+# アセットの添付に書き込みが要る（PRのときはGitHubが読み取りに落とす）
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Package
+    runs-on: ubuntu-latest
+    steps:
+      # Releaseのときはタグを見る。PRのときは空になり、既定（PRのマージref）に落ちる
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+
+      # 食い違ったまま配ると更新の検知が壊れる。Releaseは公開済みなので落ちると
+      # 作り直しになるが、下のPR側の通知で先に気付ける
+      - name: Check tag matches system.json version
+        if: github.event_name == 'release'
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: |
+          declared=$(node -p "require('./system.json').version")
+          if [ "$declared" != "$TAG_NAME" ]; then
+            echo "NG: タグ ($TAG_NAME) と system.json の version ($declared) が食い違っている"
+            echo "    Releaseは公開済み。system.json を直してタグごと作り直すこと"
+            exit 1
+          fi
+          echo "version OK: $declared"
+
+      # main はドキュメントサイトのデプロイ元でもあり、版を上げないマージも通常なので
+      # ここでは落とさずに知らせるだけにする
+      - name: Compare version with the latest release
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          declared=$(node -p "require('./system.json').version")
+          latest=$(gh release view --json tagName --jq .tagName 2>/dev/null || true)
+          if [ -z "$latest" ]; then
+            echo "::notice::system.json の version は $declared（既存のReleaseが見つからない）"
+          elif [ "$declared" = "$latest" ]; then
+            echo "::notice::system.json の version ($declared) が最新Release ($latest) と同じ。リリースするなら上げること"
+          else
+            echo "::notice::system.json の version は $declared（最新Releaseは $latest）"
+          fi
+
+      # ci.yml はブランチへのpushとPRでしか走らないので、Releaseのpushは素通りできる。
+      # 型チェックは本体ソースの調達が要るぶん重いので回さない（タグはCIが緑の
+      # コミットに打つ前提）が、テストは依存が無く一瞬なので通す
+      - name: Run tests
+        run: npm test
+
+      - name: Build system
+        run: npm run build
+
+      # Foundryはzip直下の system.json をまず探し、無ければ `*system.json` で終わる
+      # エントリを含むディレクトリをルートとみなして剥がす（本体の
+      # dist/packages/installer.mjs）。直下に置けばこの推測を挟まない
+      - name: Package dist.zip
+        run: cd dist && zip -rq ../dist.zip .
+
+      # PRではマージ前に中身を確かめられるよう成果物を残すだけ
+      - name: Upload artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: |
+            dist/system.json
+            dist.zip
+          retention-days: 7
+
+      # system.json の manifest / download が releases/latest/download/ を指しているので、
+      # publishしてからこのステップが終わるまでの数十秒は更新確認が404になる
+      - name: Attach assets to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG_NAME" dist/system.json dist.zip --clobber
