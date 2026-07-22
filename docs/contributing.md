@@ -41,6 +41,8 @@ npm test              # 単体テスト
 npm run verify:live   # 実機検証（ローカルのみ。CIでは回さない）
 ```
 
+- `verify:live` だけは専用の検証環境が要る（`dev` と `typecheck` は普段のFoundryで足りる）。作り方は[テスト方針](/testing#検証環境のセットアップ)にある
+
 ## ブランチ運用
 
 - メインブランチは **`develop`**。PRはここへ向ける
