@@ -6,16 +6,7 @@
 
 ## Phase 1: FoundryVTT v14対応
 
-v14専用に移行します（v13サポートは打ち切り）。
-
-具体的なチェックリストは [v14移行チェックリスト](/v14-migration) を参照。調査の結果、必須変更は `system.json` の compatibility 更新のみで、残りはv16で削除予定の非推奨APIの先回り対応です。
-
-**完了**（2026-07-19）。
-
-- [x] `system.json` の compatibility を v14 に
-- [x] 非推奨API対応（rollMode→messageMode、ActiveEffect mode→type など）
-- [x] TypeScript型定義戦略の決定（fvtt-types継続 or v14本体からの型生成）
-- [x] v14で起動して非推奨警告ゼロを確認
+- [x] v14専用への移行（v13サポート打ち切り）— 完了（2026-07-19）
 
 ## Phase 2: リファクタリング
 

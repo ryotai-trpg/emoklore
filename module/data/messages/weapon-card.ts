@@ -23,7 +23,7 @@ type CardAction = (this: WeaponCardModel) => Promise<void>;
  * カードが載っている ChatMessage。
  *
  * `parent` は本体の型では DataModel 止まりで、ChatMessage のメンバーが出てこない。
- * 実際に使うものだけを交差型で補う（docs/v14-migration.md「失われるもの」）。
+ * 実際に使うものだけを交差型で補う（docs/code-design.md「本体の型が足りないとき」）。
  */
 type CardMessage = ChatMessage & {
   rolls: foundry.dice.Roll[];

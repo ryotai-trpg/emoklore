@@ -24,7 +24,7 @@ npm run dev   # 初回build + HMR付きdevサーバ（localhost:30001）
 
 ### 型チェック
 
-型定義はFoundryVTT本体ソース（`client/` / `common/`）を直接参照する（fvtt-typesは不使用。経緯は[v14移行チェックリスト](/v14-migration)）。初回セットアップ:
+型定義はFoundryVTT本体ソース（`client/` / `common/`）を直接参照する（fvtt-typesは不使用。理由は[コード設計の規約](/code-design)の「本体の型が足りないとき」にある）。初回セットアップ:
 
 ```shell
 cp example-foundry-config.yaml foundry-config.yaml
@@ -157,7 +157,6 @@ feat: add resonance roll dialog
 | テスト方針（単体テスト・実機検証） | `docs/testing.md` |
 | UI設計の規約（CSS・テンプレート・ダイアログ） | `docs/ui-design.md` |
 | 開発フェーズ計画 | `docs/roadmap.md` |
-| v14移行の状況・チェックリスト | `docs/v14-migration.md` |
 | ユーザー向けの使い方 | `docs/getting-started.md` ほか機能ページ |
 | UI文字列 | `lang/ja.json`（`en.json` は追従） |
 | ゲームルール | [公式サイト](https://emoklore.dicetous.com)（実装はルールブックが正） |

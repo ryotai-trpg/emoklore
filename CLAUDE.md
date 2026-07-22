@@ -14,7 +14,6 @@
 | テスト方針（単体テスト・実機検証） | `docs/testing.md` |
 | UI設計の規約（CSS・テンプレート・ダイアログ） | `docs/ui-design.md` |
 | 開発フェーズ計画 | `docs/roadmap.md` |
-| v14移行の状況・チェックリスト・型定義戦略 | `docs/v14-migration.md` |
 | UI文字列 | `lang/ja.json`（正）、`en.json` は追従 |
 
 ## よく使うコマンド（詳細と前提: docs/contributing.md）
@@ -36,8 +35,4 @@ npm run docs:build  # VitePressビルド
 
 ## 現在の開発フェーズ
 
-本システムは**v14専用**（`system.json` の compatibility は `minimum: 14`）。v13サポートは打ち切り済みで、実機検証もv14で行う。
-
-1. ~~v14対応~~ — 完了（2026-07-19）。経緯と非推奨APIの備忘録は `docs/v14-migration.md`
-2. **リファクタリング**（現在）— `docs/architecture.md`
-3. 新機能 — `docs/roadmap.md`
+本システムは**v14専用**（`system.json` の compatibility は `minimum: 14`）。v13サポートは打ち切り済みで、実機検証もv14で行う。フェーズの計画と現在地は `docs/roadmap.md` が正。
