@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import { foundryDev } from "./tools/vite-plugin-foundry-dev";
 
 // proxy先のFoundry本体。既定はメイン環境（30000）、検証環境に向ける場合は
 // FOUNDRY_URL=http://localhost:30014 のように上書きする
@@ -11,6 +12,9 @@ export default defineConfig({
   // open: "/",
   server: {
     port: 30001,
+    // handleHotUpdate が dist/templates へ書くので、distを監視から外して
+    // 自分の書き込みを自分のwatcherが拾い直すのを防ぐ
+    watch: { ignored: ["**/dist/**"] },
     proxy: {
       "^(?!/systems/emoklore)": foundryUrl,
       "/socket.io": {
@@ -38,6 +42,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    foundryDev(),
     viteStaticCopy({
       // v4 はコピー元の相対パスを保つので、dest はすべて dist 直下（""）でよい。
       // v3 の `lang/*` + `dest: "lang"` は v4 では dist/lang/lang/ に二重に入る。

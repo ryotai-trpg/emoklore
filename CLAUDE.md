@@ -21,7 +21,7 @@
 
 ```shell
 npm install
-npm run dev         # vite build --watch（localhost:30001でFoundryにproxy）
+npm run dev         # 初回buildの後、HMR付きdevサーバ（localhost:30001でFoundryにproxy）
 npm run typecheck   # 型チェック（要 foundry/ symlink。セットアップ: docs/contributing.md）
 npm run docs:dev    # VitePressプレビュー
 npm run docs:build  # VitePressビルド

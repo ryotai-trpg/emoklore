@@ -15,11 +15,12 @@
 git clone https://github.com/ryotai-trpg/emoklore.git
 cd emoklore
 npm install
-npm run dev   # vite build --watch
+npm run dev   # 初回build + HMR付きdevサーバ（localhost:30001）
 ```
 
-- FoundryVTT の `Data/systems/emoklore` に `dist/` を配置（またはsymlink）すると、ローカルのFoundryでシステムが読み込まれる
-- `vite.config.ts` のproxy設定により、Foundry本体（既定 `localhost:30000`、環境変数 `FOUNDRY_URL` で変更可）を起動した状態で `localhost:30001` を開くと、ビルド結果が反映された画面で開発できる
+- FoundryVTT の `Data/systems/emoklore` に `dist/` を配置（またはsymlink）すると、ローカルのFoundryでシステムが読み込まれる。devサーバを使うときも必要（Foundryサーバ本体が `system.json` とテンプレートをディスクから読むため）
+- Foundry本体（既定 `localhost:30000`、環境変数 `FOUNDRY_URL` で変更可）を起動した状態で `localhost:30001` を開くと、ソースから直接配信された画面で開発できる。CSSは保存で即時反映（HMR、リロード不要）、TS・テンプレート・言語ファイルは保存で自動フルリロードされる
+- `localhost:30000` を直接開いた場合は、最後に `npm run build` した内容が表示される（devサーバの変更は乗らない）。バンドルされた実物で確認したいときは `npm run watch`（旧来の `vite build --watch`）を使う
 
 ### 型チェック
 
