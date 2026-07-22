@@ -114,10 +114,20 @@ feat: add resonance roll dialog
 
 ## リリース（メンテナ向け）
 
-1. `npm run verify:live` を通す（[実機検証](/testing#実機検証)。CIでは回らないので、ここは人が確認する）
-2. `system.json` の `version` を更新する
-3. `npm run build` で `dist/` を生成し、`dist.zip` にまとめる
-4. GitHub Releaseを作成し、`system.json` と `dist.zip` を添付する（`system.json` の `manifest` / `download` URLはlatest releaseを指している）
+**Releaseとタグを作るのは人**で、`.github/workflows/release.yml` はビルドして `system.json` と `dist.zip` を添付するだけ。draw-steel / ryuutama と同じ形にしてある。
+
+1. `system.json` の `version` を更新する
+2. `npm run verify:live` を通す（[実機検証](/testing#実機検証)。CIでは回らないので、ここは人が確認する）
+3. `develop` から `main` へPRを出す。ワークフローがビルドと `dist.zip` の作成まで走らせ、成果物を artifact に残すので、**マージ前に中身を確認できる**。`version` が最新Releaseと同じままなら通知が出る（落としはしない。`main` はドキュメントサイトのデプロイ元でもあり、版を上げないマージも通常のため）
+4. マージする
+5. GitHubのReleases画面でReleaseを作る。**タグ名は `system.json` の `version` と同じにする**（`main` を対象に「Create new tag on publish」）。ノートを書いてpublishする
+6. ワークフローが `system.json` と `dist.zip` を添付する
+
+**publish直後の数十秒はアセットがまだ無い。** `system.json` の `manifest` / `download` が指す `releases/latest/download/` は、添付が終わるまで404を返す。この間に更新確認をした利用者はエラーになるので、混む時間帯を避けるとよい。
+
+タグと `system.json` の `version` が食い違っていたらワークフローが止まる。食い違ったまま配ると更新の検知が壊れるため。ただしその時点でReleaseは公開済みなので、直してタグごと作り直すことになる。**3の通知はこれを事前に拾うためにある。**
+
+型チェックはこのワークフローでは回さない（本体ソースの調達が要るぶん重い）ので、**リリースするコミットはCIが緑であること**を確認する。テストは依存が無く一瞬なのでワークフロー側で通している。
 
 ## ドキュメントの方針（SSOT）
 
