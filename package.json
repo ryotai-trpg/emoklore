@@ -30,6 +30,7 @@
     "check:lang": "node tools/check-lang.mjs",
     "check:templates": "node tools/check-templates.mjs",
     "check:schema-doc": "node tools/check-schema-doc.mjs",
+    "check:manifest-urls": "node tools/check-manifest-urls.mjs",
     "link:foundry": "node tools/create-symlinks.mjs",
     "typecheck": "node tools/typecheck.mjs",
     "verify:live": "node tests/live/run.mjs"

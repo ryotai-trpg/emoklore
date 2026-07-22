@@ -47,6 +47,6 @@
   },
   "initiative": "@initiative",
   "manifest": "https://github.com/ryotai-trpg/emoklore/releases/latest/download/system.json",
-  "download": "https://github.com/ryotai-trpg/emoklore/releases/latest/download/dist.zip",
+  "download": "https://github.com/ryotai-trpg/emoklore/releases/download/0.0.2/dist.zip",
   "url": "https://github.com/ryotai-trpg/emoklore"
 }

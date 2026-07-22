@@ -1,5 +1,7 @@
 node_modules/
 dist/
+# リリース用の成果物（release.ymlが作る。手元でビルドしたときも落ちうる）
+dist.zip
 docs/.vitepress/dist
 docs/.vitepress/cache
 

@@ -96,8 +96,8 @@ feat: add resonance roll dialog
 
 ### 自動チェック
 
-- **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。`.hbs` を触れば `check:templates`、`lang/*.json` を触れば `check:lang`、`package.json` / `biome.json` / `ci.yml` を触れば `check:biome-version` も走る。緊急時は `git commit --no-verify` でスキップできるが非推奨
-- **CI**: pushとPRで GitHub Actions が Biome・テスト・ビルド・型チェック・翻訳/テンプレート/スキーマ表/Biomeバージョンの整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
+- **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。`.hbs` を触れば `check:templates`、`lang/*.json` を触れば `check:lang`、`system.json` を触れば `check:manifest-urls`、`package.json` / `biome.json` / `ci.yml` を触れば `check:biome-version` も走る。緊急時は `git commit --no-verify` でスキップできるが非推奨
+- **CI**: pushとPRで GitHub Actions が Biome・テスト・ビルド・型チェック・翻訳/テンプレート/スキーマ表/配布URL/Biomeバージョンの整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
   - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない
 - **依存の更新**: DependabotがnpmとGitHub Actionsを週次で見る（`.github/dependabot.yml`）。パッチとマイナーは1本にまとめ、メジャーは個別にPRが立つ。**Biomeだけは3箇所（`package.json` / `biome.json` の `$schema` / `ci.yml` の `setup-biome`）を揃える必要がある**。Dependabotが上げてくるのは `package.json` だけなので、残り2つは手で追従させる。揃っていなければ `check:biome-version` が落ちるので、追従漏れはDependabotのPRの時点で分かる
 
@@ -117,10 +117,33 @@ feat: add resonance roll dialog
 
 ## リリース（メンテナ向け）
 
-1. `npm run verify:live` を通す（[実機検証](/testing#実機検証)。CIでは回らないので、ここは人が確認する）
-2. `system.json` の `version` を更新する
-3. `npm run build` で `dist/` を生成し、`dist.zip` にまとめる
-4. GitHub Releaseを作成し、`system.json` と `dist.zip` を添付する（`system.json` の `manifest` / `download` URLはlatest releaseを指している）
+**Releaseとタグを作るのは人**で、`.github/workflows/release.yml` はビルドして `system.json` と `dist.zip` を添付するだけ。draw-steel / ryuutama と同じ形にしてある。
+
+1. `system.json` の `version` と `download` を更新する（`download` は `releases/download/<version>/dist.zip`。揃っていなければ `check:manifest-urls` が落ちるので、直し忘れはコミットの時点で分かる）
+2. `npm run verify:live` を通す（[実機検証](/testing#実機検証)。CIでは回らないので、ここは人が確認する）
+3. `develop` から `main` へPRを出す。ワークフローがビルドと `dist.zip` の作成まで走らせ、成果物を artifact に残すので、**マージ前に中身を確認できる**。`version` が最新Releaseと同じままなら通知が出る（落としはしない。`main` はドキュメントサイトのデプロイ元でもあり、版を上げないマージも通常のため）
+4. マージする
+5. GitHubのReleases画面でReleaseを作る。**タグ名は `system.json` の `version` と同じにする**（`main` を対象に「Create new tag on publish」）。ノートを書いてpublishする
+6. ワークフローが `system.json` と `dist.zip` を添付する
+
+**publish直後の数十秒はアセットがまだ無い。** `system.json` の `manifest` / `download` が指す `releases/latest/download/` は、添付が終わるまで404を返す。この間に更新確認をした利用者はエラーになるので、混む時間帯を避けるとよい。
+
+タグと `system.json` の `version` が食い違っていたらワークフローが止まる。食い違ったまま配ると更新の検知が壊れるため。ただしその時点でReleaseは公開済みなので、直してタグごと作り直すことになる。**3の通知はこれを事前に拾うためにある。**
+
+型チェックはこのワークフローでは回さない（本体ソースの調達が要るぶん重い）ので、**リリースするコミットはCIが緑であること**を確認する。テストは依存が無く一瞬なのでワークフロー側で通している。
+
+### 配布URLの決まり（`manifest` と `download`）
+
+役割が違うので方式も違う。どちらも間違えても手元では何も起きず、配ったあとに壊れる。`npm run check:manifest-urls` が両方を機械で見ている。
+
+| フィールド | 値 | なぜ |
+|---|---|---|
+| `manifest` | `releases/latest/download/system.json`（**動くポインタ**） | Foundryが更新確認で引くのは、**インストール済みの** `system.json` に書いてある `manifest`。タグ固定にすると、そのバージョンを入れた人は同じ中身をいつまでも見ることになり、更新が永久に届かない |
+| `download` | `releases/download/<version>/dist.zip`（**タグ固定**） | zipのURLは**リモートのマニフェスト**から読まれる。両方 `latest` だと latest を別々に2回解決するので、そのあいだに新しいReleaseが出ると「古いマニフェストで新しいzipを入れる」がありうる |
+
+更新確認の実装は本体の `dist/packages/system.mjs` の `System#getUpdateNotification()` と、`dist/packages/views.mjs` の `installPackage()` にある。前者が `this.manifest` をfetchして `isNewerVersion` で比べ、後者が**リモート側の** `download` を `FileDownloader` に渡す。
+
+参考システムも `manifest` は全て動くポインタで、dnd5e は `raw.githubusercontent.com/.../master/system.json`、draw-steel と ryuutama は `latest`。タグ固定にしているものは1つも無い。
 
 ## ドキュメントの方針（SSOT）
 
