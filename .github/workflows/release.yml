@@ -45,6 +45,11 @@ jobs:
           fi
           echo "version OK: $declared"
 
+      # download がタグ固定URLとして version と揃っているか。ci.yml でも見ているが、
+      # 配る直前の最後の関所なのでここでも通す
+      - name: Check manifest URLs
+        run: npm run check:manifest-urls
+
       # main はドキュメントサイトのデプロイ元でもあり、版を上げないマージも通常なので
       # ここでは落とさずに知らせるだけにする
       - name: Compare version with the latest release

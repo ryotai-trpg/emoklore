@@ -14,6 +14,12 @@ pre-commit:
       glob: "*.hbs"
       run: npm run check:templates
 
+    # manifest / download のURLは間違えても手元では何も起きず、配ったあとに壊れる。
+    # version を上げて download を直し忘れるのが典型なので、コミットの時点で見る
+    - name: manifest-urls
+      glob: "system.json"
+      run: npm run check:manifest-urls
+
     # 上のbiomeジョブのglobがjsonを含むため、lang/を編集すると整形だけ走って
     # ja/enの整合はCIまで分からなかった。2ファイルを突き合わせるのでこちらも全体を見る
     - name: lang
