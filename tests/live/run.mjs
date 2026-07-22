@@ -14,6 +14,7 @@
 import * as activeEffect from "./checks/active-effect.mjs";
 import * as characterSheet from "./checks/character-sheet.mjs";
 import * as consoleCheck from "./checks/console.mjs";
+import * as customSkill from "./checks/custom-skill.mjs";
 import * as importCheck from "./checks/import.mjs";
 import * as registration from "./checks/registration.mjs";
 import * as schema from "./checks/schema.mjs";
@@ -32,6 +33,7 @@ const CHECKS = [
   schema,
   characterSheet,
   skillRoll,
+  customSkill,
   weapon,
   activeEffect,
   importCheck,

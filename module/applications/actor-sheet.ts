@@ -35,6 +35,13 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
       case "base-skill":
         if (!isBaseSkillKey(skill)) return undefined;
         return this.actor.rollSkill({ kind: "base", key: skill });
+      case "custom-skill": {
+        // 固定表が無いので綴りは確かめようがない。判定が読むのはアクター側のミラーなので、
+        // アイテムではなくそちらに居ることを確かめる（消した直後のクリックはここで止まる）
+        const id = dataset.itemId ?? "";
+        if (!(id in this.actor.system.customSkills)) return undefined;
+        return this.actor.rollSkill({ kind: "custom", id });
+      }
       case "resonance":
         // 強度と一致度をダイアログで尋ねてから振る
         return requestResonanceRoll(this.actor);

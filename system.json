@@ -32,7 +32,8 @@
       "character": { "htmlFields": ["biography.note"] }
     },
     "Item": {
-      "weapon": { "htmlFields": ["notes"] }
+      "weapon": { "htmlFields": ["notes"] },
+      "skill": { "htmlFields": ["notes"] }
     },
     "ChatMessage": {
       "weapon": {}

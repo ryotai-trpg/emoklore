@@ -32,8 +32,13 @@
      リスト側のトラックを差し替える。行は閲覧と同じく subgrid で載るため、
      能力値がselectの行とテキストの行が混在しても縦のラインが揃う。
      段入力は 1fr で伸ばす。以前の range-picker は幅が足りず操作しづらかった */
+  /* 末尾の1列はカスタム技能の編集・削除。組込技能の行は5つしか要素を持たないので
+     そこが空くだけで、縦のラインは崩れない。行側に grid-column を書き足すと
+     subgrid の前提が崩れるため、トラックはここで足す */
   .em-skill-list--edit {
-    grid-template-columns: minmax(5rem, 1fr) 1fr minmax(5rem, 1fr) auto minmax(4rem, auto);
+    grid-template-columns:
+      minmax(5rem, 1fr) 1fr minmax(5rem, 1fr) auto minmax(4rem, auto)
+      auto;
   }
 
   /* 行の高さは中身のいちばん高いものに引きずられる。selectを持つ技能だけ
@@ -77,6 +82,30 @@
     padding-inline-end: var(--spacer-4);
   }
 
+  /* ベース区分のカスタム技能は段入力の代わりにこれが入る。段のトラックを
+     そのまま使うので、レベルを持つ行と縦のラインが揃う */
+  .em-skill-row__level-fixed {
+    color: var(--color-text-subtle);
+    font-size: var(--font-size-12);
+  }
+
+  /* 編集・削除。地と枠は本体のボタンに任せ、ここは並べ方だけを持つ */
+  .em-skill-row__controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacer-2);
+    margin-inline-start: var(--spacer-4);
+  }
+
+  .em-skill-row__control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--emoklore-row-control-size);
+    height: var(--emoklore-row-control-size);
+    cursor: pointer;
+  }
+
   /* --- 判定のトリガであることを示す ---
 
      クリックできるのは技能名（a要素）だが、当たり判定が文字幅しかないと
@@ -113,5 +142,12 @@
       outline: 2px solid var(--button-focus-outline-color);
       outline-offset: -2px;
     }
+  }
+
+  /* 技能を作成。リストの外（下）に置くので、位置決めは置く側が持つ決まりに従い
+     ここでは持たず、character-sheet.css が余白を与える */
+  .em-skill-list__footer {
+    display: flex;
+    justify-content: center;
   }
 }

@@ -1,5 +1,6 @@
 import type { EffectChangeData } from "@common/documents/_types.mjs";
 import { systemPath } from "../constants";
+import type { EmokloreItem } from "../documents/item";
 import {
   composeModifierKey,
   composeTargetId,
@@ -11,6 +12,7 @@ import {
   parseTargetId,
 } from "../utils/effect-keys";
 import { typedEntries } from "../utils/object";
+import { skillMarker } from "../utils/skill";
 
 /**
  * 「キーを直接書く」を表す選択肢の値。
@@ -38,8 +40,28 @@ type ChangeRenderContext = {
   changeType?: unknown;
 };
 
+/**
+ * 効果を持っているアクターのカスタム技能。
+ *
+ * 組込の4表と違ってアクターごとに中身が変わるので、CONFIG ではなく効果の親から引く。
+ * 親がアイテム（武器など）のときは、どのアクターに付くか決まっていないので出さない。
+ * 選択肢に出ないだけで、キーを直接指定する逃げ道（RAW_KEY_TARGET_ID）は残る。
+ */
+const buildCustomSkillOptions = (effect: { parent?: unknown }): Option[] => {
+  const parent = effect.parent as { documentName?: string; items?: Iterable<EmokloreItem> };
+  if (parent?.documentName !== "Actor") return [];
+
+  return [...(parent.items ?? [])]
+    .filter((item) => item.isSkill())
+    .map((item) => ({
+      value: composeTargetId({ kind: "collection", collection: "customSkills", key: item.id! }),
+      // 区分の印はシートやチャットと同じ。組込技能と名前が同じでも見分けが付く
+      label: `${skillMarker(item.system.isBase, item.system.isExtra)}${item.name}`,
+    }));
+};
+
 /** 修正の適用先の選択肢。表ごとに optgroup へ分ける */
-const buildTargetGroups = (): OptionGroup[] => {
+const buildTargetGroups = (customSkills: Option[]): OptionGroup[] => {
   const { characteristics, skillGroups, skills, baseSkills } = CONFIG.EMOKLORE;
   const localize = (key: string) => game.i18n.localize(key);
 
@@ -80,6 +102,15 @@ const buildTargetGroups = (): OptionGroup[] => {
       label: localize("EMOKLORE.Effect.TargetGroup.baseSkills"),
       options: toOptions("baseSkills", baseSkills, (_key, label) => `＊${label}`),
     },
+    // 持っていなければ optgroup ごと出さない
+    ...(customSkills.length > 0
+      ? [
+          {
+            label: localize("EMOKLORE.Effect.TargetGroup.customSkills"),
+            options: customSkills,
+          },
+        ]
+      : []),
     {
       label: localize("EMOKLORE.Effect.TargetGroup.other"),
       options: [
@@ -99,6 +130,10 @@ const buildTargetGroups = (): OptionGroup[] => {
  * 行動値やHP最大値に効果を乗せられるが、本体のシートからは選べない。
  */
 export class EmokloreActiveEffectConfig extends foundry.applications.sheets.ActiveEffectConfig {
+  // DocumentSheetV2 由来のメンバーは本体JSDocのジェネリクス消失で型に出ない。
+  // 適用先の選択肢を効果の親から作るので、ここで補う
+  declare document: foundry.documents.ActiveEffect & { parent?: unknown };
+
   static override DEFAULT_OPTIONS = {
     ...super.DEFAULT_OPTIONS,
     // 自前のCSSは .emoklore の下に書いてあるので、印を付けて届くようにする
@@ -137,7 +172,7 @@ export class EmokloreActiveEffectConfig extends foundry.applications.sheets.Acti
       systemPath("templates/apps/effect-change.hbs"),
       {
         ...context,
-        targetGroups: buildTargetGroups(),
+        targetGroups: buildTargetGroups(buildCustomSkillOptions(this.document)),
         aspects: MODIFIER_ASPECTS.map((aspect) => ({
           value: aspect,
           label: game.i18n.localize(`EMOKLORE.Effect.Aspect.${aspect}`),

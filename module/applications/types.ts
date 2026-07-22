@@ -2,7 +2,7 @@ import type { ApplicationRenderContext, ApplicationTab } from "@client/applicati
 import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { CharacterDataModel } from "../data/character";
-import type { WeaponDataModel } from "../data/item-models";
+import type { SkillDataModel, WeaponDataModel } from "../data/item-models";
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import type { ModifierSet } from "../rules/types";
@@ -88,6 +88,41 @@ export type BiographyRow = {
   field: unknown;
   inline: boolean;
   html: boolean;
+};
+
+/**
+ * カスタム技能1行の表示用データ。
+ *
+ * 組込技能（SkillRow）と違ってスキーマのフィールドを渡さない。編集の出し分けは
+ * 「フィールドがあるか」ではなく「選べる能力値が2件以上か」で決まるため。
+ */
+export type CustomSkillRow = {
+  /** 元になる skill アイテムのid。編集・削除・判定はこれで引く */
+  id: string;
+  /** アイテムの名前をそのまま使う */
+  label: string;
+  /** 区分の印。ベースは `＊`、エクストラは `★`、通常は空 */
+  marker: string;
+  level: number;
+  target: number;
+  isBase: boolean;
+  /** 技能ポイントを倍で数えるかの判断に使う。表示側は marker を見る */
+  isExtra: boolean;
+  /** 能力値の表示名。選べるものが1件のときに出す */
+  characteristicLabel: string;
+  /** 能力値のFont Awesomeアイコンクラス */
+  characteristicIcon: string;
+  /** 2件以上あれば選択欄を出す。1件なら表示名だけ */
+  characteristicOptions: Array<{ value: string; label: string; selected: boolean }>;
+  hasCharacteristicChoice: boolean;
+  /**
+   * 段入力のラジオをまとめる name。保存しないミラーのパスを指す。
+   *
+   * 実際の書き込みは selectSegment がアイテムへ回す。フォームに載っても
+   * `persisted: false` の枠なので本体が捨てる（保存データには出ない）
+   */
+  name: string;
+  levelSegments: ValueSegment[];
 };
 
 /** 基本技能の表示用データ。判定のトリガとして1行1ボタンで並べる */
@@ -227,6 +262,10 @@ export type CharacterContext = {
   sidebarCollapsed?: boolean;
   skills?: Record<string, SkillRow>;
   baseSkills?: BaseSkillRow[];
+  /** 技能リストに並べるカスタム技能（通常・エクストラ、編集モードではベースも） */
+  customSkills?: CustomSkillRow[];
+  /** 基本技能のチップ列に並べるカスタム技能（ベース区分のみ、閲覧モードだけ） */
+  customBaseSkills?: CustomSkillRow[];
   skillPointSum?: number;
   skillPointMax?: number;
   // 経歴は横並びの組（年齢・性別）と、それ以降を分けて渡す
@@ -242,6 +281,32 @@ export type CharacterContext = {
   limited: boolean;
   gm: boolean;
   document: EmokloreActor;
+  systemFields: Record<string, foundry.data.fields.DataField>;
+  flags: Record<string, unknown>;
+};
+
+/**
+ * カスタム技能シートのコンテキスト。
+ *
+ * CharacterContext と同じく、基底は継承せず必要なものを並べ直している（理由は上を参照）。
+ */
+export type SkillContext = {
+  system: SkillDataModel;
+  /** 区分の翻訳済み表示名。「ベース技能」「通常技能」「エクストラ技能」 */
+  categoryLabel: string;
+  /** 参照能力値。複数あるものは「身体／器用」 */
+  characteristicLabel: string;
+  /** 技能グループの翻訳済み表示名。所属しなければ「なし」 */
+  groupLabel: string;
+  /** レベルの行を出すか。ベース技能はレベルを持たないので出さない */
+  showLevel: boolean;
+  /** enrichHTML 済みの備考 */
+  notesHTML: string;
+  isPlay: boolean;
+  owner: boolean;
+  limited: boolean;
+  gm: boolean;
+  document: EmokloreItem;
   systemFields: Record<string, foundry.data.fields.DataField>;
   flags: Record<string, unknown>;
 };

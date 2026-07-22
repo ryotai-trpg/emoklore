@@ -1,0 +1,41 @@
+{{! Skill Detail }}
+<section class="em-item-detail">
+  {{#if isPlay}}
+    {{! ラベルは LOCALIZATION_PREFIXES 経由で本体が翻訳済みにしている }}
+    <div class="em-field-list">
+      <div class="em-field em-field--inline">
+        <label class="em-field__label">{{systemFields.category.label}}</label>
+        <span class="em-field__value">{{categoryLabel}}</span>
+      </div>
+      <div class="em-field em-field--inline">
+        <label class="em-field__label">{{systemFields.characteristicOptions.label}}</label>
+        <span class="em-field__value">{{characteristicLabel}}</span>
+      </div>
+      <div class="em-field em-field--inline">
+        <label class="em-field__label">{{systemFields.group.label}}</label>
+        <span class="em-field__value">{{groupLabel}}</span>
+      </div>
+      {{#if showLevel}}
+        <div class="em-field em-field--inline">
+          <label class="em-field__label">{{systemFields.level.label}}</label>
+          <span class="em-field__value">Lv.{{system.level}}</span>
+        </div>
+      {{/if}}
+      <div class="em-field">
+        <label class="em-field__label">{{systemFields.notes.label}}</label>
+        <span class="em-field__value">{{{notesHTML}}}</span>
+      </div>
+    </div>
+  {{else}}
+    {{! choices にはi18nキーが入っているので、描画時に本体へ解決させる。
+        グループは blank を許すので、空欄の見出しだけこちらで名前を付ける }}
+    {{formGroup systemFields.category value=system.category localize=true}}
+    {{formGroup systemFields.characteristicOptions value=system.characteristicOptions localize=true}}
+    {{formGroup systemFields.group value=system.group localize=true
+      blank=(localize "EMOKLORE.Common.none")}}
+    {{#if showLevel}}
+      {{formGroup systemFields.level value=system.level}}
+    {{/if}}
+    {{formGroup systemFields.notes value=system.notes}}
+  {{/if}}
+</section>

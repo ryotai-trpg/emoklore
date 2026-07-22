@@ -5,8 +5,10 @@ import {
   BIOGRAPHY_FIELDS,
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
+  buildSkillLevelSegments,
   buildValueSegments,
   getEmotionRows,
+  resolveSegmentValue,
 } from "./helpers";
 
 // performPreLocalization 済みの CONFIG を模す。label は翻訳済みの文字列になっている
@@ -139,5 +141,46 @@ describe("buildValueSegments", () => {
   it("範囲外の現在値ではどの段も checked にならない", () => {
     // スキーマのバリデーションを通れば起きないが、壊れたデータで例外にはしない
     expect(buildValueSegments(1, 6, 99).some((s) => s.checked)).toBe(false);
+  });
+});
+
+describe("buildSkillLevelSegments", () => {
+  it("Lv.0 の段は置かず、1から上限までを出す", () => {
+    expect(buildSkillLevelSegments(0).map((s) => s.value)).toEqual([1, 2, 3]);
+  });
+
+  it("修得済みならその段が checked になる", () => {
+    expect(
+      buildSkillLevelSegments(2)
+        .filter((s) => s.checked)
+        .map((s) => s.value),
+    ).toEqual([2]);
+  });
+
+  it("未修得ではどの段も checked にならない", () => {
+    expect(buildSkillLevelSegments(0).some((s) => s.checked)).toBe(false);
+  });
+});
+
+describe("resolveSegmentValue", () => {
+  it("選択中でない段を押したらその値になる", () => {
+    expect(resolveSegmentValue(3, 1, 0)).toBe(3);
+  });
+
+  it("選択中の段を押し直したら clearTo に戻る", () => {
+    expect(resolveSegmentValue(2, 2, 0)).toBe(0);
+  });
+
+  // 能力値の段は1未満にならないので clearTo を持たない。押し直しても何も起きない
+  it("clearTo が無い入力を押し直したら書かない", () => {
+    expect(resolveSegmentValue(4, 4, undefined)).toBeNull();
+  });
+
+  it("clearTo が無くても、別の段を押すぶんには書く", () => {
+    expect(resolveSegmentValue(5, 4, undefined)).toBe(5);
+  });
+
+  it("clearTo が0以外でも戻り先として使える", () => {
+    expect(resolveSegmentValue(1, 1, 1)).toBe(1);
   });
 });

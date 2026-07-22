@@ -21,7 +21,7 @@
 /* Applications — module/applications/ と対で、部品の配置と寸法を持つ */
 @import url("./applications/document-sheet.css");
 @import url("./applications/character-sheet.css");
-@import url("./applications/weapon-sheet.css");
+@import url("./applications/item-sheet.css");
 @import url("./applications/charsheet-import-dialog.css");
 @import url("./applications/active-effect-config.css");
 

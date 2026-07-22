@@ -14,5 +14,21 @@
     <i class="em-chip__icon fa-solid {{baseSkill.characteristicIcon}}"></i>
   </button>
   {{/each}}
+
+  {{! ベース区分のカスタム技能も同じ列に並べる。組込と同じく修得の概念がないので、
+      レベルによらず常に振れる }}
+  {{#each customBaseSkills as |baseSkill|}}
+  <button
+    type="button"
+    class="em-chip"
+    data-action="roll"
+    data-roll-type="custom-skill"
+    data-item-id="{{baseSkill.id}}"
+  >
+    {{baseSkill.marker}}{{baseSkill.label}}
+    <span class="em-chip__target">{{baseSkill.target}}</span>
+    <i class="em-chip__icon fa-solid {{baseSkill.characteristicIcon}}"></i>
+  </button>
+  {{/each}}
 </div>
 {{/if}}

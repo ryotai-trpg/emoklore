@@ -1,0 +1,20 @@
+{{!--
+  カスタム技能1行（閲覧）。組込技能の skill-row-play.hbs と同じ列に載る。
+
+  違いは区分の印（＊/★）だけ。組込技能は名前をルールブックで引けるが、カスタム技能は
+  引けないので、区分が分かるのはここしかない。チャットの見出しと効果の適用先も同じ印を使う。
+
+  @param skill カスタム技能の表示用データ（CustomSkillRow）
+--}}
+<div class="em-skill-row">
+  <a
+    class="em-skill-row__name"
+    data-action="roll"
+    data-roll-type="custom-skill"
+    data-item-id="{{skill.id}}"
+  >{{skill.marker}}{{skill.label}}</a>
+  <span class="em-skill-row__level">Lv.{{skill.level}}</span>
+  <progress class="em-progress em-progress--sm" value="{{skill.level}}" max="3"></progress>
+  <span class="em-skill-row__target">{{skill.target}}</span>
+  <i class="em-skill-row__stat fa-solid {{skill.characteristicIcon}}"></i>
+</div>

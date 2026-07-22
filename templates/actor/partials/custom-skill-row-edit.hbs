@@ -1,0 +1,66 @@
+{{!--
+  カスタム技能1行（編集）。組込技能の skill-row-edit.hbs と同じ列に載り、末尾に
+  編集・削除の操作列が付く。
+
+  組込技能は分野（特化）の欄がその位置に来るが、カスタム技能は特化を持たないので、
+  同じ列を能力値の選択に使わず空けている（列を保つため枠だけ置く）。
+
+  data-item-id / data-document-class は、判定・編集・削除・レベルの書き込みが
+  どのアイテムのものかを引くためのフック（utils/sheet.ts の getEmbeddedDocument）。
+
+  @param skill カスタム技能の表示用データ（CustomSkillRow）
+--}}
+<div
+  class="em-skill-row em-skill-row--edit em-skill-row--custom"
+  data-item-id="{{skill.id}}"
+  data-document-class="Item"
+>
+  <span class="em-skill-row__name">{{skill.marker}}{{skill.label}}</span>
+
+  {{! 組込技能で分野が入る列。カスタム技能は使わないが、列を保つため空けておく }}
+  <span class="em-skill-row__spec"></span>
+
+  {{! ベース技能はレベルを持たないので段を置かない }}
+  {{#if skill.isBase}}
+    <span class="em-skill-row__level-fixed">{{localize "EMOKLORE.Skill.NoLevel"}}</span>
+  {{else}}
+    {{> "systems/emoklore/templates/actor/partials/segments.hbs"
+      name=skill.name
+      segments=skill.levelSegments
+      label=skill.label
+      clearTo=0}}
+  {{/if}}
+
+  <span class="em-skill-row__target">{{skill.target}}</span>
+
+  {{! 参照能力値が2つ以上あるものだけ選べる。スキーマの choices ではなく件数で決まるので
+      formInput ではなく素の select を書く }}
+  {{#if skill.hasCharacteristicChoice}}
+    <span class="em-skill-row__stat">
+      <select data-skill-characteristic aria-label="{{skill.label}}">
+        {{#each skill.characteristicOptions as |option|}}
+          <option value="{{option.value}}" {{#if option.selected}}selected{{/if}}>{{option.label}}</option>
+        {{/each}}
+      </select>
+    </span>
+  {{else}}
+    <span class="em-skill-row__stat">{{skill.characteristicLabel}}</span>
+  {{/if}}
+
+  <span class="em-skill-row__controls">
+    <a
+      class="em-skill-row__control"
+      data-action="viewDoc"
+      data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
+    >
+      <i class="fas fa-edit"></i>
+    </a>
+    <a
+      class="em-skill-row__control"
+      data-action="deleteDoc"
+      data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
+    >
+      <i class="fas fa-trash"></i>
+    </a>
+  </span>
+</div>

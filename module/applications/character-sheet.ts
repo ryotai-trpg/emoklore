@@ -7,34 +7,35 @@ import {
   calculateTotalSkillPoints,
   SKILL_POINT_MAX,
 } from "../rules/character-points";
-import {
-  CHARACTERISTIC_MAX,
-  CHARACTERISTIC_MIN,
-  SKILL_LEVEL_MAX,
-  SKILL_LEVEL_MIN,
-} from "../rules/limits";
+import { CHARACTERISTIC_MAX, CHARACTERISTIC_MIN } from "../rules/limits";
 import { getSetting, setSetting } from "../settings";
 import { prepareActiveEffectCategories } from "../utils/effects";
 import { typedEntries } from "../utils/object";
 import {
   createDocumentData,
+  enrichDocumentHTML,
   getEmbeddedDocument,
   resolveEmbeddedDocumentClass,
 } from "../utils/sheet";
+import { skillMarker } from "../utils/skill";
 import { formatDamagePreview, formatRangeLabel } from "../utils/weapon";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
+import { promptCreateSkill } from "./dialogs/create-skill-dialog";
 import {
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
+  buildSkillLevelSegments,
   buildValueSegments,
   createEmotionOptions,
   getEmotionRows,
+  resolveSegmentValue,
 } from "./helpers";
 import type {
   BaseSkillRow,
   CharacterContext,
   CharacteristicsMap,
+  CustomSkillRow,
   EmokloreRenderOptions,
   LabeledField,
   SkillRow,
@@ -79,6 +80,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       importCharacter: this._importCharacter,
       selectSegment: this._selectSegment,
       toggleSidebar: this._toggleSidebar,
+      createSkill: this._createSkill,
     },
   };
 
@@ -109,6 +111,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         "templates/actor/base-skills.hbs",
         "templates/actor/partials/skill-row-play.hbs",
         "templates/actor/partials/skill-row-edit.hbs",
+        "templates/actor/partials/custom-skill-row-play.hbs",
+        "templates/actor/partials/custom-skill-row-edit.hbs",
         "templates/actor/partials/segments.hbs",
       ].map(systemPath),
       scrollable: [""],
@@ -213,6 +217,41 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   }
 
   /**
+   * カスタム技能を作る。
+   *
+   * `createDoc` は dataset をそのまま作成データに載せる汎用の口だが、技能は名前と
+   * 参照能力値が決まっていないと行を描けないので、先にダイアログで尋ねる。
+   * 「尋ねるかどうか」はプレゼンテーションの決定なので applications 側に置く。
+   */
+  static async _createSkill(this: EmokloreCharacterSheet, event: Event, _target: HTMLElement) {
+    event.preventDefault();
+
+    const input = await promptCreateSkill();
+    if (!input) return;
+
+    // defaultName / create は ClientDocumentMixin 由来で本体の型に出ないため、
+    // utils/sheet.ts の口を通す（createDoc と同じ経路）
+    const docCls = resolveEmbeddedDocumentClass("Item");
+
+    await docCls.create(
+      {
+        // 名前は空でも通す。あとから鉛筆で直せるので、入力し直しを強いるより
+        // 既定の名前で作ってしまうほうが早い（本体の createDoc と同じ扱い）
+        name: input.name || docCls.defaultName({ type: "skill", parent: this.actor }),
+        type: "skill",
+        system: {
+          category: input.category,
+          characteristicOptions: input.characteristicOptions,
+          // 選べるものが1つでも、判定に使う能力値は明示しておく
+          characteristic: input.characteristicOptions[0],
+          group: input.group,
+        },
+      },
+      { parent: this.actor },
+    );
+  }
+
+  /**
    * 段入力で、いま選ばれている段をもう一度押したときに値を戻す。
    *
    * ラジオは押しても外れないので、0（未修得）に戻す手段がこれしかない。
@@ -223,20 +262,64 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
    */
   static async _selectSegment(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
     const input = target as HTMLInputElement;
-    // 属性が無い・空なら解除できない入力（能力値は1未満にならない）。
-    // Number("") は NaN ではなく 0 なので、空文字は先に弾く
-    const raw = input.dataset.clearTo;
-    if (!raw) return;
-    const clearTo = Number(raw);
-    if (!Number.isFinite(clearTo)) return;
+    const value = Number(input.value);
+    if (!Number.isFinite(value)) return;
 
-    const current = foundry.utils.getProperty(this.actor, input.name);
-    if (Number(input.value) !== current) return;
+    // Number("") は NaN ではなく 0 なので、空文字は「属性が無い」と同じに倒す
+    const raw = input.dataset.clearTo;
+    const clearTo = raw ? Number(raw) : undefined;
+
+    // カスタム技能のレベルはアイテム側が正。段の name はアクター側のミラー
+    // （保存しない枠）を指しているので、フォームの送信に任せると値がどこにも残らない。
+    // 組込技能・能力値は name がそのまま保存先なので、書き込みはフォームに任せる
+    const itemId = input.closest<HTMLElement>("[data-item-id]")?.dataset.itemId;
+    const item = itemId ? this.actor.items.get(itemId) : undefined;
+
+    if (item?.isSkill()) {
+      const next = resolveSegmentValue(value, item.system.level, clearTo);
+      if (next === null || next === item.system.level) return;
+
+      // ラジオの既定動作を止めないと、checked が立ったままアクターのフォームが送られる
+      event.preventDefault();
+      await item.update({ "system.level": next });
+      return;
+    }
+
+    const current = Number(foundry.utils.getProperty(this.actor, input.name));
+    const next = resolveSegmentValue(value, current, clearTo);
+    // 選択中でない段（next === value）はラジオの既定動作と submitOnChange に任せる。
+    // 戻せない入力（能力値は1未満にならない）で押し直したときは null が返る
+    if (next === null || next === value) return;
 
     // ラジオの既定動作を止めないと、checked が立って submitOnChange が
     // 元の値で送られ、こちらの更新を打ち消してしまう
     event.preventDefault();
-    await this.actor.update({ [input.name]: clearTo });
+    await this.actor.update({ [input.name]: next });
+  }
+
+  /**
+   * カスタム技能の参照能力値を書く。
+   *
+   * 本体の actions はクリックしか見ないので、select の change はフォームの change を
+   * 拾う本体の口（`_onChangeForm`）で受ける。リスナは初回描画で1本張られたきり
+   * 差し替わらないので、描画のたびに繋ぎ直す必要がない。
+   *
+   * 拾ったぶんは super に渡さない。この select は name を持たずアイテム側が保存先なので、
+   * アクターのフォームを送っても何も起きない。
+   */
+  override _onChangeForm(formConfig: unknown, event: Event): void {
+    const select = (event.target as HTMLElement | null)?.closest?.<HTMLSelectElement>(
+      "select[data-skill-characteristic]",
+    );
+
+    if (select) {
+      const itemId = select.closest<HTMLElement>("[data-item-id]")?.dataset.itemId;
+      const item = itemId ? this.actor.items.get(itemId) : undefined;
+      if (item?.isSkill()) void item.update({ "system.characteristic": select.value });
+      return;
+    }
+
+    super._onChangeForm(formConfig, event);
   }
 
   /**
@@ -337,8 +420,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
             characteristicLabel: characteristic.label,
             characteristicIcon: characteristic.fa,
             name: `system.skills.${key}.level`,
-            // 段は1から。0（未修得）は段を置かず、選択中の段を押し直して戻す
-            levelSegments: buildValueSegments(SKILL_LEVEL_MIN + 1, SKILL_LEVEL_MAX, entry.level),
+            levelSegments: buildSkillLevelSegments(entry.level),
           },
         ];
       }),
@@ -373,28 +455,63 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     context.sidebarCollapsed = getSetting("sidebarCollapsed");
   }
 
-  private _prepareSkillsContext(context: CharacterContext): void {
-    context.skills = this._getSkills();
-    context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills);
-    context.skillPointMax = SKILL_POINT_MAX;
-    context.baseSkills = this._getBaseSkills();
+  /**
+   * カスタム技能の表示用データ。
+   *
+   * 判定に効く値はアクター側のミラー（system.customSkills）から、名前と区分は
+   * アイテムから引く。ミラーは prepareBaseData が作るので、効果を適用したあとの
+   * レベルと目標値がそのまま入っている。
+   */
+  _getCustomSkills(): CustomSkillRow[] {
+    // 行に要る値はすべてミラーに揃っているので、アイテムは引き直さない。
+    // 並び順は prepareBaseData が actor.items の順に詰めたまま
+    return Object.entries(this.actor.system.customSkills).map(([id, entry]) => {
+      const characteristic = CONFIG.EMOKLORE.characteristics[entry.characteristic];
+      const options = entry.characteristicOptions.map((key) => ({
+        value: key,
+        label: CONFIG.EMOKLORE.characteristics[key].label,
+        selected: key === entry.characteristic,
+      }));
+
+      return {
+        id,
+        label: entry.label,
+        marker: skillMarker(entry.isBase, entry.isExtra),
+        level: entry.level,
+        target: entry.target,
+        isBase: entry.isBase,
+        isExtra: entry.isExtra,
+        characteristicLabel: characteristic.label,
+        characteristicIcon: characteristic.fa,
+        characteristicOptions: options,
+        hasCharacteristicChoice: options.length > 1,
+        name: `system.customSkills.${id}.level`,
+        levelSegments: buildSkillLevelSegments(entry.level),
+      };
+    });
   }
 
-  /**
-   * 経歴の表示用データ。
-   *
-   * 備考は system.json で htmlFields に指定しているリッチテキストなので、
-   * @UUID リンクやインラインロールを解決するため描画前に enrichHTML を通す。
-   */
+  private _prepareSkillsContext(context: CharacterContext): void {
+    context.skills = this._getSkills();
+    context.baseSkills = this._getBaseSkills();
+
+    const customSkills = this._getCustomSkills();
+    const base = customSkills.filter((skill) => skill.isBase);
+    const leveled = customSkills.filter((skill) => !skill.isBase);
+
+    // 閲覧モードのベース技能はチップ列に並ぶ。編集モードは編集・削除の口が要るので
+    // 区分に関わらず技能リストへ出す（組込の基本技能は編集する項目が無いので出ない）
+    context.customSkills = context.isPlay ? leveled : customSkills;
+    context.customBaseSkills = context.isPlay ? base : [];
+
+    // ベース技能はレベルを持たないので技能ポイントを消費しない
+    context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills, leveled);
+    context.skillPointMax = SKILL_POINT_MAX;
+  }
+
+  /** 経歴の表示用データ */
   private async _prepareBiographyContext(context: CharacterContext): Promise<void> {
-    const noteHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      this.actor.system.biography.note,
-      {
-        secrets: this.actor.isOwner,
-        relativeTo: this.actor,
-        rollData: this.actor.getRollData(),
-      },
-    );
+    const noteHTML = await enrichDocumentHTML(this.actor, this.actor.system.biography.note);
 
     // systemFields の型は DataField 止まりで fields に降りられないため、スキーマから引く。
     // fields の値も label を持つ形に補っておき、キャストを1回で済ませる
@@ -441,9 +558,21 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
   }
 
-  private _calculateSkillPointSumFromContext(skills: Record<string, SkillRow>): number {
-    const skillsObject = Object.values(skills);
-    const exSkillsObject = skillsObject.filter((skill) => skill.isExtra);
-    return calculateTotalSkillPoints(skillsObject, exSkillsObject);
+  /**
+   * 消費した技能ポイント。
+   *
+   * カスタム技能も同じ表で数える。ベース技能はレベルを持たないので呼び出し側が除いてある。
+   * エクストラ技能はコストが倍なので、`calculateTotalSkillPoints` の約束どおり
+   * 全体と ex の両方に入れて2回数えさせる。
+   */
+  private _calculateSkillPointSumFromContext(
+    skills: Record<string, SkillRow>,
+    customSkills: CustomSkillRow[],
+  ): number {
+    const all = [...Object.values(skills), ...customSkills];
+    return calculateTotalSkillPoints(
+      all,
+      all.filter((skill) => skill.isExtra),
+    );
   }
 }

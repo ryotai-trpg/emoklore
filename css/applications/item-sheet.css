@@ -1,11 +1,12 @@
-/* 武器シート固有のレイアウト。部品の中身ではなく配置と寸法を持つ */
+/* アイテムシート共通のレイアウト。templates/item/header.hbs と、
+   種別ごとの詳細（.em-item-detail）を使うシートで成立する */
 
-.emoklore.sheet.weapon:not(.minimized, .minimizing, .maximizing) {
+.emoklore.sheet.item:not(.minimized, .minimizing, .maximizing) {
   min-width: 320px;
   min-height: 320px;
 }
 
-.emoklore.sheet.weapon {
+.emoklore.sheet.item {
   /* 画像と名前を横に並べ、中央で揃える。
      名前の列は minmax(0, 1fr)。grid item の既定は min-width: auto なので、
      これがないと長い名前が列を押し広げて画像を枠外へ追い出す */
@@ -51,7 +52,8 @@
     }
   }
 
-  .em-weapon-detail {
+  /* 種別ごとの詳細。並ぶ項目は違うが、器の余白と折り返しは共通 */
+  .em-item-detail {
     padding: var(--spacer-8) 0;
 
     /* 備考は長さが読めないので、折り返して器の中に収める */

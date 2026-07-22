@@ -2,6 +2,7 @@ import { systemPath } from "../constants";
 import type { SkillRollContext } from "../data/character";
 import type { EmokloreRoll } from "../dice/emoklore-roll";
 import type { EmokloreActor } from "../documents/actor";
+import { skillMarker } from "./skill";
 
 const DAMAGE_APPLIED_TEMPLATE = systemPath("templates/chat/damage-applied.hbs");
 
@@ -79,7 +80,7 @@ export function formatSkillName({
   isExtra,
   specialization,
 }: SkillRollContext): string {
-  const prefix = isBase ? "＊" : isExtra ? "★" : "";
+  const prefix = skillMarker(isBase, isExtra);
   const suffix = specialization
     ? `${game.i18n.localize("EMOKLORE.Common.colon")}${specialization}`
     : "";

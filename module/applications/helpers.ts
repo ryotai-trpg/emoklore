@@ -1,5 +1,6 @@
 import type { EmotionAttributeConfig } from "../config/emotion-attributes";
 import type { ResonantEmotionConfig } from "../config/resonant-emotions";
+import { SKILL_LEVEL_MAX, SKILL_LEVEL_MIN } from "../rules/limits";
 import type { BiographyFieldDef, BiographyRow, EmotionKey, EmotionRow } from "./types";
 
 /**
@@ -121,4 +122,30 @@ export const buildValueSegments = (min: number, max: number, current: number): V
     segments.push({ value, checked: value === current });
   }
   return segments;
+};
+
+/**
+ * 技能レベルの段。組込技能もカスタム技能も同じ並びを使う。
+ *
+ * Lv.0 の段は置かない。バーの左端が常に空いて見えるのを嫌ったため、未修得へは
+ * 「選択中の段をもう一度押す」で戻す（`resolveSegmentValue` がその判断を持つ）。
+ */
+export const buildSkillLevelSegments = (current: number): ValueSegment[] =>
+  buildValueSegments(SKILL_LEVEL_MIN + 1, SKILL_LEVEL_MAX, current);
+
+/**
+ * 段をクリックしたときに書き込む値。押し直しなら未修得へ戻す。
+ *
+ * ラジオは押しても外れないので、0 に戻す手段がこれしかない。書き込み先が
+ * アクターでもアイテムでも判断は同じなので、値を決めるところだけを純粋関数にしてある。
+ *
+ * `null` は「書かない」。戻せない入力（能力値は1未満にならない）で押し直したときに返る。
+ */
+export const resolveSegmentValue = (
+  value: number,
+  current: number,
+  clearTo: number | undefined,
+): number | null => {
+  if (value !== current) return value;
+  return clearTo === undefined ? null : clearTo;
 };

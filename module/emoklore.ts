@@ -3,11 +3,12 @@
 import "../css/emoklore.css";
 import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
 import * as applications from "./applications/character-sheet";
+import { EmokloreSkillSheet } from "./applications/skill-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
 import { statusEffects } from "./config/status-effects";
 import { CharacterDataModel } from "./data/character";
-import { WeaponDataModel } from "./data/item-models";
+import { SkillDataModel, WeaponDataModel } from "./data/item-models";
 import { WeaponCardModel } from "./data/messages/weapon-card";
 import { EmokloreDie } from "./dice/emoklore-die";
 import { EmokloreRoll } from "./dice/emoklore-roll";
@@ -44,6 +45,7 @@ Hooks.once("init", () => {
   } as typeof CONFIG.Actor.dataModels;
   CONFIG.Item.dataModels = {
     weapon: WeaponDataModel,
+    skill: SkillDataModel,
   } as typeof CONFIG.Item.dataModels;
   CONFIG.ChatMessage.dataModels = {
     weapon: WeaponCardModel,
@@ -102,6 +104,18 @@ Hooks.once("init", () => {
       types: ["weapon"],
       makeDefault: true,
       label: "EMOKLORE.Sheet.class.weapon",
+    },
+  );
+
+  DocumentSheetConfig.registerSheet(
+    Item,
+    "emoklore",
+    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
+    EmokloreSkillSheet as unknown as typeof foundry.applications.api.ApplicationV2,
+    {
+      types: ["skill"],
+      makeDefault: true,
+      label: "EMOKLORE.Sheet.class.skill",
     },
   );
 

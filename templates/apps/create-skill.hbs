@@ -1,0 +1,48 @@
+{{! 本体の standard-form 体系に乗せる。name 属性は create-skill-dialog.ts が
+    form.elements / querySelector で引くインターフェースなので変えない }}
+<div class="form-group">
+  <label for="skill-name">{{localize "EMOKLORE.Skill.Name"}}</label>
+  {{! required は付けない。ApplicationV2 の action がボタンのクリックを横取りして
+      _onSubmit を直接呼ぶので、本体のフォーム検証は走らない（見た目だけの嘘になる）。
+      空のときは既定の名前で作る（create-skill-dialog.ts 参照） }}
+  <input name="name" id="skill-name" type="text"
+    placeholder="{{localize "EMOKLORE.Skill.NamePlaceholder"}}" autofocus>
+</div>
+
+<div class="form-group stacked">
+  <label>{{localize "EMOKLORE.Item.skill.FIELDS.category.label"}}</label>
+  <div class="form-fields">
+    {{#each categories as |category|}}
+      <label>
+        <input type="radio" name="category" value="{{category.value}}" {{checked category.checked}}>
+        {{category.label}}
+      </label>
+    {{/each}}
+  </div>
+</div>
+
+{{! 複数選ぶと【身体 or 器用】のように判定時に選べるようになる }}
+<div class="form-group stacked">
+  <label>{{localize "EMOKLORE.Item.skill.FIELDS.characteristicOptions.label"}}</label>
+  <div class="form-fields em-skill-create__characteristics">
+    {{#each characteristics as |characteristic|}}
+      <label>
+        <input type="checkbox" name="characteristics" value="{{characteristic.value}}" {{checked characteristic.checked}}>
+        <i class="fa-solid {{characteristic.icon}}"></i>
+        {{characteristic.label}}
+      </label>
+    {{/each}}
+  </div>
+  <p class="hint">{{localize "EMOKLORE.Item.skill.FIELDS.characteristicOptions.hint"}}</p>
+</div>
+
+<div class="form-group">
+  <label for="skill-group">{{localize "EMOKLORE.Item.skill.FIELDS.group.label"}}</label>
+  <select name="group" id="skill-group">
+    <option value="">{{localize "EMOKLORE.Common.none"}}</option>
+    {{#each groups as |group|}}
+      <option value="{{group.value}}">{{group.label}}</option>
+    {{/each}}
+  </select>
+  <p class="hint">{{localize "EMOKLORE.Item.skill.FIELDS.group.hint"}}</p>
+</div>

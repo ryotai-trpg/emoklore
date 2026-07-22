@@ -5,7 +5,8 @@
       "npc": "NPC"
     },
     "Item": {
-      "weapon": "Weapon"
+      "weapon": "Weapon",
+      "skill": "Custom Skill"
     }
   },
   "SETTINGS": {
@@ -22,13 +23,15 @@
   },
   "EMOKLORE": {
     "Common": {
-      "colon": ": "
+      "colon": ": ",
+      "none": "None"
     },
     "Sheet": {
       "class": {
         "character": "Character Sheet",
         "weapon": "Weapon Sheet",
-        "activeEffect": "Effect Sheet"
+        "activeEffect": "Effect Sheet",
+        "skill": "Skill Sheet"
       },
       "toggleMode": "Toggle Play/Edit mode",
       "character": {
@@ -67,6 +70,35 @@
         },
         "Damage": "Damage",
         "SuccessCount": "[Successes]"
+      },
+      "skill": {
+        "FIELDS": {
+          "category": {
+            "label": "Category"
+          },
+          "characteristicOptions": {
+            "label": "Characteristics",
+            "hint": "Choosing more than one lets the sheet pick which characteristic the roll uses."
+          },
+          "characteristic": {
+            "label": "Characteristic Used"
+          },
+          "group": {
+            "label": "Skill Group",
+            "hint": "Determines whether effects like \"+1 to all Negotiation skills\" apply."
+          },
+          "level": {
+            "label": "Skill Level"
+          },
+          "notes": {
+            "label": "Notes"
+          }
+        },
+        "Category": {
+          "base": "Base Skill",
+          "normal": "Normal Skill",
+          "extra": "Extra Skill"
+        }
       }
     },
     "ChatMessage": {
@@ -346,6 +378,7 @@
         "skillGroups": "Skill Groups",
         "skills": "Skills",
         "baseSkills": "Base Skills",
+        "customSkills": "Custom Skills",
         "other": "Other",
         "rawKey": "Enter a key directly",
         "unselected": "Choose…"
@@ -405,6 +438,13 @@
       "triple": "Triple Success",
       "miracle": "Miracle Success",
       "catastrophe": "Catastrophe"
+    },
+    "Skill": {
+      "Name": "Skill Name",
+      "CreateTitle": "Create Skill",
+      "CreateButton": "Create Skill",
+      "NoLevel": "—",
+      "NamePlaceholder": "e.g. Ninjutsu"
     }
   },
   "USER": {

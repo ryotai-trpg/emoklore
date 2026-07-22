@@ -1,35 +1,29 @@
 import { systemPath } from "../constants";
 import type { WeaponDataModel } from "../data/item-models";
 import type { EmokloreItem } from "../documents/item";
+import { enrichDocumentHTML } from "../utils/sheet";
 import { formatDamagePreview, localizeAttackSkill, localizeRangeType } from "../utils/weapon";
-import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
+import { EmokloreItemSheet } from "./item-sheet";
 import type { EmokloreRenderOptions, WeaponContext } from "./types";
 
 /**
  * weaponアイテムのシート。
  *
  * 項目が少ないのでタブは作らず、ヘッダと詳細の2パートだけにしている。
- * 閲覧と編集の出し分けとモード切替は document-sheet-mixin が持つ。
+ * 寸法・クラス・モード切替は EmokloreItemSheet が持つ。
  */
-export class EmokloreWeaponSheet extends EmokloreDocumentSheetMixin(
-  foundry.applications.sheets.ItemSheetV2,
-) {
+export class EmokloreWeaponSheet extends EmokloreItemSheet {
   // このシートは registerSheet で types: ["weapon"] に限って登録しているので、
   // item は必ず武器。種別ごとのデータモデルは本体の型に出ないのでここで宣言する
   declare item: EmokloreItem & { system: WeaponDataModel };
 
-  // classes / window / form は mixin 側の DEFAULT_OPTIONS が継承チェーン経由でマージされる。
-  // standard-form は本体の .form-group のレイアウト規則が必要なので自分で足す
   static override DEFAULT_OPTIONS = {
-    classes: ["standard-form", "weapon"],
-    position: {
-      width: 420,
-      height: 480,
-    },
+    ...super.DEFAULT_OPTIONS,
+    classes: [...super.DEFAULT_OPTIONS.classes, "weapon"],
   };
 
   static override PARTS = {
-    header: { template: systemPath("templates/item/header.hbs") },
+    header: EmokloreItemSheet.HEADER_PART,
     detail: {
       template: systemPath("templates/item/weapon-detail.hbs"),
       scrollable: [""],
@@ -49,17 +43,7 @@ export class EmokloreWeaponSheet extends EmokloreDocumentSheetMixin(
     // 出すときは必ず記入済みの遠隔武器なので、射程はそのまま見せればよい
     context.showRange = system.rangeType === "ranged" && Boolean(system.range);
     context.damagePreview = formatDamagePreview(system.damageDie, system.attackPower);
-
-    // 備考は system.json で htmlFields に指定しているリッチテキストなので、
-    // @UUID リンクやインラインロールを解決するため描画前に enrichHTML を通す
-    context.notesHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      system.notes,
-      {
-        secrets: this.item.isOwner,
-        relativeTo: this.item,
-        rollData: this.item.getRollData(),
-      },
-    );
+    context.notesHTML = await enrichDocumentHTML(this.item, system.notes);
 
     return context;
   }
