@@ -90,7 +90,7 @@ feat: add resonance roll dialog
 ## コーディング方針
 
 - TypeScript は **`strict: true`** に加えていくつかのフラグを有効にしている（一覧は `tsconfig.json`）。**型・命名・層のimport方向の規約は [コード設計の規約](/code-design) が正**。`any` の禁止、`as` の使いどころ、本体の型が足りないときの補い方もそちらにある
-- UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す
+- UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す。プレースホルダの展開は `game.i18n.localize(stringId, data)` に統合されており、`format` は使わない（ランタイムaliasとして残るが型に出ない）
 - フォーマット・lintは [Biome](https://biomejs.dev/)（設定: `biome.json`）。手動実行は `npm run check`（修正適用）/ `npm run lint`（検証のみ）。Biomeは型アサーションの組み込みルールを持たないため、二重キャストの禁止はGritQLプラグイン（`tools/no-double-cast.grit`）で実装している
 - 設計の方向性・既知の構造的課題は [アーキテクチャ](/architecture) を参照
 
@@ -98,7 +98,7 @@ feat: add resonance roll dialog
 
 - **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。`.hbs` を触れば `check:templates`、`lang/*.json` を触れば `check:lang`、`system.json` を触れば `check:manifest-urls`、`package.json` / `biome.json` / `ci.yml` を触れば `check:biome-version` も走る。緊急時は `git commit --no-verify` でスキップできるが非推奨
 - **CI**: pushとPRで GitHub Actions が Biome・テスト・ビルド・型チェック・翻訳/テンプレート/スキーマ表/配布URL/Biomeバージョンの整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
-  - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない
+  - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない。本体のビルド番号は `ci.yml` の `FOUNDRY_BUILD` でピン留めしてあり（キャッシュキーもここから作られる）、ローカルのFoundryを更新したら合わせて上げる
 - **依存の更新**: DependabotがnpmとGitHub Actionsを週次で見る（`.github/dependabot.yml`）。パッチとマイナーは1本にまとめ、メジャーは個別にPRが立つ。**Biomeだけは3箇所（`package.json` / `biome.json` の `$schema` / `ci.yml` の `setup-biome`）を揃える必要がある**。Dependabotが上げてくるのは `package.json` だけなので、残り2つは手で追従させる。揃っていなければ `check:biome-version` が落ちるので、追従漏れはDependabotのPRの時点で分かる
 
 ## 表記ルール

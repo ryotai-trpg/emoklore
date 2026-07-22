@@ -148,7 +148,9 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 
 ## 本体の型が足りないとき
 
-FoundryVTT本体はJSDocで型を持つが、実行時に定義されるプロパティやミックスインの継承は型に出てこない。詳しい経緯は [v14移行チェックリスト](/v14-migration) にある。対処は2つだけ。
+型定義はFoundryVTT本体ソース（`client/` / `common/`）を `tsconfig.json` の `paths`（`@client/*` / `@common/*`）で直接参照する。本体のJSDocがそのまま型になるので、インストール中のFoundryと型が常に一致する。fvtt-typesは採らない — v14対応が無く、本体の更新のたびに型の追従を待つことになる。レガシーグローバル（`Hooks` / `Actor` など）は `module/types/foundry-shim.d.ts` が本体の名前空間へ橋渡しし、`CONFIG.EMOKLORE` は `module/types/emoklore.d.ts` のモジュール拡張で足している。本体JSにはTSのバインダが解釈できない記法が少数あるため、`npm run typecheck`（`tools/typecheck.mjs`）は `foundry/` 内の診断を除外して判定する。
+
+この方式でも、本体がJSDocで型を持つ以上、実行時に定義されるプロパティやミックスインの継承は型に出てこない。対処は2つだけ。
 
 - **スキーマ由来のプロパティは `declare` で補う**。`declare system: CharacterDataModel;` のように、サブクラスで宣言し直す
 - **足りないメンバーは交差型で補う**。`any` で潰さず、**実際に使うメンバーだけ**を足す。`type CardMessage = ChatMessage & { rolls: Roll[]; update: ... }` のように、必要な分だけ書く

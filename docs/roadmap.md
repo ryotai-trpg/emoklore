@@ -62,7 +62,7 @@ v14専用に移行します（v13サポートは打ち切り）。
     - 仕様を要検討
     - **`CONFIG.Actor.dataModels` への `npc` の登録を戻す**。`system.json` の `documentTypes.Actor` にも宣言が要る。いまは作成できない種別を登録すると `EmokloreActor#system` の型が嘘になるため外してある（`module/data/npc.ts` は残っている）。戻すと `system` が union になるので、NPCで壊れる箇所は型チェックが教えてくれる
 - ハウリングカード実装
-- イニシアチブ管理
+- イニシアチブ管理（本体の型付きCombatant（`Combat` / `Combatant` の `baseTypeAllowed`）の採用をここで検討する）
 - FoundryVTT公式に登録
 
 ### 調査メモ: UIの一貫性の棚卸し
