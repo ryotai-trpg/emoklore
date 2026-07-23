@@ -8,6 +8,8 @@ const DAMAGE_APPLIED_TEMPLATE = systemPath("templates/chat/damage-applied.hbs");
 
 /** ダメージを適用した1体ぶんの結果 */
 export type DamageApplied = {
+  /** 境界の案内から状態を付与するときの参照。引けなければ null */
+  actorUuid: string | null;
   name: string;
   before: number;
   after: number;
@@ -62,6 +64,10 @@ export async function createDamageAppliedMessage(
   );
 
   const created = await ChatMessage.create({
+    // サブタイプにするのはリスナの配線先（system.addListeners）を持つため。
+    // 境界の判定に要る前後の値も system に焼き込む
+    type: "damageApplied",
+    system: { resource: "hp", reduction, targets: applied },
     content: await foundry.applications.handlebars.renderTemplate(DAMAGE_APPLIED_TEMPLATE, {
       lines,
     }),
