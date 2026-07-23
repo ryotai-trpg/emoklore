@@ -1,0 +1,43 @@
+{{! 本体の standard-form 体系に乗せる。name 属性は apply-damage-dialog.ts が
+    form.elements.namedItem で引くインターフェースなので変えない }}
+<div class="form-group">
+  <label>{{summary}}</label>
+  <p class="hint">{{localize "EMOKLORE.ApplyDamage.EvasionHint"}}</p>
+</div>
+
+<div class="form-group">
+  <label for="reduction">{{localize "EMOKLORE.ApplyDamage.Reduction"}}</label>
+  <div class="form-fields">
+    <input name="reduction" id="reduction" type="number" value="0" min="0" step="1" autofocus>
+  </div>
+  <p class="hint">{{localize "EMOKLORE.ApplyDamage.FocusHint"}}</p>
+</div>
+
+<fieldset {{#unless canRollDefense}}disabled{{/unless}}>
+  <legend>{{localize "EMOKLORE.ApplyDamage.DefenseRoll"}}</legend>
+  <div class="form-group">
+    <label for="defense-skill">{{localize "EMOKLORE.ApplyDamage.DefenseSkill"}}</label>
+    <div class="form-fields">
+      <select name="defenseSkill" id="defense-skill">
+        {{#each defenseSkillGroups as |group|}}
+          <optgroup label="{{group.label}}">
+            {{#each group.options as |option|}}
+              <option value="{{option.value}}" {{#if option.selected}}selected{{/if}}>{{option.label}}</option>
+            {{/each}}
+          </optgroup>
+        {{/each}}
+      </select>
+      <button type="button" data-action="rollDefense">
+        <i class="fa-solid fa-dice" inert></i>
+        <span>{{localize "EMOKLORE.ApplyDamage.RollAndFill"}}</span>
+      </button>
+    </div>
+    <p class="hint">
+      {{#if canRollDefense}}
+        {{localize "EMOKLORE.ApplyDamage.DefenseHint"}}
+      {{else}}
+        {{localize "EMOKLORE.ApplyDamage.MultiTargetHint"}}
+      {{/if}}
+    </p>
+  </div>
+</fieldset>

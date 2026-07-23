@@ -59,3 +59,14 @@ export function buildDamageFormula({
 export function resolveStrengthBonus(rangeType: RangeType, strengthLevel: number): number {
   return rangeType === "melee" ? strengthLevel : 0;
 }
+
+/**
+ * 軽減値の入力を0以上の整数に丸める。
+ *
+ * ダイアログの手入力のほか、防御判定の成功数を流し込む口でもある。
+ * ファンブルの成功数は負になるが、軽減がダメージを増やす向きには働かせない。
+ */
+export function normalizeReduction(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.floor(value));
+}

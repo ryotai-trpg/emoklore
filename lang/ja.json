@@ -110,11 +110,25 @@
         "UnknownSkill": "この武器の参照技能が不明なため、攻撃判定を振れません。",
         "ActionFailed": "武器カードの操作に失敗しました。",
         "Apply": "ダメージを適用",
+        "ApplyWithReduction": "軽減して適用",
         "NoTarget": "ターゲットがいません。対象のトークンをターゲットしてください。",
         "NoGM": "権限のないキャラクターに適用するにはGMの接続が必要です。",
         "Applied": "{name} HP: {before} → {after}",
         "AppliedWithReduction": "{name} HP: {before} → {after}（軽減 {reduction}）"
       }
+    },
+    "ApplyDamage": {
+      "Title": "ダメージの適用",
+      "Summary": "対象: {target} ／ ダメージ: {damage} ／ 攻撃成功数: {successCount}",
+      "TargetCount": "{count}体",
+      "EvasionHint": "回避は、成功数が攻撃の成功数以上なら無効化です。成立していたらキャンセルで適用をやめてください。",
+      "Reduction": "軽減値",
+      "FocusHint": "リアクション専念の宣言中は、防御判定による軽減量が2倍です（値は手で入力してください）。",
+      "DefenseRoll": "防御判定",
+      "DefenseSkill": "技能",
+      "RollAndFill": "振って反映",
+      "DefenseHint": "対象のキャラクターで判定を振り、成功数を軽減値に入れます。",
+      "MultiTargetHint": "対象が複数のときは防御判定を使えません。軽減値を直接入力するか、1体ずつ適用してください。"
     },
     "emotionAttributes": {
       "desire": "欲望",
