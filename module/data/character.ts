@@ -2,6 +2,7 @@ import { type BaseSkillKey, isBaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { SkillGroupKey } from "../config/skill-groups";
 import { isSkillKey, type SkillKey } from "../config/skills";
+import { calculateArmorTotal } from "../rules/armor";
 import {
   calculateBaseSkillTarget,
   calculateCustomSkillLevel,
@@ -22,7 +23,7 @@ import {
 import type { SkillRollParams } from "../rules/skill-roll";
 import { type ModifierSet, NO_MODIFIER } from "../rules/types";
 import { typedEntries } from "../utils/object";
-import type { SkillDataModel } from "./item-models";
+import type { ArmorDataModel, SkillDataModel } from "./item-models";
 import { EmokloreSystemDataModel } from "./system-model";
 
 const { HTMLField, NumberField, SchemaField, StringField, TypedObjectField } = foundry.data.fields;
@@ -80,6 +81,11 @@ type SkillItemLike = {
   id: string | null;
   name: string;
   system: SkillDataModel;
+};
+
+/** 集計の元になる armor アイテム。documents/ を参照しないため構造で受ける */
+type ArmorItemLike = {
+  system: ArmorDataModel;
 };
 
 /** 技能判定に必要な、アクターから集めた一式 */
@@ -162,6 +168,13 @@ const defineCharacterDataModelSchema = () => ({
    * 効果値のRoll評価も整数の検証も効かなくなる
    */
   initiative: new NumberField({ required: true, integer: true, initial: 0, persisted: false }),
+
+  /**
+   * 装備中防具の防御力合計。ダメージ適用が軽減として引く値で、prepareDerivedData が
+   * 毎回入れ直す。保存しないがスキーマには置く（initiative と同じ理由。
+   * ActiveEffect（final）で防御力を修正する余地もこれで残る）
+   */
+  armor: new NumberField({ required: true, integer: true, min: 0, initial: 0, persisted: false }),
 
   characteristics: new SchemaField(
     Object.fromEntries(
@@ -361,6 +374,7 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
 
   /** 行動値。prepareDerivedData が毎回入れ直す */
   declare initiative: number;
+  declare armor: number;
 
   declare emotions: {
     surface?: string;
@@ -440,6 +454,13 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
     return actor.itemTypes?.skill ?? [];
   }
 
+  /** 種別で絞るのは #skillItems と同じく本体の itemTypes に任せる */
+  #armorItems(): ArmorItemLike[] {
+    const actor = this.parent as { itemTypes?: { armor?: ArmorItemLike[] } };
+
+    return actor.itemTypes?.armor ?? [];
+  }
+
   override prepareDerivedData() {
     super.prepareDerivedData();
 
@@ -481,6 +502,8 @@ export class CharacterDataModel extends EmokloreSystemDataModel {
       this.characteristics.physical.value,
       this.skills.speed.level,
     );
+
+    this.armor = calculateArmorTotal(this.#armorItems().map((item) => item.system));
   }
 
   /**
