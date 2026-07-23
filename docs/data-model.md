@@ -10,8 +10,10 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 |---|---|---|
 | Actor | `character` | `CharacterDataModel` |
 | Item | `weapon` | `WeaponDataModel` |
+| Item | `armor` | `ArmorDataModel` |
 | Item | `skill` | `SkillDataModel` |
 | ChatMessage | `weapon` | `WeaponCardModel` |
+| ChatMessage | `damageApplied` | `DamageAppliedModel` |
 
 **種別は `system.json` の `documentTypes` と `CONFIG.*.dataModels` の両方に書く。** 片方だけでは噛み合わない。`documentTypes` に無い種別を `dataModels` に登録すると、作成できないのに `system` の型だけが増えて嘘になる（警告も出ない）。
 
@@ -215,10 +217,11 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | `resources.mp.max` | 精神 ＋ 知力 |
 | `resources.resonance.value` | 1未満なら1に上げる |
 | `initiative` | 身体 ＋ スピードのレベル |
+| `armor` | 装備中防具の防御力合計（`rules/armor.ts` の `calculateArmorTotal`） |
 
 `hp.value` / `mp.value` は `max` を超えないよう毎回丸める。
 
-導出値のうち `resources.hp.max` / `resources.mp.max` / `initiative` は**スキーマにフィールドがあり、保存だけしない**（`persisted: false`）。かつて `initiative` はスキーマに無く `declare` だけで足していたが、それだと効果を当てたとき本体が値の型を推測する経路に落ち、効果値のRoll評価も整数の検証も効かなかった。
+導出値のうち `resources.hp.max` / `resources.mp.max` / `initiative` / `armor` は**スキーマにフィールドがあり、保存だけしない**（`persisted: false`）。かつて `initiative` はスキーマに無く `declare` だけで足していたが、それだと効果を当てたとき本体が値の型を推測する経路に落ち、効果値のRoll評価も整数の検証も効かなかった。
 
 `skills.<k>.target` と `baseSkills.<k>.target` はいまもスキーマに無く `declare` だけ。効果を当てること自体はできるが、上の3つと違って検証を伴わない。
 
@@ -229,6 +232,7 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | `skill` | StringField | `choices` は攻撃技能5種、既定 `fight` | 参照技能 |
 | `attackPower` | StringField | 既定 `""` | 武器攻撃力。**数値ではなく式** |
 | `range` | StringField | 既定 `""` | 射程。自由記述で、近接武器では使わない |
+| `equipped` | BooleanField | 既定 `false` | 構えているかの記録。ルール処理には繋がらない |
 | `notes` | HTMLField | | 備考。`htmlFields` に宣言済み |
 
 `attackPower` が文字列なのは、ルールブックが 肉体(1)・棒(2) と ナイフ(1D3)・拳銃(2D6) を同じ「武器攻撃力」として並べているため。`Roll.validate()` を通す独自バリデータが付いていて、式として読めない値は保存できない。
@@ -250,6 +254,19 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | `secretTechnique` | 奥義 | 近接 | d6 | 使わない |
 | `throw` | 投擲 | 遠隔 | なし | 使う |
 | `rangedAttack` | 射撃 | 遠隔 | なし | 使わない |
+
+## Item `armor`
+
+防具。書籍版ルールブックの「防御力（受けるダメージから引く固定値）＋適用部位の条件」を受ける器。**書籍固有のアイテムデータは同梱しない**（値は書籍を持つユーザーが書く）。公式シナリオの敵の「装甲」も、防具アイテムを1つ持たせる形で扱える。
+
+| パス | 型 | 制約 | 意味 |
+|---|---|---|---|
+| `defense` | NumberField | 0以上の整数、既定 `0` | 防御力。装備中ならダメージ適用で自動で引かれる |
+| `coverage` | StringField | 既定 `""` | 部位・適用条件。「頭部のみ」のような自由記述 |
+| `equipped` | BooleanField | 既定 `true` | 装備中か。装備中の防具だけが軽減に数えられる |
+| `notes` | HTMLField | | 備考。`htmlFields` に宣言済み |
+
+`equipped` の既定が武器と違って `true` なのは、防具は「着ている」が常態で、敵に防具を1つ作ればそのまま装甲として働くようにするため。部位に当たったかの判断はDL裁量で、適用しない防具はダメージ適用のダイアログでチェックを外す（機構は持たない）。
 
 ## Item `skill`
 
@@ -295,6 +312,18 @@ Itemにしてあるのは、コンペンディウムに入れて配ったり他�
 | `damageTotal` | NumberField | `null` | ダメージ合計。`null` は「まだ振っていない」 |
 
 **表示に要る値を使用時に焼き込んでいる**のは、あとで武器やアクターを消してもカードが読めるようにするため。`successCount` と `damageTotal` の `null` がそのままボタンの出し分けになる。
+
+## ChatMessage `damageApplied`
+
+ダメージ適用（とMP減少）の結果。行の表示は `content` に描き、境界の案内のボタン（状態の付与）に要る値を `system` に焼き込む。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `resource` | StringField | `hp` | どのリソースの結果か。`hp` / `mp` |
+| `reduction` | NumberField | `0` | 適用時の軽減値。1回の適用で全対象に共通 |
+| `targets` | ArrayField(SchemaField) | `[]` | 対象ごとの `actorUuid` / `name` / `before` / `after` / `armor` |
+
+`targets[].armor` は実際に軽減へ使った防具の値で、対象ごとに違う（行の内訳「（防具 N）」の元）。`actorUuid` は境界の案内から状態を付与するときの参照で、アクターを消したあとも行が読めるよう名前と値は別に焼き込む。
 
 ## スキーマの外に保存しているもの
 

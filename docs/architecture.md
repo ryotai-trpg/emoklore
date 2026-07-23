@@ -67,7 +67,7 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 
 カードのボタンは `WeaponCardModel.ACTIONS` の表で `data-action` から引いている。モジュールがここにキーを足せば、テンプレートを差し替えずにボタンを増やせる。
 
-〈ストレングス〉による近接武器攻撃力の加算は `resolveStrengthBonus` が決め、`buildDamageFormula` の `bonus` に渡る。ダメージの軽減は `EmokloreActor#applyDamage` の `reduction` に寄せてある。〈耐久〉判定も防御判定も「受けるダメージを【成功数】点軽減する」という同じ形で、防具を入れるならそれも同じ引き算になるため、口を1つにしておく。カードの「軽減して適用」ダイアログが、防御判定の成功数や手入力の値をここへ流す。
+〈ストレングス〉による近接武器攻撃力の加算は `resolveStrengthBonus` が決め、`buildDamageFormula` の `bonus` に渡る。ダメージの軽減と防具は `EmokloreActor#applyDamage` に寄せてある。〈耐久〉判定も防御判定も防具も「受けるダメージから引く」という同じ形なので、`calculateAppliedDamage` の1つの引き算に流す。カードの「軽減して適用」ダイアログが、防御判定の成功数や手入力の値を `reduction` として流し、防具の既定（装備中防具の合計 `system.armor`）は `applyDamage` の1点が決める。ダイアログで部位条件により防具を外したときだけ、`armor` の上書き値がGM委譲クエリまで運ばれる（`undefined`＝自動と `0`＝防具なしの明示は意味が違うので、途中で `?? 0` に畳まない）。
 
 モジュール連携の接続面はいまこのフック群だけなので、このページに置く。ハウリングカードやイニシアチブで2つ目のフック群が生えたら、独立した「モジュール連携」ページに出す。
 
