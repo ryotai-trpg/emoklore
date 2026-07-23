@@ -1,7 +1,7 @@
 import type { AttackSkillKey } from "../../config/attack-skills";
 import type { EmokloreActor } from "../../documents/actor";
 import { applyDamageToTargets } from "../../documents/queries";
-import { buildDamageFormula } from "../../rules/weapon-damage";
+import { buildDamageFormula, resolveStrengthBonus } from "../../rules/weapon-damage";
 import { createDamageAppliedMessage } from "../../utils/chat";
 import { resolveTargetActors } from "../../utils/targets";
 import {
@@ -133,13 +133,15 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
   async rollDamage(): Promise<void> {
     if (!this.buttons.canRollDamage) return;
 
+    // アクターが消えたカードでもダメージは振り直せる。そのときは〈ストレングス〉加算なし
+    const actor = await this.#resolveActor();
+    const { damageDie, rangeType } = resolveAttackSkill(this.skill);
     const config = {
       // canRollDamage が成功数の非nullを保証している
       successCount: this.successCount as number,
-      damageDie: resolveAttackSkill(this.skill).damageDie,
+      damageDie,
       attackPower: this.attackPower,
-      // 〈ストレングス〉加算の接続点。近接なら技能レベルを渡す想定だが、いまは常に0
-      bonus: 0,
+      bonus: resolveStrengthBonus(rangeType, actor?.system.skills.strength.level ?? 0),
     };
     if (Hooks.call("emoklore.preRollDamage", this.message, config) === false) return;
 

@@ -13,7 +13,12 @@ export const createFixtures = (page) =>
       system: { characteristics: { physical: { value: 5 }, intelligence: { value: 5 } } },
     });
     made.push(char.name);
-    await char.update({ "system.skills.search.level": 2, "system.skills.martialArt.level": 2 });
+    // ストレングスは近接ダメージへの加算が式に出るかを見るために取らせる
+    await char.update({
+      "system.skills.search.level": 2,
+      "system.skills.martialArt.level": 2,
+      "system.skills.strength.level": 2,
+    });
 
     // 参照技能が通常技能のものと基本技能のものを1本ずつ。両方の経路を通すため
     await char.createEmbeddedDocuments("Item", [
