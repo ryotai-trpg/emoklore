@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveHpBoundary } from "./resource-boundary";
+import { resolveHpBoundary, resolveMpBoundary } from "./resource-boundary";
 
 describe("resolveHpBoundary", () => {
   it("0まで落ちたら【心肺停止】", () => {
@@ -23,5 +23,22 @@ describe("resolveHpBoundary", () => {
 
   it("既に0の対象への追撃は境界をまたがない", () => {
     expect(resolveHpBoundary({ before: 0, after: 0 })).toBe(null);
+  });
+});
+
+describe("resolveMpBoundary", () => {
+  it("0以下にまたいだら〈＊自我〉判定の案内", () => {
+    expect(resolveMpBoundary({ before: 2, after: 0 })).toBe("faintCheck");
+    expect(resolveMpBoundary({ before: 1, after: -1 })).toBe("faintCheck");
+  });
+
+  it("0のまま・0未満のままの変化では出さない", () => {
+    expect(resolveMpBoundary({ before: 0, after: 0 })).toBe(null);
+    expect(resolveMpBoundary({ before: 0, after: -2 })).toBe(null);
+  });
+
+  it("増えるときは出さない", () => {
+    expect(resolveMpBoundary({ before: 0, after: 3 })).toBe(null);
+    expect(resolveMpBoundary({ before: 2, after: 3 })).toBe(null);
   });
 });

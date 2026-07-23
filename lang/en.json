@@ -119,6 +119,8 @@
       "damageApplied": {
         "HpZero": "HP reached 0: Cardiac Arrest. A character with Grit may roll to avoid it (the level drops by 1 per roll). From now on, roll *Survival at the end of each round; on failure, Dead.",
         "HalfLoss": "Lost half or more of current HP at once: roll *Survival to stay conscious (Endurance or Grit may substitute). On failure, Unconscious (1D10 x 10 minutes).",
+        "MpLine": "{name} MP: {before} → {after}",
+        "MpZero": "MP reached 0: roll *Self. On success, MP becomes 1; on failure, Faint.",
         "ApplyStatus": "Apply [{status}]",
         "StatusApplied": "Applied [{status}] to {name}.",
         "NoPermission": "You lack permission to apply a status to this character.",

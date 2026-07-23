@@ -69,6 +69,49 @@ export async function createDamageAppliedMessage(
   return created as ChatMessage | undefined;
 }
 
+/**
+ * MPが0以下にまたいだ案内をチャットに流す。
+ *
+ * MPには applyDamage のような一元の減少口が無く、シートの直接編集が減少手段なので、
+ * `EmokloreActor._onUpdate` からここに来る。判定の強制や【失神】の自動付与はしない。
+ */
+export async function createMpNoticeMessage(
+  actor: EmokloreActor,
+  { before, after }: { before: number; after: number },
+): Promise<ChatMessage | undefined> {
+  const actorUuid = actor.uuid ?? null;
+  const entry: EntryContext = {
+    line: game.i18n.localize("EMOKLORE.ChatMessage.damageApplied.MpLine", {
+      name: actor.name,
+      before,
+      after,
+    }),
+    notice: {
+      text: game.i18n.localize("EMOKLORE.ChatMessage.damageApplied.MpZero"),
+      statusId: "faint",
+      buttonLabel: game.i18n.localize("EMOKLORE.ChatMessage.damageApplied.ApplyStatus", {
+        status: statusLabel("faint"),
+      }),
+      actorUuid,
+    },
+  };
+
+  const created = await ChatMessage.create({
+    type: "damageApplied",
+    system: {
+      resource: "mp",
+      reduction: 0,
+      targets: [{ actorUuid, name: actor.name, before, after }],
+    },
+    content: await foundry.applications.handlebars.renderTemplate(DAMAGE_APPLIED_TEMPLATE, {
+      entries: [entry],
+    }),
+    flags: { core: { canPopout: true } },
+  });
+
+  return created as ChatMessage | undefined;
+}
+
 /** 案内1件ぶんの描画データ。actorUuid が引けないときはボタンなしで文だけ出す */
 type NoticeContext = {
   text: string;
