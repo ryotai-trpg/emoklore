@@ -9,6 +9,13 @@
   padding: 0;
 }
 
+/* 境界の案内。HPの行より一段控えめに、行の下へぶら下げる */
+.em-damage-applied__notice {
+  margin: 2px 0 4px;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-12);
+}
+
 .em-weapon-card {
   display: flex;
   flex-direction: column;
