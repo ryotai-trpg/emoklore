@@ -150,6 +150,61 @@ export async function run({ page, check }) {
     ),
   );
 
+  await check("軽減つきの適用で reduction が届く", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const world = game.actors.getName(`${tag}_target`);
+        const token = game.scenes.active?.tokens.contents.find((t) => t.actor?.id === world.id);
+        if (!token) return { ok: false, detail: "ターゲット用トークンがシーンに無い" };
+
+        token.object.setTarget(true, { releaseOthers: true });
+        await window.__waitFor(() => game.user.targets.size > 0, { label: "ターゲットの設定" });
+
+        const card = game.messages.contents.reverse().find((m) => m.system?.damageTotal != null);
+        if (!card) return { ok: false, detail: "ダメージ済みのカードが無い" };
+
+        // 前のチェックで減っているので、0でのクランプに紛れないよう満タンへ戻す
+        await token.actor.update({
+          "system.resources.hp.value": token.actor.system.resources.hp.max,
+        });
+
+        const before = token.actor.system.resources.hp.value;
+        const damage = card.system.damageTotal;
+        const reduction = 2;
+
+        // ダイアログの操作は目視の領分。UIを迂回して、reduction が適用まで届くかだけを見る
+        const targets = [...game.user.targets].map((t) => t.actor);
+        await card.system.applyDamageTo(targets, { reduction });
+
+        const expected = Math.max(0, before - Math.max(0, damage - reduction));
+        await window.__waitFor(() => token.actor.system.resources.hp.value === expected, {
+          soft: true,
+          label: "軽減後のHP反映",
+        });
+
+        const after = token.actor.system.resources.hp.value;
+        if (after !== expected) {
+          return {
+            ok: false,
+            detail: `HPが期待とずれた: ${before} → ${after}（期待 ${expected}）`,
+          };
+        }
+
+        // 結果チャットに内訳が出ることも見る
+        const applied = game.messages.contents.at(-1);
+        if (!applied?.content?.includes(`軽減 ${reduction}`)) {
+          return { ok: false, detail: "結果チャットに軽減の内訳が出ていない" };
+        }
+        return {
+          ok: true,
+          detail: `ダメージ${damage} - 軽減${reduction} → HP ${before} → ${after}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
   // ここから先は必ず外れる出目にする。命中しなかったときの分岐を見るため
   await pinDice(page, DICE.alwaysMiss);
 
