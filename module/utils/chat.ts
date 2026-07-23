@@ -50,9 +50,15 @@ export async function createRollMessage({
  */
 export async function createDamageAppliedMessage(
   applied: DamageApplied[],
+  { reduction = 0 }: { reduction?: number } = {},
 ): Promise<ChatMessage | undefined> {
+  // 軽減したときだけ内訳を添える。0のときまで「（軽減 0）」と出すのは雑音
+  const key =
+    reduction > 0
+      ? "EMOKLORE.ChatMessage.weapon.AppliedWithReduction"
+      : "EMOKLORE.ChatMessage.weapon.Applied";
   const lines = applied.map(({ name, before, after }) =>
-    game.i18n.localize("EMOKLORE.ChatMessage.weapon.Applied", { name, before, after }),
+    game.i18n.localize(key, { name, before, after, reduction }),
   );
 
   const created = await ChatMessage.create({

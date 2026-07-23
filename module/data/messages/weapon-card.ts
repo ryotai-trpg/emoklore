@@ -178,19 +178,22 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
    * 対象の集め方はボタンごとに違う（即適用はターゲット、軽減つきはダイアログを挟む）ので、
    * その先の共通の後段だけを持つ。
    */
-  async applyDamageTo(targets: EmokloreActor[]): Promise<void> {
+  async applyDamageTo(
+    targets: EmokloreActor[],
+    { reduction = 0 }: { reduction?: number } = {},
+  ): Promise<void> {
     // canApplyDamage と同じ条件だが、ダメージ量の型を絞るためここでは直接見る
     const amount = this.damageTotal;
     if (amount === null) return;
 
     // 権限の有無とGMへの委譲は documents/queries.ts が引き受ける
-    const applied = await applyDamageToTargets(targets, amount);
+    const applied = await applyDamageToTargets(targets, amount, { reduction });
     if (!applied) {
       ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoGM", { localize: true });
       return;
     }
 
-    if (applied.length > 0) await createDamageAppliedMessage(applied);
+    if (applied.length > 0) await createDamageAppliedMessage(applied, { reduction });
   }
 
   /**

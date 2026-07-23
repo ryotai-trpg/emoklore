@@ -112,7 +112,8 @@
         "Apply": "Apply Damage",
         "NoTarget": "No target. Target a token first.",
         "NoGM": "A connected GM is required to apply damage to characters you do not own.",
-        "Applied": "{name} HP: {before} → {after}"
+        "Applied": "{name} HP: {before} → {after}",
+        "AppliedWithReduction": "{name} HP: {before} → {after} (reduced by {reduction})"
       }
     },
     "emotionAttributes": {

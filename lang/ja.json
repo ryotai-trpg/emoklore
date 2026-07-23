@@ -112,7 +112,8 @@
         "Apply": "ダメージを適用",
         "NoTarget": "ターゲットがいません。対象のトークンをターゲットしてください。",
         "NoGM": "権限のないキャラクターに適用するにはGMの接続が必要です。",
-        "Applied": "{name} HP: {before} → {after}"
+        "Applied": "{name} HP: {before} → {after}",
+        "AppliedWithReduction": "{name} HP: {before} → {after}（軽減 {reduction}）"
       }
     },
     "emotionAttributes": {
