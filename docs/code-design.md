@@ -44,7 +44,7 @@ export const skillGroups: Record<SkillGroupKey, SkillGroupsConfig> = definitions
 
 `satisfies` だけだと各値が個別の狭い型に推論されるので、値の型は注釈で揃える。キーは literal のまま保たれるので `keyof typeof` で取り出せる。**`Record<string, SkillGroupsConfig>` と注釈してはいけない**。キーが `string` に潰れて `keyof` が使えなくなる。
 
-**表と表のあいだの参照も型で持つ。** 技能の定義が持つ「どの能力値で振るか」「どの技能グループか」は、`string` ではなく `CharacteristicKey` / `SkillGroupKey` で宣言する。`group: "athletc"` のような綴り間違いはこれで代入不可になり、TypeScriptが正しい綴りを提案する。かつて〈毒見〉の誤記を目視で見つけて直したことがあるが（PR #37）、それは型で防げる種類の間違いだった。
+**表と表のあいだの参照も型で持つ。** 技能の定義が持つ「どの能力値で振るか」「どの技能グループか」は、`string` ではなく `CharacteristicKey` / `SkillGroupKey` で宣言する。`group: "athletc"` のような綴り間違いはこれで代入不可になり、TypeScriptが正しい綴りを提案する。`string` のままでは、誤記を目視で見つけるまで気付けない。
 
 有限キーの `Record` を引くと `noUncheckedIndexedAccess` でも `undefined` が付かない。**だから `?.` や `?? ""` を書かない**。書くと「型は undefined にならないと言っているのに防御している」状態になり、どちらが正しいのか読んだ人に分からなくなる。
 
@@ -92,8 +92,6 @@ export type SkillRef =
 
 ## `interface` と `type`
 
-実測で `interface` 15、`type` 71。使い分けは次のとおり。
-
 - **`interface` は宣言マージか `extends` が要るとき**。本体の型を拡張する `EmokloreRollOptions extends RollOptions`、configの定義形（`SkillConfig` など）
 - **それ以外は `type`**。キーのunion、`keyof typeof`、交差型、判別可能union、行データ
 
@@ -128,34 +126,24 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 
 ## アサーション（`as`）の使いどころ
 
-**`as` は本体APIとの境界に寄せる。** 実測でキャストは55箇所あるが、**`config/` と `rules/` には1つも無い**。これは偶然ではなく、この2層がFoundryに依存しないから起きている。逆に、純粋なはずの層にキャストが現れたら、それは型付けの失敗ではなく層の設計が崩れている合図になる。
+**`as` は本体APIとの境界に寄せ、`config/` と `rules/` には1つも置かない。** この2層はFoundryに依存しないので、キャストが要る場面が無い。逆に、純粋なはずの層にキャストが現れたら、それは型付けの失敗ではなく層の設計が崩れている合図になる。
 
-数え方は「`as` の出現回数。`as const` と `import * as` は除き、`as unknown as` は1件と数える」。**表を更新するときは手で足し引きせず測り直すこと。**前回の値は `applications/` を17、`utils/` を22としていたが、実測は20と19（`queries.ts` 移動前）で、合計だけが合っていた。
-
-| 層 | キャスト数 |
-|---|---|
-| `config/` `rules/` | 0 |
-| `dice/` | 1 |
-| `data/` | 5 |
-| `documents/` | 7 |
-| `utils/` | 14 |
-| `applications/` | 20 |
-| `emoklore.ts` | 8 |
-
-- **`as unknown as` の二重キャストは lint で禁止**している（`tools/no-double-cast.grit`）。まず素の `as` で通るか試すこと。アサーションの判定は代入可能性より緩いので、代入で弾かれても `as` 単体なら通ることが多い。本当に必要なときは直前の行に `// biome-ignore lint: 理由` を付ける（現在5箇所）
+- **`as unknown as` の二重キャストは lint で禁止**している（`tools/no-double-cast.grit`）。まず素の `as` で通るか試すこと。アサーションの判定は代入可能性より緩いので、代入で弾かれても `as` 単体なら通ることが多い。本当に必要なときは直前の行に `// biome-ignore lint: 理由` を付ける
 - **確かめたうえで名乗り直しているなら、型述語にできる**。`if (this.type !== "weapon") throw` の直後に `as WeaponDataModel` と書いていたのがこれで、`isWeapon(): this is ...` にすると確認がそのまま絞り込みになる
 - **キャストの理由はコメントに書く**。「本体のどの型が足りないのか」を具体的に書く。読んだ人が本体を読み直さずに済み、本体が直ったときに消せる
 
 ## 本体の型が足りないとき
 
-FoundryVTT本体はJSDocで型を持つが、実行時に定義されるプロパティやミックスインの継承は型に出てこない。詳しい経緯は [v14移行チェックリスト](/v14-migration) にある。対処は2つだけ。
+型定義はFoundryVTT本体ソース（`client/` / `common/`）を `tsconfig.json` の `paths`（`@client/*` / `@common/*`）で直接参照する。本体のJSDocがそのまま型になるので、インストール中のFoundryと型が常に一致する。fvtt-typesは採らない — v14対応が無く、本体の更新のたびに型の追従を待つことになる。レガシーグローバル（`Hooks` / `Actor` など）は `module/types/foundry-shim.d.ts` が本体の名前空間へ橋渡しし、`CONFIG.EMOKLORE` は `module/types/emoklore.d.ts` のモジュール拡張で足している。本体JSにはTSのバインダが解釈できない記法が少数あるため、`npm run typecheck`（`tools/typecheck.mjs`）は `foundry/` 内の診断を除外して判定する。
+
+この方式でも、本体がJSDocで型を持つ以上、実行時に定義されるプロパティやミックスインの継承は型に出てこない。対処は2つだけ。
 
 - **スキーマ由来のプロパティは `declare` で補う**。`declare system: CharacterDataModel;` のように、サブクラスで宣言し直す
 - **足りないメンバーは交差型で補う**。`any` で潰さず、**実際に使うメンバーだけ**を足す。`type CardMessage = ChatMessage & { rolls: Roll[]; update: ... }` のように、必要な分だけ書く
 
 **mixinを通すと、インスタンス側だけでなく静的側も落ちる。** 本体のmixinは JSDoc の引数型が `@param {Constructor<ApplicationV2>}` のようにインスタンス側しか宣言していないため、返り値の型から基底クラスの静的メンバーが消える。`DEFAULT_OPTIONS` / `TABS` を `override` で名乗ると TS4113 になるのがこれで、`ApplicationV2Statics` を交差させて補ってある。同じ理由で `User` は `ClientDocumentMixin(BaseUser)` 由来の `isGM` を型に持たない。
 
-この2つは TypeScript 7 で初めて表面化した。**5.9 では通っていたので、通っていることは正しさの証明にならない**。あわせて `EmokloreActor` の `declare sheet` / `declare isOwner` のように、本体が getter で持っているものを `declare` で宣言し直していた箇所も TS7 が検出した（TS2610）。本体側に実体があるものは補わず消す。
+**本体側に実体があるものは `declare` で宣言し直さない。** 本体が getter で持つメンバー（`EmokloreActor#sheet` など）を `declare` で上書きすると TS2610 になる。補うのは型に出ないものだけ。なお、この種の誤りはコンパイラのバージョンが上がって初めて検出されることがある — **通っていることは正しさの証明にならない**。
 
 `declare` で名乗るということは「実体がこの形であることを人が保証する」ということなので、**保証できる根拠を一緒に書く**。たとえば武器シートの `item` を武器に絞れるのは、`registerSheet` に `types: ["weapon"]` を渡しているからで、それをコメントに書いておく。
 
@@ -175,7 +163,7 @@ FoundryVTT本体はJSDocで型を持つが、実行時に定義されるプロ�
 
 有効にしているフラグの一覧は `tsconfig.json` にある（数を本文に書くと古くなるため、ここには写さない）。書き方に効くものだけ挙げる。
 
-- **`any` は lint で禁止**（`noExplicitAny`）。本体の型が足りないときは `any` で潰さず交差型で補う。現在残っている `any` は mixin のコンストラクタ制約1箇所だけ
+- **`any` は lint で禁止**（`noExplicitAny`）。本体の型が足りないときは `any` で潰さず交差型で補う。抑制してよいのは交差型でも表現できないとき（mixin のコンストラクタ制約がそれ）だけで、必ず理由コメントを付ける
 - **`exactOptionalPropertyTypes` が有効**。任意プロパティに明示的な `undefined` を入れうる場合は `foo?: T | undefined` と書く
 - **`verbatimModuleSyntax` が有効**。型だけのimportは `import type` と書く
 
@@ -185,13 +173,36 @@ FoundryVTT本体はJSDocで型を持つが、実行時に定義されるプロ�
 |---|---|---|
 | `noPropertyAccessFromIndexSignature` | 28件 | ほぼ全部 `dataset.rollType` → `dataset['rollType']`。DOMのdatasetに対して読みにくくなるだけ |
 | `lib: ES2025` / `ESNext` | 1件 | 武器カードの `parent` のキャストが comparability を失う（`weapon-card.ts` の `this.parent as CardMessage`）。ES2024までは0件なので、そちらに固定している。二重キャストは禁止しているので、直すなら型述語か構造の側 |
-| `checkJs` + `tools/` `tests/` を `include` | 99件 | 内訳は `tests/live/` 78件・`tools/` 21件（`tools/` は再計測時点で27件）。どちらもページに注入するグローバル（`__waitFor` など）とコールバックの暗黙 `any` が大半で、型を付けるには注入側の宣言が要る |
+| `checkJs` + `tools/` `tests/` を `include` | 99件 | ページに注入するグローバル（`__waitFor` など）とコールバックの暗黙 `any` が大半で、型を付けるには注入側の宣言が要る。1件ずつ当たった結果、実行時に壊れるものは無い。**件数は当たるべき対象の量であって、中身の証拠ではない** |
 | `types: ["node"]` の分離 | — | ブラウザ向けコードにNodeのグローバルが載るが、ルートの `vite.config.ts` が同じ `include` にあるため tsconfig を分ける必要がある |
 | Biome `preset: all` | 700件超 | `useNamingConvention` 116 / `noMagicNumbers` 51 / `noConsole` 36 / `noTernary` 26 と、大半がノイズ |
 | Biome `noUnnecessaryConditions` | — | `actor-sheet` の `switch` を unreachable と誤検出する。Biomeは型情報を持たないため `dataset.rollType` を推論できない。**実機で3経路とも通ることを確認済み** |
 | Biome `useAwait` | 7件 | 本体API契約上 `async` が必須のハンドラを咎める |
 | Biome `useImportExtensions` | 90件 | bundlerの解決方式と噛み合わない |
 
-`tools/` の `checkJs` については、かつてここに「`create-symlinks.mjs` の `value` が `undefined` になりうるなど**実在する取りこぼし**が混じっている」と書いていたが、**これは誤りだったので撤回する**。27件を1件ずつ当たった結果、内訳は暗黙 `any` の注釈不足（TS7006 が10件ほか）と `catch` の `unknown`（TS18046 が2件）と `const config = {}` の索引付け（TS2339 / TS7053）で、**実行時に壊れるものは1件も無かった**。名指しされていた `value` も、直前の正規表現が `(.+?)` でマッチ済みなので `undefined` にはならない。件数だけ見て「この中に本物がある」と推定したのが間違いで、**件数は当たるべき対象の量であって、中身の証拠ではない**。
-
 Biomeは型情報を持たないので、型に関する検査はすべて `tsc` 側にある。組み込みルールに無いものは**GritQLプラグインで書けることがある**（二重キャストの禁止がそれ）。「Biomeでは無理」と決める前にプラグインを検討すること。
+
+## コメント
+
+**何をしているかはコードが持ち、コメントはコードに現れないことだけを持つ。** 処理をなぞる再述は書かない。
+
+書くもの:
+
+- **本体の仕様への依存**。「本体のシートは `phase` を hidden でしか持たない」のように、このコードの形を外から強制している事実。読んだ人が本体を読み直さずに済む
+- **一見不要・一見誤りに見えるコードの理由**。消したくなった人を止める1文
+- **型の主張の根拠**。キャストの理由、`declare` の保証根拠、`biome-ignore` の理由。それぞれの定めは上の各節にあるとおり
+- 回帰テストには**防いでいる事故を現在形で**書く。「何が起きたか」ではなく「何が起こりうるか」
+
+書かないもの:
+
+- **経緯**。「以前は」「かつて」で始まる物語は書かない。過去の事故が理由なら現在形の条件文に直す —「以前はXしていて壊れた」ではなく「Xすると壊れる（のでYする）」。同じ情報で、古くならない。履歴は `git blame` とPRが持つ
+- **本体のバージョン差分の物語**。本体の挙動は現在形で書く（「v14で〜になった」ではなく「本体は〜する」）。本システムはv14専用で、v13との差分に意味は無い
+- **閉じたIssue・マージ済みPRの番号**。書いてよい番号は2種類だけ。**未解決の制限を追跡するopen Issue**（閉じるときに修正と一緒に消す）と、**主張の証拠がIssueにしか無いもの**（番号は証拠の置き場所への参照であって、経緯の参照ではない）。どちらも、番号を読まなくてもコメント単体で意味が通る文にする
+- **未対応の計画の詳述**。何をやるかは[ロードマップ](/roadmap)とIssueが正。コメントに書くのは「いまの形が意図的である理由」まで
+
+長さは**結論を1文目に置く**ことで決まる。設計の背景がひと段落で収まらないなら、それはdocsの話題なので、docsの該当節に置いてコメントは1文と参照にする。
+
+<!-- Handlebarsの {{...}} をVueの補間として解釈させないため v-pre で囲む -->
+::: v-pre
+テンプレートとCSSの節見出し（`{{! Weapon Card }}` や `/* Layout */`）はブロックの題として書いてよい。partialの先頭の `@param` は必須（[UI設計の規約](/ui-design)が正）。
+:::

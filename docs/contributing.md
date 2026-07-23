@@ -24,7 +24,7 @@ npm run dev   # 初回build + HMR付きdevサーバ（localhost:30001）
 
 ### 型チェック
 
-型定義はFoundryVTT本体ソース（`client/` / `common/`）を直接参照する（fvtt-typesは不使用。経緯は[v14移行チェックリスト](/v14-migration)）。初回セットアップ:
+型定義はFoundryVTT本体ソース（`client/` / `common/`）を直接参照する（fvtt-typesは不使用。理由は[コード設計の規約](/code-design)の「本体の型が足りないとき」にある）。初回セットアップ:
 
 ```shell
 cp example-foundry-config.yaml foundry-config.yaml
@@ -52,7 +52,7 @@ npm run verify:live   # 実機検証（ローカルのみ。CIでは回さない
 
 ## コミット規約
 
-**1コミット1関心ごと**をなるべく守り、人間が読みやすいコミット履歴にする。
+**1コミット1関心ごと**をなるべく守り、人間が読みやすいコミット履歴にする。リファクタリングは機能追加と混ぜず、挙動を変えないコミットを小さく積む。
 
 - 1行目: `prefix: 変更の要約` を**英語**で簡潔に
 - 2行目: 空行
@@ -90,7 +90,7 @@ feat: add resonance roll dialog
 ## コーディング方針
 
 - TypeScript は **`strict: true`** に加えていくつかのフラグを有効にしている（一覧は `tsconfig.json`）。**型・命名・層のimport方向の規約は [コード設計の規約](/code-design) が正**。`any` の禁止、`as` の使いどころ、本体の型が足りないときの補い方もそちらにある
-- UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す
+- UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す。プレースホルダの展開は `game.i18n.localize(stringId, data)` に統合されており、`format` は使わない（ランタイムaliasとして残るが型に出ない）
 - フォーマット・lintは [Biome](https://biomejs.dev/)（設定: `biome.json`）。手動実行は `npm run check`（修正適用）/ `npm run lint`（検証のみ）。Biomeは型アサーションの組み込みルールを持たないため、二重キャストの禁止はGritQLプラグイン（`tools/no-double-cast.grit`）で実装している
 - 設計の方向性・既知の構造的課題は [アーキテクチャ](/architecture) を参照
 
@@ -98,7 +98,7 @@ feat: add resonance roll dialog
 
 - **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。`.hbs` を触れば `check:templates`、`lang/*.json` を触れば `check:lang`、`system.json` を触れば `check:manifest-urls`、`package.json` / `biome.json` / `ci.yml` を触れば `check:biome-version` も走る。緊急時は `git commit --no-verify` でスキップできるが非推奨
 - **CI**: pushとPRで GitHub Actions が Biome・テスト・ビルド・型チェック・翻訳/テンプレート/スキーマ表/配布URL/Biomeバージョンの整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
-  - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない
+  - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない。本体のビルド番号は `ci.yml` の `FOUNDRY_BUILD` でピン留めしてあり（キャッシュキーもここから作られる）、ローカルのFoundryを更新したら合わせて上げる
 - **依存の更新**: DependabotがnpmとGitHub Actionsを週次で見る（`.github/dependabot.yml`）。パッチとマイナーは1本にまとめ、メジャーは個別にPRが立つ。**Biomeだけは3箇所（`package.json` / `biome.json` の `$schema` / `ci.yml` の `setup-biome`）を揃える必要がある**。Dependabotが上げてくるのは `package.json` だけなので、残り2つは手で追従させる。揃っていなければ `check:biome-version` が落ちるので、追従漏れはDependabotのPRの時点で分かる
 
 ## 表記ルール
@@ -152,12 +152,11 @@ feat: add resonance roll dialog
 | 内容 | 正となる場所 |
 |---|---|
 | セットアップ・開発フロー・各種規約 | `docs/contributing.md`（このページ） |
-| 設計方針・アーキテクチャ・既知の構造的課題 | `docs/architecture.md` |
+| 設計方針・アーキテクチャ・既知の構造的課題・モジュール連携の接続点 | `docs/architecture.md` |
 | コード設計の規約（型・命名・層のimport方向） | `docs/code-design.md` |
 | テスト方針（単体テスト・実機検証） | `docs/testing.md` |
 | UI設計の規約（CSS・テンプレート・ダイアログ） | `docs/ui-design.md` |
 | 開発フェーズ計画 | `docs/roadmap.md` |
-| v14移行の状況・チェックリスト | `docs/v14-migration.md` |
 | ユーザー向けの使い方 | `docs/getting-started.md` ほか機能ページ |
 | UI文字列 | `lang/ja.json`（`en.json` は追従） |
 | ゲームルール | [公式サイト](https://emoklore.dicetous.com)（実装はルールブックが正） |
@@ -165,3 +164,16 @@ feat: add resonance roll dialog
 `CLAUDE.md` はAIエージェント併用者向けの**参照ハブ**で、上記へのポインタとAI作業に固有の事項だけを載せる。**AIを使わない開発者が読む必要のある情報はCLAUDE.mdに置かない**。このガイドを含むdocs/だけで開発が完結すること。
 
 ローカル環境に固有の情報（FoundryVTT本体ソースの場所など）は、各自がgit管理外の `CLAUDE.local.md`（`.gitignore` 済み）に書く。`CLAUDE.md` がこれをimportするため、AIエージェントにも自動で共有される。マシン依存の手順を収めたAI用プロジェクトスキル（`.claude/skills/`）も同様にgit管理外とする。
+
+### 書き方
+
+ドキュメントは**いまの姿の説明**であって、作業の記録ではない。記録はgitとPRが持つ。
+
+- **現在形で書く**。「解消した」「以前は」「〜済み」の物語を本文に置かない。過去の事故を理由に挙げたいときは「Xすると壊れる」という現在形の条件文に直す。同じ情報で、古くならない
+- **設計判断は、いまの形の説明として残す**。採らなかった代替案は「なぜ採らないか」と再検討の条件を現在形で書く。[アーキテクチャ](/architecture)の「検討して見送ったもの」と、[コード設計の規約](/code-design)の厳格フラグの見送り表がその形
+- **実測値のスナップショットを本文に写さない**。数えられるものはコード・CI・コマンドが正。「一覧は `tsconfig.json` にある」の形で参照する
+- **完了した作業を残さない**。ロードマップの完了は1行のチェックまで。完了済みのチェックリスト・作業ログ・調査メモは、続きがあるならIssueへ移し、ないなら削除する
+- **Issue/PR番号は未解決のものだけ書く**。openなIssueへの参照は、閉じるときに一緒に消す。閉じた番号を根拠として書きたくなったら、番号ではなく根拠そのものを本文に書く
+- **1ページは1つの関心の正**。複数の関心を抱え始めたら分割を検討する
+
+コード内コメントの規約は[コード設計の規約](/code-design)の「コメント」節が正。

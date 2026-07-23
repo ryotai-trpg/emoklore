@@ -25,7 +25,7 @@ export type HpChange = { before: number; after: number };
 export class EmokloreActor extends Actor {
   declare system: CharacterDataModel;
 
-  // スキーマ由来のプロパティは本体JSDocの型に出ないため補強する（docs/v14-migration.md「失われるもの」）
+  // スキーマ由来のプロパティは本体JSDocの型に出ないため補強する（docs/code-design.md「本体の型が足りないとき」）
   declare name: string;
   declare flags: Record<string, unknown>;
   // 埋め込みコレクションも同様に型に出ない
