@@ -14,6 +14,8 @@ export type DamageApplied = {
   name: string;
   before: number;
   after: number;
+  /** 軽減に使った防具の値。行の内訳に出す */
+  armor: number;
 };
 
 export type RollMessageData = {
@@ -101,7 +103,7 @@ export async function createMpNoticeMessage(
     system: {
       resource: "mp",
       reduction: 0,
-      targets: [{ actorUuid, name: actor.name, before, after }],
+      targets: [{ actorUuid, name: actor.name, before, after, armor: 0 }],
     },
     content: await foundry.applications.handlebars.renderTemplate(DAMAGE_APPLIED_TEMPLATE, {
       entries: [entry],
@@ -133,15 +135,20 @@ const statusLabel = (statusId: string): string =>
  * 判定の強制や状態の自動付与はしない。
  */
 function buildHpEntry(
-  { actorUuid, name, before, after }: DamageApplied,
+  { actorUuid, name, before, after, armor }: DamageApplied,
   reduction: number,
 ): EntryContext {
-  // 軽減したときだけ内訳を添える。0のときまで「（軽減 0）」と出すのは雑音
+  // 効いたぶんだけ内訳を添える。0のときまで「（軽減 0）」と出すのは雑音。
+  // 軽減は1回の適用で共通、防具は対象ごとに違う
   const lineKey =
-    reduction > 0
-      ? "EMOKLORE.ChatMessage.weapon.AppliedWithReduction"
-      : "EMOKLORE.ChatMessage.weapon.Applied";
-  const line = game.i18n.localize(lineKey, { name, before, after, reduction });
+    reduction > 0 && armor > 0
+      ? "EMOKLORE.ChatMessage.weapon.AppliedWithReductionAndArmor"
+      : reduction > 0
+        ? "EMOKLORE.ChatMessage.weapon.AppliedWithReduction"
+        : armor > 0
+          ? "EMOKLORE.ChatMessage.weapon.AppliedWithArmor"
+          : "EMOKLORE.ChatMessage.weapon.Applied";
+  const line = game.i18n.localize(lineKey, { name, before, after, reduction, armor });
 
   const boundary = resolveHpBoundary({ before, after });
   if (!boundary) return { line };

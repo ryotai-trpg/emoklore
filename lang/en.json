@@ -138,7 +138,9 @@
         "NoTarget": "No target. Target a token first.",
         "NoGM": "A connected GM is required to apply damage to characters you do not own.",
         "Applied": "{name} HP: {before} → {after}",
-        "AppliedWithReduction": "{name} HP: {before} → {after} (reduced by {reduction})"
+        "AppliedWithReduction": "{name} HP: {before} → {after} (reduced by {reduction})",
+        "AppliedWithArmor": "{name} HP: {before} → {after} (armor {armor})",
+        "AppliedWithReductionAndArmor": "{name} HP: {before} → {after} (reduced by {reduction} + armor {armor})"
       },
       "damageApplied": {
         "HpZero": "HP reached 0: Cardiac Arrest. A character with Grit may roll to avoid it (the level drops by 1 per roll). From now on, roll *Survival at the end of each round; on failure, Dead.",

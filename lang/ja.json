@@ -138,7 +138,9 @@
         "NoTarget": "ターゲットがいません。対象のトークンをターゲットしてください。",
         "NoGM": "権限のないキャラクターに適用するにはGMの接続が必要です。",
         "Applied": "{name} HP: {before} → {after}",
-        "AppliedWithReduction": "{name} HP: {before} → {after}（軽減 {reduction}）"
+        "AppliedWithReduction": "{name} HP: {before} → {after}（軽減 {reduction}）",
+        "AppliedWithArmor": "{name} HP: {before} → {after}（防具 {armor}）",
+        "AppliedWithReductionAndArmor": "{name} HP: {before} → {after}（軽減 {reduction} ＋ 防具 {armor}）"
       },
       "damageApplied": {
         "HpZero": "HPが0になった: 【心肺停止】。〈根性〉があれば回避判定できる（判定ごとにレベル−1）。以降、各ラウンド終了時に〈＊生存〉判定、失敗で【死亡】。",

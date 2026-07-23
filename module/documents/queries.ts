@@ -25,6 +25,11 @@ type ApplyDamageQuery = {
   actorUuids: string[];
   amount: number;
   reduction: number;
+  /**
+   * 防具の上書き値。`undefined` は「各対象の装備中防具の合計を自動で使う」で、
+   * `0` は「防具を使わない」の明示。`?? 0` に畳むと意味が変わるので畳まない
+   */
+  armor?: number | undefined;
 };
 
 /** 本体の型に出ないメンバーだけを補う */
@@ -42,7 +47,12 @@ export function registerQueries(): void {
     const query = data as Partial<ApplyDamageQuery> | null;
     if (query?.type !== "applyDamage") return null;
 
-    return applyDamageByUuid(query.actorUuids ?? [], query.amount ?? 0, query.reduction ?? 0);
+    return applyDamageByUuid(
+      query.actorUuids ?? [],
+      query.amount ?? 0,
+      query.reduction ?? 0,
+      query.armor,
+    );
   };
 }
 
@@ -59,9 +69,9 @@ export function registerQueries(): void {
 export async function applyDamageToTargets(
   actors: EmokloreActor[],
   amount: number,
-  { reduction = 0 }: { reduction?: number } = {},
+  { reduction = 0, armor }: { reduction?: number; armor?: number | undefined } = {},
 ): Promise<DamageApplied[] | undefined> {
-  if (actors.every((actor) => actor.isOwner)) return applyDamage(actors, amount, reduction);
+  if (actors.every((actor) => actor.isOwner)) return applyDamage(actors, amount, reduction, armor);
 
   // ここに来た時点で自分はGMではない。GMは常に全アクターのOWNERなので、
   // 上の every を抜けている（common/abstract/document.mjs の testUserPermission）
@@ -76,6 +86,7 @@ export async function applyDamageToTargets(
     actorUuids: actors.map((actor) => actor.uuid).filter((uuid): uuid is string => !!uuid),
     amount,
     reduction,
+    armor,
   };
 
   return (await gm.query(SYSTEM_ID, query)) as DamageApplied[];
@@ -86,6 +97,7 @@ async function applyDamageByUuid(
   actorUuids: string[],
   amount: number,
   reduction: number,
+  armor: number | undefined,
 ): Promise<DamageApplied[]> {
   const resolved = await Promise.all(
     actorUuids.map((uuid) => foundry.utils.fromUuid(uuid) as Promise<EmokloreActor | null>),
@@ -95,6 +107,7 @@ async function applyDamageByUuid(
     resolved.filter((actor): actor is EmokloreActor => !!actor),
     amount,
     reduction,
+    armor,
   );
 }
 
@@ -103,11 +116,12 @@ async function applyDamage(
   actors: EmokloreActor[],
   amount: number,
   reduction: number,
+  armor: number | undefined,
 ): Promise<DamageApplied[]> {
   const applied: DamageApplied[] = [];
 
   for (const actor of actors) {
-    const change = await actor.applyDamage(amount, { reduction });
+    const change = await actor.applyDamage(amount, { reduction, armor });
     // HPを持たないアクターやフックで中断された場合は結果が返らない
     if (change) applied.push({ actorUuid: actor.uuid ?? null, name: actor.name, ...change });
   }
