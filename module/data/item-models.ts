@@ -38,6 +38,9 @@ const defineWeaponDataModelSchema = () => {
     }),
     // ルールブックに距離の規定がないので自由記述。近接武器では使わない
     range: new StringField({ required: true, blank: true, initial: "" }),
+    // いま構えているかの記録。防具と違って機構には繋がっていない。
+    // 武器は「携行はするが構えていない」が常態なので既定 false
+    equipped: new BooleanField({ required: true, initial: false }),
     notes: new HTMLField({ required: true, blank: true }),
   };
 };
@@ -46,6 +49,7 @@ export class WeaponDataModel extends EmokloreSystemDataModel {
   declare skill: AttackSkillKey;
   declare attackPower: string;
   declare range: string;
+  declare equipped: boolean;
   declare notes: string;
 
   // 参照技能から引ける派生値。prepareDerivedData で必ず設定される
