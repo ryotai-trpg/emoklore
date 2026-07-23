@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDamageFormula, canRollDamage } from "./weapon-damage";
+import { buildDamageFormula, canRollDamage, resolveStrengthBonus } from "./weapon-damage";
 
 describe("canRollDamage", () => {
   it("成功数が1以上なら振れる", () => {
@@ -68,5 +68,30 @@ describe("buildDamageFormula", () => {
     expect(() =>
       buildDamageFormula({ successCount: -1, damageDie: "d3", attackPower: "" }),
     ).toThrow(/成功数ではない/);
+  });
+});
+
+describe("resolveStrengthBonus", () => {
+  it("近接なら技能レベルがそのまま加算値になる", () => {
+    expect(resolveStrengthBonus("melee", 2)).toBe(2);
+  });
+
+  it("未修得（レベル0）なら加算しない", () => {
+    expect(resolveStrengthBonus("melee", 0)).toBe(0);
+  });
+
+  it("遠隔には乗らない", () => {
+    expect(resolveStrengthBonus("ranged", 3)).toBe(0);
+  });
+
+  it("ダメージ式の末尾に内訳として現れる", () => {
+    expect(
+      buildDamageFormula({
+        successCount: 2,
+        damageDie: "d3",
+        attackPower: "1D6",
+        bonus: resolveStrengthBonus("melee", 2),
+      }),
+    ).toBe("2d3 + 1D6 + 2");
   });
 });

@@ -36,14 +36,16 @@ export async function run({ page, check }) {
     ),
   );
 
-  for (const [label, suffix] of [
-    ["通常技能", "刀"],
-    ["基本技能", "手榴弾"],
+  for (const [label, suffix, expectedFormula] of [
+    // 近接は〈ストレングス〉Lv2（fixtures で設定）が式の末尾に乗る
+    ["通常技能", "刀", "{n}d3 + 1d6 + 2"],
+    // 遠隔には乗らない。末尾の + 2 は武器攻撃力
+    ["基本技能", "手榴弾", "{n} + 2"],
   ]) {
     await check(`武器カードが 攻撃→ダメージ と進む（${label}）`, () =>
       assertInPage(
         page,
-        async (tag, name) => {
+        async (tag, name, template) => {
           const a = game.actors.getName(`${tag}_char`);
           const item = a.items.getName(`${tag}_${name}`);
           if (!item) return { ok: false, detail: `${name} が無い` };
@@ -72,16 +74,27 @@ export async function run({ page, check }) {
             label: "ダメージの反映",
           });
           const card = game.messages.get(id).system;
-          const ok = card.damageTotal !== null && card.buttons.canApplyDamage;
+          if (card.damageTotal === null || !card.buttons.canApplyDamage) {
+            return {
+              ok: false,
+              detail: `damageTotal=${card.damageTotal} buttons=${JSON.stringify(card.buttons)}`,
+            };
+          }
+
+          // 式そのものを見る。〈ストレングス〉加算が近接にだけ乗っているかの配線検証
+          const formula = game.messages.get(id).rolls.at(-1).formula;
+          const expected = template.replace("{n}", String(afterAttack.successCount));
+          if (formula.toLowerCase() !== expected.toLowerCase()) {
+            return { ok: false, detail: `式が期待とずれた: ${formula}（期待 ${expected}）` };
+          }
           return {
-            ok,
-            detail: ok
-              ? `成功数${afterAttack.successCount} → ${game.messages.get(id).rolls.at(-1).formula} = ${card.damageTotal}`
-              : `damageTotal=${card.damageTotal} buttons=${JSON.stringify(card.buttons)}`,
+            ok: true,
+            detail: `成功数${afterAttack.successCount} → ${formula} = ${card.damageTotal}`,
           };
         },
         TAG,
         suffix,
+        expectedFormula,
       ),
     );
   }

@@ -1,4 +1,4 @@
-import type { DamageDie } from "../config/attack-skills";
+import type { DamageDie, RangeType } from "../config/attack-skills";
 
 export type DamageFormulaParams = {
   /** 攻撃判定の成功数。振るダイスの数になる */
@@ -10,8 +10,8 @@ export type DamageFormulaParams = {
   /**
    * 武器攻撃力に足す固定値。
    *
-   * 近接戦闘の武器攻撃力は〈ストレングス〉技能レベルぶん増えるが、その配線はまだ入れていない。
-   * 呼び出し側が技能レベルを渡せるよう、口だけ開けてある。
+   * 近接戦闘の武器攻撃力は〈ストレングス〉技能レベルぶん増える。
+   * 呼び出し側が resolveStrengthBonus の答えを渡す。
    */
   bonus?: number;
 };
@@ -48,4 +48,14 @@ export function buildDamageFormula({
   const strength = bonus ? ` ${bonus > 0 ? "+" : "-"} ${Math.abs(bonus)}` : "";
 
   return `${dice}${power}${strength}`;
+}
+
+/**
+ * 近接戦闘の武器攻撃力に乗る〈ストレングス〉加算。
+ *
+ * 技能一覧〈ストレングス〉付記のとおり加算されるのは近接戦闘だけで、
+ * 遠隔（投擲・射撃）には乗らない。
+ */
+export function resolveStrengthBonus(rangeType: RangeType, strengthLevel: number): number {
+  return rangeType === "melee" ? strengthLevel : 0;
 }
