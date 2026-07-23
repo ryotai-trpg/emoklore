@@ -10,6 +10,7 @@ import { EMOKLORE } from "./config/index";
 import { statusEffects } from "./config/status-effects";
 import { CharacterDataModel } from "./data/character";
 import { SkillDataModel, WeaponDataModel } from "./data/item-models";
+import { DamageAppliedModel } from "./data/messages/damage-applied";
 import { WeaponCardModel } from "./data/messages/weapon-card";
 import { EmokloreDie } from "./dice/emoklore-die";
 import { EmokloreRoll } from "./dice/emoklore-roll";
@@ -49,6 +50,7 @@ Hooks.once("init", () => {
   } as typeof CONFIG.Item.dataModels;
   CONFIG.ChatMessage.dataModels = {
     weapon: WeaponCardModel,
+    damageApplied: DamageAppliedModel,
   } as typeof CONFIG.ChatMessage.dataModels;
 
   CONFIG.Dice.rolls.push(EmokloreRoll);

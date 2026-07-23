@@ -1,6 +1,18 @@
-{{! Damage Applied }}
+{{! 対象1体につき1項目。notice は境界をまたいだときだけ付く（utils/chat.ts が組む） }}
 <ul class="em-damage-applied">
-  {{#each lines as |line|}}
-    <li>{{line}}</li>
+  {{#each entries}}
+    <li>
+      <span>{{this.line}}</span>
+      {{#if this.notice}}
+        <p class="em-damage-applied__notice">{{this.notice.text}}</p>
+        {{#if this.notice.actorUuid}}
+          <button type="button" class="em-damage-applied__status" data-action="applyStatus"
+            data-status-id="{{this.notice.statusId}}" data-actor-uuid="{{this.notice.actorUuid}}">
+            <i class="fa-solid fa-heart-pulse" inert></i>
+            <span>{{this.notice.buttonLabel}}</span>
+          </button>
+        {{/if}}
+      {{/if}}
+    </li>
   {{/each}}
 </ul>

@@ -109,7 +109,7 @@ async function applyDamage(
   for (const actor of actors) {
     const change = await actor.applyDamage(amount, { reduction });
     // HPを持たないアクターやフックで中断された場合は結果が返らない
-    if (change) applied.push({ name: actor.name, ...change });
+    if (change) applied.push({ actorUuid: actor.uuid ?? null, name: actor.name, ...change });
   }
 
   return applied;

@@ -1,9 +1,10 @@
 import type { CharacterDataModel, SkillRef } from "../data/character";
 import { EmokloreRoll } from "../dice/emoklore-roll";
 import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
+import { resolveMpBoundary } from "../rules/resource-boundary";
 import { resolveSkillRoll } from "../rules/skill-roll";
 import type { RollSpec } from "../rules/types";
-import { createRollMessage, formatSkillName } from "../utils/chat";
+import { createMpNoticeMessage, createRollMessage, formatSkillName } from "../utils/chat";
 import type { EmokloreItem } from "./item";
 
 type ResourceKey = "hp" | "mp" | "resonance";
@@ -80,6 +81,44 @@ export class EmokloreActor extends Actor {
     return (await this.update({ [`system.resources.${resource}.value`]: newvalue })) as
       | this
       | undefined;
+  }
+
+  /**
+   * MP境界の検知のために、更新前の値を options に捕まえる。
+   *
+   * MPにはダメージ適用（HP側）のような一元の減少口が無く、シートの直接編集が
+   * 減少手段なので、Document の更新そのものを見るしかない。`_onUpdate` の時点では
+   * 旧値がもう手に入らないため、ここで運ぶ。
+   */
+  override async _preUpdate(
+    ...args: Parameters<Actor["_preUpdate"]>
+  ): Promise<boolean | undefined> {
+    const [changed, options] = args;
+    const allowed = await super._preUpdate(...args);
+    if (allowed === false) return false;
+
+    if (foundry.utils.hasProperty(changed, "system.resources.mp.value")) {
+      foundry.utils.setProperty(options, "emoklore.mpBefore", this.system.resources.mp.value);
+    }
+
+    return undefined;
+  }
+
+  override _onUpdate(...args: Parameters<Actor["_onUpdate"]>): void {
+    super._onUpdate(...args);
+    const [, options, userId] = args;
+
+    // 更新は全クライアントで発火する。案内を出すのは更新した本人だけ
+    // （draw-steel の updateStaminaEffects と同じガード）
+    if (game.userId !== userId) return;
+
+    const before = foundry.utils.getProperty(options, "emoklore.mpBefore");
+    if (typeof before !== "number") return;
+
+    const after = this.system.resources.mp.value;
+    if (!resolveMpBoundary({ before, after })) return;
+
+    void createMpNoticeMessage(this, { before, after });
   }
 
   /**

@@ -36,7 +36,8 @@
       "skill": { "htmlFields": ["notes"] }
     },
     "ChatMessage": {
-      "weapon": {}
+      "weapon": {},
+      "damageApplied": {}
     }
   },
   "license": "LICENSE",
