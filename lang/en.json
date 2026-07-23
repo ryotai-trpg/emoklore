@@ -165,7 +165,13 @@
       "DefenseSkill": "Skill",
       "RollAndFill": "Roll and Fill",
       "DefenseHint": "Rolls with the target character and fills the reduction with the successes.",
-      "MultiTargetHint": "The defense roll is unavailable with multiple targets. Enter the reduction directly, or apply to one target at a time."
+      "MultiTargetHint": "The defense roll is unavailable with multiple targets. Enter the reduction directly, or apply to one target at a time.",
+      "Armor": "Armor",
+      "ArmorHint": "All equipped armor counts toward the reduction by default. Uncheck pieces that should not apply, such as for hit location.",
+      "ArmorNone": "No equipped armor.",
+      "ArmorMultiTargetHint": "With multiple targets, each target's equipped armor total is added automatically.",
+      "ArmorPiece": "{name} (defense {defense})",
+      "ArmorPieceWithCoverage": "{name} (defense {defense} / {coverage})"
     },
     "emotionAttributes": {
       "desire": "Desire",

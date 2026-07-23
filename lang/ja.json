@@ -165,7 +165,13 @@
       "DefenseSkill": "技能",
       "RollAndFill": "振って反映",
       "DefenseHint": "対象のキャラクターで判定を振り、成功数を軽減値に入れます。",
-      "MultiTargetHint": "対象が複数のときは防御判定を使えません。軽減値を直接入力するか、1体ずつ適用してください。"
+      "MultiTargetHint": "対象が複数のときは防御判定を使えません。軽減値を直接入力するか、1体ずつ適用してください。",
+      "Armor": "防具",
+      "ArmorHint": "装備中の防具は、既定ですべて軽減に加わります。部位などの条件で適用しないものはチェックを外してください。",
+      "ArmorNone": "装備中の防具はありません。",
+      "ArmorMultiTargetHint": "対象が複数のときは、それぞれの装備中防具の合計が自動で軽減に加わります。",
+      "ArmorPiece": "{name}（防御力 {defense}）",
+      "ArmorPieceWithCoverage": "{name}（防御力 {defense}／{coverage}）"
     },
     "emotionAttributes": {
       "desire": "欲望",
