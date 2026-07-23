@@ -110,10 +110,25 @@
         "UnknownSkill": "This weapon references an unknown skill, so the attack cannot be rolled.",
         "ActionFailed": "The weapon card action failed.",
         "Apply": "Apply Damage",
+        "ApplyWithReduction": "Apply with Reduction",
         "NoTarget": "No target. Target a token first.",
         "NoGM": "A connected GM is required to apply damage to characters you do not own.",
-        "Applied": "{name} HP: {before} → {after}"
+        "Applied": "{name} HP: {before} → {after}",
+        "AppliedWithReduction": "{name} HP: {before} → {after} (reduced by {reduction})"
       }
+    },
+    "ApplyDamage": {
+      "Title": "Apply Damage",
+      "Summary": "Target: {target} / Damage: {damage} / Attack successes: {successCount}",
+      "TargetCount": "{count} targets",
+      "EvasionHint": "Evasion negates the damage when its successes are equal to or higher than the attack's. If it succeeded, cancel to skip applying.",
+      "Reduction": "Reduction",
+      "FocusHint": "While focusing on reactions, the reduction from a defense roll is doubled (enter the value manually).",
+      "DefenseRoll": "Defense Roll",
+      "DefenseSkill": "Skill",
+      "RollAndFill": "Roll and Fill",
+      "DefenseHint": "Rolls with the target character and fills the reduction with the successes.",
+      "MultiTargetHint": "The defense roll is unavailable with multiple targets. Enter the reduction directly, or apply to one target at a time."
     },
     "emotionAttributes": {
       "desire": "Desire",

@@ -3,6 +3,7 @@
 import "../css/emoklore.css";
 import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
 import * as applications from "./applications/character-sheet";
+import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
@@ -52,6 +53,10 @@ Hooks.once("init", () => {
 
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;
+
+  // 武器カードの「軽減して適用」。ハンドラはダイアログを開くので applications/ に居り、
+  // data/ からの逆依存を作らないよう、モジュールにも開いている ACTIONS の口から登録する
+  WeaponCardModel.ACTIONS.applyDamageWithReduction = applyDamageWithReduction;
 
   // トークンに付けられる状態をエモクロアのものに差し替える。既定はD&D風の
   // dead/blind/prone… で、ルールブックの【気絶】【心肺停止】などが1つも無い。

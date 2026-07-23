@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildDamageFormula, canRollDamage, resolveStrengthBonus } from "./weapon-damage";
+import {
+  buildDamageFormula,
+  canRollDamage,
+  normalizeReduction,
+  resolveStrengthBonus,
+} from "./weapon-damage";
 
 describe("canRollDamage", () => {
   it("成功数が1以上なら振れる", () => {
@@ -93,5 +98,25 @@ describe("resolveStrengthBonus", () => {
         bonus: resolveStrengthBonus("melee", 2),
       }),
     ).toBe("2d3 + 1D6 + 2");
+  });
+});
+
+describe("normalizeReduction", () => {
+  it("0以上の整数はそのまま", () => {
+    expect(normalizeReduction(0)).toBe(0);
+    expect(normalizeReduction(3)).toBe(3);
+  });
+
+  it("負値は0に倒す（ファンブルの成功数を流し込んでも増えない）", () => {
+    expect(normalizeReduction(-1)).toBe(0);
+  });
+
+  it("小数は切り捨てる", () => {
+    expect(normalizeReduction(2.7)).toBe(2);
+  });
+
+  it("数値でない入力は0として扱う", () => {
+    expect(normalizeReduction(Number.NaN)).toBe(0);
+    expect(normalizeReduction(Number.POSITIVE_INFINITY)).toBe(0);
   });
 });
