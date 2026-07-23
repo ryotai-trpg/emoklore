@@ -7,6 +7,7 @@
         <div class="em-data-table__name">{{localize "TYPES.Item.weapon"}}</div>
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.weapon.Damage"}}</div>
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.weapon.FIELDS.range.label"}}</div>
+        <div class="em-data-table__cell">{{localize "EMOKLORE.Item.weapon.FIELDS.equipped.label"}}</div>
         <div class="em-data-table__controls">
           {{#if editable}}
             <a
@@ -23,7 +24,8 @@
       </div>
 
       {{! 値の編集は武器シートが持つ。同じ name の入力を2箇所に描くと
-          非アクティブなタブぶんも送信されてフォームが壊れるため、ここは表示だけ }}
+          非アクティブなタブぶんも送信されてフォームが壊れるため、ここは表示だけ。
+          装備トグルは name を持たないチェックボックスで、直接アイテムに書く }}
       <ol class="em-data-table__body">
         {{#each weapons as |weapon|}}
           <li
@@ -43,6 +45,82 @@
               {{weapon.damagePreview}}
             </div>
             <div class="em-data-table__cell">{{weapon.rangeLabel}}</div>
+            <div class="em-data-table__cell em-data-table__cell--toggle">
+              <input
+                type="checkbox"
+                data-action="toggleEquipped"
+                data-tooltip='{{localize "EMOKLORE.Item.weapon.FIELDS.equipped.label"}}'
+                {{checked weapon.equipped}}
+                {{#unless @root.editable}}disabled{{/unless}}
+              />
+            </div>
+            <div class="em-data-table__controls">
+              <a
+                class="em-data-table__control"
+                data-action="viewDoc"
+                data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
+              >
+                <i class="fas fa-edit"></i>
+              </a>
+              {{#if @root.editable}}
+                <a
+                  class="em-data-table__control"
+                  data-action="deleteDoc"
+                  data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
+                >
+                  <i class="fas fa-trash"></i>
+                </a>
+              {{/if}}
+            </div>
+          </li>
+        {{/each}}
+      </ol>
+    </li>
+
+    <li class="em-data-table__section" data-item-type="armor">
+      <div class="em-data-table__head">
+        <div class="em-data-table__name">{{localize "TYPES.Item.armor"}}</div>
+        <div class="em-data-table__cell">{{localize "EMOKLORE.Item.armor.FIELDS.defense.label"}}</div>
+        <div class="em-data-table__cell">{{localize "EMOKLORE.Item.armor.FIELDS.coverage.label"}}</div>
+        <div class="em-data-table__cell">{{localize "EMOKLORE.Item.armor.FIELDS.equipped.label"}}</div>
+        <div class="em-data-table__controls">
+          {{#if editable}}
+            <a
+              class="em-data-table__control"
+              data-action="createDoc"
+              data-document-class="Item"
+              data-type="armor"
+              data-tooltip='{{localize "DOCUMENT.Create" type=(localize "TYPES.Item.armor")}}'
+            >
+              <i class="fas fa-plus"></i>
+            </a>
+          {{/if}}
+        </div>
+      </div>
+
+      <ol class="em-data-table__body">
+        {{#each armors as |armor|}}
+          <li
+            class="em-data-table__row draggable"
+            data-item-id="{{armor.id}}"
+            data-document-class="Item"
+          >
+            {{! 防具にはカードが無いので、名前はシートを開く }}
+            <div class="em-data-table__name" data-tooltip="{{armor.name}}">
+              <img class="em-data-table__image" src="{{armor.img}}" height="24" width="24" alt="" />
+              <a data-action="viewDoc">{{armor.name}}</a>
+            </div>
+            <div class="em-data-table__cell">{{armor.defense}}</div>
+            <div class="em-data-table__cell" data-tooltip="{{armor.coverage}}">{{armor.coverage}}</div>
+            <div class="em-data-table__cell em-data-table__cell--toggle">
+              <input
+                type="checkbox"
+                data-action="toggleEquipped"
+                data-tooltip='{{localize "EMOKLORE.Item.armor.FIELDS.equipped.label"}}'
+                {{checked armor.equipped}}
+                {{#unless @root.editable}}disabled{{/unless}}
+              />
+            </div>
             <div class="em-data-table__controls">
               <a
                 class="em-data-table__control"

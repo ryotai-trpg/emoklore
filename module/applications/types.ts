@@ -148,6 +148,17 @@ export type WeaponRow = {
   rangeLabel: string;
   /** 「【成功数】D3 ＋ 1D3」形式のダメージ式 */
   damagePreview: string;
+  equipped: boolean;
+};
+
+/** 防具1行の表示用データ。武器と同じく読むだけの一覧で、装備トグルだけが書ける */
+export type ArmorRow = {
+  id: string;
+  name: string;
+  img: string;
+  defense: number;
+  coverage: string;
+  equipped: boolean;
 };
 
 export type CharacteristicsMap = Record<
@@ -274,6 +285,7 @@ export type CharacterContext = {
   tabs: Record<string, ApplicationTab>;
   tab?: unknown;
   weapons?: WeaponRow[];
+  armors?: ArmorRow[];
   effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;
   // 基底の EmokloreDocumentSheetContext と対応する分
   isPlay: boolean;

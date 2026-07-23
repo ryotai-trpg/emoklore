@@ -90,7 +90,7 @@
   .tab.items {
     .em-data-table__head,
     .em-data-table__row {
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) minmax(0, 1fr) 70px;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) minmax(0, 1fr) 48px 70px;
     }
 
     /* ダメージ式は途中で折り返すと読めなくなるので、切り詰めて全文はツールチップに任せる */
@@ -101,6 +101,14 @@
       white-space: nowrap;
       display: block;
       text-align: center;
+    }
+
+    /* 装備チェックボックスの列。切り詰め用の block 上書きのままでは中央に置けない */
+    .em-data-table__cell--toggle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: visible;
     }
   }
 
