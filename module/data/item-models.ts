@@ -11,7 +11,7 @@ import { SKILL_LEVEL_MAX, SKILL_LEVEL_MIN } from "../rules/limits";
 import { resolveAttackSkill } from "../utils/weapon";
 import { EmokloreSystemDataModel } from "./system-model";
 
-const { HTMLField, NumberField, SetField, StringField } = foundry.data.fields;
+const { BooleanField, HTMLField, NumberField, SetField, StringField } = foundry.data.fields;
 
 const defineWeaponDataModelSchema = () => {
   return {
@@ -74,6 +74,43 @@ export class WeaponDataModel extends EmokloreSystemDataModel {
     this.damageDie = config.damageDie;
     this.usesBaseSkill = config.base;
   }
+}
+
+/**
+ * 防具。書籍版ルールブックの「防御力（受けるダメージから引く固定値）＋適用部位の条件」を
+ * 受ける器。書籍固有のアイテムデータは同梱せず、値はユーザーが書く。
+ */
+const defineArmorDataModelSchema = () => {
+  return {
+    // 書籍の防具は固定値だけで、武器攻撃力と違ってダイス式は出てこないので数値
+    defense: new NumberField({
+      required: true,
+      nullable: false,
+      integer: true,
+      min: 0,
+      initial: 0,
+    }),
+    // 「ヘルメットは頭部のみ」のような適用条件。当たったかの判断はDL裁量で、
+    // 機構が無いので自由記述（weapon.range と同じ扱い）
+    coverage: new StringField({ required: true, blank: true, initial: "" }),
+    // 装備中の防具だけがダメージの軽減に数えられる。防具は「着ている」が常態なので既定 true
+    // （敵に防具を1つ作ればそのまま装甲として働く）
+    equipped: new BooleanField({ required: true, initial: true }),
+    notes: new HTMLField({ required: true, blank: true }),
+  };
+};
+
+export class ArmorDataModel extends EmokloreSystemDataModel {
+  declare defense: number;
+  declare coverage: string;
+  declare equipped: boolean;
+  declare notes: string;
+
+  static override defineSchema() {
+    return defineArmorDataModelSchema();
+  }
+
+  static override LOCALIZATION_PREFIXES = ["EMOKLORE.Item.armor"];
 }
 
 /**

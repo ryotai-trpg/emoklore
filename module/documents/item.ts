@@ -1,4 +1,4 @@
-import type { SkillDataModel, WeaponDataModel } from "../data/item-models";
+import type { ArmorDataModel, SkillDataModel, WeaponDataModel } from "../data/item-models";
 import type { EmokloreSystemDataModel } from "../data/system-model";
 import { localizeRangeType, renderWeaponCard, type WeaponCardState } from "../utils/weapon";
 import type { EmokloreActor } from "./actor";
@@ -23,6 +23,11 @@ export class EmokloreItem extends Item {
    */
   isWeapon(): this is EmokloreItem & { type: "weapon"; system: WeaponDataModel } {
     return this.type === "weapon";
+  }
+
+  /** 防具かどうか。真なら system を ArmorDataModel として読める */
+  isArmor(): this is EmokloreItem & { type: "armor"; system: ArmorDataModel } {
+    return this.type === "armor";
   }
 
   /**

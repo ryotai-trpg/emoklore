@@ -2,6 +2,7 @@
 // 生成されず、system.json の styles が指す先がなくなる（型の宣言は types/css.d.ts）
 import "../css/emoklore.css";
 import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
+import { EmokloreArmorSheet } from "./applications/armor-sheet";
 import * as applications from "./applications/character-sheet";
 import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
@@ -9,7 +10,7 @@ import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
 import { statusEffects } from "./config/status-effects";
 import { CharacterDataModel } from "./data/character";
-import { SkillDataModel, WeaponDataModel } from "./data/item-models";
+import { ArmorDataModel, SkillDataModel, WeaponDataModel } from "./data/item-models";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
 import { WeaponCardModel } from "./data/messages/weapon-card";
 import { EmokloreDie } from "./dice/emoklore-die";
@@ -46,6 +47,7 @@ Hooks.once("init", () => {
   } as typeof CONFIG.Actor.dataModels;
   CONFIG.Item.dataModels = {
     weapon: WeaponDataModel,
+    armor: ArmorDataModel,
     skill: SkillDataModel,
   } as typeof CONFIG.Item.dataModels;
   CONFIG.ChatMessage.dataModels = {
@@ -110,6 +112,18 @@ Hooks.once("init", () => {
       types: ["weapon"],
       makeDefault: true,
       label: "EMOKLORE.Sheet.class.weapon",
+    },
+  );
+
+  DocumentSheetConfig.registerSheet(
+    Item,
+    "emoklore",
+    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
+    EmokloreArmorSheet as unknown as typeof foundry.applications.api.ApplicationV2,
+    {
+      types: ["armor"],
+      makeDefault: true,
+      label: "EMOKLORE.Sheet.class.armor",
     },
   );
 

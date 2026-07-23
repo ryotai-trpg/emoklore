@@ -6,6 +6,7 @@
     },
     "Item": {
       "weapon": "武器",
+      "armor": "防具",
       "skill": "カスタム技能"
     }
   },
@@ -30,6 +31,7 @@
       "class": {
         "character": "キャラクターシート",
         "weapon": "武器シート",
+        "armor": "防具シート",
         "activeEffect": "効果シート",
         "skill": "技能シート"
       },
@@ -70,6 +72,25 @@
         },
         "Damage": "ダメージ",
         "SuccessCount": "【成功数】"
+      },
+      "armor": {
+        "FIELDS": {
+          "defense": {
+            "label": "防御力",
+            "hint": "受けるダメージからそのまま引かれる。"
+          },
+          "coverage": {
+            "label": "部位・適用条件",
+            "hint": "「頭部のみ」のような適用の条件を自由に書ける。"
+          },
+          "equipped": {
+            "label": "装備",
+            "hint": "装備中の防具だけがダメージの軽減に数えられる。"
+          },
+          "notes": {
+            "label": "備考"
+          }
+        }
       },
       "skill": {
         "FIELDS": {

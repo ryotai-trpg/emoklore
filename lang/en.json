@@ -6,6 +6,7 @@
     },
     "Item": {
       "weapon": "Weapon",
+      "armor": "Armor",
       "skill": "Custom Skill"
     }
   },
@@ -30,6 +31,7 @@
       "class": {
         "character": "Character Sheet",
         "weapon": "Weapon Sheet",
+        "armor": "Armor Sheet",
         "activeEffect": "Effect Sheet",
         "skill": "Skill Sheet"
       },
@@ -70,6 +72,25 @@
         },
         "Damage": "Damage",
         "SuccessCount": "[Successes]"
+      },
+      "armor": {
+        "FIELDS": {
+          "defense": {
+            "label": "Defense",
+            "hint": "Subtracted directly from incoming damage."
+          },
+          "coverage": {
+            "label": "Coverage / Condition",
+            "hint": "Free text such as \"head only\"."
+          },
+          "equipped": {
+            "label": "Equipped",
+            "hint": "Only equipped armor counts toward damage reduction."
+          },
+          "notes": {
+            "label": "Notes"
+          }
+        }
       },
       "skill": {
         "FIELDS": {

@@ -1,0 +1,27 @@
+{{! Armor Detail }}
+<section class="em-item-detail">
+  {{#if isPlay}}
+    {{! ラベルは LOCALIZATION_PREFIXES 経由で本体が翻訳済みにしている }}
+    <div class="em-field-list">
+      <div class="em-field em-field--inline">
+        <label class="em-field__label">{{systemFields.defense.label}}</label>
+        <span class="em-field__value">{{system.defense}}</span>
+      </div>
+      {{#if showCoverage}}
+        <div class="em-field em-field--inline">
+          <label class="em-field__label">{{systemFields.coverage.label}}</label>
+          <span class="em-field__value">{{system.coverage}}</span>
+        </div>
+      {{/if}}
+      <div class="em-field">
+        <label class="em-field__label">{{systemFields.notes.label}}</label>
+        <span class="em-field__value">{{{notesHTML}}}</span>
+      </div>
+    </div>
+  {{else}}
+    {{formGroup systemFields.defense value=system.defense}}
+    {{formGroup systemFields.coverage value=system.coverage}}
+    {{formGroup systemFields.equipped value=system.equipped}}
+    {{formGroup systemFields.notes value=system.notes}}
+  {{/if}}
+</section>
