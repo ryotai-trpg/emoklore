@@ -7,9 +7,8 @@ import { typedEntries } from "./object";
  * CCFOLIA形式でコピーしたものを想定している
  *
  * ユーザーが貼り付けた文字列を JSON.parse しただけのものなので、**どの項目も
- * 実際には無いことがある**。必須として宣言すると、取り込み側で確かめないまま
- * 回してしまう（実際 params がそれで、壊れたJSONを貼ると例外になっていた）。
- * 型の側で任意にしておけば、確かめないと通らない。
+ * 実際には無いことがある**。必須として宣言すると、取り込み側が確かめないまま回し、
+ * 壊れたJSONを貼ったときに例外になる。型の側で任意にしておけば、確かめないと通らない。
  */
 interface CharSheetJSON {
   kind: "character";
@@ -298,7 +297,7 @@ export async function importFromCharSheet(
  * 判別可能unionにしてあるので、`valid` を見れば `data` と `error` の
  * どちらがあるかが型で決まる。`{ valid: boolean; data?: T; error?: string }`
  * だと、valid を確かめたあとでも data が任意のままで、呼び出し側が
- * `data!` と書くしかなかった。
+ * `data!` と書くしかなくなる。
  */
 export type CharSheetValidation =
   | { valid: true; data: CharSheetJSON }

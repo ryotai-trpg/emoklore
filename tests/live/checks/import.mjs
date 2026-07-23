@@ -65,7 +65,7 @@ const submitJson = async (page, json) =>
 
 export async function run({ page, check }) {
   await check("params を持たないJSONでも例外にならない", async () => {
-    // 以前はここで data.params を配列チェックなしで回して TypeError になっていた
+    // data.params を配列チェックなしで回すと、ここで TypeError になる
     const json = JSON.stringify({
       kind: "character",
       data: { name: IMPORTED_NAME, status: [{ label: "HP", value: 9, max: 9 }] },

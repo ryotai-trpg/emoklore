@@ -107,7 +107,7 @@ export async function run({ page, check }) {
         const delta = game.messages.size - before;
         const newErrs = window.__errs.slice(errsBefore);
         el.dataset.skill = original;
-        // 境界で型述語を通すようになる前は、CONFIG を引いた先の分割代入が TypeError になっていた
+        // 境界の型述語を外すと、CONFIG を引いた先の分割代入が TypeError になる
         const ok = delta === 0 && newErrs.length === 0;
         return {
           ok,

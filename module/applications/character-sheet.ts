@@ -444,9 +444,9 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   /**
    * サイドバーの表示用データ。
    *
-   * 能力値はカードにしか出ないので、ここでだけ用意する。以前は技能パートが
-   * 積んだものを経歴パートが拾っており（_preparePartContext は同じ context を
-   * 共有する）、パートの順序に暗黙に依存していた。
+   * 能力値はカードにしか出ないので、ここでだけ用意する。_preparePartContext は
+   * 同じ context を共有するため、別のパートが積んだものを拾うとパートの順序への
+   * 暗黙の依存になる。
    */
   private _prepareSidebarContext(context: CharacterContext): void {
     context.characteristics = this._getCharacteristics();

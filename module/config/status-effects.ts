@@ -5,8 +5,7 @@
  * そのキー名で読むため。翻訳は `ActiveEffect.fromStatusEffect` が
  * `_loc(effectData.name)` で解決するので、preLocalize の対象にはしない。
  *
- * `showIcon` は指定しない。本体が `fromStatusEffect` で `??= ALWAYS` を入れており
- * （v14 で `isTemporary` の判定から `statuses` が外れたぶんの手当て）、
+ * `showIcon` は指定しない。本体が `fromStatusEffect` で `??= ALWAYS` を入れるので、
  * 期限を持たない状態でもトークンにアイコンが出る。
  */
 export interface StatusEffectConfig {

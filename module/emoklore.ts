@@ -38,8 +38,7 @@ Hooks.once("init", () => {
   // 固定したサブクラスは代入互換にならない。登録先の型として明示する
   //
   // npc は system.json の documentTypes に無く作成できないため登録しない。登録だけ
-  // 残すと EmokloreActor#system の型（CharacterDataModel）が嘘になる。
-  // NPCシートを実装する Phase 3 で、判定まわりの扱いごと決めて戻す
+  // 残すと EmokloreActor#system の型（CharacterDataModel）が嘘になる
   CONFIG.Actor.dataModels = {
     character: CharacterDataModel,
   } as typeof CONFIG.Actor.dataModels;

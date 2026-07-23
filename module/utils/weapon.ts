@@ -23,8 +23,8 @@ const CARD_TEMPLATE = systemPath("templates/chat/weapon-card.hbs");
  *
  * 未知のキーが来る経路は3つある。手書き・移行データ、CONFIG.EMOKLORE.attackSkills から
  * キーを消したモジュール、そして emoklore.preRollAttack で skill を差し替えるモジュール。
- * かつては引く側が4箇所それぞれに ?? を書いており、同じ入力に対して base が真偽で
- * 食い違い、damageDie が d3 と null に割れていた。倒し先はここだけが決める
+ * 倒し先はここだけが決める。引く側が個別に ?? で倒すと、同じ入力に対して base や
+ * damageDie の既定が呼び出し元ごとに食い違う
  */
 export const resolveAttackSkill = (skill: string): AttackSkillConfig =>
   isAttackSkillKey(skill) ? attackSkills[skill] : attackSkills.fight;

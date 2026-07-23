@@ -24,8 +24,8 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
     const dataset = (target as HTMLElement & { dataset: DOMStringMap }).dataset;
 
     // dataset は生の文字列なので、技能キーとして通ることをここで確かめる。
-    // テンプレートの綴り間違いは、以前は as SkillKey をすり抜けて
-    // CONFIG を引いた先の分割代入で TypeError になっていた
+    // as SkillKey と名乗るだけでは綴り間違いが素通りし、CONFIG を引いた先の
+    // 分割代入で TypeError になる
     const skill = dataset.skill ?? "";
 
     switch (dataset.rollType) {

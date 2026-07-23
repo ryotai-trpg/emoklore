@@ -24,7 +24,7 @@ export function prepareActiveEffectCategories(
 
   // 無効なものを優先し、残りを一時的／恒常に振り分ける。
   //
-  // v14 で `isSuppressed` が `duration.expired` を拾うようになり、期限切れの効果は
+  // 本体の `isSuppressed` は `duration.expired` を拾うので、期限切れの効果は
   // `active` が落ちる。ただしここが見ているのは `disabled`（利用者が切ったか）なので、
   // 期限切れは「無効」ではなく一時的／恒常のどちらかに残る。区分は
   // 「利用者が切ったか」であって「いま効いているか」ではない

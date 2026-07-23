@@ -30,10 +30,9 @@ const { HTMLField, NumberField, SchemaField, StringField, TypedObjectField } = f
 /**
  * どの技能を振るか。
  *
- * 技能と基本技能は別の表にあり、キーの集合も違う。かつては
- * `(skill: string, { base: boolean })` の組で渡していたが、これだと
- * 「base: true に通常技能のキー」という有り得ない組み合わせが型で作れてしまい、
- * 受け取った側は as で名乗り直すしかなかった。判別可能unionにして、
+ * 技能と基本技能は別の表にあり、キーの集合も違う。`(skill: string, { base: boolean })`
+ * のような組で渡すと「base: true に通常技能のキー」という有り得ない組み合わせが
+ * 型で作れてしまい、受け取った側は as で名乗り直すしかなくなる。判別可能unionにして、
  * 種別とキーが必ず対応するようにする。
  */
 export type SkillRef =
@@ -276,8 +275,8 @@ const defineCharacterDataModelSchema = () => ({
       typedEntries(CONFIG.EMOKLORE.skillGroups).map(([group]) => [
         group,
         new SchemaField({
-          // label は保存しない。ここで game.i18n.localize した結果を initial に焼き込んでいたため、
-          // アクター作成後に言語を切り替えても古いラベルが残っていた
+          // label は持たない。game.i18n.localize した結果を initial に焼き込むと、
+          // アクター作成後に言語を切り替えても古いラベルが残る
           mod: modifierField(),
         }),
       ]),
