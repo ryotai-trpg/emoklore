@@ -18,6 +18,7 @@ import { EmokloreDie } from "./dice/emoklore-die";
 import { EmokloreRoll } from "./dice/emoklore-roll";
 import { EmokloreActor } from "./documents/actor";
 import { EmokloreCombat } from "./documents/combat";
+import { EmokloreCombatant } from "./documents/combatant";
 import { EmokloreItem } from "./documents/item";
 import { registerQueries } from "./documents/queries";
 import { getSetting, registerSystemSettings } from "./settings";
@@ -38,6 +39,7 @@ Hooks.once("init", () => {
   CONFIG.Actor.documentClass = EmokloreActor;
   CONFIG.Item.documentClass = EmokloreItem;
   CONFIG.Combat.documentClass = EmokloreCombat;
+  CONFIG.Combatant.documentClass = EmokloreCombatant;
 
   // system配下のデータモデルを登録する。
   // TypeDataModel のコンストラクタ型はジェネリクスが開いたままなので、ModelData を
@@ -61,6 +63,10 @@ Hooks.once("init", () => {
   CONFIG.Combat.dataModels = {
     standard: CombatDataModel,
   } as typeof CONFIG.Combat.dataModels;
+
+  // イニシアチブは能力値＋技能の整数。小数点以下は出さない。同値のタイブレークはトラッカーの
+  // 相対入力（+2 / =5）で手動調整するので、整数のまま直接編集できる状態を保つ
+  CONFIG.Combat.initiative.decimals = 0;
 
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;
