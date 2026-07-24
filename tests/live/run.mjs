@@ -15,6 +15,7 @@ import * as activeEffect from "./checks/active-effect.mjs";
 import * as armor from "./checks/armor.mjs";
 import * as boundary from "./checks/boundary.mjs";
 import * as characterSheet from "./checks/character-sheet.mjs";
+import * as combat from "./checks/combat.mjs";
 import * as consoleCheck from "./checks/console.mjs";
 import * as customSkill from "./checks/custom-skill.mjs";
 import * as importCheck from "./checks/import.mjs";
@@ -40,6 +41,7 @@ const CHECKS = [
   boundary,
   armor,
   activeEffect,
+  combat,
   importCheck,
   consoleCheck,
 ];
