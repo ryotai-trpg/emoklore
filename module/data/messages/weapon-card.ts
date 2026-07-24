@@ -141,7 +141,11 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
       successCount: this.successCount as number,
       damageDie,
       attackPower: this.attackPower,
-      bonus: resolveStrengthBonus(rangeType, actor?.system.skills.strength.level ?? 0),
+      // 〈ストレングス〉加算は能力値＋技能を持つ種別だけ。怪異（技能なし）や消えたアクターは0
+      bonus: resolveStrengthBonus(
+        rangeType,
+        actor?.isCharacterLike() ? actor.system.skills.strength.level : 0,
+      ),
     };
     if (Hooks.call("emoklore.preRollDamage", this.message, config) === false) return;
 

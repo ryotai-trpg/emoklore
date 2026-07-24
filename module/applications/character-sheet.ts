@@ -1,4 +1,5 @@
 import { systemPath } from "../constants";
+import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import {
@@ -48,7 +49,9 @@ import type {
  * モード切替とコンテキストの基礎部分は document-sheet-mixin が持つ。
  */
 export class EmokloreCharacterSheet extends EmokloreActorSheet {
-  declare actor: EmokloreActor;
+  // このシートは type: "character" にしか登録しないので、actor は共鳴者に絞れる。
+  // 能力値・技能・感情を種別の絞り込みなしで読めるようにする
+  declare actor: EmokloreActor & { system: CharacterDataModel };
 
   static override DEFAULT_OPTIONS = {
     ...super.DEFAULT_OPTIONS,

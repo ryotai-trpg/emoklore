@@ -1,4 +1,7 @@
 import type { CharacterDataModel, SkillRef } from "../data/character";
+import type { CharacterLikeDataModel } from "../data/character-like";
+import type { KaiDataModel } from "../data/kai";
+import type { NpcDataModel } from "../data/npc";
 import { EmokloreRoll } from "../dice/emoklore-roll";
 import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
 import { resolveMpBoundary } from "../rules/resource-boundary";
@@ -19,25 +22,47 @@ export type HpChange = {
 };
 
 /**
- * system を CharacterDataModel として扱う。
+ * system は種別ごとのデータモデルのunion。
  *
- * `system.json` の documentTypes が character しか宣言しておらず、emoklore.ts も
- * character しか登録していないので、この宣言は実態と一致している。作成できない種別を
- * 登録したまま固定で宣言すると型が嘘になり、判定・リソース操作に `resources?.hp` の
- * ような「型が持たないはずの undefined」への防御が要るようになる。
+ * character（共鳴者）・npc（人間NPC）・kai（怪異）の3種別を登録しているので、
+ * `system` はそれらのunionになる。共通して持つのは `resources.hp/mp` で、これらに触る
+ * リソース操作（applyDamage・MP境界）は絞り込みなしで通る。共鳴値・技能判定のように
+ * 一部の種別しか持たないものは、型述語（isCharacter / isCharacterLike / isKai）で絞ってから触る。
  *
- * NPCを足すときは system が union になるので、型が絞り込みを要求してくる。
- * どこがNPCで壊れるかはそのとき型チェックが教えてくれる（ロードマップ Phase 3）。
+ * 作成できない種別を登録すると型が嘘になるので、`system.json` の documentTypes と
+ * emoklore.ts の登録は必ず揃える。
  */
 export class EmokloreActor extends Actor {
-  declare system: CharacterDataModel;
+  declare system: CharacterDataModel | NpcDataModel | KaiDataModel;
 
   // スキーマ由来のプロパティは本体JSDocの型に出ないため補強する（docs/code-design.md「本体の型が足りないとき」）
   declare name: string;
+  declare type: "character" | "npc" | "kai";
   declare flags: Record<string, unknown>;
   // 埋め込みコレクションも同様に型に出ない
   declare items: foundry.utils.Collection<string, EmokloreItem>;
   declare effects: foundry.utils.Collection<string, foundry.documents.ActiveEffect>;
+
+  /**
+   * 種別の判定と `system` の絞り込みを1つにまとめる（`EmokloreItem#isWeapon` と同じ形）。
+   * 確認したうえで、さらに `as` で名乗り直すことにならないようにする。
+   */
+  isCharacter(): this is EmokloreActor & { system: CharacterDataModel } {
+    return this.type === "character";
+  }
+
+  isNpc(): this is EmokloreActor & { system: NpcDataModel } {
+    return this.type === "npc";
+  }
+
+  isKai(): this is EmokloreActor & { system: KaiDataModel } {
+    return this.type === "kai";
+  }
+
+  /** 共鳴者・人間NPCの共通基底。真なら能力値・技能・技能判定（getSkillRollContext）を読める */
+  isCharacterLike(): this is EmokloreActor & { system: CharacterLikeDataModel } {
+    return this.type === "character" || this.type === "npc";
+  }
 
   /**
    * `@` で参照できる値。判定式のほか、ActiveEffectの効果値の解決にも使われる
@@ -60,20 +85,29 @@ export class EmokloreActor extends Actor {
    *
    * `reduction` は軽減量の共通の口。〈耐久〉判定・防御判定はどちらも「受けるダメージを
    * 【成功数】点軽減する」という形で、武器カードの「軽減して適用」がここへ渡してくる。
-   * 防具は同じ引き算のもう1つの項。未指定なら装備中防具の合計（`system.armor`）が
-   * 自動で乗り、ダイアログで部位条件により外したときだけ上書き値が渡ってくる。
+   * 防具は同じ引き算のもう1つの項。未指定なら共鳴者・人間NPCは装備中防具の合計
+   * （`system.armor`）が自動で乗り、ダイアログで部位条件により外したときだけ上書き値が
+   * 渡ってくる。
+   *
+   * 怪異の装甲は本人が常に持つ平坦な軽減なので、`reduction` / `armor` を渡す側に
+   * 足させず、ここで自前で上乗せする（防具アイテムの概念を持たないため独立に扱う）。
    */
   async applyDamage(
     amount: number,
     { reduction = 0, armor }: { reduction?: number; armor?: number | undefined } = {},
   ): Promise<HpChange | undefined> {
-    // 防具の既定は「装備中防具の合計」。この1行だけが既定を決める
+    // 防具の既定は「装備中防具の合計」（共鳴者・人間NPCだけ）。この1行だけが既定を決める
     // （「自動で乗せるか」をシステム設定にするときはここに差す）
-    const armorApplied = armor ?? this.system.armor;
+    const armorApplied = armor ?? (this.isCharacterLike() ? this.system.armor : 0);
+    const kaiArmor = this.isKai() ? this.system.resources.armor : 0;
 
     const hp = this.system.resources.hp;
     const before = hp.value;
-    const applied = calculateAppliedDamage({ amount, reduction, armor: armorApplied });
+    const applied = calculateAppliedDamage({
+      amount,
+      reduction,
+      armor: armorApplied + kaiArmor,
+    });
     const updates = {
       "system.resources.hp.value": Math.clamp(before - applied, 0, hp.max),
     };
@@ -84,10 +118,17 @@ export class EmokloreActor extends Actor {
     Hooks.callAll("emoklore.applyDamage", this, applied);
 
     // フックが updates を書き換えている場合があるので、結果は保存後の値から取る
-    return { before, after: this.system.resources.hp.value, armor: armorApplied };
+    return { before, after: this.system.resources.hp.value, armor: armorApplied + kaiArmor };
   }
 
   async adjustResource(resource: ResourceKey, point: number): Promise<this | undefined> {
+    // resonance は共鳴者だけが持つ。ここを抜けると resource は "hp" | "mp"（全種別が同形で持つ）
+    if (resource === "resonance") {
+      if (!this.isCharacter()) return undefined;
+      const value = this.system.resources.resonance.value + point;
+      return (await this.update({ "system.resources.resonance.value": value })) as this | undefined;
+    }
+
     const newvalue = this.system.resources[resource].value + point;
     return (await this.update({ [`system.resources.${resource}.value`]: newvalue })) as
       | this
@@ -143,6 +184,13 @@ export class EmokloreActor extends Actor {
     emotionMatch: ResonanceMatch,
     options: Record<string, unknown> = {},
   ): Promise<ChatMessage | undefined> {
+    // 共鳴判定は共鳴者だけが持つ（〈∞共鳴〉値がダイス数になる）。入口は共鳴者シートに
+    // しかないので、ここへ他種別で来るのは呼び出し側の誤り。黙って変な判定を振らせない
+    if (!this.isCharacter()) {
+      ui.notifications?.warn("EMOKLORE.Resonance.NotCharacter", { localize: true });
+      return;
+    }
+
     const spec = resolveResonanceRoll({
       resonanceValue: this.system.resources.resonance.value,
       intensity,
@@ -171,6 +219,11 @@ export class EmokloreActor extends Actor {
     ref: SkillRef,
     options: Record<string, unknown> = {},
   ): Promise<{ roll: EmokloreRoll; flavor: string }> {
+    // 技能判定は能力値＋技能を持つ共鳴者・人間NPCだけ。怪異は直接判定の攻撃を使う
+    if (!this.isCharacterLike()) {
+      throw new Error(`emoklore | この種別は技能判定を持ちません: ${this.type}`);
+    }
+
     const context = this.system.getSkillRollContext(ref);
     const spec = resolveSkillRoll(context.params);
 
