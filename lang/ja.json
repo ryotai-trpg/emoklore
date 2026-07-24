@@ -8,6 +8,9 @@
       "weapon": "武器",
       "armor": "防具",
       "skill": "カスタム技能"
+    },
+    "Combat": {
+      "standard": "標準"
     }
   },
   "SETTINGS": {
@@ -152,6 +155,15 @@
         "NoPermission": "このキャラクターに状態を付与する権限がありません。",
         "ActorMissing": "対象のキャラクターが見つかりません。",
         "ActionFailed": "操作に失敗しました。"
+      }
+    },
+    "Combat": {
+      "presets": {
+        "combat": "戦闘・逃走",
+        "underwater": "水中戦闘",
+        "search": "捜索",
+        "debate": "議論",
+        "cardiacArrest": "心肺停止（器用）"
       }
     },
     "ApplyDamage": {

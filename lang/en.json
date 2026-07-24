@@ -8,6 +8,9 @@
       "weapon": "Weapon",
       "armor": "Armor",
       "skill": "Custom Skill"
+    },
+    "Combat": {
+      "standard": "Standard"
     }
   },
   "SETTINGS": {
@@ -152,6 +155,15 @@
         "NoPermission": "You lack permission to apply a status to this character.",
         "ActorMissing": "The target character could not be found.",
         "ActionFailed": "The action failed."
+      }
+    },
+    "Combat": {
+      "presets": {
+        "combat": "Combat / Flight",
+        "underwater": "Underwater Combat",
+        "search": "Search",
+        "debate": "Debate",
+        "cardiacArrest": "Cardiac Arrest (Dexterity)"
       }
     },
     "ApplyDamage": {
