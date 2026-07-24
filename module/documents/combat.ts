@@ -7,6 +7,8 @@ export class EmokloreCombat extends Combat {
   // CONFIG.Combat.dataModels.standard に CombatDataModel を登録し、_initializeSource で全Combatを
   // standard に寄せているので、system は常に CombatDataModel（本体JSDocの型には出ないため補う）
   declare system: CombatDataModel;
+  // 埋め込みコレクションも本体JSDocの型に出ないため補う（EmokloreActor#items と同じ）
+  declare combatants: foundry.utils.Collection<string, Combatant>;
 
   /**
    * 種別未指定・base のCombatを standard に寄せる。
@@ -22,5 +24,19 @@ export class EmokloreCombat extends Combat {
     const source = data as { type?: string };
     if (!source.type || source.type === "base") source.type = "standard";
     return super._initializeSource(data, options);
+  }
+
+  /**
+   * 全Combatantを現在の基準で再算出する。
+   *
+   * 本体の roll all は initiative 未設定のものだけを振るが、こちらは基準を変えたあと全員へ
+   * 反映するため、既に値があっても振り直す。イニシアチブはダイスを含まない決定的な値なので、
+   * 振り直しても手動で並べ替えたぶん以外は変わらない。トラッカーの「全員再算出」から呼ぶ。
+   */
+  async recomputeAll(): Promise<this> {
+    const ids = this.combatants
+      .map((combatant) => combatant.id)
+      .filter((id): id is string => id !== null);
+    return this.rollInitiative(ids, { updateTurn: false });
   }
 }

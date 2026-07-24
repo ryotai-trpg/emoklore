@@ -1,0 +1,46 @@
+{{!
+  イニシアチブ基準の選択バー。CombatTracker に _onRender で注入する。
+  @param isGM 現在のユーザーがGMか
+  @param basisLabel 現在の基準の表示文字列（プレイヤー向け）
+  @param presets [{ key, label, selected }] プリセット
+  @param customSelected どのプリセットにも一致しない（カスタム）か
+  @param characteristics [{ key, label, selected }] 能力値の選択肢
+  @param skills [{ key, label, selected }] 技能の選択肢
+  @param noSkill 技能なしが選ばれているか
+}}
+<div class="em-initiative-basis">
+  {{#if isGM}}
+    <div class="em-initiative-basis__row">
+      <select class="em-initiative-basis__preset" data-em="preset"
+        aria-label="{{localize "EMOKLORE.Combat.bar.preset"}}">
+        <option value="" {{#if customSelected}}selected{{/if}}>{{localize "EMOKLORE.Combat.bar.custom"}}</option>
+        {{#each presets}}
+          <option value="{{this.key}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+      <button type="button" class="em-initiative-basis__recompute" data-em="recompute">
+        {{localize "EMOKLORE.Combat.bar.recomputeAll"}}
+      </button>
+    </div>
+    <div class="em-initiative-basis__row">
+      <select class="em-initiative-basis__select" data-em="characteristic"
+        aria-label="{{localize "EMOKLORE.Combat.FIELDS.characteristic.label"}}">
+        {{#each characteristics}}
+          <option value="{{this.key}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+      <select class="em-initiative-basis__select" data-em="skill"
+        aria-label="{{localize "EMOKLORE.Combat.FIELDS.skill.label"}}">
+        <option value="" {{#if noSkill}}selected{{/if}}>{{localize "EMOKLORE.Combat.bar.noSkill"}}</option>
+        {{#each skills}}
+          <option value="{{this.key}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+  {{else}}
+    <div class="em-initiative-basis__label">
+      <span class="em-initiative-basis__title">{{localize "EMOKLORE.Combat.bar.title"}}</span>
+      <span class="em-initiative-basis__value">{{basisLabel}}</span>
+    </div>
+  {{/if}}
+</div>

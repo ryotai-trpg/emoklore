@@ -172,6 +172,13 @@
         "skill": {
           "label": "技能"
         }
+      },
+      "bar": {
+        "title": "行動値",
+        "preset": "プリセット",
+        "custom": "カスタム",
+        "noSkill": "技能なし",
+        "recomputeAll": "全員再算出"
       }
     },
     "ApplyDamage": {

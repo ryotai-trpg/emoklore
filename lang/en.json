@@ -172,6 +172,13 @@
         "skill": {
           "label": "Skill"
         }
+      },
+      "bar": {
+        "title": "Initiative",
+        "preset": "Preset",
+        "custom": "Custom",
+        "noSkill": "No skill",
+        "recomputeAll": "Recompute all"
       }
     },
     "ApplyDamage": {

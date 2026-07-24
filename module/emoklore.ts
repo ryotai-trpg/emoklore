@@ -4,6 +4,7 @@ import "../css/emoklore.css";
 import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
 import { EmokloreArmorSheet } from "./applications/armor-sheet";
 import * as applications from "./applications/character-sheet";
+import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
@@ -67,6 +68,9 @@ Hooks.once("init", () => {
   // イニシアチブは能力値＋技能の整数。小数点以下は出さない。同値のタイブレークはトラッカーの
   // 相対入力（+2 / =5）で手動調整するので、整数のまま直接編集できる状態を保つ
   CONFIG.Combat.initiative.decimals = 0;
+
+  // 基準（能力値＋技能）の選択バーをトラッカーに後付けする
+  CONFIG.ui.combat = EmokloreCombatTracker;
 
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;
