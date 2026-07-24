@@ -1,4 +1,6 @@
 import type { CombatDataModel } from "../data/combat";
+import { createSurvivalReminderMessage } from "../utils/chat";
+import type { EmokloreCombatant } from "./combatant";
 
 /**
  * Combat のドキュメント実装。全Combatを、イニシアチブ基準を持つ型付き（standard）に寄せる。
@@ -8,7 +10,7 @@ export class EmokloreCombat extends Combat {
   // standard に寄せているので、system は常に CombatDataModel（本体JSDocの型には出ないため補う）
   declare system: CombatDataModel;
   // 埋め込みコレクションも本体JSDocの型に出ないため補う（EmokloreActor#items と同じ）
-  declare combatants: foundry.utils.Collection<string, Combatant>;
+  declare combatants: foundry.utils.Collection<string, EmokloreCombatant>;
 
   /**
    * 種別未指定・base のCombatを standard に寄せる。
@@ -38,5 +40,25 @@ export class EmokloreCombat extends Combat {
       .map((combatant) => combatant.id)
       .filter((id): id is string => id !== null);
     return this.rollInitiative(ids, { updateTurn: false });
+  }
+
+  /**
+   * ラウンド終了時、【心肺停止】のキャラクターに〈＊生存〉判定を促すリマインダを出す。
+   *
+   * 本体の #triggerTurnEvents はGM限定なので、リマインダはGMのクライアントで1枚だけ作られる。
+   * 表示のみで、判定の強制や【死亡】の自動付与はしない（#86 と同じ方針）。ラウンド進行が線形な
+   * 通常の進み方でこのフックは発火する。
+   */
+  override async _onEndRound(context: Parameters<Combat["_onEndRound"]>[0]): Promise<void> {
+    await super._onEndRound(context);
+
+    const targets = this.combatants
+      .filter((combatant) => combatant.actor?.statuses.has("cardiacArrest"))
+      .map((combatant) => ({
+        actorUuid: combatant.actor?.uuid ?? null,
+        name: combatant.name ?? "",
+      }));
+
+    if (targets.length > 0) await createSurvivalReminderMessage(targets, context.round);
   }
 }

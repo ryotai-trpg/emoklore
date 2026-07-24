@@ -1,11 +1,13 @@
 import { systemPath } from "../constants";
 import type { SkillRollContext } from "../data/character";
+import type { SurvivalTarget } from "../data/messages/survival-reminder";
 import type { EmokloreRoll } from "../dice/emoklore-roll";
 import type { EmokloreActor } from "../documents/actor";
 import { resolveHpBoundary } from "../rules/resource-boundary";
 import { skillMarker } from "./skill";
 
 const DAMAGE_APPLIED_TEMPLATE = systemPath("templates/chat/damage-applied.hbs");
+const SURVIVAL_REMINDER_TEMPLATE = systemPath("templates/chat/survival-reminder.hbs");
 
 /** ダメージを適用した1体ぶんの結果 */
 export type DamageApplied = {
@@ -107,6 +109,28 @@ export async function createMpNoticeMessage(
     },
     content: await foundry.applications.handlebars.renderTemplate(DAMAGE_APPLIED_TEMPLATE, {
       entries: [entry],
+    }),
+    flags: { core: { canPopout: true } },
+  });
+
+  return created as ChatMessage | undefined;
+}
+
+/**
+ * 心肺停止者への〈＊生存〉判定リマインダをチャットに流す。ラウンド終了時に呼ばれる。
+ *
+ * 対象を並べ、各自に判定ショートカットを添えるところまで。判定の強制や【死亡】の自動付与は
+ * しない（EmokloreCombat._onEndRound から呼ぶ）。
+ */
+export async function createSurvivalReminderMessage(
+  targets: SurvivalTarget[],
+  round: number,
+): Promise<ChatMessage | undefined> {
+  const created = await ChatMessage.create({
+    type: "survivalReminder",
+    system: { round, targets },
+    content: await foundry.applications.handlebars.renderTemplate(SURVIVAL_REMINDER_TEMPLATE, {
+      targets,
     }),
     flags: { core: { canPopout: true } },
   });

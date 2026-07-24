@@ -1,0 +1,18 @@
+{{! 心肺停止者への〈＊生存〉判定リマインダ。対象1体につき1項目、判定ボタンを添える }}
+<div class="em-survival-reminder">
+  <p class="em-survival-reminder__prompt">{{localize "EMOKLORE.ChatMessage.survivalReminder.Prompt"}}</p>
+  <ul class="em-survival-reminder__list">
+    {{#each targets}}
+      <li class="em-survival-reminder__item">
+        <span class="em-survival-reminder__name">{{this.name}}</span>
+        {{#if this.actorUuid}}
+          <button type="button" class="em-survival-reminder__roll" data-action="rollSurvival"
+            data-actor-uuid="{{this.actorUuid}}">
+            <i class="fa-solid fa-heart-pulse" inert></i>
+            <span>{{localize "EMOKLORE.ChatMessage.survivalReminder.Roll"}}</span>
+          </button>
+        {{/if}}
+      </li>
+    {{/each}}
+  </ul>
+</div>

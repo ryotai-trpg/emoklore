@@ -14,6 +14,7 @@ import { CharacterDataModel } from "./data/character";
 import { CombatDataModel } from "./data/combat";
 import { ArmorDataModel, SkillDataModel, WeaponDataModel } from "./data/item-models";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
+import { SurvivalReminderModel } from "./data/messages/survival-reminder";
 import { WeaponCardModel } from "./data/messages/weapon-card";
 import { EmokloreDie } from "./dice/emoklore-die";
 import { EmokloreRoll } from "./dice/emoklore-roll";
@@ -59,6 +60,7 @@ Hooks.once("init", () => {
   CONFIG.ChatMessage.dataModels = {
     weapon: WeaponCardModel,
     damageApplied: DamageAppliedModel,
+    survivalReminder: SurvivalReminderModel,
   } as typeof CONFIG.ChatMessage.dataModels;
   // Combat は単一種別 standard。エンカウンターのイニシアチブ基準を system に持たせる
   CONFIG.Combat.dataModels = {

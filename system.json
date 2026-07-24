@@ -38,7 +38,8 @@
     },
     "ChatMessage": {
       "weapon": {},
-      "damageApplied": {}
+      "damageApplied": {},
+      "survivalReminder": {}
     },
     "Combat": {
       "standard": {}

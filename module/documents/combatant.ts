@@ -4,6 +4,9 @@ import type { EmokloreCombat } from "./combat";
  * Combatant のドキュメント実装。イニシアチブ式を所属Combatの基準から引く。
  */
 export class EmokloreCombatant extends Combatant {
+  // スキーマ由来の表示名は本体JSDocの型に出ない（EmokloreActor#name と同じ）
+  declare name: string;
+
   /**
    * イニシアチブ式。所属Combatのイニシアチブ基準（能力値＋技能）から組み立てる。
    *

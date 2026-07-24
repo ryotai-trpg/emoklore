@@ -29,3 +29,4 @@
 /* Chat — シートの外に出るチャットカード */
 @import url("./chat/dice-roll.css");
 @import url("./chat/weapon-card.css");
+@import url("./chat/survival-reminder.css");

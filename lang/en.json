@@ -155,6 +155,12 @@
         "NoPermission": "You lack permission to apply a status to this character.",
         "ActorMissing": "The target character could not be found.",
         "ActionFailed": "The action failed."
+      },
+      "survivalReminder": {
+        "Prompt": "End of round. Characters in Cardiac Arrest roll *Survival (Endurance or Grit may substitute). On failure, Dead.",
+        "Roll": "Roll Survival",
+        "ActorMissing": "The target character could not be found.",
+        "ActionFailed": "The action failed."
       }
     },
     "Combat": {
