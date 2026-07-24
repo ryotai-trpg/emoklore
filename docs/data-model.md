@@ -14,6 +14,8 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | Item | `skill` | `SkillDataModel` |
 | ChatMessage | `weapon` | `WeaponCardModel` |
 | ChatMessage | `damageApplied` | `DamageAppliedModel` |
+| ChatMessage | `survivalReminder` | `SurvivalReminderModel` |
+| Combat | `standard` | `CombatDataModel` |
 
 **種別は `system.json` の `documentTypes` と `CONFIG.*.dataModels` の両方に書く。** 片方だけでは噛み合わない。`documentTypes` に無い種別を `dataModels` に登録すると、作成できないのに `system` の型だけが増えて嘘になる（警告も出ない）。
 
@@ -324,6 +326,26 @@ Itemにしてあるのは、コンペンディウムに入れて配ったり他�
 | `targets` | ArrayField(SchemaField) | `[]` | 対象ごとの `actorUuid` / `name` / `before` / `after` / `armor` |
 
 `targets[].armor` は実際に軽減へ使った防具の値で、対象ごとに違う（行の内訳「（防具 N）」の元）。`actorUuid` は境界の案内から状態を付与するときの参照で、アクターを消したあとも行が読めるよう名前と値は別に焼き込む。
+
+## ChatMessage `survivalReminder`
+
+ラウンド終了時、【心肺停止】のキャラクターに〈＊生存〉判定を促すリマインダ。damageApplied と同じ `system.addListeners` の配線に乗る。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `round` | NumberField | `0` | 対象となったラウンド |
+| `targets` | ArrayField(SchemaField) | `[]` | 対象ごとの `actorUuid` / `name` |
+
+## Combat `standard`
+
+エンカウンターのイニシアチブ基準（能力値＋技能）を持つ。**全Combatはこの単一種別に寄る** — `EmokloreCombat` が `base` を `standard` に初期化するので、種別を選ばせなくても基準を必ず持てる。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `characteristic` | StringField | `physical` | イニシアチブに使う能力値 |
+| `skill` | StringField | `speed` | 足す技能。空文字なら技能なし（【心肺停止】の【器用】単独） |
+
+イニシアチブ値そのものは保存しない。`CombatDataModel#formula` が基準から式を組み立て、`EmokloreCombatant#_getInitiativeFormula` がロール時に返す。設計の詳細は [アーキテクチャ](/architecture) にある。
 
 ## スキーマの外に保存しているもの
 
