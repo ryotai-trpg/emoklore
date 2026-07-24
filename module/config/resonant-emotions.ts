@@ -202,6 +202,15 @@ const definitions = {
 
 export type ResonantEmotionKey = keyof typeof definitions;
 
+/**
+ * 共鳴感情のキーかどうか。
+ *
+ * 怪異の感情（SetField）やピッカーから読み戻す文字列は保存データ・フォーム由来で、
+ * 宣言した型を裏切りうる。CONFIG を引く前にここを通す。
+ */
+export const isResonantEmotionKey = (value: string): value is ResonantEmotionKey =>
+  value in definitions;
+
 // satisfies だけだと各値が個別の狭い型に推論されるため、値の型は ResonantEmotionConfig に揃える。
 // キーは literal のまま保たれるので ResonantEmotionKey が使える
 export const resonantEmotions: Record<ResonantEmotionKey, ResonantEmotionConfig> = definitions;

@@ -1,0 +1,163 @@
+{{! Kai (怪異) sheet }}
+<header class="em-kai__header">
+  <img class="em-kai__avatar" src="{{document.img}}" data-edit="img" alt="" />
+  {{#if isPlay}}
+    <h1 class="em-kai__name">{{document.name}}</h1>
+  {{else}}
+    <input class="em-kai__name-input" type="text" name="name" value="{{document.name}}"
+      placeholder="{{localize "EMOKLORE.Sheet.kai.NamePlaceholder"}}" />
+  {{/if}}
+</header>
+
+<section class="em-kai__stats">
+  <label class="em-kai__stat">
+    <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.hp.value.label"}}</span>
+    {{#if isPlay}}
+      <span>{{system.resources.hp.value}} / {{system.resources.hp.max}}</span>
+    {{else}}
+      <span class="em-kai__stat-edit">
+        <input type="number" name="system.resources.hp.value" value="{{system.resources.hp.value}}" />
+        <span>/</span>
+        <input type="number" name="system.resources.hp.max" value="{{system.resources.hp.max}}" />
+      </span>
+    {{/if}}
+  </label>
+  <label class="em-kai__stat">
+    <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.mp.value.label"}}</span>
+    {{#if isPlay}}
+      <span>{{system.resources.mp.value}} / {{system.resources.mp.max}}</span>
+    {{else}}
+      <span class="em-kai__stat-edit">
+        <input type="number" name="system.resources.mp.value" value="{{system.resources.mp.value}}" />
+        <span>/</span>
+        <input type="number" name="system.resources.mp.max" value="{{system.resources.mp.max}}" />
+      </span>
+    {{/if}}
+  </label>
+  <label class="em-kai__stat">
+    <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.armor.label"}}</span>
+    {{#if isPlay}}
+      <span>{{system.resources.armor}}</span>
+    {{else}}
+      <input type="number" name="system.resources.armor" value="{{system.resources.armor}}" min="0" />
+    {{/if}}
+  </label>
+  <label class="em-kai__stat">
+    <span>{{localize "EMOKLORE.Actor.kai.FIELDS.initiative.label"}}</span>
+    {{#if isPlay}}
+      <span>{{system.initiative}}</span>
+    {{else}}
+      <input type="number" name="system.initiative" value="{{system.initiative}}" />
+    {{/if}}
+  </label>
+</section>
+
+<section class="em-kai__block">
+  <h3>{{localize "EMOKLORE.Actor.kai.Emotions"}}</h3>
+  {{#if isPlay}}
+    <div class="em-kai__emotions">
+      {{#each selectedEmotions}}<span class="em-kai__emotion">{{label}}</span>{{/each}}
+    </div>
+  {{else}}
+    <select class="em-kai__emotion-select" name="system.emotions" multiple size="6">
+      {{#each emotionOptions}}
+        <option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+      {{/each}}
+    </select>
+  {{/if}}
+</section>
+
+<section class="em-kai__block">
+  <header class="em-kai__block-head">
+    <h3>{{localize "EMOKLORE.Actor.kai.Resonance"}}</h3>
+    <button type="button" class="em-kai__resonance-request" data-action="requestResonance">
+      <i class="fa-solid fa-tower-broadcast" inert></i>
+      <span>{{localize "EMOKLORE.Actor.kai.RequestResonance"}}</span>
+    </button>
+  </header>
+  <div class="em-kai__resonance">
+    <label class="em-kai__field">
+      <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resonance.intensity.label"}}</span>
+      {{#if isPlay}}
+        <span>{{system.resonance.intensity}}</span>
+      {{else}}
+        <input type="number" name="system.resonance.intensity" value="{{system.resonance.intensity}}" min="1" />
+      {{/if}}
+    </label>
+    <label class="em-kai__field">
+      <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resonance.rise.label"}}</span>
+      {{#if isPlay}}
+        <span>{{system.resonance.rise}}</span>
+      {{else}}
+        <input type="text" name="system.resonance.rise" value="{{system.resonance.rise}}" />
+      {{/if}}
+    </label>
+  </div>
+  {{#if resonanceTableLink}}
+    <div class="em-kai__resonance-table">
+      <span>{{localize "EMOKLORE.Actor.kai.ResonanceTable"}}</span>
+      {{{resonanceTableLink}}}
+    </div>
+  {{/if}}
+</section>
+
+<section class="em-kai__block">
+  <h3>{{localize "EMOKLORE.Actor.kai.Mutation"}}</h3>
+  {{#if isPlay}}
+    <div class="em-kai__mutation">{{{mutationHTML}}}</div>
+  {{else}}
+    <textarea class="em-kai__mutation-input" name="system.mutation" rows="3">{{system.mutation}}</textarea>
+  {{/if}}
+</section>
+
+<section class="em-kai__block">
+  <header class="em-kai__block-head">
+    <h3>{{localize "EMOKLORE.Actor.kai.Attacks"}}</h3>
+    {{#unless isPlay}}
+      <button type="button" data-action="addAttack">
+        <i class="fa-solid fa-plus" inert></i>
+      </button>
+    {{/unless}}
+  </header>
+  <ul class="em-kai__attack-list">
+    {{#each system.attacks}}
+      <li class="em-kai__attack" data-attack-index="{{@index}}">
+        {{#if ../isPlay}}
+          <a class="em-kai__attack-name" data-action="rollAttack">
+            {{#if name}}{{name}}{{else}}{{localize "EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"}}{{/if}}
+          </a>
+          <span class="em-kai__attack-judge">
+            {{#if judgeless}}
+              {{localize "EMOKLORE.ChatMessage.kaiAttack.Judgeless"}} {{fixedSuccess}}
+            {{else}}
+              {{diceCount}}DM≦{{target}}
+            {{/if}}
+          </span>
+          {{#if damage}}<span class="em-kai__attack-damage">{{damage}}</span>{{/if}}
+          {{#if mpCost}}<span class="em-kai__attack-mp">{{localize "EMOKLORE.ChatMessage.kaiAttack.MpCost"}}{{mpCost}}</span>{{/if}}
+        {{else}}
+          <input class="em-kai__attack-name-input" type="text" name="system.attacks.{{@index}}.name"
+            value="{{name}}" placeholder="{{localize "EMOKLORE.Actor.kai.AttackName"}}" />
+          <div class="em-kai__attack-fields">
+            <label>{{localize "EMOKLORE.Actor.kai.AttackDice"}}
+              <input type="number" name="system.attacks.{{@index}}.diceCount" value="{{diceCount}}" min="0" /></label>
+            <label>{{localize "EMOKLORE.Actor.kai.AttackTarget"}}
+              <input type="number" name="system.attacks.{{@index}}.target" value="{{target}}" min="0" /></label>
+            <label>{{localize "EMOKLORE.Actor.kai.AttackDamage"}}
+              <input type="text" name="system.attacks.{{@index}}.damage" value="{{damage}}"
+                placeholder="@successd3+3" /></label>
+            <label>{{localize "EMOKLORE.ChatMessage.kaiAttack.MpCost"}}
+              <input type="number" name="system.attacks.{{@index}}.mpCost" value="{{mpCost}}" min="0" /></label>
+            <label class="em-kai__attack-flag">{{localize "EMOKLORE.ChatMessage.kaiAttack.Judgeless"}}
+              <input type="checkbox" name="system.attacks.{{@index}}.judgeless" {{checked judgeless}} /></label>
+            <label>{{localize "EMOKLORE.Actor.kai.FixedSuccess"}}
+              <input type="number" name="system.attacks.{{@index}}.fixedSuccess" value="{{fixedSuccess}}" min="0" /></label>
+          </div>
+          <a class="em-kai__attack-delete" data-action="deleteAttack" data-tooltip="APPLICATION.ACTIONS.Delete">
+            <i class="fa-solid fa-trash" inert></i>
+          </a>
+        {{/if}}
+      </li>
+    {{/each}}
+  </ul>
+</section>

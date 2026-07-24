@@ -1,0 +1,146 @@
+/* 人間NPCシートのレイアウト。templates/actor/npc-sheet.hbs と対。
+   能力値・技能・武器を1画面に縦に並べる軽量シート */
+
+.emoklore.sheet.npc:not(.minimized, .minimizing, .maximizing) {
+  min-width: 360px;
+  min-height: 320px;
+}
+
+.emoklore.sheet.npc {
+  .em-npc__header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "avatar name" "avatar resources";
+    align-items: center;
+    gap: var(--spacer-4) var(--spacer-8);
+    padding-bottom: var(--spacer-8);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .em-npc__avatar {
+    grid-area: avatar;
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  .em-npc__name {
+    grid-area: name;
+    margin: 0;
+    font-size: var(--font-size-20);
+  }
+
+  .em-npc__name-input {
+    grid-area: name;
+  }
+
+  .em-npc__resources {
+    grid-area: resources;
+    display: flex;
+    gap: var(--spacer-16);
+  }
+
+  .em-npc__resource {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-4);
+  }
+
+  .em-npc__resource-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-4);
+  }
+
+  .em-npc__resource-edit input,
+  .em-npc__characteristic input,
+  .em-npc__skill-input {
+    width: 3rem;
+    text-align: center;
+  }
+
+  .em-npc__characteristics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: var(--spacer-4);
+    padding: var(--spacer-8) 0;
+  }
+
+  .em-npc__characteristic {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-4);
+  }
+
+  .em-npc__characteristic-label {
+    flex: 1;
+  }
+
+  .em-npc__characteristic-value {
+    min-width: 1.5rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .em-npc__skills h3,
+  .em-npc__weapons h3 {
+    margin: var(--spacer-8) 0 var(--spacer-4);
+    font-size: var(--font-size-14);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .em-npc__section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-8);
+  }
+
+  .em-npc__skill-list,
+  .em-npc__weapon-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .em-npc__skill {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto 2rem;
+    align-items: center;
+    gap: var(--spacer-8);
+    padding: 1px 0;
+  }
+
+  .em-npc__skill-name,
+  .em-npc__weapon-name {
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .em-npc__skill-name:hover,
+  .em-npc__weapon-name:hover {
+    text-shadow: 0 0 8px var(--color-shadow-primary);
+  }
+
+  .em-npc__skill-target {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .em-npc__weapon {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+    align-items: center;
+    gap: var(--spacer-8);
+    padding: 1px 0;
+  }
+
+  .em-npc__weapon-meta {
+    color: var(--color-text-subtle);
+    font-size: var(--font-size-12);
+  }
+}

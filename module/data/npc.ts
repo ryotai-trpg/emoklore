@@ -12,5 +12,6 @@ import { CharacterLikeDataModel } from "./character-like";
  * 無いので落とした（Issue #81）。怪異の「強度」は共鳴強度で、邪気とは別物。
  */
 export class NpcDataModel extends CharacterLikeDataModel {
-  static override LOCALIZATION_PREFIXES = ["EMOKLORE.Actor.npc"];
+  // 能力値・技能・HP/MP は共鳴者と同じスキーマなので、フィールドのラベルも共鳴者のものを流用する
+  static override LOCALIZATION_PREFIXES = ["EMOKLORE.Actor.character"];
 }

@@ -7,6 +7,8 @@ import * as applications from "./applications/character-sheet";
 import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
 import { applyKaiDamage } from "./applications/kai-attack";
+import { EmokloreKaiSheet } from "./applications/kai-sheet";
+import { EmokloreNpcSheet } from "./applications/npc-sheet";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
@@ -139,6 +141,30 @@ Hooks.once("init", () => {
       types: ["character"],
       makeDefault: true,
       label: "EMOKLORE.Sheet.class.character",
+    },
+  );
+
+  DocumentSheetConfig.registerSheet(
+    Actor,
+    "emoklore",
+    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
+    EmokloreNpcSheet as unknown as typeof foundry.applications.api.ApplicationV2,
+    {
+      types: ["npc"],
+      makeDefault: true,
+      label: "EMOKLORE.Sheet.class.npc",
+    },
+  );
+
+  DocumentSheetConfig.registerSheet(
+    Actor,
+    "emoklore",
+    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
+    EmokloreKaiSheet as unknown as typeof foundry.applications.api.ApplicationV2,
+    {
+      types: ["kai"],
+      makeDefault: true,
+      label: "EMOKLORE.Sheet.class.kai",
     },
   );
 

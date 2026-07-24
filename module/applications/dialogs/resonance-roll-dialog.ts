@@ -11,10 +11,15 @@ const TEMPLATE = systemPath("templates/apps/resonance-roll.hbs");
 /**
  * 共鳴判定の強度と共鳴感情の一致度を尋ねる。
  *
- * キャンセルされた場合は null を返す。
+ * キャンセルされた場合は null を返す。`intensity` を渡すと強度の初期値になる
+ * （怪異シートが共鳴プリセットの強度を差し込む導線。#75 で全共鳴者への要求カードに置き換わる）。
  */
-export async function promptResonanceRoll(): Promise<ResonanceRollInput | null> {
-  const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {});
+export async function promptResonanceRoll({
+  intensity,
+}: {
+  intensity?: number;
+} = {}): Promise<ResonanceRollInput | null> {
+  const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, { intensity });
 
   // prompt は static メソッドで中身が this.wait(...) なので、変数に取り出して呼ぶと
   // thisが外れて壊れる。必ずメソッドとして呼ぶこと。
