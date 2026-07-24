@@ -19,6 +19,7 @@ import * as combat from "./checks/combat.mjs";
 import * as consoleCheck from "./checks/console.mjs";
 import * as customSkill from "./checks/custom-skill.mjs";
 import * as importCheck from "./checks/import.mjs";
+import * as npcKai from "./checks/npc-kai.mjs";
 import * as registration from "./checks/registration.mjs";
 import * as schema from "./checks/schema.mjs";
 import * as skillRoll from "./checks/skill-roll.mjs";
@@ -38,6 +39,7 @@ const CHECKS = [
   skillRoll,
   customSkill,
   weapon,
+  npcKai,
   boundary,
   armor,
   activeEffect,
