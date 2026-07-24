@@ -13,9 +13,11 @@ import { statusEffects } from "./config/status-effects";
 import { CharacterDataModel } from "./data/character";
 import { CombatDataModel } from "./data/combat";
 import { ArmorDataModel, SkillDataModel, WeaponDataModel } from "./data/item-models";
+import { KaiDataModel } from "./data/kai";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
 import { SurvivalReminderModel } from "./data/messages/survival-reminder";
 import { WeaponCardModel } from "./data/messages/weapon-card";
+import { NpcDataModel } from "./data/npc";
 import { EmokloreDie } from "./dice/emoklore-die";
 import { EmokloreRoll } from "./dice/emoklore-roll";
 import { EmokloreActor } from "./documents/actor";
@@ -47,10 +49,12 @@ Hooks.once("init", () => {
   // TypeDataModel のコンストラクタ型はジェネリクスが開いたままなので、ModelData を
   // 固定したサブクラスは代入互換にならない。登録先の型として明示する
   //
-  // npc は system.json の documentTypes に無く作成できないため登録しない。登録だけ
-  // 残すと EmokloreActor#system の型（CharacterDataModel）が嘘になる
+  // 種別と system.json の documentTypes は必ず揃える。作成できない種別を登録すると
+  // EmokloreActor#system の型が嘘になる（片方だけ足すと到達不能な種別が生まれる）
   CONFIG.Actor.dataModels = {
     character: CharacterDataModel,
+    npc: NpcDataModel,
+    kai: KaiDataModel,
   } as typeof CONFIG.Actor.dataModels;
   CONFIG.Item.dataModels = {
     weapon: WeaponDataModel,
@@ -103,6 +107,16 @@ Hooks.once("init", () => {
     character: {
       bar: ["resources.hp", "resources.mp", "resources.resonance"],
       value: [],
+    },
+    // 人間NPCは共鳴値を持たないので HP/MP のみ
+    npc: {
+      bar: ["resources.hp", "resources.mp"],
+      value: [],
+    },
+    // 怪異は HP/MP をバーに、装甲は減らない固定値なので value に出す
+    kai: {
+      bar: ["resources.hp", "resources.mp"],
+      value: ["resources.armor"],
     },
   };
 

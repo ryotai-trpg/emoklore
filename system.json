@@ -29,7 +29,9 @@
   ],
   "documentTypes": {
     "Actor": {
-      "character": { "htmlFields": ["biography.note"] }
+      "character": { "htmlFields": ["biography.note"] },
+      "npc": {},
+      "kai": { "htmlFields": ["mutation"] }
     },
     "Item": {
       "weapon": { "htmlFields": ["notes"] },
