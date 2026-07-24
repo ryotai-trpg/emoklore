@@ -164,6 +164,14 @@
         "search": "Search",
         "debate": "Debate",
         "cardiacArrest": "Cardiac Arrest (Dexterity)"
+      },
+      "FIELDS": {
+        "characteristic": {
+          "label": "Characteristic"
+        },
+        "skill": {
+          "label": "Skill"
+        }
       }
     },
     "ApplyDamage": {

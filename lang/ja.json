@@ -164,6 +164,14 @@
         "search": "捜索",
         "debate": "議論",
         "cardiacArrest": "心肺停止（器用）"
+      },
+      "FIELDS": {
+        "characteristic": {
+          "label": "能力値"
+        },
+        "skill": {
+          "label": "技能"
+        }
       }
     },
     "ApplyDamage": {

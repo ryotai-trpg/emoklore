@@ -10,12 +10,14 @@ import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
 import { statusEffects } from "./config/status-effects";
 import { CharacterDataModel } from "./data/character";
+import { CombatDataModel } from "./data/combat";
 import { ArmorDataModel, SkillDataModel, WeaponDataModel } from "./data/item-models";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
 import { WeaponCardModel } from "./data/messages/weapon-card";
 import { EmokloreDie } from "./dice/emoklore-die";
 import { EmokloreRoll } from "./dice/emoklore-roll";
 import { EmokloreActor } from "./documents/actor";
+import { EmokloreCombat } from "./documents/combat";
 import { EmokloreItem } from "./documents/item";
 import { registerQueries } from "./documents/queries";
 import { getSetting, registerSystemSettings } from "./settings";
@@ -35,6 +37,7 @@ Hooks.once("init", () => {
   // Documentの実装クラスを差し替える
   CONFIG.Actor.documentClass = EmokloreActor;
   CONFIG.Item.documentClass = EmokloreItem;
+  CONFIG.Combat.documentClass = EmokloreCombat;
 
   // system配下のデータモデルを登録する。
   // TypeDataModel のコンストラクタ型はジェネリクスが開いたままなので、ModelData を
@@ -54,6 +57,10 @@ Hooks.once("init", () => {
     weapon: WeaponCardModel,
     damageApplied: DamageAppliedModel,
   } as typeof CONFIG.ChatMessage.dataModels;
+  // Combat は単一種別 standard。エンカウンターのイニシアチブ基準を system に持たせる
+  CONFIG.Combat.dataModels = {
+    standard: CombatDataModel,
+  } as typeof CONFIG.Combat.dataModels;
 
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;

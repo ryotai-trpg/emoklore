@@ -218,3 +218,12 @@ export const skills: Record<SkillKey, SkillConfig> = definitions;
  * SkillKey として扱う前に必ずここを通す。
  */
 export const isSkillKey = (value: string): value is SkillKey => value in skills;
+
+/**
+ * スキーマの choices に渡す表。値は翻訳済み文字列ではなくi18nキーを入れる。
+ *
+ * `characteristicChoices` と同じ扱い。描画時に formInput の localize が解決する。
+ */
+export const skillChoices: Record<string, string> = Object.fromEntries(
+  Object.entries(definitions).map(([key, { label }]) => [key, label]),
+);

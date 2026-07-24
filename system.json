@@ -39,6 +39,9 @@
     "ChatMessage": {
       "weapon": {},
       "damageApplied": {}
+    },
+    "Combat": {
+      "standard": {}
     }
   },
   "license": "LICENSE",
