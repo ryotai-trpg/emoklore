@@ -9,17 +9,20 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | ドキュメント | 種別 | データモデル |
 |---|---|---|
 | Actor | `character` | `CharacterDataModel` |
+| Actor | `npc` | `NpcDataModel` |
+| Actor | `kai` | `KaiDataModel` |
 | Item | `weapon` | `WeaponDataModel` |
 | Item | `armor` | `ArmorDataModel` |
 | Item | `skill` | `SkillDataModel` |
 | ChatMessage | `weapon` | `WeaponCardModel` |
+| ChatMessage | `kaiAttack` | `KaiAttackCardModel` |
 | ChatMessage | `damageApplied` | `DamageAppliedModel` |
 | ChatMessage | `survivalReminder` | `SurvivalReminderModel` |
 | Combat | `standard` | `CombatDataModel` |
 
 **種別は `system.json` の `documentTypes` と `CONFIG.*.dataModels` の両方に書く。** 片方だけでは噛み合わない。`documentTypes` に無い種別を `dataModels` に登録すると、作成できないのに `system` の型だけが増えて嘘になる（警告も出ない）。
 
-`npc` は `module/data/npc.ts` に定義だけが残っている。**登録していないので作成できない。** `EmokloreActor#system` を `CharacterDataModel` 固定で宣言しているため、登録すると型が嘘になる。NPCシートを作るときに合わせて決める（[ロードマップ](/roadmap) Phase 3）。
+Actorは3種別あり、`EmokloreActor#system` はそれらのunion。共鳴者（`character`）と人間NPC（`npc`）は能力値・技能・派生値・技能判定を `CharacterLikeDataModel`（`module/data/character-like.ts`）で共有し、`character` はそこに共鳴値・共鳴感情・経歴を足す。`npc` は追加を持たない軽量版で、邪気（旧 `wickedness`）はルールブックに該当が無いので落とした。怪異（`kai`）は能力値の標準ブロックを持たない別形状（下記）。
 
 ## マイグレーション機構は無い
 
@@ -227,6 +230,29 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 
 `skills.<k>.target` と `baseSkills.<k>.target` はいまもスキーマに無く `declare` だけ。効果を当てること自体はできるが、上の3つと違って検証を伴わない。
 
+## Actor `npc`
+
+人間NPC。`CharacterLikeDataModel` を継承し、`character` から共鳴値・共鳴感情・経歴を除いたもの。能力値・技能・基本技能・カスタム技能・技能グループ・`resources.hp/mp`・`mod`・導出値（`initiative` を含む）は共鳴者と同じなので、上の `Actor character` の各節を参照。判定の計算（`getSkillRollContext` / `derived-values`）も共鳴者と1つの実装を共有する。
+
+## Actor `kai`
+
+怪異。能力値の標準ブロックを持たない別形状で、`CharacterLikeDataModel` は継承しない。攻撃の判定は能力値から派生させず、ダイス数と判定値を直接持つ。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `resources.hp` | SchemaField | value 10 / max 10 | HP。派生ではなくシナリオが与える固定値なので max も保存する |
+| `resources.mp` | SchemaField | value 0 / max 0 | MP。同上 |
+| `resources.armor` | NumberField | 0 | 装甲。受けるダメージを平坦に軽減する（`applyDamage` が自前で引く） |
+| `initiative` | NumberField | 0 | 固定イニシアチブ値。`getRollData` 展開で `@initiative` に解決し、既定の【身体】＋〈スピード〉基準で並ぶ |
+| `emotions` | SetField(StringField) | `[]` | 共鳴感情（複数）。値は感情キー。#74 の感情ピッカーで編集UIを置き換える |
+| `resonance.intensity` | NumberField | 5 | 共鳴判定の強度（判定値）のプリセット |
+| `resonance.rise` | StringField | `"1"` | 上昇値。ダイス式も受ける（`Roll.validate` で検証）。適用は #75 |
+| `resonanceTable` | DocumentUUIDField | `null` | 使う共鳴表/デッキへの参照。引く処理は #79 |
+| `mutation` | HTMLField | `""` | 憑依時の変異などの自由記述。`system.json` の `htmlFields` に宣言 |
+| `attacks` | ArrayField(SchemaField) | `[]` | 攻撃・固有技能のリスト（下記） |
+
+攻撃1件は `name` / `diceCount`（ダイス数）/ `target`（判定値）/ `damage`（自由Roll式。成功数は `@success`。`Roll.validate` で検証）/ `mpCost` / `judgeless`（判定なし）/ `fixedSuccess`（judgeless時の固定成功数）を持つ。ダメージにD4が出るため武器の `DamageDie`（d3/d6）列挙には収めず自由式にしている。判定の組み立てと `@success` の差し替えは `module/rules/kai-attack.ts`。
+
 ## Item `weapon`
 
 | パス | 型 | 制約 | 意味 |
@@ -314,6 +340,21 @@ Itemにしてあるのは、コンペンディウムに入れて配ったり他�
 | `damageTotal` | NumberField | `null` | ダメージ合計。`null` は「まだ振っていない」 |
 
 **表示に要る値を使用時に焼き込んでいる**のは、あとで武器やアクターを消してもカードが読めるようにするため。`successCount` と `damageTotal` の `null` がそのままボタンの出し分けになる。
+
+## ChatMessage `kaiAttack`
+
+怪異の攻撃カード。武器カードと違い育たず、判定とダメージを一度に振って1枚に出す。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `attackName` | StringField | `""` | 攻撃名 |
+| `actorUuid` | DocumentUUIDField | `null` | 振った怪異。ダメージ適用の参照 |
+| `mpCost` | NumberField | 0 | 消費MP（表示のみ） |
+| `judgeless` | BooleanField | `false` | 判定なしの攻撃か |
+| `successCount` | NumberField | `null` | 判定の成功数（judgeless なら固定成功数） |
+| `damageTotal` | NumberField | `null` | ダメージ合計 |
+
+ボタンのハンドラ（ダメージ適用）は `data/` に置かず、`applications/kai-attack.ts` のものを `emoklore.ts` の init が `ACTIONS` へ登録する（[アーキテクチャ](/architecture)の課題5 の再演を避ける）。
 
 ## ChatMessage `damageApplied`
 
