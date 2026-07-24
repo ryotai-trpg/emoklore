@@ -6,6 +6,7 @@ import { EmokloreArmorSheet } from "./applications/armor-sheet";
 import * as applications from "./applications/character-sheet";
 import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
+import { applyKaiDamage } from "./applications/kai-attack";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
@@ -15,6 +16,7 @@ import { CombatDataModel } from "./data/combat";
 import { ArmorDataModel, SkillDataModel, WeaponDataModel } from "./data/item-models";
 import { KaiDataModel } from "./data/kai";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
+import { KaiAttackCardModel } from "./data/messages/kai-attack-card";
 import { SurvivalReminderModel } from "./data/messages/survival-reminder";
 import { WeaponCardModel } from "./data/messages/weapon-card";
 import { NpcDataModel } from "./data/npc";
@@ -63,6 +65,7 @@ Hooks.once("init", () => {
   } as typeof CONFIG.Item.dataModels;
   CONFIG.ChatMessage.dataModels = {
     weapon: WeaponCardModel,
+    kaiAttack: KaiAttackCardModel,
     damageApplied: DamageAppliedModel,
     survivalReminder: SurvivalReminderModel,
   } as typeof CONFIG.ChatMessage.dataModels;
@@ -84,6 +87,9 @@ Hooks.once("init", () => {
   // 武器カードの「軽減して適用」。ハンドラはダイアログを開くので applications/ に居り、
   // data/ からの逆依存を作らないよう、モジュールにも開いている ACTIONS の口から登録する
   WeaponCardModel.ACTIONS.applyDamageWithReduction = applyDamageWithReduction;
+
+  // 怪異の攻撃カードの「ダメージ適用」も同じく applications/ 側のハンドラを ACTIONS へ登録する
+  KaiAttackCardModel.ACTIONS.applyDamage = applyKaiDamage;
 
   // トークンに付けられる状態をエモクロアのものに差し替える。既定はD&D風の
   // dead/blind/prone… で、ルールブックの【気絶】【心肺停止】などが1つも無い。

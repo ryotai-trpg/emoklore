@@ -1,0 +1,48 @@
+{{! Kai Attack Card }}
+<div class="em-kai-attack-card">
+  <header class="em-kai-attack-card__head">
+    <div class="em-kai-attack-card__name">{{attackName}}</div>
+    <div class="em-kai-attack-card__meta">
+      {{#if judgeless}}
+        {{localize "EMOKLORE.ChatMessage.kaiAttack.Judgeless"}}
+        <span class="em-kai-attack-card__sep">/</span>
+      {{/if}}
+      {{localize "EMOKLORE.ChatMessage.kaiAttack.SuccessCount"}}
+      {{successCount}}
+      {{#if mpCost}}
+        <span class="em-kai-attack-card__sep">/</span>
+        {{localize "EMOKLORE.ChatMessage.kaiAttack.MpCost"}}
+        {{mpCost}}
+      {{/if}}
+    </div>
+  </header>
+
+  {{! ロールは本体の描画をそのまま埋める。content に要素があるので二重には描かれない }}
+  {{#if judgmentHTML}}
+    <section class="em-kai-attack-card__roll">
+      <h4 class="em-kai-attack-card__roll-label">
+        {{localize "EMOKLORE.ChatMessage.kaiAttack.Judgment"}}
+      </h4>
+      {{{judgmentHTML}}}
+    </section>
+  {{/if}}
+
+  {{#if damageHTML}}
+    <section class="em-kai-attack-card__roll">
+      <h4 class="em-kai-attack-card__roll-label">
+        {{localize "EMOKLORE.ChatMessage.kaiAttack.Damage"}}
+      </h4>
+      {{{damageHTML}}}
+    </section>
+  {{/if}}
+
+  {{#if canApplyDamage}}
+    {{! 対象は押した瞬間の盤面から取るので、何度でも押せる }}
+    <footer class="em-kai-attack-card__buttons">
+      <button type="button" data-action="applyDamage">
+        <i class="fa-solid fa-heart-crack" inert></i>
+        <span>{{localize "EMOKLORE.ChatMessage.weapon.Apply"}}</span>
+      </button>
+    </footer>
+  {{/if}}
+</div>

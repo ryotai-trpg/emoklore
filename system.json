@@ -40,6 +40,7 @@
     },
     "ChatMessage": {
       "weapon": {},
+      "kaiAttack": {},
       "damageApplied": {},
       "survivalReminder": {}
     },

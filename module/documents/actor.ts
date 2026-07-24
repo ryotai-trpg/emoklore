@@ -3,12 +3,14 @@ import type { CharacterLikeDataModel } from "../data/character-like";
 import type { KaiDataModel } from "../data/kai";
 import type { NpcDataModel } from "../data/npc";
 import { EmokloreRoll } from "../dice/emoklore-roll";
+import { buildKaiAttackSpec, substituteSuccess } from "../rules/kai-attack";
 import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
 import { resolveMpBoundary } from "../rules/resource-boundary";
 import { resolveSkillRoll } from "../rules/skill-roll";
 import type { RollSpec } from "../rules/types";
 import { calculateAppliedDamage } from "../rules/weapon-damage";
 import { createMpNoticeMessage, createRollMessage, formatSkillName } from "../utils/chat";
+import { type KaiAttackCardState, renderKaiAttackCard } from "../utils/kai";
 import type { EmokloreItem } from "./item";
 
 type ResourceKey = "hp" | "mp" | "resonance";
@@ -198,6 +200,70 @@ export class EmokloreActor extends Actor {
     });
 
     return this.#postRoll(spec, game.i18n.localize("EMOKLORE.Resonance.Name"), options);
+  }
+
+  /**
+   * 怪異の攻撃を振り、結果を攻撃カードに出す。
+   *
+   * 攻撃判定は能力値から派生させず、攻撃が持つダイス数と判定値で直接振る。judgeless の攻撃は
+   * 判定を振らず固定成功数を使う。ダメージは自由式で、成功数（@success）を差し替えて評価する。
+   * カードの「ダメージ適用」ボタンのハンドラは applications/ 側が持つ（data/ に駆動を置かない）。
+   */
+  async rollKaiAttack(
+    index: number,
+    options: Record<string, unknown> = {},
+  ): Promise<ChatMessage | undefined> {
+    if (!this.isKai()) {
+      throw new Error(`emoklore | 怪異ではないので攻撃を持ちません: ${this.type}`);
+    }
+
+    const attack = this.system.attacks[index];
+    if (!attack) return;
+
+    // 判定。judgeless なら振らずに固定成功数を使う
+    let judgmentRoll: EmokloreRoll | null = null;
+    let successCount: number;
+    if (attack.judgeless) {
+      successCount = attack.fixedSuccess;
+    } else {
+      const spec = buildKaiAttackSpec({ diceCount: attack.diceCount, target: attack.target });
+      judgmentRoll = EmokloreRoll.fromSpec(spec, options);
+      await judgmentRoll.evaluate();
+      successCount = judgmentRoll.successCount;
+    }
+
+    // ダメージ。式が空なら振らない。成功数は @success を差し替えて渡す
+    let damageRoll: foundry.dice.Roll | null = null;
+    let damageTotal: number | null = null;
+    if (attack.damage) {
+      damageRoll = new foundry.dice.Roll(substituteSuccess(attack.damage, successCount));
+      await damageRoll.evaluate();
+      damageTotal = damageRoll.total ?? 0;
+    }
+
+    const state: KaiAttackCardState = {
+      attackName: attack.name || game.i18n.localize("EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"),
+      actorUuid: this.uuid ?? null,
+      mpCost: attack.mpCost,
+      judgeless: attack.judgeless,
+      successCount,
+      damageTotal,
+    };
+
+    const rolls = [judgmentRoll, damageRoll].filter(
+      (roll): roll is foundry.dice.Roll => roll !== null,
+    );
+    const created = await ChatMessage.create({
+      type: "kaiAttack",
+      system: state,
+      speaker: ChatMessage.getSpeaker({ actor: this }),
+      rolls,
+      content: await renderKaiAttackCard(state, { judgmentRoll, damageRoll }),
+      sound: CONFIG.sounds.dice,
+      flags: { core: { canPopout: true } },
+    });
+
+    return created as ChatMessage | undefined;
   }
 
   async rollSkill(
