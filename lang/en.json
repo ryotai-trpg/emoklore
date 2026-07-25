@@ -19,7 +19,7 @@
     "EMOKLORE": {
       "DeveloperMode": {
         "Name": "Developer Mode",
-        "Hint": "test"
+        "Hint": "Logs the template context to the console on every sheet render, and opens the actor sheet configured below on startup. For development."
       },
       "DeveloperActorId": {
         "Name": "Actor ID to Open on Startup",
@@ -617,8 +617,7 @@
         "AttackDice": "Dice",
         "AttackTarget": "Target",
         "AttackDamage": "Damage Formula",
-        "FixedSuccess": "Fixed Successes",
-        "NoResonanceTarget": "Target a resonant to request a resonance roll."
+        "FixedSuccess": "Fixed Successes"
       }
     },
     "skillRoll": "{skillName} Roll",
@@ -762,7 +761,7 @@
     }
   },
   "USER": {
-    "RoleAssistant": "Assitant Dealer",
+    "RoleAssistant": "Assistant Dealer",
     "RoleGamemaster": "Dealer"
   }
 }

@@ -19,7 +19,7 @@
     "EMOKLORE": {
       "DeveloperMode": {
         "Name": "開発者モード",
-        "Hint": "テスト"
+        "Hint": "シートを描くたびにテンプレートへ渡すコンテキストをコンソールに出し、起動時に下のアクターのシートを自動で開きます。開発用です。"
       },
       "DeveloperActorId": {
         "Name": "起動時に開くアクターID",
@@ -617,8 +617,7 @@
         "AttackDice": "ダイス",
         "AttackTarget": "判定値",
         "AttackDamage": "ダメージ式",
-        "FixedSuccess": "固定成功数",
-        "NoResonanceTarget": "共鳴判定を要求する共鳴者をターゲットしてください"
+        "FixedSuccess": "固定成功数"
       }
     },
     "skillRoll": "〈{skillName}〉判定",
