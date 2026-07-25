@@ -5,14 +5,17 @@
  * Documentのメソッドではなくこちらが持つ。`documents/` 側は検証済みの値を必須引数で
  * 受け、ダイアログを一切知らない。
  *
- * 技能ロールに修正ダイアログ（DM修正・成功数修正）を足すときは `requestSkillRoll` を
- * ここに並べる。ただしあれは `RollSpec` を組み直す種類のダイアログで、共鳴判定の
- * ように `rules/` への入力を集めるものとは役割が違う。dnd5e が
- * `BasicRoll.build(config, dialog, message)` として `dice/` に持っているのは前者にあたる。
+ * 判定オプション（ダイスボーナス・成功数修正・必要成功数）のダイアログもここに置く。
+ * dnd5e は `BasicRoll.build(config, dialog, message)` として `dice/` に持っているが、
+ * あちらはダイアログがRollクラスの静的メンバーで、パイプライン全体がRollの関心にある。
+ * エモクロアの `EmokloreRoll.fromSpec` は決まりきった `RollSpec` を式に写すだけで、
+ * ダイアログが組み直す相手はその手前の `SkillRollParams`（`rules/` への入力）になる。
  */
 
+import type { SkillRef } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import { promptResonanceRoll } from "./dialogs/resonance-roll-dialog";
+import { promptSkillRoll } from "./dialogs/skill-roll-dialog";
 
 /**
  * 共鳴判定。強度と共鳴感情の一致度を尋ねてから振る。キャンセルされたら何もしない。
@@ -30,4 +33,25 @@ export async function requestResonanceRoll(
   if (!input) return;
 
   return actor.rollResonance(input.intensity, input.emotionMatch, options);
+}
+
+/**
+ * 技能判定。判定オプションを尋ねてから振る。キャンセルされたら何もしない。
+ *
+ * シートからのクリックは即ロールが既定で、こちらは修飾キーで開く。ほとんどの判定に
+ * 修正は付かないので、毎回ダイアログを挟むと手数が増えるだけになる。
+ */
+export async function requestSkillRoll(
+  actor: EmokloreActor,
+  ref: SkillRef,
+  options: Record<string, unknown> = {},
+): Promise<ChatMessage | undefined> {
+  const input = await promptSkillRoll();
+  if (!input) return;
+
+  return actor.rollSkill(
+    ref,
+    { ...options, requiredSuccess: input.requiredSuccess },
+    input.situational,
+  );
 }

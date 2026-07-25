@@ -577,6 +577,17 @@
       "ErrorMissingData": "データが見つかりません",
       "ErrorImportFailed": "インポートに失敗しました"
     },
+    "RollOptions": {
+      "Title": "判定オプション",
+      "DiceBonus": "ダイスボーナス",
+      "DiceBonusHint": "非常に有利な状況で1個、極めて有利な状況で2個が目安",
+      "SuccessMod": "成功数修正",
+      "Requirement": "必要成功数",
+      "NoRequirement": "指定なし",
+      "AtLeast": "{result}以上",
+      "Met": "{requirement} 達成",
+      "Missed": "{requirement} 未達"
+    },
     "EmotionPicker": {
       "Title": "共鳴感情",
       "Open": "感情を選ぶ",

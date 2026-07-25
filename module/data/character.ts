@@ -1,5 +1,6 @@
 import type { ResonantEmotionKey } from "../config/resonant-emotions";
 import { normalizeResonance } from "../rules/derived-values";
+import type { ModifierSet } from "../rules/types";
 import { CharacterLikeDataModel, defineResourcesSchema } from "./character-like";
 
 const { HTMLField, SchemaField, SetField, StringField } = foundry.data.fields;
@@ -24,7 +25,7 @@ export class CharacterDataModel extends CharacterLikeDataModel {
   declare resources: {
     hp: { value: number; max: number };
     mp: { value: number; max: number };
-    resonance: { value: number; max: number };
+    resonance: { value: number; max: number; mod: ModifierSet };
   };
 
   declare emotions: {

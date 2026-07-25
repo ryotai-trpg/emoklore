@@ -165,4 +165,123 @@ export async function run({ page, check }) {
       TAG,
     ),
   );
+
+  await check("Shift+クリックは判定オプションのダイアログを開く", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        const el = a.sheet.element.querySelector("[data-roll-type=skill][data-skill=search]");
+        if (!el) return { ok: false, detail: "〈検索〉の判定ボタンが無い" };
+
+        const findDialog = () =>
+          [...foundry.applications.instances.values()].find((x) =>
+            x.constructor.name.includes("Dialog"),
+          );
+
+        const before = game.messages.size;
+        el.dispatchEvent(new MouseEvent("click", { bubbles: true, shiftKey: true }));
+        const dlg = await window.__waitFor(findDialog, {
+          soft: true,
+          label: "判定オプションのダイアログ",
+        });
+        const inputs = dlg
+          ? [...dlg.element.querySelectorAll("[name]")].map((i) => i.name).join(",")
+          : "";
+        if (dlg) {
+          await dlg.close();
+          await window.__waitFor(() => !findDialog(), { soft: true, label: "ダイアログが閉じる" });
+        }
+
+        // キャンセル後の判定は非同期に着弾するので、その場で数えると競合する。
+        // 「増えないこと」の確認なので、増えるのを待って時間切れになるのが正常
+        const rolled =
+          (await window.__waitFor(
+            () => (game.messages.size > before ? game.messages.size - before : null),
+            { soft: true, timeout: 1000, label: "キャンセル後の判定" },
+          )) ?? 0;
+
+        const ok = Boolean(dlg) && inputs === "bonus,success,requirement" && rolled === 0;
+        return {
+          ok,
+          detail: ok
+            ? `入力=${inputs} キャンセルで0件`
+            : `dialog=${Boolean(dlg)} 入力=${inputs} ${rolled}件`,
+        };
+      },
+      TAG,
+    ),
+  );
+
+  await check("ダイスボーナスと成功数修正が式の内訳に出る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        // レベルは前のチェックが動かすので、その場で読んで期待値を組む
+        const level = a.system.skills.search.level;
+        const m = await a.rollSkill(
+          { kind: "skill", key: "search" },
+          {},
+          { bonus: 3, success: 1, target: -1 },
+        );
+        const roll = m.rolls[0];
+        const ok =
+          roll.dmFormula.startsWith(`(${level}+3)DM≦(`) &&
+          roll.dmFormula.endsWith("-1)") &&
+          roll.successMod === 1;
+        return { ok, detail: `${roll.dmFormula} 成功数修正${roll.successMod}` };
+      },
+      TAG,
+    ),
+  );
+
+  await check("要求成功数への到達がチャットに出る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        const ref = { kind: "skill", key: "search" };
+        // ダイスは出目1固定（クリティカル）で1個あたり成功数2。レベル3なら6で、
+        // トリプル要求には届き、ミラクル要求（7以上）には届かない
+        const met = await a.rollSkill(ref, { requiredSuccess: 3 });
+        const missed = await a.rollSkill(ref, { requiredSuccess: 7 });
+
+        const shown = await window.__waitFor(
+          () => document.querySelector(`[data-message-id="${missed.id}"] .em-requirement`),
+          { soft: true, label: "到達表示の描画" },
+        );
+
+        const ok =
+          /達成$/.test(met.rolls[0].requirementLabel) &&
+          /未達$/.test(missed.rolls[0].requirementLabel) &&
+          Boolean(shown);
+        return {
+          ok,
+          detail: `${met.rolls[0].requirementLabel} / ${missed.rolls[0].requirementLabel} 描画=${Boolean(shown)}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
+  await check("要求がなければ到達の行は出ない", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        const m = await a.rollSkill({ kind: "skill", key: "search" });
+        const shown = await window.__waitFor(
+          () => document.querySelector(`[data-message-id="${m.id}"] .dice-roll`),
+          { label: "判定カードの描画" },
+        );
+        const row = shown.querySelector(".em-requirement");
+        return {
+          ok: m.rolls[0].requirementLabel === "" && !row,
+          detail: row ? `余計な行: ${row.textContent.trim()}` : "行なし",
+        };
+      },
+      TAG,
+    ),
+  );
 }

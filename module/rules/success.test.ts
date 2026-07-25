@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { classifyFace, facePoints, resolveResultName } from "./success";
+import {
+  classifyFace,
+  facePoints,
+  meetsRequirement,
+  requiredSuccesses,
+  resolveResultName,
+} from "./success";
 
 describe("classifyFace", () => {
   it.each([
@@ -47,5 +53,36 @@ describe("resolveResultName", () => {
     [15, "catastrophe"],
   ])("成功数%iは%s", (successCount, expected) => {
     expect(resolveResultName(successCount)).toBe(expected);
+  });
+});
+
+describe("requiredSuccesses", () => {
+  it.each([
+    ["single", 1],
+    ["double", 2],
+    ["triple", 3],
+    ["miracle", 4],
+  ] as const)("%s に要る成功数は%i", (requirement, expected) => {
+    expect(requiredSuccesses(requirement)).toBe(expected);
+  });
+});
+
+describe("meetsRequirement", () => {
+  it("要求ちょうどでも届いたことにする", () => {
+    expect(meetsRequirement(2, 2)).toBe(true);
+  });
+
+  it("足りなければ未達", () => {
+    expect(meetsRequirement(1, 2)).toBe(false);
+  });
+
+  // 結果名で比べると resolveResultName が4〜9を miracle に潰すので、
+  // カタストロフ（10以上）がミラクル要求を満たさなくなる
+  it("カタストロフはミラクル要求を満たす", () => {
+    expect(meetsRequirement(10, requiredSuccesses("miracle"))).toBe(true);
+  });
+
+  it("ファンブル（負の成功数）はどの要求も満たさない", () => {
+    expect(meetsRequirement(-1, requiredSuccesses("single"))).toBe(false);
   });
 });

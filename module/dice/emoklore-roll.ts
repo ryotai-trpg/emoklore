@@ -1,12 +1,13 @@
 import type { RollOptions } from "@client/dice/_types.mjs";
 import { systemPath } from "../constants";
-import { type ResultName, resolveResultName } from "../rules/success";
+import { meetsRequirement, type ResultName, resolveResultName } from "../rules/success";
 import type { RollSpec } from "../rules/types";
 import { SUCCESS_MODIFIER } from "./emoklore-die";
 
 export interface EmokloreRollOptions extends RollOptions {
   dmFormula?: string;
   successMod?: number;
+  requiredSuccess?: number;
 }
 
 export class EmokloreRoll extends foundry.dice.Roll {
@@ -19,6 +20,16 @@ export class EmokloreRoll extends foundry.dice.Roll {
    */
   successMod: number;
 
+  /**
+   * DLが要求した成功数。0は要求なし。
+   *
+   * カードではなくロールが持つ。GMが出した要求カードはPLから更新できない
+   * （`ChatMessage#getUserLevel` は作成者にしかOWNERを返さない）ので、到達を
+   * カード側に書き戻す形にすると委譲が1往復要る。ロールのオプションはメッセージと
+   * 一緒に保存されるので、再描画しても残る
+   */
+  requiredSuccess: number;
+
   constructor(
     formula: string = "1d10",
     data: Record<string, unknown> = {},
@@ -27,6 +38,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
     super(formula, data, options);
     this.dmFormula = options.dmFormula ?? "";
     this.successMod = options.successMod ?? 0;
+    this.requiredSuccess = options.requiredSuccess ?? 0;
   }
 
   /**
@@ -65,6 +77,20 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return game.i18n.localize("EMOKLORE.successMod", { mod: formatSigned(this.successMod) });
   }
 
+  /** 要求された成功数への到達の表示。要求がなければ空文字 */
+  get requirementLabel(): string {
+    if (this.requiredSuccess <= 0) return "";
+
+    const requirement = game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
+      result: game.i18n.localize(`EMOKLORE.result.${resolveResultName(this.requiredSuccess)}`),
+    });
+    const key = meetsRequirement(this.successCount, this.requiredSuccess)
+      ? "EMOKLORE.RollOptions.Met"
+      : "EMOKLORE.RollOptions.Missed";
+
+    return game.i18n.localize(key, { requirement });
+  }
+
   /**
    * ツールチップのダイス合計を「3+1」形式にする。
    *
@@ -94,6 +120,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
       resultLabel: this.resultLabel,
       dmFormula: this.dmFormula,
       successModLabel: this.successModLabel,
+      requirementLabel: this.requirementLabel,
     };
   }
 

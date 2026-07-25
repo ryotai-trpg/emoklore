@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { formatDMPart, resolveSkillRoll, type SkillRollParams } from "./skill-roll";
+import { resolveSkillRoll, type SkillRollParams } from "./skill-roll";
 import type { ModifierSet } from "./types";
 
 const noMod: ModifierSet = { bonus: 0, success: 0, target: 0 };
 const mod = (m: Partial<ModifierSet>): ModifierSet => ({ ...noMod, ...m });
 
 /**
- * 修正の系統は4つあるが、1件のテストが見たいのはたいてい1〜2系統だけ。
+ * 修正の系統は5つあるが、1件のテストが見たいのはたいてい1〜2系統だけ。
  * 残りを既定で埋めて、注目している修正だけがテストの本文に出るようにする。
  */
 const params = (
@@ -16,6 +16,7 @@ const params = (
   characteristicMod: noMod,
   skillGroupMod: noMod,
   globalMod: noMod,
+  situationalMod: noMod,
   ...p,
 });
 
@@ -99,18 +100,24 @@ describe("resolveSkillRoll", () => {
       dmFormula: "(3-1)DM≦(5-2)",
     });
   });
-});
 
-describe("formatDMPart", () => {
-  it("修正値がなければ基準値だけを返す", () => {
-    expect(formatDMPart(3, 0)).toBe("3");
-  });
+  // その場の修正はアクターに保存された4系統と同じ扱いで畳む。ダイスボーナスも
+  // 成功数修正も判定値修正も、式の内訳にそのまま出る
+  it("その場の修正が保存された修正と同じように合算される", () => {
+    const spec = resolveSkillRoll(
+      params({
+        level: 2,
+        baseTarget: 6,
+        globalMod: mod({ bonus: 1 }),
+        situationalMod: mod({ bonus: 2, success: 1, target: -1 }),
+      }),
+    );
 
-  it("正の修正値は括弧付きで符号を添える", () => {
-    expect(formatDMPart(3, 2)).toBe("(3+2)");
-  });
-
-  it("負の修正値は括弧付きでそのまま連結する", () => {
-    expect(formatDMPart(3, -2)).toBe("(3-2)");
+    expect(spec).toEqual({
+      diceCount: 5,
+      target: 5,
+      successMod: 1,
+      dmFormula: "(2+3)DM≦(6-1)",
+    });
   });
 });

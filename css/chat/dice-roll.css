@@ -17,3 +17,12 @@
   opacity: 0.7;
   font-size: var(--font-size-12);
 }
+
+/* DLが要求した成功数への到達。結果の下に1行添える。
+   達成と未達を色では分けない。文言（達成 / 未達）が意味を持っているので、
+   色を足すと意味が二重になり、色でしか読めない情報も作ってしまう */
+.dice-roll .em-requirement {
+  margin-top: var(--spacer-2);
+  text-align: center;
+  font-size: var(--font-size-12);
+}

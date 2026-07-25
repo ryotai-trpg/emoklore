@@ -576,6 +576,17 @@
       "ErrorMissingData": "Data not found",
       "ErrorImportFailed": "Import failed"
     },
+    "RollOptions": {
+      "Title": "Roll Options",
+      "DiceBonus": "Dice Bonus",
+      "DiceBonusHint": "One die for a very favorable situation, two for an extremely favorable one.",
+      "SuccessMod": "Success Modifier",
+      "Requirement": "Required Successes",
+      "NoRequirement": "None",
+      "AtLeast": "{result} or better",
+      "Met": "{requirement}: met",
+      "Missed": "{requirement}: not met"
+    },
     "EmotionPicker": {
       "Title": "Resonant Emotions",
       "Open": "Choose Emotions",

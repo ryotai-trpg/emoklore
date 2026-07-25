@@ -7,7 +7,7 @@ import { buildKaiAttackSpec, substituteSuccess } from "../rules/kai-attack";
 import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
 import { resolveMpBoundary } from "../rules/resource-boundary";
 import { resolveSkillRoll } from "../rules/skill-roll";
-import type { RollSpec } from "../rules/types";
+import { type ModifierSet, NO_MODIFIER, type RollSpec, sumModifiers } from "../rules/types";
 import { calculateAppliedDamage } from "../rules/weapon-damage";
 import { createMpNoticeMessage, createRollMessage, formatSkillName } from "../utils/chat";
 import { type KaiAttackCardState, renderKaiAttackCard } from "../utils/kai";
@@ -185,6 +185,7 @@ export class EmokloreActor extends Actor {
     intensity: number,
     emotionMatch: ResonanceMatch,
     options: Record<string, unknown> = {},
+    situational: ModifierSet = NO_MODIFIER,
   ): Promise<ChatMessage | undefined> {
     // 共鳴判定は共鳴者だけが持つ（〈∞共鳴〉値がダイス数になる）。入口は共鳴者シートに
     // しかないので、ここへ他種別で来るのは呼び出し側の誤り。黙って変な判定を振らせない
@@ -197,6 +198,8 @@ export class EmokloreActor extends Actor {
       resonanceValue: this.system.resources.resonance.value,
       intensity,
       emotionMatch,
+      // 〈∞共鳴〉に乗った効果と、その場の修正を合わせる
+      mod: sumModifiers(this.system.resources.resonance.mod, situational),
     });
 
     return this.#postRoll(spec, game.i18n.localize("EMOKLORE.Resonance.Name"), options);
@@ -269,8 +272,9 @@ export class EmokloreActor extends Actor {
   async rollSkill(
     ref: SkillRef,
     options: Record<string, unknown> = {},
+    situational: ModifierSet = NO_MODIFIER,
   ): Promise<ChatMessage | undefined> {
-    const { roll, flavor } = await this.buildSkillRoll(ref, options);
+    const { roll, flavor } = await this.buildSkillRoll(ref, options, situational);
 
     return createRollMessage({ actor: this, flavor, roll });
   }
@@ -284,14 +288,16 @@ export class EmokloreActor extends Actor {
   async buildSkillRoll(
     ref: SkillRef,
     options: Record<string, unknown> = {},
+    situational: ModifierSet = NO_MODIFIER,
   ): Promise<{ roll: EmokloreRoll; flavor: string }> {
     // 技能判定は能力値＋技能を持つ共鳴者・人間NPCだけ。怪異は直接判定の攻撃を使う
     if (!this.isCharacterLike()) {
       throw new Error(`emoklore | この種別は技能判定を持ちません: ${this.type}`);
     }
 
+    // data/ が集めるのは保存データだけ。その場の修正はここで差し込む
     const context = this.system.getSkillRollContext(ref);
-    const spec = resolveSkillRoll(context.params);
+    const spec = resolveSkillRoll({ ...context.params, situationalMod: situational });
 
     return {
       roll: await this.#buildRoll(spec, options),

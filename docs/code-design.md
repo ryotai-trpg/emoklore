@@ -25,7 +25,9 @@ TypeScriptの型と、モジュールの分け方に関する規約はここが�
 
 **後者を表の行にしてはいけない。** 表は既に `documents/` → `data/` を許しているので、`data/` の行に `documents/` を足すと、表そのものが2層間の相互依存を許可することになる。順序を決めるための表が順序を失う。矢印は症状で、原因はハンドラの置き場所のほうにある。
 
-**ダイアログを開くかどうかは `applications/` が決める。** `documents/` のメソッドは検証済みの値を必須引数で受け、ダイアログを知らない。入力を集めてから呼ぶ入口は `applications/rolls.ts` にある。dnd5e は `Actor5e#rollSkill(config, dialog, message)` のようにDocument側がダイアログの可否まで持つが、あちらのダイアログは組み上がったロールを構成し直すもの（有利/不利・状況ボーナス）で、共鳴判定のように `rules/` への入力そのものを尋ねるものとは役割が違う。前者を足すときは `dice/` 側に置く。
+**ダイアログを開くかどうかは `applications/` が決める。** `documents/` のメソッドは検証済みの値を必須引数で受け、ダイアログを知らない。入力を集めてから呼ぶ入口は `applications/rolls.ts` にある。dnd5e は `Actor5e#rollSkill(config, dialog, message)` のようにDocument側がダイアログの可否まで持つが、それは**あちらのダイアログがRollクラスの静的メンバー（`BasicRoll.build`）で、パイプライン全体がRollの関心にある**ためで、こちらの事情とは違う。
+
+**判定ダイアログも `applications/` に置く。** `EmokloreRoll.fromSpec` は決まりきった `RollSpec` を式に写すだけなので、ダイスボーナスや成功数修正が組み直す相手はその手前の `SkillRollParams`（`rules/` への入力）になる。`dice/` に置くと、`DialogV2` と `game.i18n` のために表へ `dice/` → `config/` `utils/` を足すことになり、「Roll / Die / 結果の表現」という薄い層でなくなる。
 
 ## 文字列で持たない
 
