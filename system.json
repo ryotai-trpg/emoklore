@@ -42,7 +42,8 @@
       "weapon": {},
       "kaiAttack": {},
       "damageApplied": {},
-      "survivalReminder": {}
+      "survivalReminder": {},
+      "skillRequest": {}
     },
     "Combat": {
       "standard": {}

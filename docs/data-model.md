@@ -18,6 +18,7 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | ChatMessage | `kaiAttack` | `KaiAttackCardModel` |
 | ChatMessage | `damageApplied` | `DamageAppliedModel` |
 | ChatMessage | `survivalReminder` | `SurvivalReminderModel` |
+| ChatMessage | `skillRequest` | `SkillRequestModel` |
 | Combat | `standard` | `CombatDataModel` |
 
 **種別は `system.json` の `documentTypes` と `CONFIG.*.dataModels` の両方に書く。** 片方だけでは噛み合わない。`documentTypes` に無い種別を `dataModels` に登録すると、作成できないのに `system` の型だけが増えて嘘になる（警告も出ない）。
@@ -379,6 +380,20 @@ Itemにしてあるのは、コンペンディウムに入れて配ったり他�
 |---|---|---|---|
 | `round` | NumberField | `0` | 対象となったラウンド |
 | `targets` | ArrayField(SchemaField) | `[]` | 対象ごとの `actorUuid` / `name` |
+
+## ChatMessage `skillRequest`
+
+DLからの判定要求。**出したら変わらない** — 本体は作成者にしか OWNER を返さないので（`ChatMessage#getUserLevel`）、DLが出したカードをPLが更新することはできない。各自の判定結果は別のメッセージとして出る。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `skills` | ArrayField(SchemaField) | `[]` | 要求する技能。`kind`（`skill` / `base`）と `key` の対。カスタム技能はアクター固有なので入らない |
+| `requiredSuccess` | NumberField | `0` | 要求する成功数。0は指定なし |
+| `bonus` | NumberField | `0` | PLの判定に載せるダイスボーナス |
+| `successMod` | NumberField | `0` | 同じく成功数修正 |
+| `note` | StringField | `""` | 機械に落ちない条件の補足 |
+
+判定値修正は持たない。DLが状況で与えるものではなく、状態異常や極限共鳴の[効果](/active-effect)の側にあるため。
 
 ## Combat `standard`
 

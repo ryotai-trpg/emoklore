@@ -183,6 +183,12 @@
         "MpCost": "消費MP",
         "UnnamedAttack": "攻撃",
         "ActionFailed": "操作に失敗しました"
+      },
+      "skillRequest": {
+        "Title": "判定の要求",
+        "NoActor": "振るアクターが決まりません。トークンを選ぶか、担当キャラクターを設定してください",
+        "NotCharacterLike": "この種別は技能判定を持ちません",
+        "ActionFailed": "判定要求カードの操作に失敗しました"
       }
     },
     "Combat": {
@@ -576,6 +582,18 @@
       "ErrorInvalidKind": "キャラクターデータではありません",
       "ErrorMissingData": "データが見つかりません",
       "ErrorImportFailed": "インポートに失敗しました"
+    },
+    "SkillRequest": {
+      "Title": "判定を要求",
+      "Post": "チャットに出す",
+      "Skills": "技能",
+      "SkillsHint": "Ctrl（⌘）を押しながらで複数選べます",
+      "WithBase": "ベース技能も併記する",
+      "WithBaseHint": "「〈観察眼〉または〈＊知覚〉で判定」の形になります",
+      "NormalSkills": "通常技能",
+      "BaseSkills": "基本技能",
+      "Note": "補足",
+      "NotePlaceholder": "この判定にだけ効く条件があれば"
     },
     "RollOptions": {
       "Title": "判定オプション",

@@ -1,0 +1,39 @@
+{{! Skill Request Card }}
+<div class="em-skill-request">
+  <header class="em-skill-request__head">
+    <i class="fa-solid fa-hand-point-right" inert></i>
+    <span>{{localize "EMOKLORE.ChatMessage.skillRequest.Title"}}</span>
+  </header>
+
+  {{! 技能ごとにボタンを1つ。押した人のアクターで振る }}
+  <div class="em-skill-request__skills">
+    {{#each skills}}
+      <button
+        type="button"
+        class="em-skill-request__skill"
+        data-action="rollRequested"
+        data-kind="{{this.kind}}"
+        data-key="{{this.key}}"
+      >〈{{this.label}}〉</button>
+    {{/each}}
+  </div>
+
+  <dl class="em-skill-request__terms">
+    {{#if requirement}}
+      <dt>{{localize "EMOKLORE.RollOptions.Requirement"}}</dt>
+      <dd>{{requirement}}</dd>
+    {{/if}}
+    {{#if bonus}}
+      <dt>{{localize "EMOKLORE.RollOptions.DiceBonus"}}</dt>
+      <dd>{{numberFormat bonus sign=true}}</dd>
+    {{/if}}
+    {{#if successMod}}
+      <dt>{{localize "EMOKLORE.RollOptions.SuccessMod"}}</dt>
+      <dd>{{numberFormat successMod sign=true}}</dd>
+    {{/if}}
+  </dl>
+
+  {{#if note}}
+    <p class="em-skill-request__note">{{note}}</p>
+  {{/if}}
+</div>

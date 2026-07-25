@@ -1,0 +1,47 @@
+{{! 本体の standard-form 体系に乗せる。name 属性は skill-request-dialog.ts が
+    form.elements.namedItem で引くインターフェースなので変えない }}
+<div class="form-group stacked">
+  <label for="skills">{{localize "EMOKLORE.SkillRequest.Skills"}}</label>
+  <select name="skills" id="skills" multiple size="10">
+    {{#each groups}}
+      <optgroup label="{{this.label}}">
+        {{#each this.skills}}
+          <option value="{{this.value}}">{{this.label}}</option>
+        {{/each}}
+      </optgroup>
+    {{/each}}
+  </select>
+  <p class="hint">{{localize "EMOKLORE.SkillRequest.SkillsHint"}}</p>
+</div>
+
+<div class="form-group">
+  <label for="withBase">{{localize "EMOKLORE.SkillRequest.WithBase"}}</label>
+  <input name="withBase" id="withBase" type="checkbox" checked>
+  <p class="hint">{{localize "EMOKLORE.SkillRequest.WithBaseHint"}}</p>
+</div>
+
+<div class="form-group">
+  <label for="requiredSuccess">{{localize "EMOKLORE.RollOptions.Requirement"}}</label>
+  <select name="requiredSuccess" id="requiredSuccess">
+    <option value="0">{{localize "EMOKLORE.RollOptions.NoRequirement"}}</option>
+    {{#each requirements}}
+      <option value="{{this.value}}">{{this.label}}</option>
+    {{/each}}
+  </select>
+</div>
+
+<div class="form-group">
+  <label for="bonus">{{localize "EMOKLORE.RollOptions.DiceBonus"}}</label>
+  <input name="bonus" id="bonus" type="number" step="1" value="0">
+</div>
+
+<div class="form-group">
+  <label for="successMod">{{localize "EMOKLORE.RollOptions.SuccessMod"}}</label>
+  <input name="successMod" id="successMod" type="number" step="1" value="0">
+</div>
+
+<div class="form-group stacked">
+  <label for="note">{{localize "EMOKLORE.SkillRequest.Note"}}</label>
+  <input name="note" id="note" type="text"
+    placeholder="{{localize 'EMOKLORE.SkillRequest.NotePlaceholder'}}">
+</div>

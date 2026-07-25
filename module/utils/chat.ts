@@ -4,6 +4,7 @@ import type { SurvivalTarget } from "../data/messages/survival-reminder";
 import type { EmokloreRoll } from "../dice/emoklore-roll";
 import type { EmokloreActor } from "../documents/actor";
 import { resolveHpBoundary } from "../rules/resource-boundary";
+import { renderSkillRequestCard, type SkillRequestState } from "./request";
 import { skillMarker } from "./skill";
 
 const DAMAGE_APPLIED_TEMPLATE = systemPath("templates/chat/damage-applied.hbs");
@@ -110,6 +111,25 @@ export async function createMpNoticeMessage(
     content: await foundry.applications.handlebars.renderTemplate(DAMAGE_APPLIED_TEMPLATE, {
       entries: [entry],
     }),
+    flags: { core: { canPopout: true } },
+  });
+
+  return created as ChatMessage | undefined;
+}
+
+/**
+ * DLからの判定要求をチャットに流す。
+ *
+ * 出したら変わらないカードなので、状態は作成時に焼き込むだけ。各PLの判定結果は
+ * 別のメッセージとして出る（カードはPLから更新できない）。
+ */
+export async function createSkillRequestMessage(
+  request: SkillRequestState,
+): Promise<ChatMessage | undefined> {
+  const created = await ChatMessage.create({
+    type: "skillRequest",
+    system: request,
+    content: await renderSkillRequestCard(request),
     flags: { core: { canPopout: true } },
   });
 
