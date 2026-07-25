@@ -38,7 +38,8 @@
         <div class="em-meter__value">
           Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
         </div>
-        {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows}}
+        {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows
+      acquired=acquiredEmotionRows}}
       </div>
       <progress
         class="em-progress em-progress--resonance"
@@ -51,10 +52,16 @@
   {{else}}
   {{! 編集は3つのselectではなくピッカーで行う。ここは現在値の表示と入口だけを持つ }}
   <div class="em-emotion-list">
-    {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows}}
+    {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows
+      acquired=acquiredEmotionRows}}
     <button type="button" class="em-emotion-list__pick" data-action="pickEmotions">
       <i class="fa-solid fa-heart" inert></i>
       <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
+    </button>
+    {{! 追加取得は3枠と別の操作。枚数が決まらないので複数選択モードで開く }}
+    <button type="button" class="em-emotion-list__pick" data-action="pickAcquiredEmotions">
+      <i class="fa-solid fa-heart-circle-plus" inert></i>
+      <span>{{localize "EMOKLORE.EmotionPicker.OpenAcquired"}}</span>
     </button>
   </div>
   {{/if}}

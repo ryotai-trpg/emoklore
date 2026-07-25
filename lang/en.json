@@ -674,6 +674,7 @@
     "EmotionPicker": {
       "Title": "Resonant Emotions",
       "Open": "Choose Emotions",
+      "OpenAcquired": "Choose Acquired",
       "Unselected": "Not Selected",
       "Clear": "Remove",
       "Confirm": "Confirm",

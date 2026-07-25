@@ -271,6 +271,8 @@ export type CharacterContext = {
   system: CharacterDataModel;
   // テンプレートが system.emotions も参照するので、紛れないよう emotionRows にしている
   emotionRows: Record<EmotionKey, EmotionRow>;
+  /** 追加取得した共鳴感情。枚数が決まらないので配列 */
+  acquiredEmotionRows: EmotionRow[];
   characteristics?: CharacteristicsMap;
   charPointSum?: number;
   charPointMax?: number;

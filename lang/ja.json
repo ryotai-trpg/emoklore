@@ -675,6 +675,7 @@
     "EmotionPicker": {
       "Title": "共鳴感情",
       "Open": "感情を選ぶ",
+      "OpenAcquired": "追加取得を選ぶ",
       "Unselected": "未選択",
       "Clear": "外す",
       "Confirm": "決定",
