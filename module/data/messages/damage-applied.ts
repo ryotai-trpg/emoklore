@@ -1,11 +1,9 @@
 import type { EmokloreActor } from "../../documents/actor";
+import { attachCardActions, type CardActions } from "../../utils/chat-card";
 import { EmokloreSystemDataModel } from "../system-model";
 
 const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
-
-/** 案内のボタン1つぶんの処理。押した要素の dataset を読むので、要素ごと受け取る */
-type NoticeAction = (this: DamageAppliedModel, button: HTMLElement) => Promise<void>;
 
 /** どのリソースの結果か。行の書式と境界の案内の出し分けに使う */
 export type ResourceKind = "hp" | "mp";
@@ -51,7 +49,7 @@ export class DamageAppliedModel extends EmokloreSystemDataModel {
   declare targets: AppliedTarget[];
 
   /** 案内のボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: Record<string, NoticeAction>;
+  static ACTIONS: CardActions<DamageAppliedModel>;
 
   static override defineSchema() {
     return defineDamageAppliedSchema();
@@ -95,39 +93,14 @@ export class DamageAppliedModel extends EmokloreSystemDataModel {
     );
   }
 
-  /**
-   * 案内のボタンに反応する。`renderChatMessageHTML` から呼ばれる（武器カードと同じ配線）。
-   *
-   * 武器カードの ACTIONS と違ってボタン要素を渡すのは、1枚に対象ぶんのボタンが並び、
-   * どの対象・どの状態かを押した要素の dataset からしか特定できないため。
-   */
+  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
   addListeners(html: HTMLElement): void {
-    const root = html.querySelector(".em-damage-applied");
-    if (!root) return;
-
-    root.addEventListener("click", (event) => {
-      const target = (event.target as HTMLElement).closest<HTMLElement>("[data-action]");
-      const actionName = target?.dataset.action;
-      if (!target || !actionName) return;
-
-      const action = DamageAppliedModel.ACTIONS[actionName];
-      if (!action) return;
-
-      // 連打で二重に付けさせない。処理中はボタンを落とし、成否によらず必ず戻す
-      const button = target instanceof HTMLButtonElement ? target : null;
-      if (button) button.disabled = true;
-
-      action
-        .call(this, target)
-        .catch((error: unknown) => {
-          console.error("emoklore | 境界の案内の操作に失敗しました", error);
-          ui.notifications?.error("EMOKLORE.ChatMessage.damageApplied.ActionFailed", {
-            localize: true,
-          });
-        })
-        .finally(() => {
-          if (button) button.disabled = false;
-        });
+    attachCardActions(html, {
+      root: ".em-damage-applied",
+      model: this,
+      actions: DamageAppliedModel.ACTIONS,
+      label: "境界の案内",
+      errorKey: "EMOKLORE.ChatMessage.damageApplied.ActionFailed",
     });
   }
 }

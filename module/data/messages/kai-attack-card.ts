@@ -1,9 +1,7 @@
+import { attachCardActions, type CardActions } from "../../utils/chat-card";
 import { EmokloreSystemDataModel } from "../system-model";
 
 const { BooleanField, DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
-
-/** カードの1ボタンぶんの処理。押した瞬間に this がモデルに束縛される */
-type KaiCardAction = (this: KaiAttackCardModel) => Promise<void>;
 
 const defineKaiAttackCardSchema = () => {
   return {
@@ -35,7 +33,7 @@ export class KaiAttackCardModel extends EmokloreSystemDataModel {
   declare damageTotal: number | null;
 
   /** カードのボタン。`data-action` の値と対応する。ハンドラは applications/ 側から登録する */
-  static ACTIONS: Record<string, KaiCardAction> = {};
+  static ACTIONS: CardActions<KaiAttackCardModel> = {};
 
   static override defineSchema() {
     return defineKaiAttackCardSchema();
@@ -43,36 +41,14 @@ export class KaiAttackCardModel extends EmokloreSystemDataModel {
 
   static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.kaiAttack"];
 
-  /**
-   * カードのボタンに反応する。`renderChatMessageHTML` から呼ばれる（武器カードと同じ配線）。
-   */
+  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
   addListeners(html: HTMLElement): void {
-    const card = html.querySelector(".em-kai-attack-card");
-    if (!card) return;
-
-    card.addEventListener("click", (event) => {
-      const target = (event.target as HTMLElement).closest<HTMLElement>("[data-action]");
-      const actionName = target?.dataset.action;
-      if (!target || !actionName) return;
-
-      const action = KaiAttackCardModel.ACTIONS[actionName];
-      if (!action) return;
-
-      // 連打で二重に適用させない。処理中はボタンを落とし、成否によらず必ず戻す
-      const button = target instanceof HTMLButtonElement ? target : null;
-      if (button) button.disabled = true;
-
-      action
-        .call(this)
-        .catch((error: unknown) => {
-          console.error("emoklore | 怪異の攻撃カードの操作に失敗しました", error);
-          ui.notifications?.error("EMOKLORE.ChatMessage.kaiAttack.ActionFailed", {
-            localize: true,
-          });
-        })
-        .finally(() => {
-          if (button) button.disabled = false;
-        });
+    attachCardActions(html, {
+      root: ".em-kai-attack-card",
+      model: this,
+      actions: KaiAttackCardModel.ACTIONS,
+      label: "怪異の攻撃カード",
+      errorKey: "EMOKLORE.ChatMessage.kaiAttack.ActionFailed",
     });
   }
 }

@@ -3,6 +3,7 @@ import type { EmokloreActor } from "../../documents/actor";
 import { applyDamageToTargets } from "../../documents/queries";
 import { buildDamageFormula, resolveStrengthBonus } from "../../rules/weapon-damage";
 import { createDamageAppliedMessage } from "../../utils/chat";
+import { attachCardActions, type CardActions } from "../../utils/chat-card";
 import { resolveTargetActors } from "../../utils/targets";
 import {
   type CardButtons,
@@ -15,9 +16,6 @@ import { resolveSkillRef } from "../character";
 import { EmokloreSystemDataModel } from "../system-model";
 
 const { DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
-
-/** カードの1ボタンぶんの処理。押した瞬間に this がモデルに束縛される */
-type CardAction = (this: WeaponCardModel) => Promise<void>;
 
 /**
  * カードが載っている ChatMessage。
@@ -73,7 +71,7 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
   declare damageTotal: number | null;
 
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: Record<string, CardAction>;
+  static ACTIONS: CardActions<WeaponCardModel>;
 
   static override defineSchema() {
     return defineWeaponCardSchema();
@@ -223,37 +221,14 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
     return ((await foundry.utils.fromUuid(this.actorUuid)) as EmokloreActor | null) ?? undefined;
   }
 
-  /**
-   * カードのボタンに反応する。`renderChatMessageHTML` から呼ばれる。
-   *
-   * リスナはカードのルートに1つだけ張り、`data-action` で振り分ける。本体のチャットログは
-   * 自前のアクション表しか見ないので、システム側のボタンはここで拾う必要がある。
-   */
+  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
   addListeners(html: HTMLElement): void {
-    const card = html.querySelector(".em-weapon-card");
-    if (!card) return;
-
-    card.addEventListener("click", (event) => {
-      const target = (event.target as HTMLElement).closest<HTMLElement>("[data-action]");
-      const actionName = target?.dataset.action;
-      if (!target || !actionName) return;
-
-      const action = WeaponCardModel.ACTIONS[actionName];
-      if (!action) return;
-
-      // 連打で二重に振らせない。処理中はボタンを落とし、成否によらず必ず戻す
-      const button = target instanceof HTMLButtonElement ? target : null;
-      if (button) button.disabled = true;
-
-      action
-        .call(this)
-        .catch((error: unknown) => {
-          console.error("emoklore | 武器カードの操作に失敗しました", error);
-          ui.notifications?.error("EMOKLORE.ChatMessage.weapon.ActionFailed", { localize: true });
-        })
-        .finally(() => {
-          if (button) button.disabled = false;
-        });
+    attachCardActions(html, {
+      root: ".em-weapon-card",
+      model: this,
+      actions: WeaponCardModel.ACTIONS,
+      label: "武器カード",
+      errorKey: "EMOKLORE.ChatMessage.weapon.ActionFailed",
     });
   }
 }
