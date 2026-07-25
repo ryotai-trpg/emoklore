@@ -6,15 +6,6 @@ import { CharacterLikeDataModel, defineResourcesSchema } from "./character-like"
 
 const { HTMLField, SchemaField, SetField, StringField } = foundry.data.fields;
 
-// 判定まわりの共有型・関数は CharacterLikeDataModel と同じ場所（character-like.ts）に居る。
-// 従来 data/character から import している箇所を壊さないよう、ここから再輸出する
-export {
-  type CustomSkillEntry,
-  resolveSkillRef,
-  type SkillRef,
-  type SkillRollContext,
-} from "./character-like";
-
 /**
  * 共鳴者（PC）のデータモデル。
  *

@@ -2,8 +2,8 @@ import { createMpNoticeMessage } from "../chat/damage-applied";
 import { createKaiAttackMessage } from "../chat/kai-attack-card";
 import { createRollMessage } from "../chat/message";
 import { formatRollFlavor, formatSkillName } from "../chat/roll-flavor";
-import type { CharacterDataModel, SkillRef } from "../data/character";
-import type { CharacterLikeDataModel } from "../data/character-like";
+import type { CharacterDataModel } from "../data/character";
+import type { CharacterLikeDataModel, SkillRef } from "../data/character-like";
 import type { KaiDataModel } from "../data/kai";
 import type { KaiAttackCardState } from "../data/messages/kai-attack-card";
 import type { NpcDataModel } from "../data/npc";
@@ -15,8 +15,6 @@ import { resolveSkillRoll } from "../rules/skill-roll";
 import { type ModifierSet, NO_MODIFIER, type RollSpec, sumModifiers } from "../rules/types";
 import { calculateAppliedDamage } from "../rules/weapon-damage";
 import type { EmokloreItem } from "./item";
-
-type ResourceKey = "hp" | "mp" | "resonance";
 
 /** ダメージ適用の結果。チャットに「HP: 15 → 12」と出すために使う */
 export type HpChange = {
@@ -85,8 +83,7 @@ export class EmokloreActor extends Actor {
   /**
    * ダメージを受ける。
    *
-   * `adjustResource` は素の加算で下限を持たないが、こちらは0で止める。ルール上HPは
-   * 0で【心肺停止】となり、マイナスのHPという概念がない。
+   * HPは0で止める。ルール上0で【心肺停止】となり、マイナスのHPという概念がない。
    *
    * `reduction` は軽減量の共通の口。〈耐久〉判定・防御判定はどちらも「受けるダメージを
    * 【成功数】点軽減する」という形で、武器カードの「軽減して適用」がここへ渡してくる。
@@ -144,20 +141,6 @@ export class EmokloreActor extends Actor {
     await this.update({ "system.resources.resonance.value": before + amount });
 
     return { before, after: this.system.resources.resonance.value };
-  }
-
-  async adjustResource(resource: ResourceKey, point: number): Promise<this | undefined> {
-    // resonance は共鳴者だけが持つ。ここを抜けると resource は "hp" | "mp"（全種別が同形で持つ）
-    if (resource === "resonance") {
-      if (!this.isCharacter()) return undefined;
-      const value = this.system.resources.resonance.value + point;
-      return (await this.update({ "system.resources.resonance.value": value })) as this | undefined;
-    }
-
-    const newvalue = this.system.resources[resource].value + point;
-    return (await this.update({ [`system.resources.${resource}.value`]: newvalue })) as
-      | this
-      | undefined;
   }
 
   /**

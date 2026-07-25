@@ -7,7 +7,7 @@
  */
 
 import { updateWeaponCard } from "../chat/weapon-card";
-import { resolveSkillRef } from "../data/character";
+import { resolveSkillRef } from "../data/character-like";
 import {
   resolveCardButtons,
   type WeaponCardModel,

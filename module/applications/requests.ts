@@ -11,7 +11,8 @@ import { createResonanceRequestMessage } from "../chat/resonance-request";
 import { createSkillRequestMessage } from "../chat/skill-request";
 import { isBaseSkillKey } from "../config/base-skills";
 import { isSkillKey } from "../config/skills";
-import type { CharacterDataModel, SkillRef } from "../data/character";
+import type { CharacterDataModel } from "../data/character";
+import type { SkillRef } from "../data/character-like";
 import type {
   ResonanceRequestModel,
   ResonanceRequestState,
