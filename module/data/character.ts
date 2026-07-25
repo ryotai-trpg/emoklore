@@ -1,7 +1,8 @@
+import type { ResonantEmotionKey } from "../config/resonant-emotions";
 import { normalizeResonance } from "../rules/derived-values";
 import { CharacterLikeDataModel, defineResourcesSchema } from "./character-like";
 
-const { HTMLField, SchemaField, StringField } = foundry.data.fields;
+const { HTMLField, SchemaField, SetField, StringField } = foundry.data.fields;
 
 // 判定まわりの共有型・関数は CharacterLikeDataModel と同じ場所（character-like.ts）に居る。
 // 従来 data/character から import している箇所を壊さないよう、ここから再輸出する
@@ -30,6 +31,7 @@ export class CharacterDataModel extends CharacterLikeDataModel {
     surface?: string;
     hidden?: string;
     root?: string;
+    acquired: Set<ResonantEmotionKey>;
   };
 
   declare biography: {
@@ -55,6 +57,16 @@ export class CharacterDataModel extends CharacterLikeDataModel {
         surface: new StringField(),
         hidden: new StringField(),
         root: new StringField(),
+
+        // 共振や怪異の付与で後から増える枠。3枠と違って枚数が決まらないので Set で持つ。
+        // 感情マッチングは3枠とこれを合わせて見る（#75）。編集UIが付くのも #75
+        acquired: new SetField(
+          new StringField({
+            required: true,
+            blank: false,
+            choices: Object.keys(CONFIG.EMOKLORE.resonantEmotions),
+          }),
+        ),
       }),
 
       biography: new SchemaField({

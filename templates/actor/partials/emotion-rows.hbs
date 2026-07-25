@@ -1,0 +1,13 @@
+{{!--
+  共鳴感情の3行。「感情名: 属性」の対なので定義リストで表す。
+
+  @param rows 表・裏・ルーツの表示用データ（label と attribute。未選択は空文字）
+--}}
+<dl class="em-meter__emotions">
+  <dt>{{rows.surface.label}}</dt>
+  <dd>{{#if rows.surface.attribute}}（{{rows.surface.attribute}}）{{/if}}</dd>
+  <dt>{{rows.hidden.label}}</dt>
+  <dd>{{#if rows.hidden.attribute}}（{{rows.hidden.attribute}}）{{/if}}</dd>
+  <dt>{{rows.root.label}}</dt>
+  <dd>{{#if rows.root.attribute}}（{{rows.root.attribute}}）{{/if}}</dd>
+</dl>

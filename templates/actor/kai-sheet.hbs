@@ -55,17 +55,16 @@
 
 <section class="em-kai__block">
   <h3>{{localize "EMOKLORE.Actor.kai.Emotions"}}</h3>
-  {{#if isPlay}}
-    <div class="em-kai__emotions">
-      {{#each selectedEmotions}}<span class="em-kai__emotion">{{label}}</span>{{/each}}
-    </div>
-  {{else}}
-    <select class="em-kai__emotion-select" name="system.emotions" multiple size="6">
-      {{#each emotionOptions}}
-        <option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-      {{/each}}
-    </select>
-  {{/if}}
+  <div class="em-kai__emotions">
+    {{#each selectedEmotions}}<span class="em-kai__emotion">{{label}}</span>{{/each}}
+  </div>
+  {{#unless isPlay}}
+    {{! 編集はピッカーで行う。ここは入口だけを持つ }}
+    <button type="button" class="em-kai__emotion-pick" data-action="pickEmotions">
+      <i class="fa-solid fa-heart" inert></i>
+      <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
+    </button>
+  {{/unless}}
 </section>
 
 <section class="em-kai__block">

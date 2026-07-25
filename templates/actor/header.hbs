@@ -38,15 +38,7 @@
         <div class="em-meter__value">
           Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
         </div>
-        {{! 表・裏・根源は「感情名: 属性」の対なので定義リストで表す }}
-        <dl class="em-meter__emotions">
-          <dt>{{emotionRows.surface.label}}</dt>
-          <dd>{{#if emotionRows.surface.attribute}}（{{emotionRows.surface.attribute}}）{{/if}}</dd>
-          <dt>{{emotionRows.hidden.label}}</dt>
-          <dd>{{#if emotionRows.hidden.attribute}}（{{emotionRows.hidden.attribute}}）{{/if}}</dd>
-          <dt>{{emotionRows.root.label}}</dt>
-          <dd>{{#if emotionRows.root.attribute}}（{{emotionRows.root.attribute}}）{{/if}}</dd>
-        </dl>
+        {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows}}
       </div>
       <progress
         class="em-progress em-progress--resonance"
@@ -57,22 +49,13 @@
     </div>
   </div>
   {{else}}
+  {{! 編集は3つのselectではなくピッカーで行う。ここは現在値の表示と入口だけを持つ }}
   <div class="em-emotion-list">
-    {{formGroup
-    systemFields.emotions.fields.surface
-    value=system.emotions.surface
-    options=emotionOptions
-    }}
-    {{formGroup
-    systemFields.emotions.fields.hidden
-    value=system.emotions.hidden
-    options=emotionOptions
-    }}
-    {{formGroup
-    systemFields.emotions.fields.root
-    value=system.emotions.root
-    options=emotionOptions
-    }}
+    {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows}}
+    <button type="button" class="em-emotion-list__pick" data-action="pickEmotions">
+      <i class="fa-solid fa-heart" inert></i>
+      <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
+    </button>
   </div>
   {{/if}}
 </header>

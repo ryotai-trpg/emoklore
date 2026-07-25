@@ -577,6 +577,16 @@
       "ErrorMissingData": "データが見つかりません",
       "ErrorImportFailed": "インポートに失敗しました"
     },
+    "EmotionPicker": {
+      "Title": "共鳴感情",
+      "Open": "感情を選ぶ",
+      "Unselected": "未選択",
+      "Clear": "外す",
+      "Confirm": "決定",
+      "Cancel": "キャンセル",
+      "HintSlots": "枠を選んでから感情をクリックします",
+      "HintMany": "感情をクリックして選びます。もう一度クリックすると外れます"
+    },
     "Resonance": {
       "Name": "♾️共鳴",
       "Intensity": "強度",

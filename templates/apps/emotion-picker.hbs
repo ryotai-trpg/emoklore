@@ -1,0 +1,67 @@
+{{! Emotion Picker }}
+{{! ApplicationV2 は1パーツにつきルート要素1つを要求するので、この div は必須。
+    アプリの classes と同名にすると二重に付いて紛らわしいので名前は持たせない }}
+<div>
+  {{#unless multiple}}
+  {{! 埋める枠。押すと行き先が切り替わり、感情を押すとその枠に入る }}
+  <div class="em-emotion-picker__slots">
+    {{#each slots}}
+    <div class="em-emotion-picker__slot">
+      <button
+        type="button"
+        class="em-emotion-picker__slot-target"
+        data-action="selectSlot"
+        data-slot="{{this.key}}"
+        aria-pressed="{{this.active}}"
+      >
+        <span class="em-emotion-picker__slot-label">{{this.label}}</span>
+        <span class="em-emotion-picker__slot-value">{{this.value}}</span>
+      </button>
+      {{#if this.filled}}
+      <button
+        type="button"
+        class="inline-control icon fa-solid fa-xmark"
+        data-action="clearSlot"
+        data-slot="{{this.key}}"
+        data-tooltip
+        aria-label="{{localize 'EMOKLORE.EmotionPicker.Clear'}}"
+      ></button>
+      {{/if}}
+    </div>
+    {{/each}}
+  </div>
+  {{/unless}}
+
+  <p class="hint">{{hint}}</p>
+
+  <div class="em-emotion-picker__columns">
+    {{#each columns}}
+    <section class="em-emotion-picker__column">
+      <h3 class="em-emotion-picker__attribute">{{this.label}}</h3>
+      <ul class="em-emotion-picker__emotions">
+        {{#each this.emotions}}
+        <li>
+          <button
+            type="button"
+            class="em-emotion-picker__emotion"
+            data-action="pickEmotion"
+            data-emotion="{{this.key}}"
+            aria-pressed="{{this.selected}}"
+          >{{this.label}}</button>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+    {{/each}}
+  </div>
+
+  <footer class="form-footer">
+    <button type="button" data-action="cancel">
+      {{localize "EMOKLORE.EmotionPicker.Cancel"}}
+    </button>
+    <button type="submit" class="default">
+      <i class="fa-solid fa-check"></i>
+      {{localize "EMOKLORE.EmotionPicker.Confirm"}}
+    </button>
+  </footer>
+</div>

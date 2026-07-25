@@ -8,7 +8,8 @@ import type { BiographyFieldDef, BiographyRow, EmotionKey, EmotionRow } from "./
  * ルール計算は module/rules/ に、DOM操作は module/utils/sheet.ts にある。
  */
 
-const EMOTION_KEYS: readonly EmotionKey[] = ["surface", "hidden", "root"];
+/** 表・裏・ルーツの並び。行の組み立てとピッカーの枠で同じ並びを使う */
+export const EMOTION_KEYS: readonly EmotionKey[] = ["surface", "hidden", "root"];
 
 /**
  * 経歴の項目の並び。
@@ -59,18 +60,45 @@ export const buildBiographyRows = (
     html: html ?? false,
   }));
 
-export const createEmotionOptions = (): Array<{ value: string; label: string; group: string }> => {
-  return Object.entries(CONFIG.EMOKLORE.resonantEmotions).map(([value, { label, attribute }]) => {
-    const attributeLabel = CONFIG.EMOKLORE.emotionAttributes[attribute].label;
-    return {
-      value,
-      label: game.i18n.localize("EMOKLORE.resonantEmotion", {
-        emotion: label,
-        attribute: attributeLabel,
-      }),
-      group: attributeLabel,
-    };
-  });
+/** 感情ピッカーの1マス。`key` は保存する感情キー、`label` は翻訳済みの表示名 */
+export type EmotionCell = { key: string; label: string };
+
+/** 感情ピッカーの1列。1つの感情属性とそこに属する感情 */
+export type EmotionColumn = { attribute: string; label: string; emotions: EmotionCell[] };
+
+/**
+ * 感情ピッカーの列を組み立てる。属性ごとに1列、その中に属する感情を並べる。
+ *
+ * 感情の定義は属性キーを1つ持つだけの平らな表なので、属性から感情を引く向きは
+ * ここで作る。列の並びは属性の表の順（欲望・情念・理想・関係・傷）で、列の中は
+ * 感情の表の定義順。
+ *
+ * どちらの label も i18nInit の performPreLocalization で翻訳済みなので、
+ * ここでは参照するだけでよい。game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
+ */
+export const buildEmotionColumns = (
+  resonantEmotions: Record<string, ResonantEmotionConfig>,
+  emotionAttributes: Record<string, EmotionAttributeConfig>,
+): EmotionColumn[] => {
+  const columns = new Map<string, EmotionColumn>();
+
+  for (const [attribute, { label }] of Object.entries(emotionAttributes)) {
+    columns.set(attribute, { attribute, label, emotions: [] });
+  }
+
+  for (const [key, { label, attribute }] of Object.entries(resonantEmotions)) {
+    // 属性の表に載っていない感情にも列を作る。落とすとその感情を選ぶ手段が消える
+    let column = columns.get(attribute);
+    if (!column) {
+      column = { attribute, label: "", emotions: [] };
+      columns.set(attribute, column);
+    }
+
+    column.emotions.push({ key, label });
+  }
+
+  // 感情を1つも持たない属性は列にしない。空の列だけが並ぶのを避ける
+  return Array.from(columns.values()).filter((column) => column.emotions.length > 0);
 };
 
 /**
@@ -84,7 +112,9 @@ export const createEmotionOptions = (): Array<{ value: string; label: string; gr
  * game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
  */
 export const getEmotionRows = (
-  emotions: Record<string, string | undefined>,
+  // 見るのは3枠だけ。`system.emotions` は追加取得（`acquired`）も持つが、行に出すのは
+  // 表・裏・ルーツなので、余りを受け取らない形で宣言する
+  emotions: Partial<Record<EmotionKey, string>>,
   resonantEmotions: Record<string, ResonantEmotionConfig>,
   emotionAttributes: Record<string, EmotionAttributeConfig>,
 ): Record<EmotionKey, EmotionRow> => {

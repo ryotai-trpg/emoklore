@@ -1,3 +1,4 @@
+import { isResonantEmotionKey } from "../config/resonant-emotions";
 import { systemPath } from "../constants";
 import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
@@ -23,12 +24,13 @@ import { formatDamagePreview, formatRangeLabel } from "../utils/weapon";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import { promptCreateSkill } from "./dialogs/create-skill-dialog";
+import { EmotionPicker } from "./emotion-picker";
 import {
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
   buildSkillLevelSegments,
   buildValueSegments,
-  createEmotionOptions,
+  EMOTION_KEYS,
   getEmotionRows,
   resolveSegmentValue,
 } from "./helpers";
@@ -38,6 +40,7 @@ import type {
   CharacteristicsMap,
   CustomSkillRow,
   EmokloreRenderOptions,
+  EmotionKey,
   LabeledField,
   SkillRow,
 } from "./types";
@@ -85,6 +88,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       selectSegment: this._selectSegment,
       toggleSidebar: this._toggleSidebar,
       createSkill: this._createSkill,
+      pickEmotions: this._pickEmotions,
     },
   };
 
@@ -92,7 +96,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     header: {
       template: systemPath("templates/actor/header.hbs"),
       // 入れ子のpartialは再帰的に解決されないので、使うものをすべて並べる
-      templates: [systemPath("templates/actor/partials/meter.hbs")],
+      templates: [
+        "templates/actor/partials/meter.hbs",
+        "templates/actor/partials/emotion-rows.hbs",
+      ].map(systemPath),
     },
     // 本体のテンプレートなので systemPath は通さない
     tabs: { template: "templates/generic/tab-navigation.hbs" },
@@ -156,7 +163,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       context.config.emotionAttributes,
     );
 
-    context.emotionOptions = createEmotionOptions();
     return context;
   }
 
@@ -263,6 +269,42 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         },
       },
       { parent: this.actor },
+    );
+  }
+
+  /**
+   * 共鳴感情をピッカーで選び直す。
+   *
+   * 枠のラベルはスキーマから引く。`localizeSchema` が `lang/ja.json` の FIELDS を入れて
+   * くれるので、言語キーをここで組み立てずに済む。
+   */
+  static async _pickEmotions(this: EmokloreCharacterSheet, event: Event) {
+    event.preventDefault();
+
+    const emotions = this.actor.system.emotions;
+    // SchemaField の入れ子は本体の型に出ないので、実際に使うメンバーだけ交差型で補う。
+    // キーを EmotionKey に絞ると、有限キーの Record として undefined 無しで引ける
+    const field = this.actor.system.schema.fields.emotions as foundry.data.fields.DataField & {
+      fields: Record<EmotionKey, { label: string }>;
+    };
+
+    const picked = await EmotionPicker.pickSlots(
+      EMOTION_KEYS.map((key) => {
+        const saved = emotions[key];
+
+        return {
+          key,
+          label: field.fields[key].label,
+          // 保存値は素の StringField で `choices` が無い。感情キーとして名乗る前に確かめる
+          value: saved && isResonantEmotionKey(saved) ? saved : null,
+        };
+      }),
+    );
+    if (!picked) return;
+
+    // 未選択は空文字で書く。null を入れると素の StringField では扱いが揺れる
+    await this.actor.update(
+      Object.fromEntries(EMOTION_KEYS.map((key) => [`system.emotions.${key}`, picked[key] ?? ""])),
     );
   }
 

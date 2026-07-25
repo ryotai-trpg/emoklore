@@ -265,7 +265,6 @@ export type CharacterContext = {
   system: CharacterDataModel;
   // テンプレートが system.emotions も参照するので、紛れないよう emotionRows にしている
   emotionRows: Record<EmotionKey, EmotionRow>;
-  emotionOptions: Array<{ value: string; label: string; group: string }>;
   characteristics?: CharacteristicsMap;
   charPointSum?: number;
   charPointMax?: number;

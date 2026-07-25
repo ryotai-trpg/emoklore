@@ -98,8 +98,17 @@
     background: var(--color-data-background);
   }
 
-  .em-kai__emotion-select {
-    width: 100%;
+  button.em-kai__emotion-pick {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-4);
+    margin-top: var(--spacer-4);
+    padding: var(--spacer-4) var(--spacer-8);
+    width: auto;
+    /* 本体の button は --button-size で高さが固まる。中身なりに縮める */
+    height: auto;
+    min-height: 0;
+    line-height: 1.4;
   }
 
   .em-kai__resonance {
