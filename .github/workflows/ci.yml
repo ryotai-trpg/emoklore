@@ -48,6 +48,8 @@ jobs:
         run: npm run check:biome-version
       - name: Check lang key parity
         run: npm run check:lang
+      - name: Check i18n key references
+        run: npm run check:i18n
       - name: Check Handlebars templates
         run: npm run check:templates
       - name: Check schema doc

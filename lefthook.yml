@@ -1,5 +1,5 @@
 # gitフック定義（スキップしたい場合は `git commit --no-verify`。非推奨）
-# - pre-commit: stagedファイルにBiome（format+lint）を自動適用し、テンプレートを検査する
+# - pre-commit: stagedファイルにBiome（format+lint）を自動適用し、テンプレートと翻訳を検査する
 # - commit-msg: コミットメッセージがdocs/contributing.mdの規約に沿うか検査する
 pre-commit:
   jobs:
@@ -25,6 +25,16 @@ pre-commit:
     - name: lang
       glob: "lang/*.json"
       run: npm run check:lang
+
+    # キーと参照側の突き合わせ。lang・テンプレート・moduleのどれを触っても
+    # 片側だけ動かせば壊れるので、3つとも引き金にする。全体を見るチェック
+    - name: i18n
+      glob:
+        - "lang/*.json"
+        - "*.hbs"
+        - "module/**/*.ts"
+        - "system.json"
+      run: npm run check:i18n
 
     # Biomeのバージョンは3箇所に散っており、揃っていないとCIとローカルで違うBiomeが走る。
     # Dependabotが上げてくるのは package.json だけなので、そのPRの時点で気付けるようにする
