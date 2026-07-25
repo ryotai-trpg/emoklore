@@ -271,7 +271,7 @@ export async function run({ page, check }) {
     ),
   );
 
-  await check("引いた反応を適用すると効果が乗り、外すと消える", () =>
+  await check("引いた反応を適用すると効果が乗る", () =>
     assertInPage(
       page,
       async (tag) => {
@@ -298,8 +298,58 @@ export async function run({ page, check }) {
         // アイテムに付いた効果（transfer）がそのまま共鳴者に乗る
         const withEffect = actor.system.characteristics.mentality.mod.success;
 
-        await applied.delete();
+        const ok = !!applied && withEffect === baseline - 1;
+
+        return {
+          ok,
+          detail: ok
+            ? `適用で【精神】の成功数 ${baseline} → ${withEffect}`
+            : `applied=${!!applied} 基準=${baseline} 適用中=${withEffect}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
+  await check("効果タブのハウリング区分に並び、外すと効果も消える", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_char`);
+        const baseline = actor.system.characteristics.mentality.mod.success;
+
+        // あとの検証が開いたままのシートを当てにしているので、開けた場合だけ閉じる
+        const wasOpen = actor.sheet.rendered;
+        await actor.sheet.render(true);
+        const row = await window.__waitFor(
+          () =>
+            [
+              ...actor.sheet.element.querySelectorAll(
+                '[data-effect-type="howling"] .em-data-table__row',
+              ),
+            ].find((el) => el.textContent.includes(`${tag}_共振`)),
+          { label: "ハウリング区分の行" },
+        );
+
+        // 反応が持つ効果は一時的／永続的の区分に出さない（同じ反応が2行に分かれない）
+        const inCategories = [
+          ...actor.sheet.element.querySelectorAll(
+            '[data-effect-type="temporary"] .em-data-table__row, [data-effect-type="passive"] .em-data-table__row',
+          ),
+        ].some((el) => el.textContent.includes(`${tag}_共振`));
+
+        // 回復判定のショートカット。押せば通常の技能判定が飛ぶ
+        const shortcuts = [...row.querySelectorAll("[data-action=roll]")].map(
+          (el) => el.dataset.rollType,
+        );
+
+        row.querySelector("[data-action=deleteDoc]").click();
+        await window.__waitFor(
+          () => !actor.items.find((i) => i.type === "howling" && i.name === `${tag}_共振`),
+          { label: "反応アイテムの削除" },
+        );
         const afterDelete = actor.system.characteristics.mentality.mod.success;
+        if (!wasOpen) await actor.sheet.close();
 
         // ワールドに作った共鳴表と反応は fixtures の後片付け（アクターとシーンだけ）に
         // 乗らないので、ここで消す
@@ -310,13 +360,19 @@ export async function run({ page, check }) {
           await doc?.delete();
         }
 
-        const ok = !!applied && withEffect === baseline - 1 && afterDelete === baseline;
+        const ok =
+          !inCategories &&
+          shortcuts.length === 2 &&
+          shortcuts.includes("base-skill") &&
+          shortcuts.includes("skill") &&
+          row.textContent.includes("同調") &&
+          afterDelete === baseline + 1;
 
         return {
           ok,
           detail: ok
-            ? `適用で【精神】の成功数 ${baseline} → ${withEffect}、削除で戻った`
-            : `applied=${!!applied} 基準=${baseline} 適用中=${withEffect} 削除後=${afterDelete}`,
+            ? `分類=同調 回復=${shortcuts.join(",")} 削除で ${baseline} → ${afterDelete}`
+            : `他区分に重複=${inCategories} 回復=${shortcuts.join(",")} 削除後=${afterDelete}（基準${baseline}）`,
         };
       },
       TAG,
