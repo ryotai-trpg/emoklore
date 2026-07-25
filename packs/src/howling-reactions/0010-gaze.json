@@ -1,0 +1,21 @@
+{
+  "_id": "emokHowling0010a",
+  "_key": "!items!emokHowling0010a",
+  "name": "視線",
+  "type": "howling",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "category": "agitation",
+    "effect": "<p>見えざる視線が気になってしかたがなくなる。</p>",
+    "recovery": {
+      "note": "症状と期間はDLが決定する。",
+      "skills": []
+    },
+    "notes": ""
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 500000,
+  "ownership": { "default": 0 },
+  "flags": {}
+}

@@ -1,0 +1,21 @@
+{
+  "_id": "emokHowling0011a",
+  "_key": "!items!emokHowling0011a",
+  "name": "侵食",
+  "type": "howling",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "category": "attunement",
+    "effect": "<p>即座に〈∞共鳴〉レベルが1増加する。</p><p>一度きりの効果なので、シートの〈∞共鳴〉を手で上げること。</p>",
+    "recovery": {
+      "note": "",
+      "skills": []
+    },
+    "notes": ""
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 600000,
+  "ownership": { "default": 0 },
+  "flags": {}
+}
