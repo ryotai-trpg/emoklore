@@ -22,6 +22,7 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | ChatMessage | `skillRequest` | `SkillRequestModel` |
 | ChatMessage | `resonanceRequest` | `ResonanceRequestModel` |
 | ChatMessage | `resonanceOutcome` | `ResonanceOutcomeModel` |
+| ChatMessage | `howlingDraw` | `HowlingDrawModel` |
 | Combat | `standard` | `CombatDataModel` |
 
 **種別は `system.json` の `documentTypes` と `CONFIG.*.dataModels` の両方に書く。** 片方だけでは噛み合わない。`documentTypes` に無い種別を `dataModels` に登録すると、作成できないのに `system` の型だけが増えて嘘になる（警告も出ない）。
@@ -254,7 +255,7 @@ Actorは3種別あり、`EmokloreActor#system` はそれらのunion。共鳴者�
 | `emotions` | SetField(StringField) | `[]` | 共鳴感情（複数）。値は感情キー。#74 の感情ピッカーで編集UIを置き換える |
 | `resonance.intensity` | NumberField | 5 | 共鳴判定の強度（判定値）のプリセット |
 | `resonance.rise` | StringField | `"1"` | 上昇値。ダイス式も受ける（`Roll.validate` で検証）。適用は #75 |
-| `resonanceTable` | DocumentUUIDField | `null` | 使う共鳴表/デッキへの参照。引く処理は #79 |
+| `resonanceTable` | DocumentUUIDField | `null` | 使う共鳴表（RollTable）への参照。ハウリングが起きたら結果カードのボタンがここを引く |
 | `mutation` | HTMLField | `""` | 憑依時の変異などの自由記述。`system.json` の `htmlFields` に宣言 |
 | `attacks` | ArrayField(SchemaField) | `[]` | 攻撃・固有技能のリスト（下記） |
 
@@ -453,9 +454,25 @@ DLからの共鳴判定・憑依判定の要求。判定要求カードと同じ
 | `rise` / `before` / `after` | NumberField | 0 / 1 / 1 | 上がった量と、前後の〈∞共鳴〉 |
 | `howling` | BooleanField | `false` | トリプル以上でハウリング発生。憑依判定では起きない |
 | `possessionReached` | BooleanField | `false` | 憑依判定で成功数が【精神】以上に届いたか |
-| `kaiUuid` | DocumentUUIDField | `null` | 引く共鳴表を辿るための怪異。#79 が使う |
+| `kaiUuid` | DocumentUUIDField | `null` | 引く共鳴表を辿るための怪異 |
 
-ボタンはまだ無い。ハウリングの「表を引く／カードを引く」は #79 が `ACTIONS` に足す。
+ハウリングが起きていて、怪異に共鳴表が紐づいているときだけ〔共鳴表を引く〕のボタンが出る。押すと次の `howlingDraw` カードが出る。
+
+## ChatMessage `howlingDraw`
+
+共鳴表から引いた反応。判定・共鳴結果に続く3枚目のカードになる。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `actorUuid` / `name` | DocumentUUIDField / StringField | `null` / `""` | 引いた共鳴者。適用先で、押した人がOWNERでなければ止まる |
+| `kaiUuid` / `tableUuid` | DocumentUUIDField | `null` | どの怪異のどの表から引いたか。出典の記録 |
+| `reactionName` / `reactionImg` | StringField | `""` | 反応の名前と画像 |
+| `category` | StringField | `""` | 分類キー。text結果では空 |
+| `description` | HTMLField | `""` | 効果の記述。`htmlFields` に宣言済み |
+| `recoverySkills` / `recoveryNote` | StringField | `""` | 回復条件。技能は「＊自我／心理」の形に整形済み |
+| `itemUuid` | DocumentUUIDField | `null` | 適用で作る反応アイテム。text結果では null で、〔適用〕ごと出ない |
+
+**表示に要る値は焼き込む**（武器カードと同じ）。反応アイテムや表を消したあとでも過去のカードが読める。**出したら変わらない** — 適用したかどうかは書き戻さず、いま何を受けているかは共鳴者の効果タブが持つ。
 
 ## Combat `standard`
 
