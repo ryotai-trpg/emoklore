@@ -215,6 +215,9 @@
       }
     },
     "ChatMessage": {
+      "Common": {
+        "ActorMissing": "The target character could not be found."
+      },
       "weapon": {
         "Attack": "Attack",
         "Damage": "Damage",
@@ -239,13 +242,11 @@
         "ApplyStatus": "Apply [{status}]",
         "StatusApplied": "Applied [{status}] to {name}.",
         "NoPermission": "You lack permission to apply a status to this character.",
-        "ActorMissing": "The target character could not be found.",
         "ActionFailed": "The action failed."
       },
       "survivalReminder": {
         "Prompt": "End of round. Characters in Cardiac Arrest roll *Survival (Endurance or Grit may substitute). On failure, Dead.",
         "Roll": "Roll Survival",
-        "ActorMissing": "The target character could not be found.",
         "ActionFailed": "The action failed."
       },
       "kaiAttack": {
@@ -754,8 +755,7 @@
     },
     "Skill": {
       "Name": "Skill Name",
-      "CreateTitle": "Create Skill",
-      "CreateButton": "Create Skill",
+      "Create": "Create Skill",
       "NoLevel": "—",
       "NamePlaceholder": "e.g. Ninjutsu"
     }

@@ -215,6 +215,9 @@
       }
     },
     "ChatMessage": {
+      "Common": {
+        "ActorMissing": "対象のキャラクターが見つかりません。"
+      },
       "weapon": {
         "Attack": "攻撃判定",
         "Damage": "ダメージ",
@@ -239,13 +242,11 @@
         "ApplyStatus": "【{status}】を付与",
         "StatusApplied": "{name}に【{status}】を付与しました。",
         "NoPermission": "このキャラクターに状態を付与する権限がありません。",
-        "ActorMissing": "対象のキャラクターが見つかりません。",
         "ActionFailed": "操作に失敗しました。"
       },
       "survivalReminder": {
         "Prompt": "ラウンド終了。【心肺停止】のキャラクターは〈＊生存〉判定（〈耐久〉〈根性〉で代用可）。失敗で【死亡】。",
         "Roll": "〈生存〉判定",
-        "ActorMissing": "対象のキャラクターが見つかりません。",
         "ActionFailed": "操作に失敗しました。"
       },
       "kaiAttack": {
@@ -754,8 +755,7 @@
     },
     "Skill": {
       "Name": "技能名",
-      "CreateTitle": "技能を作成",
-      "CreateButton": "技能を作成",
+      "Create": "技能を作成",
       "NoLevel": "—",
       "NamePlaceholder": "例: 忍術"
     }

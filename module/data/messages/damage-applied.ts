@@ -88,7 +88,7 @@ export class DamageAppliedModel extends ChatCardModel {
 
     const actor = (await foundry.utils.fromUuid(actorUuid)) as EmokloreActor | null;
     if (!actor) {
-      ui.notifications?.warn("EMOKLORE.ChatMessage.damageApplied.ActorMissing", {
+      ui.notifications?.warn("EMOKLORE.ChatMessage.Common.ActorMissing", {
         localize: true,
       });
       return;
