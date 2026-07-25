@@ -1,14 +1,10 @@
 import { systemPath } from "../../constants";
 import type { RequestedSkill } from "../../data/messages/skill-request";
-import { typedEntries } from "../../utils/object";
 import type { SkillRequestState } from "../../utils/request";
 import { baseSkillOf, requirementChoices } from "../../utils/request";
-import { skillMarker } from "../../utils/skill";
+import { buildSkillRefGroups, parseSkillRefValue, toSkillRefValue } from "../../utils/skill";
 
 const TEMPLATE = systemPath("templates/apps/skill-request.hbs");
-
-/** 選択肢の value は「経路:キー」。selectの値は1本の文字列にしかならないので繋ぐ */
-const SEPARATOR = ":";
 
 /**
  * DLが判定要求の内容を決める。技能（複数）・必要成功数・ダイスボーナス・成功数修正・補足。
@@ -20,7 +16,7 @@ const SEPARATOR = ":";
  */
 export async function promptSkillRequest(): Promise<SkillRequestState | null> {
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
-    groups: buildSkillGroups(),
+    groups: buildSkillRefGroups(),
     requirements: requirementChoices(),
   });
 
@@ -44,24 +40,6 @@ export async function promptSkillRequest(): Promise<SkillRequestState | null> {
   return (result as SkillRequestState | null) ?? null;
 }
 
-/** 通常技能と基本技能の2グループ。印（★ / ＊）を付けて、シートの表記と揃える */
-const buildSkillGroups = () => [
-  {
-    label: game.i18n.localize("EMOKLORE.SkillRequest.NormalSkills"),
-    skills: typedEntries(CONFIG.EMOKLORE.skills).map(([key, { label, isExtra }]) => ({
-      value: `skill${SEPARATOR}${key}`,
-      label: `${skillMarker(false, isExtra ?? false)}${label}`,
-    })),
-  },
-  {
-    label: game.i18n.localize("EMOKLORE.SkillRequest.BaseSkills"),
-    skills: typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key, { label }]) => ({
-      value: `base${SEPARATOR}${key}`,
-      label: `${skillMarker(true, false)}${label}`,
-    })),
-  },
-];
-
 /**
  * フォームの入力を読む。
  *
@@ -81,7 +59,7 @@ function readInput(button: HTMLElement): SkillRequestState {
   };
 
   const selected = [...(form.elements.namedItem("skills") as HTMLSelectElement).selectedOptions];
-  const skills = selected.map(toRequestedSkill);
+  const skills = selected.map((option) => parseSkillRefValue(option.value));
   const withBase = (form.elements.namedItem("withBase") as HTMLInputElement).checked;
 
   return {
@@ -93,12 +71,6 @@ function readInput(button: HTMLElement): SkillRequestState {
   };
 }
 
-/** 「経路:キー」を分解する。value は自分で組んだものなので、経路は base 以外を skill に倒す */
-const toRequestedSkill = (option: HTMLOptionElement): RequestedSkill => {
-  const [kind, key = ""] = option.value.split(SEPARATOR);
-  return { kind: kind === "base" ? "base" : "skill", key };
-};
-
 /**
  * 選ばれた通常技能に対応するベース技能を後ろへ足す。
  *
@@ -107,15 +79,18 @@ const toRequestedSkill = (option: HTMLOptionElement): RequestedSkill => {
  */
 const appendBaseSkills = (skills: RequestedSkill[]): RequestedSkill[] => {
   const result = [...skills];
-  const known = new Set(skills.map(({ kind, key }) => `${kind}${SEPARATOR}${key}`));
+  const known = new Set(skills.map(toSkillRefValue));
 
   for (const { kind, key } of skills) {
     if (kind !== "skill") continue;
 
     const base = baseSkillOf(key);
-    if (!base || known.has(`base${SEPARATOR}${base}`)) continue;
+    if (!base) continue;
 
-    known.add(`base${SEPARATOR}${base}`);
+    const value = toSkillRefValue({ kind: "base", key: base });
+    if (known.has(value)) continue;
+
+    known.add(value);
     result.push({ kind: "base", key: base });
   }
 
