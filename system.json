@@ -56,13 +56,13 @@
   "packs": [
     {
       "name": "howling-reactions",
-      "label": "ハウリング反応",
+      "label": "EMOKLORE.Pack.howlingReactions",
       "type": "Item",
       "system": "emoklore"
     },
     {
       "name": "resonance-tables",
-      "label": "共鳴表",
+      "label": "EMOKLORE.Pack.resonanceTables",
       "type": "RollTable",
       "system": "emoklore"
     }

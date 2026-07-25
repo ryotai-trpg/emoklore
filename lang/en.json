@@ -70,6 +70,10 @@
       "none": "None",
       "separator": " / "
     },
+    "Pack": {
+      "howlingReactions": "Howling Reactions",
+      "resonanceTables": "Resonance Tables"
+    },
     "Sheet": {
       "class": {
         "character": "Character Sheet",

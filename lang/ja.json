@@ -70,6 +70,10 @@
       "none": "なし",
       "separator": "／"
     },
+    "Pack": {
+      "howlingReactions": "ハウリング反応",
+      "resonanceTables": "共鳴表"
+    },
     "Sheet": {
       "class": {
         "character": "キャラクターシート",
