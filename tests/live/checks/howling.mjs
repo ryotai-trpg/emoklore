@@ -28,8 +28,17 @@ const REACTION = {
   effects: [
     {
       name: "精神汚染",
-      // mode 2 = ADD
-      changes: [{ key: "system.characteristics.mentality.mod.success", mode: 2, value: "-1" }],
+      // v14 の修正は system.changes（type / phase）。素の changes + mode は互換シム経由になる
+      system: {
+        changes: [
+          {
+            key: "system.characteristics.mentality.mod.success",
+            type: "add",
+            value: "-1",
+            phase: "initial",
+          },
+        ],
+      },
       transfer: true,
     },
   ],
