@@ -20,14 +20,14 @@ import { promptSkillRoll } from "./dialogs/skill-roll-dialog";
 /**
  * 共鳴判定。強度と共鳴感情の一致度を尋ねてから振る。キャンセルされたら何もしない。
  *
- * `preset.intensity` は怪異シートが共鳴プリセットの強度を初期値として差し込む導線。
- * 対象アクターの〈∞共鳴〉値で振るので、怪異ではなく共鳴者を渡す（#75 で全共鳴者への
- * 要求カードに置き換わるまでの暫定）。
+ * こちらはPL側の手動フロー。DLからの要求カード（`applications/requests.ts`）と違い、
+ * シートのボタンから自分で振るときに通る。対象アクターの〈∞共鳴〉値で振るので、
+ * 怪異ではなく共鳴者を渡す。
  */
 export async function requestResonanceRoll(
   actor: EmokloreActor,
   options: Record<string, unknown> = {},
-  preset: { intensity?: number; emotion?: string } = {},
+  preset: { intensity?: number; emotions?: readonly string[] } = {},
 ): Promise<ChatMessage | undefined> {
   // 一致度は選んだ感情とアクターの共鳴感情から自動で決まるので、突き合わせ先を渡す。
   // 共鳴判定は共鳴者だけが振れるが、判定側でも弾くのでここでは持っている分だけ渡す

@@ -5,6 +5,7 @@ import type {
 import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
 import { isResonantEmotionKey, type ResonantEmotionKey } from "../config/resonant-emotions";
 import { systemPath } from "../constants";
+import { formatEmotion } from "../utils/emotion";
 import { buildEmotionColumns } from "./helpers";
 import type { ApplicationV2Statics } from "./types";
 
@@ -37,6 +38,8 @@ type PickerSlot = { key: string; label: string; value: string; active: boolean; 
 type EmotionPickerContext = ApplicationRenderContext & {
   columns: PickerColumn[];
   slots: PickerSlot[];
+  /** 複数選択モードで選ばれている感情。枠モードでは枠チップが同じ役目を持つ */
+  tags: Array<{ key: string; label: string }>;
   multiple: boolean;
   hint: string;
 };
@@ -81,6 +84,7 @@ export class EmotionPicker extends (HandlebarsApplicationMixin(
       selectSlot: EmotionPicker.onSelectSlot,
       clearSlot: EmotionPicker.onClearSlot,
       pickEmotion: EmotionPicker.onPickEmotion,
+      removeEmotion: EmotionPicker.onRemoveEmotion,
       cancel: EmotionPicker.onCancel,
     },
   };
@@ -88,6 +92,8 @@ export class EmotionPicker extends (HandlebarsApplicationMixin(
   static override PARTS = {
     form: {
       template: systemPath("templates/apps/emotion-picker.hbs"),
+      // 入れ子のpartialは再帰的に解決されないので、使うものを並べる
+      templates: [systemPath("templates/apps/partials/emotion-tags.hbs")],
     },
   };
 
@@ -172,6 +178,10 @@ export class EmotionPicker extends (HandlebarsApplicationMixin(
 
     return {
       multiple: this.#multiple,
+      // 枠モードは枠チップが選択中を見せるので、タグは複数選択モードだけ
+      tags: this.#multiple
+        ? Array.from(this.#selected).map((key) => ({ key, label: formatEmotion(key) }))
+        : [],
       hint: game.i18n.localize(
         this.#multiple ? "EMOKLORE.EmotionPicker.HintMany" : "EMOKLORE.EmotionPicker.HintSlots",
       ),
@@ -236,6 +246,15 @@ export class EmotionPicker extends (HandlebarsApplicationMixin(
       this.#activeSlot = this.#slots.find((candidate) => !candidate.value)?.key ?? slot.key;
     }
 
+    await this.render();
+  }
+
+  /** タグの×で外す。複数選択モードだけに出る */
+  static async onRemoveEmotion(this: EmotionPicker, _event: Event, target: HTMLElement) {
+    const key = target.closest<HTMLElement>(".tag")?.dataset.key;
+    if (!key) return;
+
+    this.#selected.delete(key);
     await this.render();
   }
 

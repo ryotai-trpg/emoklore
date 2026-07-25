@@ -1,0 +1,26 @@
+{{!--
+  選択中の共鳴感情をタグで並べる。
+
+  本体の `<multi-select>` が使う `.tags.input-element-tags` にそのまま乗せるので、
+  折り返し・間隔・タグの見た目は本体が持つ。感情名は長く、数も決まらないので、
+  1行に詰める入力（ボタンのラベルなど）では溢れる。
+
+  ×の `data-action` はピッカーとダイアログの両方で拾う。感情キーは本体のタグと同じく
+  `.tag` の `data-key` から辿る。×に `data-emotion` を持たせると、グリッドの感情ボタンと
+  同じ属性が2箇所に出て `querySelector` がどちらを返すか分からなくなる。
+
+  @param tags {key, label} の配列。空なら何も出ない
+--}}
+<div class="tags input-element-tags">
+  {{#each tags}}
+  <div class="tag" data-key="{{this.key}}">
+    <span>{{this.label}}</span>
+    <a
+      class="remove fa-solid fa-xmark"
+      data-action="removeEmotion"
+      data-tooltip="ELEMENTS.TAGS.Remove"
+      aria-label="{{localize 'ELEMENTS.TAGS.Remove'}}"
+    ></a>
+  </div>
+  {{/each}}
+</div>

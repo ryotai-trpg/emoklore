@@ -29,7 +29,8 @@
   "EMOKLORE": {
     "Common": {
       "colon": "：",
-      "none": "なし"
+      "none": "なし",
+      "separator": "／"
     },
     "Sheet": {
       "class": {
@@ -189,6 +190,22 @@
         "NoActor": "振るアクターが決まりません。トークンを選ぶか、担当キャラクターを設定してください",
         "NotCharacterLike": "この種別は技能判定を持ちません",
         "ActionFailed": "判定要求カードの操作に失敗しました"
+      },
+      "resonanceRequest": {
+        "Title": "共鳴判定の要求",
+        "PossessionTitle": "憑依判定の要求",
+        "Targets": "対象",
+        "Roll": "共鳴判定を振る",
+        "NoActor": "振る共鳴者が決まりません。トークンを選ぶか、担当キャラクターを設定してください",
+        "NoGM": "共鳴値を上げる権限がありません。GMの接続が必要です",
+        "ActionFailed": "共鳴判定要求カードの操作に失敗しました"
+      },
+      "resonanceOutcome": {
+        "Raised": "{name} 〈∞共鳴〉Lv.{before} → Lv.{after}（+{rise}）",
+        "Unchanged": "{name} 〈∞共鳴〉Lv.{after} のまま",
+        "Howling": "トリプル以上：ハウリング（極限共鳴）が発生。共鳴表かハウリングカードを引いてください",
+        "PossessionReached": "成功数が【精神】以上。〈＊自我〉判定に失敗すると【憑依】が成立します",
+        "ActionFailed": "共鳴結果カードの操作に失敗しました"
       }
     },
     "Combat": {
@@ -593,7 +610,12 @@
       "NormalSkills": "通常技能",
       "BaseSkills": "基本技能",
       "Note": "補足",
-      "NotePlaceholder": "この判定にだけ効く条件があれば"
+      "NotePlaceholder": "この判定にだけ効く条件があれば",
+      "ResonanceTitle": "共鳴判定を要求",
+      "RiseHint": "成功時に〈∞共鳴〉が上がる量。1D3 のようなダイス式も書けます",
+      "ForcedMatchHint": "自動なら、各共鳴者の感情と指定した感情から決まります",
+      "Possession": "憑依判定",
+      "PossessionHint": "成否によらず〈∞共鳴〉+1。ハウリングは起きず、成功数が【精神】以上かを見ます"
     },
     "RollOptions": {
       "Title": "判定オプション",
@@ -619,6 +641,7 @@
     "Resonance": {
       "Name": "♾️共鳴",
       "Intensity": "強度",
+      "Rise": "上昇値",
       "Match": "一致度",
       "MatchAuto": "自動",
       "MatchAutoHint": "選んだ感情と自分の共鳴感情から決まります。DLが一致度を指定したときは手で選んでください",
