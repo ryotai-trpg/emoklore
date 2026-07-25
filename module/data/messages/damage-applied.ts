@@ -103,12 +103,12 @@ export class DamageAppliedModel extends ChatCardModel {
     await actor.toggleStatusEffect(statusId, { active: true });
 
     // カードの見た目は変わらないので、付いたことだけ通知で返す
-    ui.notifications?.info(
-      game.i18n.localize("EMOKLORE.ChatMessage.damageApplied.StatusApplied", {
+    ui.notifications?.info("EMOKLORE.ChatMessage.damageApplied.StatusApplied", {
+      format: {
         name: actor.name,
         status: game.i18n.localize(CONFIG.statusEffects[statusId]?.name ?? ""),
-      }),
-    );
+      },
+    });
   }
 }
 

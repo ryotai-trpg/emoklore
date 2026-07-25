@@ -267,27 +267,21 @@ export async function importFromCharSheet(
   // まとめてアクターへ反映する
   await actor.update(updateData);
 
-  ui.notifications?.info(
-    game.i18n.localize("EMOKLORE.Import.Success", {
-      name: data.name || actor.name,
-    }),
-  );
+  ui.notifications?.info("EMOKLORE.Import.Success", {
+    format: { name: data.name || actor.name },
+  });
 
   // 取り込めなかったものは黙って捨てず知らせる（表記ゆれの発見に必要）
   if (unrecognizedEmotions.length > 0) {
-    ui.notifications?.warn(
-      game.i18n.localize("EMOKLORE.Import.WarnUnknownEmotions", {
-        labels: unrecognizedEmotions.join("、"),
-      }),
-    );
+    ui.notifications?.warn("EMOKLORE.Import.WarnUnknownEmotions", {
+      format: { labels: unrecognizedEmotions.join("、") },
+    });
   }
 
   if (unrecognizedSkills.length > 0) {
-    ui.notifications?.warn(
-      game.i18n.localize("EMOKLORE.Import.WarnUnknownSkills", {
-        labels: unrecognizedSkills.join("、"),
-      }),
-    );
+    ui.notifications?.warn("EMOKLORE.Import.WarnUnknownSkills", {
+      format: { labels: unrecognizedSkills.join("、") },
+    });
   }
 }
 
