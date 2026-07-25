@@ -56,7 +56,7 @@ export async function run({ page, check }) {
           await window.__waitFor(() => game.messages.get(id), { label: "武器カードの作成" });
 
           // update のたびにモデルは作り直されるので、毎回メッセージから取り直す
-          await game.messages.get(id).system.rollAttack();
+          await window.__cardAction(game.messages.get(id), "rollAttack");
           const afterAttack = await window.__waitFor(
             () => {
               const sys = game.messages.get(id).system;
@@ -68,7 +68,7 @@ export async function run({ page, check }) {
             return { ok: false, detail: "攻撃判定のあとも successCount が null" };
           }
 
-          await game.messages.get(id).system.rollDamage();
+          await window.__cardAction(game.messages.get(id), "rollDamage");
           await window.__waitFor(() => game.messages.get(id).system.damageTotal !== null, {
             soft: true,
             label: "ダメージの反映",
@@ -120,7 +120,7 @@ export async function run({ page, check }) {
         const worldBefore = world.system.resources.hp.value;
         const damage = card.system.damageTotal;
 
-        await card.system.applyDamage();
+        await window.__cardAction(card, "applyDamage");
         await window.__waitFor(() => token.actor.system.resources.hp.value !== before, {
           soft: true,
           label: "HPの反映",
@@ -175,7 +175,7 @@ export async function run({ page, check }) {
 
         // ダイアログの操作は目視の領分。UIを迂回して、reduction が適用まで届くかだけを見る
         const targets = [...game.user.targets].map((t) => t.actor);
-        await card.system.applyDamageTo(targets, { reduction });
+        await game.system.api.applyDamageAndReport(targets, damage, { reduction });
 
         const expected = Math.max(0, before - Math.max(0, damage - reduction));
         await window.__waitFor(() => token.actor.system.resources.hp.value === expected, {
@@ -216,7 +216,7 @@ export async function run({ page, check }) {
         const msg = await a.items.getName(`${tag}_刀`).use();
         const id = msg.id;
         await window.__waitFor(() => game.messages.get(id), { label: "武器カードの作成" });
-        await game.messages.get(id).system.rollAttack();
+        await window.__cardAction(game.messages.get(id), "rollAttack");
         await window.__waitFor(() => game.messages.get(id).system.successCount !== null, {
           soft: true,
           label: "攻撃判定の成功数",
@@ -257,7 +257,7 @@ export async function run({ page, check }) {
           const id = msg.id;
           await window.__waitFor(() => game.messages.get(id), { label: "武器カードの作成" });
 
-          await game.messages.get(id).system.rollAttack();
+          await window.__cardAction(game.messages.get(id), "rollAttack");
           const card = await window.__waitFor(
             () => {
               const sys = game.messages.get(id).system;

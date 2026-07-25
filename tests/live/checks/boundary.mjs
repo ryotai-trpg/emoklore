@@ -17,12 +17,12 @@ export async function run({ page, check }) {
         const msg = await a.items.getName(`${tag}_刀`).use();
         const id = msg.id;
         await window.__waitFor(() => game.messages.get(id), { label: "武器カードの作成" });
-        await game.messages.get(id).system.rollAttack();
+        await window.__cardAction(game.messages.get(id), "rollAttack");
         await window.__waitFor(() => game.messages.get(id).system.successCount !== null, {
           soft: true,
           label: "攻撃判定",
         });
-        await game.messages.get(id).system.rollDamage();
+        await window.__cardAction(game.messages.get(id), "rollDamage");
         await window.__waitFor(() => game.messages.get(id).system.damageTotal !== null, {
           soft: true,
           label: "ダメージ",
@@ -40,7 +40,7 @@ export async function run({ page, check }) {
         const before = token.actor.system.resources.hp.value;
 
         const targets = [...game.user.targets].map((t) => t.actor);
-        await game.messages.get(id).system.applyDamageTo(targets);
+        await game.system.api.applyDamageAndReport(targets, damage);
 
         const applied = game.messages.contents.at(-1);
         if (applied.type !== "damageApplied") {
@@ -99,7 +99,7 @@ export async function run({ page, check }) {
         const before = token.actor.system.resources.hp.value;
 
         const targets = [...game.user.targets].map((t) => t.actor);
-        await card.system.applyDamageTo(targets);
+        await game.system.api.applyDamageAndReport(targets, damage);
 
         const applied = game.messages.contents.at(-1);
         const ok =

@@ -1,12 +1,10 @@
 import { createRollMessage } from "../../chat/message";
 import { systemPath } from "../../constants";
 import { resolveSkillRef, type SkillRef } from "../../data/character";
-import type { WeaponCardModel } from "../../data/messages/weapon-card";
 import type { EmokloreActor } from "../../documents/actor";
 import { normalizeReduction } from "../../rules/weapon-damage";
 import { typedEntries } from "../../utils/object";
 import { skillMarker } from "../../utils/skill";
-import { resolveTargetActors } from "../../utils/targets";
 
 export type DamageReductionInput = {
   reduction: number;
@@ -18,35 +16,6 @@ const TEMPLATE = systemPath("templates/apps/apply-damage.hbs");
 
 /** 防御判定の既定。ルールブックの防御の例示が〈耐久〉 */
 const DEFAULT_DEFENSE_SKILL = "skill:endurance";
-
-/**
- * カードの「軽減して適用」ボタン。軽減値を尋ねてから適用する。
- *
- * `WeaponCardModel.ACTIONS` へは `module/emoklore.ts` の init が登録する。
- * ACTIONS はモジュールにも開いている拡張点で、ここから登録すれば
- * data/ から applications/ への import を作らずに済む。
- */
-export async function applyDamageWithReduction(this: WeaponCardModel): Promise<void> {
-  const amount = this.damageTotal;
-  if (amount === null) return;
-
-  // 対象は押した瞬間に凍結する。ダイアログを開いている間にターゲットを付け替えても、
-  // 防御判定を振った相手と適用先が食い違わないようにするため
-  const targets = resolveTargetActors();
-  if (targets.length === 0) {
-    ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoTarget", { localize: true });
-    return;
-  }
-
-  const input = await promptDamageReduction({
-    amount,
-    successCount: this.successCount,
-    targets,
-  });
-  if (!input) return;
-
-  await this.applyDamageTo(targets, { reduction: input.reduction, armor: input.armor });
-}
 
 /**
  * 軽減値を尋ねる。キャンセルされた場合は null を返す。

@@ -1,13 +1,6 @@
-import { createDamageAppliedMessage } from "../../chat/damage-applied";
-import { type CardButtons, resolveCardButtons, updateWeaponCard } from "../../chat/weapon-card";
 import type { AttackSkillKey } from "../../config/attack-skills";
-import type { EmokloreActor } from "../../documents/actor";
-import { applyDamageToTargets } from "../../documents/queries";
-import { buildDamageFormula, resolveStrengthBonus } from "../../rules/weapon-damage";
+import { canRollDamage } from "../../rules/weapon-damage";
 import type { CardActions } from "../../utils/chat-card";
-import { resolveTargetActors } from "../../utils/targets";
-import { resolveAttackSkill } from "../../utils/weapon";
-import { resolveSkillRef } from "../character";
 import { ChatCardModel } from "./card-model";
 
 const { DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
@@ -40,6 +33,29 @@ export type WeaponCardMessage = ChatMessage & {
   update: (data: Record<string, unknown>) => Promise<unknown>;
 };
 
+/** カードのどのボタンが出るか。押せるかどうかの判定にも同じものを使う */
+export type CardButtons = {
+  canRollAttack: boolean;
+  canRollDamage: boolean;
+  canApplyDamage: boolean;
+};
+
+/**
+ * カードの進み具合からボタンの出し分けを決める。
+ *
+ * 描画とアクション側のガードで同じ条件が要る。別々に書くと、片方だけ直したときに
+ * 「押せるのに何も起きない」「押せないはずが実行される」という形でずれる。
+ */
+export const resolveCardButtons = (
+  state: Pick<WeaponCardState, "successCount" | "damageTotal">,
+): CardButtons => ({
+  canRollAttack: state.successCount === null,
+  canRollDamage:
+    state.successCount !== null && canRollDamage(state.successCount) && state.damageTotal === null,
+  // 適用は何度でも押せるようにしておく。狙いを変えて続けて当てることがある
+  canApplyDamage: state.damageTotal !== null,
+});
+
 const defineWeaponCardSchema = () => {
   return {
     // 表示と再ロールに要る値は使用時点で焼き込む。武器やアクターを消したあとでも
@@ -70,6 +86,9 @@ const defineWeaponCardSchema = () => {
  * まるごと自前で描くことになる。`content` だけを自分で持ち、枠は本体に描かせる。
  * 本体は `content` に要素があれば `rolls` を自動描画しないので、ロールをメッセージに
  * 載せたまま、カード側で見出し付きに並べられる。
+ *
+ * **ボタンのハンドラは持たない。** 判定とダメージ適用を駆動するので `applications/` 側に
+ * 置き、`emoklore.ts` の init が `ACTIONS` へ登録する（他のカードと同じ形）。
  */
 export class WeaponCardModel extends ChatCardModel {
   declare weaponName: string;
@@ -89,7 +108,7 @@ export class WeaponCardModel extends ChatCardModel {
   };
 
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static override ACTIONS: CardActions<WeaponCardModel>;
+  static override ACTIONS: CardActions<WeaponCardModel> = {};
 
   static override defineSchema() {
     return defineWeaponCardSchema();
@@ -110,129 +129,4 @@ export class WeaponCardModel extends ChatCardModel {
   get buttons(): CardButtons {
     return resolveCardButtons(this);
   }
-
-  /**
-   * 攻撃判定を振り、同じカードに書き足す。
-   *
-   * 攻撃判定は技能判定そのものなので、アクター側の組み立てをそのまま借りる。
-   */
-  async rollAttack(): Promise<void> {
-    if (!this.buttons.canRollAttack) return;
-
-    const actor = await this.#resolveActor();
-    if (!actor) {
-      ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.ActorMissing", { localize: true });
-      return;
-    }
-
-    // base は skill から決まるので config に載せない。両方を載せると、skill だけを
-    // 差し替えるフックが「通常技能のキーに base: true」のような対を作れてしまう
-    const config = { skill: this.skill };
-    if (Hooks.call("emoklore.preRollAttack", this.message, config) === false) return;
-
-    // skill はカードに焼き込んだ保存データで、フックで差し替えられてもいる。
-    // 宣言した型（AttackSkillKey）を裏切りうるので、判定に渡す前に確かめる。
-    // base を引くのはフックの後。先に引くと差し替え前の技能の答えを使うことになる
-    const ref = resolveSkillRef(config.skill, { base: resolveAttackSkill(config.skill).base });
-    if (!ref) {
-      ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.UnknownSkill", { localize: true });
-      return;
-    }
-
-    const { roll } = await actor.buildSkillRoll(ref);
-    await this.#applyRoll([roll], { successCount: roll.successCount });
-
-    Hooks.callAll("emoklore.rollAttack", this.message, roll);
-  }
-
-  /** ダメージを振り、同じカードに書き足す */
-  async rollDamage(): Promise<void> {
-    if (!this.buttons.canRollDamage) return;
-
-    // アクターが消えたカードでもダメージは振り直せる。そのときは〈ストレングス〉加算なし
-    const actor = await this.#resolveActor();
-    const { damageDie, rangeType } = resolveAttackSkill(this.skill);
-    const config = {
-      // canRollDamage が成功数の非nullを保証している
-      successCount: this.successCount as number,
-      damageDie,
-      attackPower: this.attackPower,
-      // 〈ストレングス〉加算は能力値＋技能を持つ種別だけ。怪異（技能なし）や消えたアクターは0
-      bonus: resolveStrengthBonus(
-        rangeType,
-        actor?.isCharacterLike() ? actor.system.skills.strength.level : 0,
-      ),
-    };
-    if (Hooks.call("emoklore.preRollDamage", this.message, config) === false) return;
-
-    const roll = new foundry.dice.Roll(buildDamageFormula(config));
-    await roll.evaluate();
-
-    const attackRoll = this.attackRoll;
-    const rolls = attackRoll ? [attackRoll, roll] : [roll];
-    await this.#applyRoll(rolls, { damageTotal: roll.total ?? 0 });
-
-    Hooks.callAll("emoklore.rollDamage", this.message, roll);
-  }
-
-  /**
-   * 振ったダメージを対象に適用する。
-   *
-   * 対象は押した瞬間のターゲットだけ。敵のように自分がOWNER権限を持たないアクターは
-   * クライアントから直接書き換えられない（サーバが `Document#update` を権限検査する）ので、
-   * 1体でも触れないものが混じっていればGMのクライアントにまとめて肩代わりしてもらう。
-   */
-  async applyDamage(): Promise<void> {
-    const targets = resolveTargetActors();
-    if (targets.length === 0) {
-      ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoTarget", { localize: true });
-      return;
-    }
-
-    await this.applyDamageTo(targets);
-  }
-
-  /**
-   * 振ったダメージを対象へ適用し、結果をチャットに流す。
-   *
-   * 対象の集め方はボタンごとに違う（即適用はターゲット、軽減つきはダイアログを挟む）ので、
-   * その先の共通の後段だけを持つ。
-   */
-  async applyDamageTo(
-    targets: EmokloreActor[],
-    { reduction = 0, armor }: { reduction?: number; armor?: number | undefined } = {},
-  ): Promise<void> {
-    // canApplyDamage と同じ条件だが、ダメージ量の型を絞るためここでは直接見る
-    const amount = this.damageTotal;
-    if (amount === null) return;
-
-    // 権限の有無とGMへの委譲は documents/queries.ts が引き受ける
-    const applied = await applyDamageToTargets(targets, amount, { reduction, armor });
-    if (!applied) {
-      ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoGM", { localize: true });
-      return;
-    }
-
-    if (applied.length > 0) await createDamageAppliedMessage(applied, { reduction });
-  }
-
-  /** ロールと状態をカードに書き戻す。描き直しとダイス音は chat/weapon-card.ts が持つ */
-  async #applyRoll(rolls: foundry.dice.Roll[], changes: Partial<WeaponCardState>): Promise<void> {
-    const system = { ...this.toObject(), ...changes } as WeaponCardState;
-
-    await updateWeaponCard(this.message, system, rolls);
-  }
-
-  async #resolveActor(): Promise<EmokloreActor | undefined> {
-    if (!this.actorUuid) return undefined;
-
-    return ((await foundry.utils.fromUuid(this.actorUuid)) as EmokloreActor | null) ?? undefined;
-  }
 }
-
-// クラス本体の静的初期化子から prototype を引くと定義順に依存するので、外で組み立てる
-WeaponCardModel.ACTIONS = {
-  rollAttack: WeaponCardModel.prototype.rollAttack,
-  rollDamage: WeaponCardModel.prototype.rollDamage,
-  applyDamage: WeaponCardModel.prototype.applyDamage,
-};

@@ -6,39 +6,16 @@
  */
 
 import { systemPath } from "../constants";
-import type {
-  WeaponCardMessage,
-  WeaponCardSource,
-  WeaponCardState,
+import {
+  resolveCardButtons,
+  type WeaponCardMessage,
+  type WeaponCardSource,
+  type WeaponCardState,
 } from "../data/messages/weapon-card";
-import { canRollDamage } from "../rules/weapon-damage";
 import { localizeAttackSkill } from "../utils/weapon";
 import { buildCardMessageData } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/weapon-card.hbs");
-
-/** カードのどのボタンが出るか。押せるかどうかの判定にも同じものを使う */
-export type CardButtons = {
-  canRollAttack: boolean;
-  canRollDamage: boolean;
-  canApplyDamage: boolean;
-};
-
-/**
- * カードの進み具合からボタンの出し分けを決める。
- *
- * 描画とアクション側のガードで同じ条件が要る。別々に書くと、片方だけ直したときに
- * 「押せるのに何も起きない」「押せないはずが実行される」という形でずれる。
- */
-export const resolveCardButtons = (
-  state: Pick<WeaponCardState, "successCount" | "damageTotal">,
-): CardButtons => ({
-  canRollAttack: state.successCount === null,
-  canRollDamage:
-    state.successCount !== null && canRollDamage(state.successCount) && state.damageTotal === null,
-  // 適用は何度でも押せるようにしておく。狙いを変えて続けて当てることがある
-  canApplyDamage: state.damageTotal !== null,
-});
 
 /**
  * 武器カードのHTMLを組み立てる。

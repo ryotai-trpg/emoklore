@@ -53,12 +53,12 @@ export async function run({ page, check }) {
         const msg = await a.items.getName(`${tag}_刀`).use();
         const id = msg.id;
         await window.__waitFor(() => game.messages.get(id), { label: "武器カードの作成" });
-        await game.messages.get(id).system.rollAttack();
+        await window.__cardAction(game.messages.get(id), "rollAttack");
         await window.__waitFor(() => game.messages.get(id).system.successCount !== null, {
           soft: true,
           label: "攻撃判定",
         });
-        await game.messages.get(id).system.rollDamage();
+        await window.__cardAction(game.messages.get(id), "rollDamage");
         await window.__waitFor(() => game.messages.get(id).system.damageTotal !== null, {
           soft: true,
           label: "ダメージ",
@@ -79,7 +79,7 @@ export async function run({ page, check }) {
         });
         const before = token.actor.system.resources.hp.value;
 
-        await game.messages.get(id).system.applyDamage();
+        await window.__cardAction(game.messages.get(id), "applyDamage");
 
         const expected = Math.max(0, before - Math.max(0, damage - 2));
         const after = token.actor.system.resources.hp.value;
@@ -124,7 +124,7 @@ export async function run({ page, check }) {
 
         // ダイアログの操作は目視の領分。UIを迂回して「全部外した」相当の armor: 0 を送る
         const targets = [...game.user.targets].map((t) => t.actor);
-        await card.system.applyDamageTo(targets, { reduction: 1, armor: 0 });
+        await game.system.api.applyDamageAndReport(targets, damage, { reduction: 1, armor: 0 });
 
         const expected = Math.max(0, before - Math.max(0, damage - 1));
         const after = token.actor.system.resources.hp.value;
@@ -167,7 +167,7 @@ export async function run({ page, check }) {
 
         // armor は送らない。既定（装備合計の自動）に軽減が重なる経路
         const targets = [...game.user.targets].map((t) => t.actor);
-        await card.system.applyDamageTo(targets, { reduction: 1 });
+        await game.system.api.applyDamageAndReport(targets, damage, { reduction: 1 });
 
         const expected = Math.max(0, before - Math.max(0, damage - 1 - 2));
         const after = token.actor.system.resources.hp.value;
@@ -211,7 +211,7 @@ export async function run({ page, check }) {
         });
         const before = token.actor.system.resources.hp.value;
 
-        await game.messages.get(card.id).system.applyDamage();
+        await window.__cardAction(game.messages.get(card.id), "applyDamage");
 
         const expected = Math.max(0, before - damage);
         const after = token.actor.system.resources.hp.value;
