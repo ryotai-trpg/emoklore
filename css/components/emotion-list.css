@@ -1,8 +1,24 @@
-/* 共鳴感情の選択欄を縦に積む。編集モードのヘッダに出る */
+/* 共鳴感情の編集欄。現在の3行と、ピッカーを開くボタンを縦に積む。
+   編集モードのヘッダに出る */
 
 .emoklore {
   .em-emotion-list {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacer-4);
+  }
+
+  button.em-emotion-list__pick {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-4);
+    margin: 0;
+    padding: var(--spacer-4) var(--spacer-8);
+    width: auto;
+    /* 本体の button は --button-size で高さが固まる。中身なりに縮める */
+    height: auto;
+    min-height: 0;
+    line-height: 1.4;
   }
 }

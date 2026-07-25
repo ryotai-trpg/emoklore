@@ -100,19 +100,13 @@ describe("buildEmotionColumns", () => {
 
   // 落とすとその感情を選ぶ手段が消える。属性の表に足し忘れたことが分かるよう、
   // 見出しは空のまま列として出す
-  it("属性の表に無い感情も列を作って出す", () => {
-    const columns = buildEmotionColumns(
-      {
-        hope: { label: "希望", attribute: "ideal" },
-        chaos: { label: "混沌", attribute: "unknown" },
-      },
-      emotionAttributes,
-    );
+  it("属性の定義が欠けていても感情は列にして出す", () => {
+    const columns = buildEmotionColumns(resonantEmotions, { ideal: { label: "理想" } });
 
     expect(columns).toContainEqual({
-      attribute: "unknown",
+      attribute: "desire",
       label: "",
-      emotions: [{ key: "chaos", label: "混沌" }],
+      emotions: [{ key: "possession", label: "独占" }],
     });
   });
 });

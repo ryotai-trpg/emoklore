@@ -8,7 +8,8 @@ import type { BiographyFieldDef, BiographyRow, EmotionKey, EmotionRow } from "./
  * ルール計算は module/rules/ に、DOM操作は module/utils/sheet.ts にある。
  */
 
-const EMOTION_KEYS: readonly EmotionKey[] = ["surface", "hidden", "root"];
+/** 表・裏・ルーツの並び。行の組み立てとピッカーの枠で同じ並びを使う */
+export const EMOTION_KEYS: readonly EmotionKey[] = ["surface", "hidden", "root"];
 
 /**
  * 経歴の項目の並び。
@@ -58,20 +59,6 @@ export const buildBiographyRows = (
     inline: inline ?? false,
     html: html ?? false,
   }));
-
-export const createEmotionOptions = (): Array<{ value: string; label: string; group: string }> => {
-  return Object.entries(CONFIG.EMOKLORE.resonantEmotions).map(([value, { label, attribute }]) => {
-    const attributeLabel = CONFIG.EMOKLORE.emotionAttributes[attribute].label;
-    return {
-      value,
-      label: game.i18n.localize("EMOKLORE.resonantEmotion", {
-        emotion: label,
-        attribute: attributeLabel,
-      }),
-      group: attributeLabel,
-    };
-  });
-};
 
 /** 感情ピッカーの1マス。`key` は保存する感情キー、`label` は翻訳済みの表示名 */
 export type EmotionCell = { key: string; label: string };

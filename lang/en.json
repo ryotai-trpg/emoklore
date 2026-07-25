@@ -576,6 +576,16 @@
       "ErrorMissingData": "Data not found",
       "ErrorImportFailed": "Import failed"
     },
+    "EmotionPicker": {
+      "Title": "Resonant Emotions",
+      "Open": "Choose Emotions",
+      "Unselected": "Not Selected",
+      "Clear": "Remove",
+      "Confirm": "Confirm",
+      "Cancel": "Cancel",
+      "HintSlots": "Choose a slot, then click an emotion to fill it.",
+      "HintMany": "Click an emotion to select it. Click again to remove it."
+    },
     "Resonance": {
       "Name": "♾️Resonance",
       "Intensity": "Intensity",

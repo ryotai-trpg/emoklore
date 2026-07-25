@@ -4,7 +4,8 @@ import type { EmokloreActor } from "../documents/actor";
 import { enrichDocumentHTML } from "../utils/sheet";
 import { resolveTargetActors } from "../utils/targets";
 import { EmokloreActorSheet } from "./actor-sheet";
-import { createEmotionOptions } from "./helpers";
+import { EmotionPicker } from "./emotion-picker";
+import { buildEmotionColumns } from "./helpers";
 import { requestResonanceRoll } from "./rolls";
 import type { EmokloreRenderOptions } from "./types";
 
@@ -40,6 +41,7 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
       addAttack: this._addAttack,
       deleteAttack: this._deleteAttack,
       requestResonance: this._requestResonance,
+      pickEmotions: this._pickEmotions,
     },
   };
 
@@ -54,13 +56,22 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
     const context = (await super._prepareContext(options)) as KaiSheetContext;
     const system = this.actor.system;
 
+    // 表示は「感情（属性）」。並びはピッカーの列と同じ属性順にする
     const selected = new Set<string>(system.emotions);
-    const options_ = createEmotionOptions();
-    context.emotionOptions = options_.map((option) => ({
-      ...option,
-      selected: selected.has(option.value),
-    }));
-    context.selectedEmotions = options_.filter((option) => selected.has(option.value));
+    context.selectedEmotions = buildEmotionColumns(
+      CONFIG.EMOKLORE.resonantEmotions,
+      CONFIG.EMOKLORE.emotionAttributes,
+    ).flatMap((column) =>
+      column.emotions
+        .filter((emotion) => selected.has(emotion.key))
+        .map((emotion) => ({
+          key: emotion.key,
+          label: game.i18n.localize("EMOKLORE.resonantEmotion", {
+            emotion: emotion.label,
+            attribute: column.label,
+          }),
+        })),
+    );
 
     context.mutationHTML = await enrichDocumentHTML(this.actor, system.mutation);
     context.resonanceTableLink = system.resonanceTable
@@ -97,6 +108,16 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
     });
   }
 
+  /** 怪異の共鳴感情をピッカーで選び直す。枚数が決まらないので複数選択モードで開く */
+  static async _pickEmotions(this: EmokloreKaiSheet, event: Event) {
+    event.preventDefault();
+
+    const picked = await EmotionPicker.pickMany(this.actor.system.emotions);
+    if (!picked) return;
+
+    await this.actor.update({ "system.emotions": picked });
+  }
+
   /**
    * 共鳴判定を要求する。暫定は、ターゲットした共鳴者に怪異の共鳴プリセットの強度を
    * 差し込んで共鳴判定を振らせる。全共鳴者への要求カード・感情マッチング自動化は #75。
@@ -126,8 +147,7 @@ type KaiSheetContext = {
   system: KaiDataModel;
   systemFields: Record<string, foundry.data.fields.DataField>;
   flags: Record<string, unknown>;
-  emotionOptions: Array<{ value: string; label: string; group: string; selected: boolean }>;
-  selectedEmotions: Array<{ value: string; label: string; group: string }>;
+  selectedEmotions: Array<{ key: string; label: string }>;
   mutationHTML: string;
   resonanceTableLink: string;
 };
