@@ -11,7 +11,7 @@ import { isSkillKey } from "../config/skills";
 import { systemPath } from "../constants";
 import type { RequestedSkill, SkillRequestState } from "../data/messages/skill-request";
 import { resolveResultName } from "../rules/success";
-import { skillMarker } from "../utils/skill";
+import { describeSkillLabel } from "../utils/skill";
 import { createCardMessage } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/skill-request.hbs");
@@ -28,16 +28,11 @@ export type RequestedSkillRow = RequestedSkill & { label: string };
  */
 export const describeRequestedSkill = ({ kind, key }: RequestedSkill): RequestedSkillRow => {
   if (kind === "base" && isBaseSkillKey(key)) {
-    return {
-      kind,
-      key,
-      label: `${skillMarker(true, false)}${CONFIG.EMOKLORE.baseSkills[key].label}`,
-    };
+    return { kind, key, label: describeSkillLabel({ kind, key }).markedLabel };
   }
 
   if (kind === "skill" && isSkillKey(key)) {
-    const { label, isExtra } = CONFIG.EMOKLORE.skills[key];
-    return { kind, key, label: `${skillMarker(false, isExtra ?? false)}${label}` };
+    return { kind, key, label: describeSkillLabel({ kind, key }).markedLabel };
   }
 
   return { kind, key, label: key };

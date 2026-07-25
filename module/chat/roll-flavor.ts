@@ -6,13 +6,13 @@
  */
 
 import type { SkillRollContext } from "../data/character-like";
-import { skillMarker } from "../utils/skill";
+import { describeSkillLabel } from "../utils/skill";
 
 /**
  * チャットの見出しに出す判定名を組み立てる。「＊格闘」「★技能：専門」など。
  *
- * 基本技能は「＊」、エクストラ技能は「★」を頭に付けるのがシート表記の慣習。
- * 表示の話なのでルール層ではなく、チャットカードを作るこの層に置く。
+ * 印の付け方は `describeSkillLabel` が決める。判定の文脈は組込・基本・カスタムの
+ * どれでも同じ形（表示名と区分）に均されているので、カスタムとして渡す。
  */
 export function formatSkillName({
   label,
@@ -20,12 +20,12 @@ export function formatSkillName({
   isExtra,
   specialization,
 }: SkillRollContext): string {
-  const prefix = skillMarker(isBase, isExtra);
+  const { markedLabel } = describeSkillLabel({ kind: "custom", label, isBase, isExtra });
   const suffix = specialization
     ? `${game.i18n.localize("EMOKLORE.Common.colon")}${specialization}`
     : "";
 
-  return `${prefix}${label}${suffix}`;
+  return `${markedLabel}${suffix}`;
 }
 
 /** チャットの見出し。判定の種類によらず「〈○○〉判定」の形にする */

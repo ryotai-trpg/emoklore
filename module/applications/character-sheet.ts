@@ -2,51 +2,30 @@ import { isResonantEmotionKey } from "../config/resonant-emotions";
 import { systemPath } from "../constants";
 import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
-import type { EmokloreItem } from "../documents/item";
-import {
-  CHARACTERISTIC_POINT_MAX,
-  calculateCharPointSum,
-  calculateTotalSkillPoints,
-  SKILL_POINT_MAX,
-} from "../rules/character-points";
-import { CHARACTERISTIC_MAX, CHARACTERISTIC_MIN } from "../rules/limits";
 import { getSetting, setSetting } from "../settings";
-import { prepareActiveEffectCategories } from "../utils/effects";
-import { prepareHowlingRows } from "../utils/howling";
-import { typedEntries } from "../utils/object";
 import {
   createDocumentData,
-  enrichDocumentHTML,
   getEmbeddedDocument,
   resolveEmbeddedDocumentClass,
 } from "../utils/sheet";
-import { skillMarker } from "../utils/skill";
-import { formatDamagePreview, formatRangeLabel } from "../utils/weapon";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
+import {
+  buildBiographyContext,
+  buildEffectsContext,
+  buildItemsContext,
+  buildSidebarContext,
+  buildSkillsContext,
+} from "./context/character";
 import { promptCreateSkill } from "./dialogs/create-skill-dialog";
 import { EmotionPicker } from "./emotion-picker";
 import {
-  BIOGRAPHY_PAIRED_COUNT,
-  buildBiographyRows,
-  buildSkillLevelSegments,
-  buildValueSegments,
   EMOTION_KEYS,
   getAcquiredEmotionRows,
   getEmotionRows,
   resolveSegmentValue,
 } from "./helpers";
-import type {
-  BaseSkillRow,
-  CharacterContext,
-  CharacteristicsMap,
-  CustomSkillRow,
-  EmokloreRenderOptions,
-  EmotionKey,
-  LabeledField,
-  SkillRow,
-} from "./types";
-
+import type { CharacterContext, EmokloreRenderOptions, EmotionKey } from "./types";
 /**
  * characterアクターのシート。
  *
@@ -181,21 +160,23 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   ): Promise<CharacterContext> {
     await super._preparePartContext(partId, context, options);
 
+    // 何を積むかは applications/context/character.ts が決める。戻り値は
+    // Pick<CharacterContext, ...> で縛ってあるので、無いキーを積もうとすると型で止まる
     switch (partId) {
       case "sidebar":
-        this._prepareSidebarContext(context);
+        Object.assign(context, buildSidebarContext(this.actor));
         break;
       case "skills":
-        this._prepareSkillsContext(context);
+        Object.assign(context, buildSkillsContext(this.actor, { isPlay: context.isPlay }));
         break;
       case "biography":
-        await this._prepareBiographyContext(context);
+        Object.assign(context, await buildBiographyContext(this.actor));
         break;
       case "items":
-        this._prepareItemsContext(context);
+        Object.assign(context, buildItemsContext(this.actor));
         break;
       case "effects":
-        this._prepareEffectsContext(context);
+        Object.assign(context, buildEffectsContext(this.actor));
         break;
       default:
         // header / tabs は追加のコンテキストを必要としないので何もしない
@@ -449,246 +430,5 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     // フォーム要素をまとめて無効化する（document-sheet.mjs の _onRender）。
     // 開閉は編集ではないので、このボタンだけは押せる状態に戻す
     if (toggle instanceof HTMLButtonElement) toggle.disabled = false;
-  }
-
-  /**
-   * 能力値の表示用データ。
-   *
-   * アイコンは CONFIG.EMOKLORE 側の定義なので、テンプレートで二重の lookup を
-   * 組まずに済むようここで引いておく。
-   */
-  _getCharacteristics(): CharacteristicsMap {
-    return Object.fromEntries(
-      typedEntries(CONFIG.EMOKLORE.characteristics).map(([chc, { fa }]) => {
-        const value = this.actor.system.characteristics[chc].value;
-        return [
-          chc,
-          {
-            field: this.actor.system.schema.getField(["characteristics", chc]),
-            value,
-            icon: fa,
-            name: `system.characteristics.${chc}.value`,
-            segments: buildValueSegments(CHARACTERISTIC_MIN, CHARACTERISTIC_MAX, value),
-          },
-        ];
-      }),
-    );
-  }
-
-  /**
-   * 技能の表示用データ。
-   *
-   * label / isExtra はアクターに保存せず CONFIG.EMOKLORE 側の定義なので、ここで合流させる。
-   * 能力値ラベルも同様に引いておく。CONFIG の label は i18nInit の performPreLocalization で
-   * 翻訳済みなので、テンプレート側で言語キーを組み立てる必要はない。
-   */
-  _getSkills(): Record<string, SkillRow> {
-    return Object.fromEntries(
-      typedEntries(CONFIG.EMOKLORE.skills).map(([key, { label, isExtra }]) => {
-        const entry = this.actor.system.skills[key];
-        const characteristic = CONFIG.EMOKLORE.characteristics[entry.characteristic];
-        return [
-          key,
-          {
-            field: this.actor.system.schema.getField(["skills", key]),
-            label,
-            isExtra: isExtra ?? false,
-            level: entry.level,
-            target: entry.target,
-            characteristic: entry.characteristic,
-            specialization: entry.specialization,
-            mod: entry.mod,
-            characteristicLabel: characteristic.label,
-            characteristicIcon: characteristic.fa,
-            name: `system.skills.${key}.level`,
-            levelSegments: buildSkillLevelSegments(entry.level),
-          },
-        ];
-      }),
-    );
-  }
-
-  /**
-   * 基本技能の表示用データ。
-   *
-   * 目標値と能力値はアクターに、表示名は CONFIG.EMOKLORE にあるので、ここで合流させる。
-   */
-  _getBaseSkills(): BaseSkillRow[] {
-    return typedEntries(this.actor.system.baseSkills).map(([key, { characteristic, target }]) => ({
-      key,
-      label: CONFIG.EMOKLORE.baseSkills[key].label,
-      target,
-      characteristicIcon: CONFIG.EMOKLORE.characteristics[characteristic].fa,
-    }));
-  }
-
-  /**
-   * サイドバーの表示用データ。
-   *
-   * 能力値はカードにしか出ないので、ここでだけ用意する。_preparePartContext は
-   * 同じ context を共有するため、別のパートが積んだものを拾うとパートの順序への
-   * 暗黙の依存になる。
-   */
-  private _prepareSidebarContext(context: CharacterContext): void {
-    context.characteristics = this._getCharacteristics();
-    context.charPointSum = calculateCharPointSum(context.characteristics);
-    context.charPointMax = CHARACTERISTIC_POINT_MAX;
-    context.sidebarCollapsed = getSetting("sidebarCollapsed");
-  }
-
-  /**
-   * カスタム技能の表示用データ。
-   *
-   * 判定に効く値はアクター側のミラー（system.customSkills）から、名前と区分は
-   * アイテムから引く。ミラーは prepareBaseData が作るので、効果を適用したあとの
-   * レベルと目標値がそのまま入っている。
-   */
-  _getCustomSkills(): CustomSkillRow[] {
-    // 行に要る値はすべてミラーに揃っているので、アイテムは引き直さない。
-    // 並び順は prepareBaseData が actor.items の順に詰めたまま
-    return Object.entries(this.actor.system.customSkills).map(([id, entry]) => {
-      const characteristic = CONFIG.EMOKLORE.characteristics[entry.characteristic];
-      const options = entry.characteristicOptions.map((key) => ({
-        value: key,
-        label: CONFIG.EMOKLORE.characteristics[key].label,
-        selected: key === entry.characteristic,
-      }));
-
-      return {
-        id,
-        label: entry.label,
-        marker: skillMarker(entry.isBase, entry.isExtra),
-        level: entry.level,
-        target: entry.target,
-        isBase: entry.isBase,
-        isExtra: entry.isExtra,
-        characteristicLabel: characteristic.label,
-        characteristicIcon: characteristic.fa,
-        characteristicOptions: options,
-        hasCharacteristicChoice: options.length > 1,
-        name: `system.customSkills.${id}.level`,
-        levelSegments: buildSkillLevelSegments(entry.level),
-      };
-    });
-  }
-
-  private _prepareSkillsContext(context: CharacterContext): void {
-    context.skills = this._getSkills();
-    context.baseSkills = this._getBaseSkills();
-
-    const customSkills = this._getCustomSkills();
-    const base = customSkills.filter((skill) => skill.isBase);
-    const leveled = customSkills.filter((skill) => !skill.isBase);
-
-    // 閲覧モードのベース技能はチップ列に並ぶ。編集モードは編集・削除の口が要るので
-    // 区分に関わらず技能リストへ出す（組込の基本技能は編集する項目が無いので出ない）
-    context.customSkills = context.isPlay ? leveled : customSkills;
-    context.customBaseSkills = context.isPlay ? base : [];
-
-    // ベース技能はレベルを持たないので技能ポイントを消費しない
-    context.skillPointSum = this._calculateSkillPointSumFromContext(context.skills, leveled);
-    context.skillPointMax = SKILL_POINT_MAX;
-  }
-
-  /** 経歴の表示用データ */
-  private async _prepareBiographyContext(context: CharacterContext): Promise<void> {
-    const noteHTML = await enrichDocumentHTML(this.actor, this.actor.system.biography.note);
-
-    // systemFields の型は DataField 止まりで fields に降りられないため、スキーマから引く。
-    // fields の値も label を持つ形に補っておき、キャストを1回で済ませる
-    const biography = this.actor.system.schema.getField([
-      "biography",
-    ]) as foundry.data.fields.SchemaField & { fields: Record<string, LabeledField> };
-
-    const rows = buildBiographyRows(biography.fields, this.actor.system.biography, {
-      note: noteHTML,
-    });
-
-    // 先頭の数件は横並びの組にするので、テンプレート側で分けて回せるよう2つに割る
-    context.biographyPairedRows = rows.slice(0, BIOGRAPHY_PAIRED_COUNT);
-    context.biographyRows = rows.slice(BIOGRAPHY_PAIRED_COUNT);
-  }
-
-  /**
-   * アイテムの表示用データ。
-   *
-   * 間合いとダメージ式は武器の派生値（参照技能から引いたもの）なので、ここでは
-   * 表示用に整えるだけ。アイテムタブは読むだけの一覧で、値の編集は武器シートが持つ。
-   * 同じ `name` の入力を2箇所に描くとフォームの送信が壊れるため、ここに入力は置かない。
-   */
-  private _prepareItemsContext(context: CharacterContext): void {
-    // itemTypes は本体が Record<string, Item[]> で型付けており、実装クラスまでは絞られない
-    const weapons = (this.actor.itemTypes.weapon ?? []) as EmokloreItem[];
-
-    // isWeapon は型述語なので、filter を通すと system が WeaponDataModel に絞られる。
-    // itemTypes.weapon の中身は元から武器だけなので、実行時のふるまいは変わらない
-    context.weapons = weapons
-      .filter((item) => item.isWeapon())
-      .map((item) => ({
-        // 保存済みの埋め込みドキュメントなので id は必ずある
-        id: item.id!,
-        name: item.name,
-        img: item.img,
-        rangeLabel: formatRangeLabel(item.system.rangeType, item.system.range),
-        damagePreview: formatDamagePreview(item.system.damageDie, item.system.attackPower),
-        equipped: item.system.equipped,
-      }));
-
-    const armors = (this.actor.itemTypes.armor ?? []) as EmokloreItem[];
-    context.armors = armors
-      .filter((item) => item.isArmor())
-      .map((item) => ({
-        id: item.id!,
-        name: item.name,
-        img: item.img,
-        defense: item.system.defense,
-        coverage: item.system.coverage,
-        equipped: item.system.equipped,
-      }));
-  }
-
-  /**
-   * 効果タブの表示用データ。
-   *
-   * ハウリング反応はアイテムそのものを別区分に並べる。反応が持つ効果は一時的／永続的の
-   * 区分から除いてあり、**同じ反応が2行に分かれて見えないようにする**。効果を持たない
-   * 反応（RPだけのもの）も並ぶのは、それも受けている状態には違いないため。
-   */
-  private _prepareEffectsContext(context: CharacterContext): void {
-    context.tab = context.tabs.effects;
-
-    const items = (this.actor.itemTypes.howling ?? []) as EmokloreItem[];
-    context.howlings = prepareHowlingRows(
-      items.flatMap((item) =>
-        // 埋め込みドキュメントなので id は必ずある（アイテムタブの行と同じ扱い）
-        item.isHowling()
-          ? [{ id: item.id!, name: item.name, img: item.img, system: item.system }]
-          : [],
-      ),
-    );
-
-    context.effects = prepareActiveEffectCategories(
-      [...this.actor.allApplicableEffects()].filter(
-        (effect) => (effect.parent as { type?: string } | null)?.type !== "howling",
-      ),
-    );
-  }
-
-  /**
-   * 消費した技能ポイント。
-   *
-   * カスタム技能も同じ表で数える。ベース技能はレベルを持たないので呼び出し側が除いてある。
-   * エクストラ技能はコストが倍なので、`calculateTotalSkillPoints` の約束どおり
-   * 全体と ex の両方に入れて2回数えさせる。
-   */
-  private _calculateSkillPointSumFromContext(
-    skills: Record<string, SkillRow>,
-    customSkills: CustomSkillRow[],
-  ): number {
-    const all = [...Object.values(skills), ...customSkills];
-    return calculateTotalSkillPoints(
-      all,
-      all.filter((skill) => skill.isExtra),
-    );
   }
 }

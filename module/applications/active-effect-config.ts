@@ -12,7 +12,7 @@ import {
   parseTargetId,
 } from "../utils/effect-keys";
 import { typedEntries } from "../utils/object";
-import { skillMarker } from "../utils/skill";
+import { describeSkillLabel } from "../utils/skill";
 
 /**
  * 「キーを直接書く」を表す選択肢の値。
@@ -56,7 +56,12 @@ const buildCustomSkillOptions = (effect: { parent?: unknown }): Option[] => {
     .map((item) => ({
       value: composeTargetId({ kind: "collection", collection: "customSkills", key: item.id! }),
       // 区分の印はシートやチャットと同じ。組込技能と名前が同じでも見分けが付く
-      label: `${skillMarker(item.system.isBase, item.system.isExtra)}${item.name}`,
+      label: describeSkillLabel({
+        kind: "custom",
+        label: item.name,
+        isBase: item.system.isBase,
+        isExtra: item.system.isExtra,
+      }).markedLabel,
     }));
 };
 

@@ -1,10 +1,10 @@
 import { createRollMessage } from "../../chat/message";
 import { systemPath } from "../../constants";
-import { resolveSkillRef, type SkillRef } from "../../data/character";
+import { resolveSkillRef, type SkillRef } from "../../data/character-like";
 import type { EmokloreActor } from "../../documents/actor";
 import { normalizeReduction } from "../../rules/weapon-damage";
 import { typedEntries } from "../../utils/object";
-import { skillMarker } from "../../utils/skill";
+import { describeSkillLabel, parseSkillRefValue, toSkillRefValue } from "../../utils/skill";
 
 export type DamageReductionInput = {
   reduction: number;
@@ -87,18 +87,22 @@ type DefenseSkillGroup = { label: string; options: DefenseSkillOption[] };
  * カスタム技能は対象アクターの所持アイテム依存なので、必要になったら足す。
  */
 function listDefenseSkillGroups(): DefenseSkillGroup[] {
-  // CONFIG.EMOKLORE の label は i18nInit で翻訳済み（performPreLocalization）
-  const skills = typedEntries(CONFIG.EMOKLORE.skills).map(([key, config]) => ({
-    value: `skill:${key}`,
-    label: `${skillMarker(false, config.isExtra ?? false)}${config.label}`,
-    selected: `skill:${key}` === DEFAULT_DEFENSE_SKILL,
-  }));
-  const baseSkills = typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key, config]) => ({
-    value: `base:${key}`,
-    label: `${skillMarker(true, false)}${config.label}`,
+  const skills = typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => {
+    const value = toSkillRefValue({ kind: "skill", key });
+    return {
+      value,
+      label: describeSkillLabel({ kind: "skill", key }).markedLabel,
+      selected: value === DEFAULT_DEFENSE_SKILL,
+    };
+  });
+  const baseSkills = typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key]) => ({
+    value: toSkillRefValue({ kind: "base", key }),
+    label: describeSkillLabel({ kind: "base", key }).markedLabel,
     selected: false,
   }));
 
+  // 見出しはカスタム技能の区分名を借りている。判定要求のダイアログとは別の言い回しなので、
+  // 揃えるかどうかは文言の整理（Issue #59）で決める
   return [
     { label: game.i18n.localize("EMOKLORE.Item.skill.Category.normal"), options: skills },
     { label: game.i18n.localize("EMOKLORE.Item.skill.Category.base"), options: baseSkills },
@@ -131,10 +135,9 @@ async function rollDefense(defender: EmokloreActor | null, button: HTMLElement):
 
 /** select の値（`skill:endurance` / `base:athletic`）を検証して SkillRef へ */
 function parseSkillValue(value: string): SkillRef | null {
-  const [kind, key] = value.split(":");
-  if (kind !== "skill" && kind !== "base") return null;
+  const { kind, key } = parseSkillRefValue(value);
 
-  return resolveSkillRef(key ?? "", { base: kind === "base" });
+  return resolveSkillRef(key, { base: kind === "base" });
 }
 
 /** チェックボックス1つぶんの防具。value に防御力を持たせ、readInput が合計する */
