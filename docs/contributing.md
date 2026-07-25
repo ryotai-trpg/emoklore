@@ -33,6 +33,21 @@ npm run link:foundry   # foundry/client・foundry/common のsymlinkを作成
 npm run typecheck      # tsc --noEmit（本体ソース内の診断は除外される）
 ```
 
+### コンペンディウム（packs）
+
+同梱するコンペンディウムの**正は `packs/src/<パック名>/*.json`**で、配る形（LevelDB）はビルドで作る。LevelDBはディレクトリごと1つのデータベースでテキストとしてgitに置けないため、draw-steel と同じくソースをJSONで持つ形にしてある。
+
+```shell
+npm run build:packs   # packs/src → dist/packs
+```
+
+`npm run build` / `dev` / `watch` はこれを先に走らせるので、普段は個別に叩かなくてよい。
+
+- パック名は `system.json` の `packs[].name` と揃える。揃っていないとFoundryが空のパックを開く
+- 各JSONには **`_key` が要る**（`!items!<id>` / `!tables!<id>`、埋め込みは `!items.effects!<親id>.<id>` / `!tables.results!<親id>.<id>`）。**`_key` の無いファイルは黙って飛ばされる**ので、書き忘れると「1件も入らないのにビルドは成功する」
+- ドキュメント間の参照は `Compendium.emoklore.<パック名>.<種別>.<id>` の形。`_id` を固定しているのはこのため
+- **Foundryを起動したままだとビルドが失敗する。** LevelDBのロックは排他で、パックを開いているプロセスがあると `NotOpenError` になる。Foundryを止めてから叩くこと
+
 ### テスト
 
 **テストの方針は [テスト方針](/testing) が正**。単体テスト（vitest）と実機検証の使い分け、置き場所、実機検証の環境変数はそちらにある。

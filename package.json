@@ -6,6 +6,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.5",
+    "@foundryvtt/foundryvtt-cli": "^3.0.4",
     "@types/node": "^26.1.1",
     "handlebars": "^4.7.9",
     "lefthook": "^2.1.10",
@@ -16,9 +17,10 @@
     "vitest": "^4.1.10"
   },
   "scripts": {
-    "build": "vite build",
-    "dev": "vite build && vite dev",
-    "watch": "vite build --watch",
+    "build": "npm run build:packs && vite build",
+    "build:packs": "node tools/build-packs.mjs",
+    "dev": "npm run build && vite dev",
+    "watch": "npm run build:packs && vite build --watch",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
