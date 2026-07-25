@@ -42,6 +42,48 @@ export const createFixtures = (page) =>
     });
     made.push(importee.name);
 
+    // 人間NPC: 能力値＋技能で共鳴者と同じ計算を振れることを見るため、技能を1本取らせる
+    const npc = await Actor.implementation.create({
+      name: `${tag}_npc`,
+      type: "npc",
+      system: { characteristics: { physical: { value: 4 } } },
+    });
+    made.push(npc.name);
+    await npc.update({ "system.skills.search.level": 2 });
+
+    // 怪異: 固定初速・装甲・共鳴感情・共鳴プリセット・攻撃（自由ダメージ式のD4と判定なし）
+    const kai = await Actor.implementation.create({
+      name: `${tag}_kai`,
+      type: "kai",
+      system: {
+        initiative: 6,
+        resources: { hp: { value: 30, max: 30 }, mp: { value: 5, max: 5 }, armor: 5 },
+        emotions: ["selfAssertion"],
+        resonance: { intensity: 5, rise: "1" },
+        attacks: [
+          {
+            name: `${tag}_粘液手`,
+            diceCount: 2,
+            target: 7,
+            damage: "@successd4+3",
+            mpCost: 0,
+            judgeless: false,
+            fixedSuccess: 1,
+          },
+          {
+            name: `${tag}_侵食`,
+            diceCount: 0,
+            target: 0,
+            damage: "1",
+            mpCost: 0,
+            judgeless: true,
+            fixedSuccess: 3,
+          },
+        ],
+      },
+    });
+    made.push(kai.name);
+
     // ダメージ適用はターゲット（トークン）を経由するので、シーンとトークンが要る
     let scene = game.scenes.getName(`${tag}_scene`);
     if (!scene) {

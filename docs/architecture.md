@@ -12,7 +12,7 @@
 module/
   emoklore.ts        … エントリ。CSS目次のimport、CONFIG登録、configのラベル事前ローカライズ、開発用フック
   config/            … 静的なゲームルール定義（技能・特性・共鳴感情など）→ CONFIG.EMOKLORE
-  data/              … TypeDataModelスキーマ（character / npc / weapon / 武器カードのChatMessage）と派生値計算
+  data/              … TypeDataModelスキーマ（character / npc / kai / weapon / チャットカード）と派生値計算
   rules/             … ゲームルールの純粋関数（判定計算・成功数）。Foundry非依存でvitest対象
   documents/         … Actor / Item 拡張とGMへの処理委譲（queries）。判定を実行して結果を流す
   applications/      … ApplicationV2シート・ダイアログ、判定の入口（rolls）。ダイアログを開くのはここ
@@ -126,7 +126,7 @@ Foundryは `Document#update` をサーバ側で権限検査するので、OWNER�
 
 **基準は型付きCombatの `system` に持たせる。** `documentTypes.Combat` に単一種別 `standard` を宣言し、`CombatDataModel` が `characteristic` と `skill` を保存する。`EmokloreCombat#_initializeSource` が `base` を `standard` に寄せるので、種別を選ばせなくても全Combatが基準を持つ。
 
-**Combatantは型付きにしない。** 基準はエンカウンター単位で、同値のタイブレークも手動なので、combatantごとのシステムデータが要らない。ドキュメントクラスだけ差し替える（dnd5eの `Combatant5e` と同じ薄い上書き）。作れない・不要な種別を登録しないのは、NPCの扱い（下記の既知の構造的課題）と同じ判断。
+**Combatantは型付きにしない。** 基準はエンカウンター単位で、同値のタイブレークも手動なので、combatantごとのシステムデータが要らない。ドキュメントクラスだけ差し替える（dnd5eの `Combatant5e` と同じ薄い上書き）。作れない・不要な種別を登録しないのは、Actorの種別と `documentTypes` を必ず揃える方針（下記のNPC・怪異）と同じ判断。
 
 **式は `Combatant#_getInitiativeFormula` の1点で組み立てる。** 本体が「systemが上書きしてよい」と明記する唯一のシームで、roll all / roll NPC / トラッカーの行ロール・再ロールはすべて `Combat#rollInitiative` → `Combatant#getInitiativeRoll` → ここを通る。`combat.system` の基準から式文字列を返し、本体が `actor.getRollData()` に対して解決する。純粋な組み立ては `rules/initiative.ts` に切り出してテストしている。
 
@@ -141,7 +141,7 @@ Foundryは `Document#update` をサーバ側で権限検査するので、OWNER�
 ## 既知の構造的課題
 
 1. **スキーマ定義が `CONFIG.EMOKLORE` に依存**: `module/data/character.ts` がキー集合を得るために定義時点で `CONFIG.EMOKLORE` を読む。`CONFIG.EMOKLORE` を設定するのは自分の `init` フックなので制御下にあるが、他モジュールが `init` 中に `Actor.dataModels.character.schema` へ触ると壊れうる。`TypedObjectField` での解消は検討したうえで見送った（下記）
-2. **NPCの扱いが未定**: `NpcDataModel` は `wickedness` しか持たず、シートも判定もなく、登録もしていない — 作成できない種別を登録すると `EmokloreActor#system` の型が嘘になるため（`module/data/npc.ts` は意図的に残してある）。NPC用シートの実装（[ロードマップ](/roadmap) Phase 3）で判定まわりごと決める。登録を戻すと `system` が union になるので、NPCで壊れる箇所は型チェックが教えてくれる
+2. **Actorの種別とunion（NPC・怪異は実装済み — Issue #81）**: `character`（共鳴者）・`npc`（人間NPC）・`kai`（怪異）の3種別を登録しているので、`EmokloreActor#system` は3つのunion。共通して持つ `resources.hp/mp` に触るリソース操作（`applyDamage`・MP境界）は絞り込みなしで通り、共鳴値・技能判定のように一部の種別しか持たないものは型述語（`isCharacter` / `isCharacterLike` / `isKai`、`EmokloreItem#isWeapon` と同じ形）で絞る。人間NPCは能力値・技能・派生値・技能判定を共鳴者と共有する（両者が `CharacterLikeDataModel` を継承。ルール上「人間NPCに専用ルールは無く、判定が要るなら共鳴者と同じ作り」）。怪異は能力値の標準ブロックを持たない別形状で、直接判定（ダイス数＋判定値）の攻撃を持つ。怪異の攻撃カードのボタンハンドラは `applications/`（`applyKaiDamage`）に置き `ACTIONS` へ外部登録することで、課題5（`data/` オーケストレータ）を繰り返さない。**種別は `system.json` の `documentTypes` と `CONFIG.Actor.dataModels` で必ず揃える**（作成できない種別を登録すると `system` の型が嘘になる）
 3. **`config/` の副作用**: `module/config/index.ts` が import 時に `preLocalize` を呼び、`performPreLocalization` が `CONFIG.EMOKLORE` を破壊的に書き換える。この表の「`config/` に置かないもの」に反するが、dnd5e / draw-steel 由来の確立したパターンなので当面は踏襲する
 4. **`utils/charsheet-importer.ts` が2つの顔を持つ**: 純粋なパーサ（`parseSkills` / `parseEmotions` / `validateCharSheetJSON`、単体テスト済み）と、`actor.update()` と `ui.notifications` を持つ適用部（`importFromCharSheet`）が同じファイルにある。後者は `EmokloreActor` を `import type` で借りているので、**この逆依存はimportグラフに現れない**。分割は20〜30行規模だが、`buildImportIndexes()` が `CONFIG.EMOKLORE` を読むため、パーサを完全に純粋化するなら索引を引数で渡す形への変更が要る（Issue #58）
 5. **`data/messages/weapon-card.ts` がオーケストレータ**: カードのボタンハンドラ（`rollAttack` / `rollDamage` / `applyDamage`）が `actor.buildSkillRoll()` と `applyDamageToTargets()` を駆動し、`ui.notifications` とフックも持つ。`data/` の「置かないもの: UI、チャット生成」に反する。層表の `data/` の行に `documents/` を足して解決してはいけない（表が `documents/` → `data/` を許しているので、相互依存を許可することになる）。直すならハンドラの置き場所のほう

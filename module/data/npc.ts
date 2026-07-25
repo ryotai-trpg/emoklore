@@ -1,39 +1,17 @@
-import { EmokloreSystemDataModel } from "./system-model";
+import { CharacterLikeDataModel } from "./character-like";
 
 /**
- * NPCのデータモデル。
+ * 人間NPCのデータモデル。
  *
- * **未使用に見えるが消さないこと。** `system.json` の documentTypes に npc が無く
- * 作成できないため、emoklore.ts での登録を外してある（登録だけ残すと
- * EmokloreActor#system の型が嘘になるため）。NPCシートを実装する Phase 3 で戻す。
+ * ルールブックに「人間のNPCに専用ルールは無く、判定が要るなら共鳴者と同じ作りになる」ため、
+ * 能力値・技能・派生値・技能判定は共鳴者と同じ `CharacterLikeDataModel` をそのまま継承する。
+ * 共鳴者との違いは持たないもの側にある — 共鳴値・共鳴感情・経歴・キャラポイント予算を持たず、
+ * シートも軽量にする。判定の計算は共鳴者と1つの実装を共有する。
+ *
+ * かつては `wickedness`（邪気）だけを持つ登録外の stub だった。邪気はルールブックに該当が
+ * 無いので落とした（Issue #81）。怪異の「強度」は共鳴強度で、邪気とは別物。
  */
-
-const { NumberField, SchemaField } = foundry.data.fields;
-
-const defineNpcDataModelSchema = () => ({
-  wickedness: new SchemaField({
-    value: new NumberField({
-      required: true,
-      integer: true,
-      min: 0,
-      initial: 5,
-    }),
-    max: new NumberField({
-      required: true,
-      integer: true,
-      min: 0,
-      initial: 100,
-    }),
-  }),
-});
-
-export class NpcDataModel extends EmokloreSystemDataModel {
-  declare wickedness: {
-    value: number;
-    max: number;
-  };
-
-  static override defineSchema() {
-    return defineNpcDataModelSchema();
-  }
+export class NpcDataModel extends CharacterLikeDataModel {
+  // 能力値・技能・HP/MP は共鳴者と同じスキーマなので、フィールドのラベルも共鳴者のものを流用する
+  static override LOCALIZATION_PREFIXES = ["EMOKLORE.Actor.character"];
 }

@@ -2,7 +2,8 @@
   "TYPES": {
     "Actor": {
       "character": "キャラクター",
-      "npc": "NPC"
+      "npc": "NPC",
+      "kai": "怪異"
     },
     "Item": {
       "weapon": "武器",
@@ -36,7 +37,9 @@
         "weapon": "武器シート",
         "armor": "防具シート",
         "activeEffect": "効果シート",
-        "skill": "技能シート"
+        "skill": "技能シート",
+        "npc": "NPCシート",
+        "kai": "怪異シート"
       },
       "toggleMode": "プレイ・編集モード切替",
       "character": {
@@ -49,6 +52,16 @@
         "fields": {
           "specialization": "分野"
         }
+      },
+      "npc": {
+        "NamePlaceholder": "名前",
+        "Skills": "技能",
+        "BaseSkills": "基本技能",
+        "CustomSkills": "カスタム技能",
+        "Weapons": "武器"
+      },
+      "kai": {
+        "NamePlaceholder": "名前"
       }
     },
     "Item": {
@@ -161,6 +174,15 @@
         "Roll": "〈生存〉判定",
         "ActorMissing": "対象のキャラクターが見つかりません。",
         "ActionFailed": "操作に失敗しました。"
+      },
+      "kaiAttack": {
+        "Judgment": "判定",
+        "Damage": "ダメージ",
+        "Judgeless": "判定なし・成功数",
+        "SuccessCount": "成功数",
+        "MpCost": "消費MP",
+        "UnnamedAttack": "攻撃",
+        "ActionFailed": "操作に失敗しました"
       }
     },
     "Combat": {
@@ -451,6 +473,48 @@
         "computer": "電脳",
         "stealth": "隠匿",
         "strongLuck": "強運"
+      },
+      "kai": {
+        "FIELDS": {
+          "resources": {
+            "hp": {
+              "value": {
+                "label": "HP"
+              }
+            },
+            "mp": {
+              "value": {
+                "label": "MP"
+              }
+            },
+            "armor": {
+              "label": "装甲"
+            }
+          },
+          "initiative": {
+            "label": "イニシアチブ"
+          },
+          "resonance": {
+            "intensity": {
+              "label": "強度"
+            },
+            "rise": {
+              "label": "上昇値"
+            }
+          }
+        },
+        "Emotions": "共鳴感情",
+        "Resonance": "共鳴判定",
+        "RequestResonance": "共鳴判定を要求",
+        "ResonanceTable": "共鳴表",
+        "Mutation": "憑依時の変異",
+        "Attacks": "攻撃",
+        "AttackName": "名前",
+        "AttackDice": "ダイス",
+        "AttackTarget": "判定値",
+        "AttackDamage": "ダメージ式",
+        "FixedSuccess": "固定成功数",
+        "NoResonanceTarget": "共鳴判定を要求する共鳴者をターゲットしてください"
       }
     },
     "skillRoll": "〈{skillName}〉判定",
@@ -519,7 +583,8 @@
       "MatchNone": "一致なし",
       "MatchRoot": "ルーツ属性一致",
       "MatchCompletely": "完全一致",
-      "RollButton": "ロール"
+      "RollButton": "ロール",
+      "NotCharacter": "共鳴判定は共鳴者だけが振れます"
     },
     "result": {
       "fumble": "ファンブル",

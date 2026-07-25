@@ -14,12 +14,19 @@
 import type { EmokloreActor } from "../documents/actor";
 import { promptResonanceRoll } from "./dialogs/resonance-roll-dialog";
 
-/** 共鳴判定。強度と共鳴感情の一致度を尋ねてから振る。キャンセルされたら何もしない */
+/**
+ * 共鳴判定。強度と共鳴感情の一致度を尋ねてから振る。キャンセルされたら何もしない。
+ *
+ * `preset.intensity` は怪異シートが共鳴プリセットの強度を初期値として差し込む導線。
+ * 対象アクターの〈∞共鳴〉値で振るので、怪異ではなく共鳴者を渡す（#75 で全共鳴者への
+ * 要求カードに置き換わるまでの暫定）。
+ */
 export async function requestResonanceRoll(
   actor: EmokloreActor,
   options: Record<string, unknown> = {},
+  preset: { intensity?: number } = {},
 ): Promise<ChatMessage | undefined> {
-  const input = await promptResonanceRoll();
+  const input = await promptResonanceRoll(preset);
   if (!input) return;
 
   return actor.rollResonance(input.intensity, input.emotionMatch, options);

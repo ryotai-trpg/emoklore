@@ -1,0 +1,128 @@
+{{! Human NPC sheet — 単一ルートが要る（HandlebarsApplicationMixin のパート制約） }}
+<div class="em-npc">
+<header class="em-npc__header">
+  <img class="em-npc__avatar" src="{{document.img}}" data-edit="img" alt="" />
+  {{#if isPlay}}
+    <h1 class="em-npc__name">{{document.name}}</h1>
+  {{else}}
+    <input class="em-npc__name-input" type="text" name="name" value="{{document.name}}"
+      placeholder="{{localize "EMOKLORE.Sheet.npc.NamePlaceholder"}}" />
+  {{/if}}
+
+  <div class="em-npc__resources">
+    <label class="em-npc__resource"
+      data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.hp.label"}}">
+      {{! HP/MPのアイコンは共鳴者のメータと同じものを使う（fa-heart / fa-wand-magic-sparkles） }}
+      <i class="fa-solid fa-heart em-npc__resource-icon" inert></i>
+      {{#if isPlay}}
+        <span class="em-npc__resource-value">{{system.resources.hp.value}} / {{system.resources.hp.max}}</span>
+      {{else}}
+        <span class="em-npc__resource-edit">
+          <input type="number" name="system.resources.hp.value" value="{{system.resources.hp.value}}" />
+          <span class="em-npc__resource-sep">/</span>
+          <span>{{system.resources.hp.max}}</span>
+        </span>
+      {{/if}}
+    </label>
+    <label class="em-npc__resource"
+      data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.mp.label"}}">
+      <i class="fa-solid fa-wand-magic-sparkles em-npc__resource-icon" inert></i>
+      {{#if isPlay}}
+        <span class="em-npc__resource-value">{{system.resources.mp.value}} / {{system.resources.mp.max}}</span>
+      {{else}}
+        <span class="em-npc__resource-edit">
+          <input type="number" name="system.resources.mp.value" value="{{system.resources.mp.value}}" />
+          <span class="em-npc__resource-sep">/</span>
+          <span>{{system.resources.mp.max}}</span>
+        </span>
+      {{/if}}
+    </label>
+  </div>
+</header>
+
+<section class="em-npc__characteristics">
+  {{#each characteristics}}
+    <div class="em-npc__characteristic">
+      <i class="{{icon}}" inert></i>
+      <span class="em-npc__characteristic-label">{{label}}</span>
+      {{#if ../isPlay}}
+        <span class="em-npc__characteristic-value">{{value}}</span>
+      {{else}}
+        <input type="number" name="{{name}}" value="{{value}}" min="1" max="9" />
+      {{/if}}
+    </div>
+  {{/each}}
+</section>
+
+<section class="em-npc__skills">
+  <h3>{{localize "EMOKLORE.Sheet.npc.Skills"}}</h3>
+  <ul class="em-npc__skill-list">
+    {{#each skills}}
+      <li class="em-npc__skill">
+        <a class="em-npc__skill-name" data-action="roll" data-roll-type="{{rollType}}" data-skill="{{key}}">{{marker}}{{label}}</a>
+        <i class="{{characteristicIcon}}" inert></i>
+        {{#if ../isPlay}}
+          <span class="em-npc__skill-level">Lv.{{level}}</span>
+        {{else}}
+          <input class="em-npc__skill-input" type="number" name="{{name}}" value="{{level}}" min="0" max="3" />
+        {{/if}}
+        <span class="em-npc__skill-target">{{target}}</span>
+      </li>
+    {{/each}}
+  </ul>
+</section>
+
+<section class="em-npc__skills">
+  <h3>{{localize "EMOKLORE.Sheet.npc.BaseSkills"}}</h3>
+  <ul class="em-npc__skill-list">
+    {{#each baseSkills}}
+      <li class="em-npc__skill">
+        <a class="em-npc__skill-name" data-action="roll" data-roll-type="{{rollType}}" data-skill="{{key}}">{{marker}}{{label}}</a>
+        <i class="{{characteristicIcon}}" inert></i>
+        <span class="em-npc__skill-target">{{target}}</span>
+      </li>
+    {{/each}}
+  </ul>
+</section>
+
+{{#if customSkills.length}}
+  <section class="em-npc__skills">
+    <h3>{{localize "EMOKLORE.Sheet.npc.CustomSkills"}}</h3>
+    <ul class="em-npc__skill-list">
+      {{#each customSkills}}
+        <li class="em-npc__skill" data-item-id="{{id}}">
+          <a class="em-npc__skill-name" data-action="roll" data-roll-type="custom-skill" data-item-id="{{id}}">{{marker}}{{label}}</a>
+          {{#if ../isPlay}}
+            <span class="em-npc__skill-level">Lv.{{level}}</span>
+          {{/if}}
+          <span class="em-npc__skill-target">{{target}}</span>
+        </li>
+      {{/each}}
+    </ul>
+  </section>
+{{/if}}
+
+<section class="em-npc__weapons">
+  <header class="em-npc__section-head">
+    <h3>{{localize "EMOKLORE.Sheet.npc.Weapons"}}</h3>
+    {{#unless isPlay}}
+      <button type="button" data-action="createDoc" data-document-class="Item" data-type="weapon">
+        <i class="fa-solid fa-plus" inert></i>
+      </button>
+    {{/unless}}
+  </header>
+  <ul class="em-npc__weapon-list">
+    {{#each weapons}}
+      <li class="em-npc__weapon" data-item-id="{{id}}">
+        <img class="em-npc__weapon-image" src="{{img}}" height="24" width="24" alt="" />
+        <a class="em-npc__weapon-name" data-action="roll" data-roll-type="weapon" data-item-id="{{id}}">{{name}}</a>
+        <span class="em-npc__weapon-meta">{{rangeLabel}} / {{damagePreview}}</span>
+        {{#unless ../isPlay}}
+          <a data-action="viewDoc" data-tooltip="APPLICATION.ACTIONS.Edit"><i class="fa-solid fa-pen-to-square" inert></i></a>
+          <a data-action="deleteDoc" data-tooltip="APPLICATION.ACTIONS.Delete"><i class="fa-solid fa-trash" inert></i></a>
+        {{/unless}}
+      </li>
+    {{/each}}
+  </ul>
+</section>
+</div>

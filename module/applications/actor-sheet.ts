@@ -37,9 +37,12 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
         return this.actor.rollSkill({ kind: "base", key: skill });
       case "custom-skill": {
         // 固定表が無いので綴りは確かめようがない。判定が読むのはアクター側のミラーなので、
-        // アイテムではなくそちらに居ることを確かめる（消した直後のクリックはここで止まる）
+        // アイテムではなくそちらに居ることを確かめる（消した直後のクリックはここで止まる）。
+        // カスタム技能を持つのは能力値＋技能を持つ種別だけ
         const id = dataset.itemId ?? "";
-        if (!(id in this.actor.system.customSkills)) return undefined;
+        if (!this.actor.isCharacterLike() || !(id in this.actor.system.customSkills)) {
+          return undefined;
+        }
         return this.actor.rollSkill({ kind: "custom", id });
       }
       case "resonance":

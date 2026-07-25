@@ -1,0 +1,177 @@
+/* 怪異シートのレイアウト。templates/actor/kai-sheet.hbs と対。
+   HP/装甲/MP・共鳴感情・共鳴プリセット・憑依変異・攻撃リストを縦に並べる */
+
+.emoklore.sheet.kai:not(.minimized, .minimizing, .maximizing) {
+  min-width: 360px;
+  min-height: 360px;
+}
+
+.emoklore.sheet.kai {
+  /* 単一パート（.em-kai）を .window-content（本体が flex 縦積み）の中で伸ばし、はみ出しを
+     スクロールさせる。flex の子は min-height: auto だと縮まずスクロールが効かないので 0 にする */
+  .em-kai {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: var(--spacer-4);
+  }
+
+  .em-kai__header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacer-8);
+    padding-bottom: var(--spacer-8);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .em-kai__avatar {
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  .em-kai__name {
+    margin: 0;
+    font-size: var(--font-size-20);
+  }
+
+  .em-kai__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--spacer-8);
+    padding: var(--spacer-8) 0;
+  }
+
+  .em-kai__stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-4);
+  }
+
+  .em-kai__stat-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-4);
+  }
+
+  .em-kai__stat input {
+    width: 3rem;
+    text-align: center;
+  }
+
+  .em-kai__block {
+    padding: var(--spacer-8) 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .em-kai__block h3 {
+    margin: 0 0 var(--spacer-4);
+    font-size: var(--font-size-14);
+  }
+
+  .em-kai__block-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-8);
+    margin-bottom: var(--spacer-4);
+  }
+
+  .em-kai__block-head h3 {
+    margin: 0;
+  }
+
+  .em-kai__emotions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-4);
+  }
+
+  .em-kai__emotion {
+    padding: 1px var(--spacer-8);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-data-background);
+  }
+
+  .em-kai__emotion-select {
+    width: 100%;
+  }
+
+  .em-kai__resonance {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-16);
+  }
+
+  .em-kai__field {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-4);
+  }
+
+  .em-kai__field input[type="number"] {
+    width: 3rem;
+    text-align: center;
+  }
+
+  .em-kai__attack-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacer-4);
+  }
+
+  .em-kai__attack {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacer-8);
+    padding: var(--spacer-4) 0;
+  }
+
+  .em-kai__attack-name {
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .em-kai__attack-name:hover {
+    text-shadow: 0 0 8px var(--color-shadow-primary);
+  }
+
+  .em-kai__attack-damage {
+    color: var(--color-text-subtle);
+  }
+
+  .em-kai__attack-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-8);
+    flex: 1 1 100%;
+  }
+
+  .em-kai__attack-fields label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-4);
+  }
+
+  .em-kai__attack-fields input[type="number"] {
+    width: 3rem;
+    text-align: center;
+  }
+
+  .em-kai__attack-name-input {
+    flex: 1 1 100%;
+  }
+
+  .em-kai__mutation-input {
+    width: 100%;
+  }
+}

@@ -2,7 +2,8 @@
   "TYPES": {
     "Actor": {
       "character": "Character",
-      "npc": "NPC"
+      "npc": "NPC",
+      "kai": "Apparition"
     },
     "Item": {
       "weapon": "Weapon",
@@ -36,7 +37,9 @@
         "weapon": "Weapon Sheet",
         "armor": "Armor Sheet",
         "activeEffect": "Effect Sheet",
-        "skill": "Skill Sheet"
+        "skill": "Skill Sheet",
+        "npc": "NPC Sheet",
+        "kai": "Apparition Sheet"
       },
       "toggleMode": "Toggle Play/Edit mode",
       "character": {
@@ -49,6 +52,16 @@
         "fields": {
           "specialization": "Specialization"
         }
+      },
+      "npc": {
+        "NamePlaceholder": "Name",
+        "Skills": "Skills",
+        "BaseSkills": "Base Skills",
+        "CustomSkills": "Custom Skills",
+        "Weapons": "Weapons"
+      },
+      "kai": {
+        "NamePlaceholder": "Name"
       }
     },
     "Item": {
@@ -160,6 +173,15 @@
         "Prompt": "End of round. Characters in Cardiac Arrest roll *Survival (Endurance or Grit may substitute). On failure, Dead.",
         "Roll": "Roll Survival",
         "ActorMissing": "The target character could not be found.",
+        "ActionFailed": "The action failed."
+      },
+      "kaiAttack": {
+        "Judgment": "Judgment",
+        "Damage": "Damage",
+        "Judgeless": "No roll · successes",
+        "SuccessCount": "Successes",
+        "MpCost": "MP cost",
+        "UnnamedAttack": "Attack",
         "ActionFailed": "The action failed."
       }
     },
@@ -451,6 +473,48 @@
         "computer": "Computer",
         "stealth": "Stealth",
         "strongLuck": "Strong Luck"
+      },
+      "kai": {
+        "FIELDS": {
+          "resources": {
+            "hp": {
+              "value": {
+                "label": "HP"
+              }
+            },
+            "mp": {
+              "value": {
+                "label": "MP"
+              }
+            },
+            "armor": {
+              "label": "Armor"
+            }
+          },
+          "initiative": {
+            "label": "Initiative"
+          },
+          "resonance": {
+            "intensity": {
+              "label": "Intensity"
+            },
+            "rise": {
+              "label": "Rise"
+            }
+          }
+        },
+        "Emotions": "Resonant Emotions",
+        "Resonance": "Resonance Roll",
+        "RequestResonance": "Request Resonance Roll",
+        "ResonanceTable": "Resonance Table",
+        "Mutation": "Possession Mutation",
+        "Attacks": "Attacks",
+        "AttackName": "Name",
+        "AttackDice": "Dice",
+        "AttackTarget": "Target",
+        "AttackDamage": "Damage Formula",
+        "FixedSuccess": "Fixed Successes",
+        "NoResonanceTarget": "Target a resonant to request a resonance roll."
       }
     },
     "skillRoll": "{skillName} Roll",
@@ -518,7 +582,8 @@
       "MatchNone": "No Match",
       "MatchRoot": "Root Attribute Match",
       "MatchCompletely": "Perfect Match",
-      "RollButton": "Roll"
+      "RollButton": "Roll",
+      "NotCharacter": "Only resonants can make resonance rolls."
     },
     "resonantEmotion": "{emotion} ({attribute})",
     "result": {
