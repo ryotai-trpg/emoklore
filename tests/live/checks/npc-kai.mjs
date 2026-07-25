@@ -98,14 +98,30 @@ export async function run({ page, check }) {
           await window.__setMode(sheet, mode);
           for (const key of window.__findUnresolvedKeys(sheet.element)) leaked.add(key);
         }
+
+        // 攻撃欄のラベルはスキーマ（FIELDS.attacks.element.*）から引く。
+        // 道を間違えると生キーではなく空文字になり、未解決キーの検査では見つからない
+        await window.__setMode(sheet, "edit");
+        const labels = [...sheet.element.querySelectorAll(".em-kai__attack-fields label")].map(
+          (label) => label.firstChild?.textContent?.trim() ?? "",
+        );
+        const namePlaceholder =
+          sheet.element.querySelector(".em-kai__attack-name-input")?.placeholder ?? "";
+        const blank = labels.filter((label) => label === "").length;
         await window.__setMode(sheet, "play");
 
+        // 攻撃1件につきラベルが6つ。件数は検証データ側の都合なので割り切れることだけ見る
+        const ok =
+          leaked.size === 0 &&
+          labels.length > 0 &&
+          labels.length % 6 === 0 &&
+          blank === 0 &&
+          namePlaceholder !== "";
         return {
-          ok: leaked.size === 0,
-          detail:
-            leaked.size === 0
-              ? "閲覧・編集とも なし"
-              : `生キー: ${[...leaked].slice(0, 5).join(", ")}`,
+          ok,
+          detail: ok
+            ? `閲覧・編集とも なし／攻撃欄=${labels.join("・")}（名前=${namePlaceholder}）`
+            : `生キー: ${[...leaked].slice(0, 5).join(", ") || "なし"} 攻撃欄のラベル${labels.length}件（空${blank}）名前=${namePlaceholder || "空"}`,
         };
       },
       TAG,
