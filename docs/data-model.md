@@ -392,7 +392,7 @@ Itemにしてあるのは、コンペンディウムに入れて配ったり他�
 | `successCount` | NumberField | `null` | 判定の成功数（judgeless なら固定成功数） |
 | `damageTotal` | NumberField | `null` | ダメージ合計 |
 
-ボタンのハンドラ（ダメージ適用）は `data/` に置かず、`applications/kai-attack.ts` のものを `emoklore.ts` の init が `ACTIONS` へ登録する（[アーキテクチャ](/architecture)の課題5 の再演を避ける）。
+ボタンのハンドラ（ダメージ適用）は `data/` に置かず、`applications/kai-attack.ts` のものを `emoklore.ts` の init が `ACTIONS` へ登録する（どのカードも同じ形。[コード設計の規約](/code-design)「層とimportの方向」）。
 
 ## ChatMessage `damageApplied`
 
