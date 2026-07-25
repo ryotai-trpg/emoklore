@@ -24,7 +24,9 @@
 @import url("./applications/item-sheet.css");
 @import url("./applications/charsheet-import-dialog.css");
 @import url("./applications/active-effect-config.css");
+@import url("./applications/combat-tracker.css");
 
 /* Chat — シートの外に出るチャットカード */
 @import url("./chat/dice-roll.css");
 @import url("./chat/weapon-card.css");
+@import url("./chat/survival-reminder.css");

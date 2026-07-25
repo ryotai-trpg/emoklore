@@ -120,6 +120,24 @@ Foundryは `Document#update` をサーバ側で権限検査するので、OWNER�
 
 1体でも触れない対象が混じっていれば、触れるものも含めてまとめてGMに預ける。一部だけ自分で処理すると適用の記録が2件に割れてしまうため。
 
+## イニシアチブとCombatの統合
+
+イニシアチブは本体のCombat / Combatant / CombatTrackerに乗せている。要はエンカウンターごとに「能力値＋技能」を選べることで、ルール上イニシアチブ値は状況で変わる（戦闘は【身体】＋〈スピード〉、捜索は【五感】＋〈観察眼〉…）。
+
+**基準は型付きCombatの `system` に持たせる。** `documentTypes.Combat` に単一種別 `standard` を宣言し、`CombatDataModel` が `characteristic` と `skill` を保存する。`EmokloreCombat#_initializeSource` が `base` を `standard` に寄せるので、種別を選ばせなくても全Combatが基準を持つ。
+
+**Combatantは型付きにしない。** 基準はエンカウンター単位で、同値のタイブレークも手動なので、combatantごとのシステムデータが要らない。ドキュメントクラスだけ差し替える（dnd5eの `Combatant5e` と同じ薄い上書き）。作れない・不要な種別を登録しないのは、NPCの扱い（下記の既知の構造的課題）と同じ判断。
+
+**式は `Combatant#_getInitiativeFormula` の1点で組み立てる。** 本体が「systemが上書きしてよい」と明記する唯一のシームで、roll all / roll NPC / トラッカーの行ロール・再ロールはすべて `Combat#rollInitiative` → `Combatant#getInitiativeRoll` → ここを通る。`combat.system` の基準から式文字列を返し、本体が `actor.getRollData()` に対して解決する。純粋な組み立ては `rules/initiative.ts` に切り出してテストしている。
+
+**既定の【身体】＋〈スピード〉だけは派生値 `@initiative` を返す。** `system.initiative` は効果の着地点でもあるので、既定の基準では初速への効果が抜け落ちない。他の基準は入力（能力値・技能）側の効果だけが乗り、`system.initiative` への直接の効果は乗らない。これは既知の割り切りで、基準ごとに別の初速修正を持ち込むルールが無いぶん許容している。
+
+**ターン順は線形。** イニシアチブ降順の素直な並びで、draw-steelのようなスロット制ではない。同値のタイブレーク（1D10の小さい方が先）と待機・放棄は、本体トラッカーの相対入力（`+2` / `=5`）による手動調整に委ねる。非線形な並べ替えでターンイベントが欠ける本体の挙動（`#triggerTurnEvents` が前進を仮定する）は、線形運用なので踏まない。`_manageTurnEvents` の再実装はしない。
+
+**トラッカーのUIは `_onRender` で後付け注入する。** 基準の選択バーを冪等に差す。注入コードは層分けに従い `applications/`（`EmokloreCombatTracker`）に置く。ryuutamaは `combat.system._onRender` へ転送してDataModel側にUIを置くが、`data/` にUIを持たせない方針なので、こちらはトラッカー側に置く。
+
+**ラウンド終了時の〈＊生存〉判定リマインダは `Combat#_onEndRound` で出す。** 【心肺停止】のcombatantを集めて型付きChatMessage（`SurvivalReminderModel`）を作る。表示と判定ショートカットまでで、判定の強制や【死亡】の自動付与はしない（HP/MP境界の案内と同じ方針）。
+
 ## 既知の構造的課題
 
 1. **スキーマ定義が `CONFIG.EMOKLORE` に依存**: `module/data/character.ts` がキー集合を得るために定義時点で `CONFIG.EMOKLORE` を読む。`CONFIG.EMOKLORE` を設定するのは自分の `init` フックなので制御下にあるが、他モジュールが `init` 中に `Actor.dataModels.character.schema` へ触ると壊れうる。`TypedObjectField` での解消は検討したうえで見送った（下記）

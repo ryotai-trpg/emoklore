@@ -8,6 +8,9 @@
       "weapon": "武器",
       "armor": "防具",
       "skill": "カスタム技能"
+    },
+    "Combat": {
+      "standard": "標準"
     }
   },
   "SETTINGS": {
@@ -152,6 +155,36 @@
         "NoPermission": "このキャラクターに状態を付与する権限がありません。",
         "ActorMissing": "対象のキャラクターが見つかりません。",
         "ActionFailed": "操作に失敗しました。"
+      },
+      "survivalReminder": {
+        "Prompt": "ラウンド終了。【心肺停止】のキャラクターは〈＊生存〉判定（〈耐久〉〈根性〉で代用可）。失敗で【死亡】。",
+        "Roll": "〈生存〉判定",
+        "ActorMissing": "対象のキャラクターが見つかりません。",
+        "ActionFailed": "操作に失敗しました。"
+      }
+    },
+    "Combat": {
+      "presets": {
+        "combat": "戦闘・逃走",
+        "underwater": "水中戦闘",
+        "search": "捜索",
+        "debate": "議論",
+        "cardiacArrest": "心肺停止（器用）"
+      },
+      "FIELDS": {
+        "characteristic": {
+          "label": "能力値"
+        },
+        "skill": {
+          "label": "技能"
+        }
+      },
+      "bar": {
+        "title": "行動値",
+        "preset": "プリセット",
+        "custom": "カスタム",
+        "noSkill": "技能なし",
+        "recomputeAll": "全員再算出"
       }
     },
     "ApplyDamage": {

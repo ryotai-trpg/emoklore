@@ -4,18 +4,23 @@ import "../css/emoklore.css";
 import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
 import { EmokloreArmorSheet } from "./applications/armor-sheet";
 import * as applications from "./applications/character-sheet";
+import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
 import { statusEffects } from "./config/status-effects";
 import { CharacterDataModel } from "./data/character";
+import { CombatDataModel } from "./data/combat";
 import { ArmorDataModel, SkillDataModel, WeaponDataModel } from "./data/item-models";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
+import { SurvivalReminderModel } from "./data/messages/survival-reminder";
 import { WeaponCardModel } from "./data/messages/weapon-card";
 import { EmokloreDie } from "./dice/emoklore-die";
 import { EmokloreRoll } from "./dice/emoklore-roll";
 import { EmokloreActor } from "./documents/actor";
+import { EmokloreCombat } from "./documents/combat";
+import { EmokloreCombatant } from "./documents/combatant";
 import { EmokloreItem } from "./documents/item";
 import { registerQueries } from "./documents/queries";
 import { getSetting, registerSystemSettings } from "./settings";
@@ -35,6 +40,8 @@ Hooks.once("init", () => {
   // Documentの実装クラスを差し替える
   CONFIG.Actor.documentClass = EmokloreActor;
   CONFIG.Item.documentClass = EmokloreItem;
+  CONFIG.Combat.documentClass = EmokloreCombat;
+  CONFIG.Combatant.documentClass = EmokloreCombatant;
 
   // system配下のデータモデルを登録する。
   // TypeDataModel のコンストラクタ型はジェネリクスが開いたままなので、ModelData を
@@ -53,7 +60,19 @@ Hooks.once("init", () => {
   CONFIG.ChatMessage.dataModels = {
     weapon: WeaponCardModel,
     damageApplied: DamageAppliedModel,
+    survivalReminder: SurvivalReminderModel,
   } as typeof CONFIG.ChatMessage.dataModels;
+  // Combat は単一種別 standard。エンカウンターのイニシアチブ基準を system に持たせる
+  CONFIG.Combat.dataModels = {
+    standard: CombatDataModel,
+  } as typeof CONFIG.Combat.dataModels;
+
+  // イニシアチブは能力値＋技能の整数。小数点以下は出さない。同値のタイブレークはトラッカーの
+  // 相対入力（+2 / =5）で手動調整するので、整数のまま直接編集できる状態を保つ
+  CONFIG.Combat.initiative.decimals = 0;
+
+  // 基準（能力値＋技能）の選択バーをトラッカーに後付けする
+  CONFIG.ui.combat = EmokloreCombatTracker;
 
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;

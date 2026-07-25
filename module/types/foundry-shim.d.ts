@@ -9,5 +9,7 @@ declare global {
     export import ActiveEffect = foundry.documents.ActiveEffect;
     export import Item = foundry.documents.Item;
     export import ChatMessage = foundry.documents.ChatMessage;
+    export import Combat = foundry.documents.Combat;
+    export import Combatant = foundry.documents.Combatant;
   }
 }

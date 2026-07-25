@@ -8,6 +8,9 @@
       "weapon": "Weapon",
       "armor": "Armor",
       "skill": "Custom Skill"
+    },
+    "Combat": {
+      "standard": "Standard"
     }
   },
   "SETTINGS": {
@@ -152,6 +155,36 @@
         "NoPermission": "You lack permission to apply a status to this character.",
         "ActorMissing": "The target character could not be found.",
         "ActionFailed": "The action failed."
+      },
+      "survivalReminder": {
+        "Prompt": "End of round. Characters in Cardiac Arrest roll *Survival (Endurance or Grit may substitute). On failure, Dead.",
+        "Roll": "Roll Survival",
+        "ActorMissing": "The target character could not be found.",
+        "ActionFailed": "The action failed."
+      }
+    },
+    "Combat": {
+      "presets": {
+        "combat": "Combat / Flight",
+        "underwater": "Underwater Combat",
+        "search": "Search",
+        "debate": "Debate",
+        "cardiacArrest": "Cardiac Arrest (Dexterity)"
+      },
+      "FIELDS": {
+        "characteristic": {
+          "label": "Characteristic"
+        },
+        "skill": {
+          "label": "Skill"
+        }
+      },
+      "bar": {
+        "title": "Initiative",
+        "preset": "Preset",
+        "custom": "Custom",
+        "noSkill": "No skill",
+        "recomputeAll": "Recompute all"
       }
     },
     "ApplyDamage": {

@@ -1,0 +1,39 @@
+/* イニシアチブ基準の選択バー。CombatTracker に注入されるためシートの外に出る。
+   自前のクラスはすべて em- 接頭辞なので、本体や他モジュールとは衝突しない */
+
+.em-initiative-basis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+  padding: var(--spacer-4) var(--spacer-8);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.em-initiative-basis__row {
+  display: flex;
+  gap: var(--spacer-4);
+  align-items: center;
+}
+
+/* select は伸ばし、min-width: 0 で長いラベルが枠を破らないようにする */
+.em-initiative-basis__preset,
+.em-initiative-basis__select {
+  flex: 1;
+  min-width: 0;
+}
+
+.em-initiative-basis__recompute {
+  flex: 0 0 auto;
+}
+
+/* プレイヤー向けの読み取り専用表示 */
+.em-initiative-basis__label {
+  display: flex;
+  gap: var(--spacer-4);
+  align-items: baseline;
+}
+
+.em-initiative-basis__title {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-12);
+}
