@@ -34,17 +34,35 @@ export async function run({ page, check }) {
         picker.element.querySelector("[data-emotion=anger]").click();
         picker.element.querySelector("[data-emotion=anger]").click();
         picker.element.querySelector("[data-emotion=regret]").click();
+        // グリッド側にも選択中がタグで出る
+        await window.__waitFor(() => picker.element.querySelectorAll(".tags .tag").length === 2, {
+          label: "ピッカーのタグ",
+        });
         picker.element.querySelector("button[type=submit]").click();
         await window.__waitFor(() => !findApp("EmotionPicker"), { label: "ピッカーが閉じる" });
 
         const form = dlg.element.querySelector("form") ?? dlg.element;
         const value = form.elements.namedItem("emotions").value;
-        const label = dlg.element.querySelector("[data-emotion-label]").textContent.trim();
+        // 表示は本体と同じタグ。長い名前が並んでも折り返せる形になっている
+        const tags = [...dlg.element.querySelectorAll(".em-emotion-field .tag")].map((t) =>
+          t.querySelector("span").textContent.trim(),
+        );
+
+        // タグの×で外すと hidden も一緒に減る
+        dlg.element.querySelector(".em-emotion-field .tag[data-key=regret] .remove").click();
+        await window.__waitFor(() => form.elements.namedItem("emotions").value === "hope", {
+          label: "タグの削除",
+        });
+        const afterRemove = [...dlg.element.querySelectorAll(".em-emotion-field .tag")].length;
+
         await dlg.close();
         await window.__waitFor(() => !findApp("Dialog"), { soft: true, label: "ダイアログ" });
 
-        const ok = value === "hope,regret" && label === "希望（理想）／後悔（傷）";
-        return { ok, detail: `${value} / ${label}` };
+        const ok =
+          value === "hope,regret" &&
+          tags.join("／") === "希望（理想）／後悔（傷）" &&
+          afterRemove === 1;
+        return { ok, detail: `${value} → タグ[${tags.join(" ")}] → ×で${afterRemove}件` };
       },
       TAG,
     ),
