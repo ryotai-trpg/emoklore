@@ -23,6 +23,7 @@ import * as importCheck from "./checks/import.mjs";
 import * as npcKai from "./checks/npc-kai.mjs";
 import * as registration from "./checks/registration.mjs";
 import * as schema from "./checks/schema.mjs";
+import * as skillRequest from "./checks/skill-request.mjs";
 import * as skillRoll from "./checks/skill-roll.mjs";
 import * as weapon from "./checks/weapon.mjs";
 import { closeBrowser, ensureChrome, openPage } from "./lib/cdp.mjs";
@@ -38,6 +39,7 @@ const CHECKS = [
   schema,
   characterSheet,
   skillRoll,
+  skillRequest,
   customSkill,
   weapon,
   npcKai,

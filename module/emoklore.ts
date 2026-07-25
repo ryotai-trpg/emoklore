@@ -4,11 +4,13 @@ import "../css/emoklore.css";
 import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
 import { EmokloreArmorSheet } from "./applications/armor-sheet";
 import * as applications from "./applications/character-sheet";
+import { injectChatControls } from "./applications/chat-controls";
 import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
 import { applyKaiDamage } from "./applications/kai-attack";
 import { EmokloreKaiSheet } from "./applications/kai-sheet";
 import { EmokloreNpcSheet } from "./applications/npc-sheet";
+import { rollRequested } from "./applications/requests";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
@@ -19,6 +21,7 @@ import { ArmorDataModel, SkillDataModel, WeaponDataModel } from "./data/item-mod
 import { KaiDataModel } from "./data/kai";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
 import { KaiAttackCardModel } from "./data/messages/kai-attack-card";
+import { SkillRequestModel } from "./data/messages/skill-request";
 import { SurvivalReminderModel } from "./data/messages/survival-reminder";
 import { WeaponCardModel } from "./data/messages/weapon-card";
 import { NpcDataModel } from "./data/npc";
@@ -70,6 +73,7 @@ Hooks.once("init", () => {
     kaiAttack: KaiAttackCardModel,
     damageApplied: DamageAppliedModel,
     survivalReminder: SurvivalReminderModel,
+    skillRequest: SkillRequestModel,
   } as typeof CONFIG.ChatMessage.dataModels;
   // Combat は単一種別 standard。エンカウンターのイニシアチブ基準を system に持たせる
   CONFIG.Combat.dataModels = {
@@ -92,6 +96,9 @@ Hooks.once("init", () => {
 
   // 怪異の攻撃カードの「ダメージ適用」も同じく applications/ 側のハンドラを ACTIONS へ登録する
   KaiAttackCardModel.ACTIONS.applyDamage = applyKaiDamage;
+
+  // DLからの判定要求。押した人のアクターで振るので、これも applications/ 側から登録する
+  SkillRequestModel.ACTIONS.rollRequested = rollRequested;
 
   // トークンに付けられる状態をエモクロアのものに差し替える。既定はD&D風の
   // dead/blind/prone… で、ルールブックの【気絶】【心肺停止】などが1つも無い。
@@ -221,6 +228,11 @@ Hooks.once("init", () => {
 Hooks.on("renderChatMessageHTML", (message: ChatMessage, html: HTMLElement) => {
   const system = (message as { system?: { addListeners?: (html: HTMLElement) => void } }).system;
   system?.addListeners?.(html);
+});
+
+// チャット欄にDL用のボタンを差す。v14は入力欄まわりの要素をこのフックで渡してくる
+Hooks.on("renderChatInput", (_chat: unknown, elements: Record<string, HTMLElement>) => {
+  injectChatControls(elements);
 });
 
 Hooks.once("i18nInit", () => {

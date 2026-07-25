@@ -183,6 +183,12 @@
         "MpCost": "MP cost",
         "UnnamedAttack": "Attack",
         "ActionFailed": "The action failed."
+      },
+      "skillRequest": {
+        "Title": "Check Requested",
+        "NoActor": "No actor to roll with. Select a token or assign a character.",
+        "NotCharacterLike": "This actor type has no skill checks.",
+        "ActionFailed": "The check request card action failed."
       }
     },
     "Combat": {
@@ -575,6 +581,18 @@
       "ErrorInvalidKind": "Not a character data",
       "ErrorMissingData": "Data not found",
       "ErrorImportFailed": "Import failed"
+    },
+    "SkillRequest": {
+      "Title": "Request a Check",
+      "Post": "Post to Chat",
+      "Skills": "Skills",
+      "SkillsHint": "Hold Ctrl (Cmd) to select several.",
+      "WithBase": "Include base skills",
+      "WithBaseHint": "Produces the “Observation or *Perception” form.",
+      "NormalSkills": "Skills",
+      "BaseSkills": "Base Skills",
+      "Note": "Note",
+      "NotePlaceholder": "Any condition that applies only to this check"
     },
     "RollOptions": {
       "Title": "Roll Options",

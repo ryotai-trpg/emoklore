@@ -1,11 +1,9 @@
 import type { EmokloreActor } from "../../documents/actor";
+import { attachCardActions, type CardActions } from "../../utils/chat-card";
 import { EmokloreSystemDataModel } from "../system-model";
 
 const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
-
-/** ボタン1つぶんの処理。押した要素の dataset を読むので要素ごと受け取る */
-type ReminderAction = (this: SurvivalReminderModel, button: HTMLElement) => Promise<void>;
 
 /** リマインダ1体ぶん。アクターを消したあとも読めるよう名前を焼き込む */
 export type SurvivalTarget = {
@@ -37,7 +35,7 @@ export class SurvivalReminderModel extends EmokloreSystemDataModel {
   declare targets: SurvivalTarget[];
 
   /** ボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: Record<string, ReminderAction>;
+  static ACTIONS: CardActions<SurvivalReminderModel>;
 
   static override defineSchema() {
     return defineSurvivalReminderSchema();
@@ -66,34 +64,14 @@ export class SurvivalReminderModel extends EmokloreSystemDataModel {
     await actor.rollSkill({ kind: "base", key: "survival" });
   }
 
-  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（damage-applied と同じ配線） */
+  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
   addListeners(html: HTMLElement): void {
-    const root = html.querySelector(".em-survival-reminder");
-    if (!root) return;
-
-    root.addEventListener("click", (event) => {
-      const target = (event.target as HTMLElement).closest<HTMLElement>("[data-action]");
-      const actionName = target?.dataset.action;
-      if (!target || !actionName) return;
-
-      const action = SurvivalReminderModel.ACTIONS[actionName];
-      if (!action) return;
-
-      // 連打で二重に振らせない。処理中はボタンを落とし、成否によらず必ず戻す
-      const button = target instanceof HTMLButtonElement ? target : null;
-      if (button) button.disabled = true;
-
-      action
-        .call(this, target)
-        .catch((error: unknown) => {
-          console.error("emoklore | 生存判定リマインダの操作に失敗しました", error);
-          ui.notifications?.error("EMOKLORE.ChatMessage.survivalReminder.ActionFailed", {
-            localize: true,
-          });
-        })
-        .finally(() => {
-          if (button) button.disabled = false;
-        });
+    attachCardActions(html, {
+      root: ".em-survival-reminder",
+      model: this,
+      actions: SurvivalReminderModel.ACTIONS,
+      label: "生存判定リマインダ",
+      errorKey: "EMOKLORE.ChatMessage.survivalReminder.ActionFailed",
     });
   }
 }
