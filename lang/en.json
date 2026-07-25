@@ -24,6 +24,43 @@
       "DeveloperActorId": {
         "Name": "Actor ID to Open on Startup",
         "Hint": "When developer mode is enabled, automatically open this actor's sheet on startup. Leave blank to do nothing."
+      },
+      "autoArmorReduction": {
+        "Name": "Apply Equipped Armor Automatically",
+        "Hint": "Subtract the defense of equipped armor when damage is applied. Turn off to choose armor manually in the reduction dialog (a kai's innate armor always applies regardless of this setting)."
+      },
+      "autoHpBoundaryNotice": {
+        "Name": "Announce HP Thresholds",
+        "Hint": "Post a chat notice, with a button to apply the status, when half or more HP is lost at once and when HP reaches 0. Neither setting forces a roll or applies a status automatically."
+      },
+      "autoMpBoundaryNotice": {
+        "Name": "Announce MP Thresholds",
+        "Hint": "Post a chat notice, with a button to apply Faint, when MP crosses to 0 or below."
+      },
+      "autoSurvivalReminder": {
+        "Name": "Remind About Survival Rolls",
+        "Hint": "At the end of a combat round, post a chat reminder with roll shortcuts for characters in Cardiac Arrest."
+      },
+      "autoResonanceRise": {
+        "Name": "Raise Resonance Automatically",
+        "Hint": "Raise Resonance on a successful roll when answering a Dealer's resonance request. Turn off to post the outcome card without changing the value."
+      },
+      "autoEmotionMatch": {
+        "Name": "Match Resonant Emotions Automatically",
+        "Hint": "Decide the match from the emotions the Dealer specified and those the character holds. Turn off to ask in a dialog on every roll (a match forced by the Dealer still takes priority)."
+      },
+      "skillRollDialog": {
+        "Name": "Roll Options Dialog",
+        "Hint": "Whether clicking a skill name opens the dialog that asks for dice bonuses and the like.",
+        "Modifier": "Only on Shift+click",
+        "Always": "Every time"
+      },
+      "damageResultVisibility": {
+        "Name": "Visibility of Damage Results",
+        "Hint": "Who can see the \"Actor HP: 16 → 8\" result card. Use this to hide enemy HP.",
+        "Public": "Everyone",
+        "Gm": "Dealer only",
+        "Mode": "Follow the chat mode selector"
       }
     }
   },

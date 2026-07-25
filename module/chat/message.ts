@@ -14,6 +14,20 @@ import type { EmokloreActor } from "../documents/actor";
 const COMMON_FLAGS = { core: { canPopout: true } };
 
 /**
+ * メッセージの公開範囲。本体の `CONFIG.ChatMessage.modes` のキー。
+ *
+ * v14 は `ChatMessage#_preCreate` が `options.messageMode` を見て `applyMode` を通す。
+ * **渡さなければ `applyMode` 自体が走らない**ので、「そのまま全員に出す」が既定になる。
+ * `ChatMessage.applyRollMode` は v14 で非推奨なので使わない。
+ */
+export type MessageMode = "public" | "self" | "gm" | "blind" | "ic";
+
+export type PostOptions = {
+  /** 省略すると全員に出る。`"mode"` 相当（チャット欄の選択に従う）は呼び出し側が解決する */
+  messageMode?: MessageMode | undefined;
+};
+
+/**
  * 型付きカード1枚ぶんの中身。
  *
  * `system` はサブタイプのスキーマと同じ形。型引数で受けるので、
@@ -39,19 +53,31 @@ export const buildCardMessageData = <S>(data: CardMessageData<S>) => ({
   flags: COMMON_FLAGS,
 });
 
+/**
+ * 本体の `create` の第2引数。
+ *
+ * `messageMode` は `ChatMessage#_preCreate` が読むが、本体の
+ * `DatabaseCreateOperation` には宣言が無いので足す（実際に使う1つだけ）。
+ */
+type CreateOptions = Parameters<typeof ChatMessage.create>[1] & { messageMode?: MessageMode };
+
 /** 組み立て済みのメッセージをチャットに置く。フックを挟んだ側の受け口 */
 export async function postMessage(
   data: ReturnType<typeof buildCardMessageData>,
+  { messageMode }: PostOptions = {},
 ): Promise<ChatMessage | undefined> {
+  const options: CreateOptions = messageMode ? { messageMode } : {};
+
   // 本体の create は Document 止まりの型を返すので、ここで1回だけ絞る
-  return (await ChatMessage.create(data)) as ChatMessage | undefined;
+  return (await ChatMessage.create(data, options)) as ChatMessage | undefined;
 }
 
 /** 型付きカードを1枚チャットに置く。フックを挟まないカードはこちらを使う */
 export async function createCardMessage<S>(
   data: CardMessageData<S>,
+  options: PostOptions = {},
 ): Promise<ChatMessage | undefined> {
-  return postMessage(buildCardMessageData(data));
+  return postMessage(buildCardMessageData(data), options);
 }
 
 export type RollMessageData = {

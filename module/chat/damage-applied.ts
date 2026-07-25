@@ -10,7 +10,8 @@ import { systemPath } from "../constants";
 import type { AppliedTarget, DamageAppliedState } from "../data/messages/damage-applied";
 import type { EmokloreActor } from "../documents/actor";
 import { resolveHpBoundary } from "../rules/resource-boundary";
-import { createCardMessage } from "./message";
+import { getSetting } from "../settings";
+import { createCardMessage, type MessageMode } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/damage-applied.hbs");
 
@@ -56,6 +57,9 @@ function buildHpEntry(
           : "EMOKLORE.ChatMessage.weapon.Applied";
   const line = game.i18n.localize(lineKey, { name, before, after, reduction, armor });
 
+  // 案内は設定で切れる。切ると結果の行だけが残る
+  if (!getSetting("autoHpBoundaryNotice")) return { line };
+
   const boundary = resolveHpBoundary({ before, after });
   if (!boundary) return { line };
 
@@ -81,9 +85,28 @@ const renderCard = (entries: EntryContext[]): Promise<string> =>
   foundry.applications.handlebars.renderTemplate(TEMPLATE, { entries });
 
 /**
+ * 結果カードを誰に見せるか。
+ *
+ * 既定（全員）では何も返さない。本体は `options.messageMode` があるときだけ `applyMode` を
+ * 通すので、渡さないことがそのまま「全員に出す」になる。
+ */
+const resolveVisibility = (): MessageMode | undefined => {
+  switch (getSetting("damageResultVisibility")) {
+    case "gm":
+      return "gm";
+    // チャット欄のモード選択に従う。本体の applyMode が既定で読むのと同じ設定
+    case "mode":
+      return game.settings.get("core", "messageMode") as MessageMode;
+    default:
+      return undefined;
+  }
+};
+
+/**
  * ダメージ適用の結果をチャットに流す。「アクター名 HP: 15 → 12」を対象の数だけ並べる。
  *
  * 適用した本人にしか見えない通知ではなく、卓の全員が経過を追えるようにチャットへ出す。
+ * 敵のHPを伏せたい卓は、公開範囲を設定で絞れる。
  */
 export async function createDamageAppliedMessage(
   applied: AppliedTarget[],
@@ -93,11 +116,14 @@ export async function createDamageAppliedMessage(
   // 要るため。境界の判定に使った前後の値も system に焼き込む
   const system: DamageAppliedState = { resource: "hp", reduction, targets: applied };
 
-  return createCardMessage({
-    type: "damageApplied",
-    system,
-    content: await renderCard(applied.map((target) => buildHpEntry(target, reduction))),
-  });
+  return createCardMessage(
+    {
+      type: "damageApplied",
+      system,
+      content: await renderCard(applied.map((target) => buildHpEntry(target, reduction))),
+    },
+    { messageMode: resolveVisibility() },
+  );
 }
 
 /**
@@ -105,6 +131,9 @@ export async function createDamageAppliedMessage(
  *
  * MPには applyDamage のような一元の減少口が無く、シートの直接編集が減少手段なので、
  * `EmokloreActor._onUpdate` からここに来る。判定の強制や【失神】の自動付与はしない。
+ *
+ * **公開範囲の設定は効かせない。** あれは「敵のHPを伏せる」ための設定で、こちらは
+ * 自分のシートを編集した結果の案内なので、伏せる理由が無い。
  */
 export async function createMpNoticeMessage(
   actor: EmokloreActor,
