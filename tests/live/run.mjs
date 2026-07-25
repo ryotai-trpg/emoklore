@@ -23,6 +23,7 @@ import * as emotionPicker from "./checks/emotion-picker.mjs";
 import * as importCheck from "./checks/import.mjs";
 import * as npcKai from "./checks/npc-kai.mjs";
 import * as registration from "./checks/registration.mjs";
+import * as resonanceRequest from "./checks/resonance-request.mjs";
 import * as schema from "./checks/schema.mjs";
 import * as skillRequest from "./checks/skill-request.mjs";
 import * as skillRoll from "./checks/skill-roll.mjs";
@@ -46,6 +47,7 @@ const CHECKS = [
   npcKai,
   emotionPicker,
   emotionMatch,
+  resonanceRequest,
   boundary,
   armor,
   activeEffect,
