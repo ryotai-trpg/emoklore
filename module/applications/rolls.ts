@@ -12,7 +12,7 @@
  * ダイアログが組み直す相手はその手前の `SkillRollParams`（`rules/` への入力）になる。
  */
 
-import type { SkillRef } from "../data/character";
+import type { SkillRef } from "../data/character-like";
 import type { EmokloreActor } from "../documents/actor";
 import { promptResonanceRoll } from "./dialogs/resonance-roll-dialog";
 import { promptSkillRoll } from "./dialogs/skill-roll-dialog";

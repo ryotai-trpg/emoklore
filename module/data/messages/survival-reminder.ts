@@ -1,6 +1,6 @@
 import type { EmokloreActor } from "../../documents/actor";
-import { attachCardActions, type CardActions } from "../../utils/chat-card";
-import { EmokloreSystemDataModel } from "../system-model";
+import type { CardActions } from "../../utils/chat-card";
+import { ChatCardModel } from "./card-model";
 
 const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
@@ -9,6 +9,12 @@ const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
 export type SurvivalTarget = {
   actorUuid: string | null;
   name: string;
+};
+
+/** カードに焼き込む内容。スキーマと同じ形 */
+export type SurvivalReminderState = {
+  round: number;
+  targets: SurvivalTarget[];
 };
 
 const defineSurvivalReminderSchema = () => {
@@ -30,12 +36,18 @@ const defineSurvivalReminderSchema = () => {
  * （docs/roadmap.md「実装しないこと: 高度な自動化」）。damage-applied と同じ型付きサブタイプに
  * して、`renderChatMessageHTML` の汎用配線（system.addListeners）に乗せる。
  */
-export class SurvivalReminderModel extends EmokloreSystemDataModel {
+export class SurvivalReminderModel extends ChatCardModel {
   declare round: number;
   declare targets: SurvivalTarget[];
 
+  static override CARD = {
+    root: ".em-survival-reminder",
+    label: "生存判定リマインダ",
+    errorKey: "EMOKLORE.ChatMessage.survivalReminder.ActionFailed",
+  };
+
   /** ボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: CardActions<SurvivalReminderModel>;
+  static override ACTIONS: CardActions<SurvivalReminderModel>;
 
   static override defineSchema() {
     return defineSurvivalReminderSchema();
@@ -62,17 +74,6 @@ export class SurvivalReminderModel extends EmokloreSystemDataModel {
 
     // 〈＊生存〉は基本技能 survival。〈耐久〉〈根性〉での代用は各自の判断に任せる
     await actor.rollSkill({ kind: "base", key: "survival" });
-  }
-
-  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
-  addListeners(html: HTMLElement): void {
-    attachCardActions(html, {
-      root: ".em-survival-reminder",
-      model: this,
-      actions: SurvivalReminderModel.ACTIONS,
-      label: "生存判定リマインダ",
-      errorKey: "EMOKLORE.ChatMessage.survivalReminder.ActionFailed",
-    });
   }
 }
 

@@ -6,11 +6,11 @@
  * 登録する（architecture.md 課題5 を繰り返さない）。
  */
 
+import { buildHowlingDrawState, createHowlingDrawMessage } from "../chat/howling-draw";
 import type { HowlingDrawModel } from "../data/messages/howling-draw";
 import type { ResonanceOutcomeModel } from "../data/messages/resonance-outcome";
 import type { EmokloreActor } from "../documents/actor";
-import { createHowlingDrawMessage } from "../utils/chat";
-import { buildHowlingDrawState, resolveResonanceTable } from "../utils/howling";
+import { resolveResonanceTable } from "../utils/howling";
 
 /**
  * 共鳴結果カードの「共鳴表を引く」。怪異に紐づいた表を1回引き、結果をカードに出す。

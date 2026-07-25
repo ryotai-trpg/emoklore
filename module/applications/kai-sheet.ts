@@ -6,7 +6,7 @@ import { EmokloreActorSheet } from "./actor-sheet";
 import { EmotionPicker } from "./emotion-picker";
 import { buildEmotionColumns } from "./helpers";
 import { requestResonanceCheck } from "./requests";
-import type { EmokloreRenderOptions } from "./types";
+import type { EmokloreRenderOptions, KaiSheetContext } from "./types";
 
 /** 攻撃を1件足すときの既定値。スキーマの initial と揃える */
 const DEFAULT_ATTACK: KaiAttack = {
@@ -134,19 +134,3 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
     });
   }
 }
-
-/** 怪異シートの表示用コンテキスト */
-type KaiSheetContext = {
-  // 基底の EmokloreDocumentSheetContext と対応する分
-  isPlay: boolean;
-  owner: boolean;
-  limited: boolean;
-  gm: boolean;
-  document: EmokloreActor;
-  system: KaiDataModel;
-  systemFields: Record<string, foundry.data.fields.DataField>;
-  flags: Record<string, unknown>;
-  selectedEmotions: Array<{ key: string; label: string }>;
-  mutationHTML: string;
-  resonanceTableLink: string;
-};

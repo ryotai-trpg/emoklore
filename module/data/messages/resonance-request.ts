@@ -1,5 +1,5 @@
-import { attachCardActions, type CardActions } from "../../utils/chat-card";
-import { EmokloreSystemDataModel } from "../system-model";
+import type { CardActions } from "../../utils/chat-card";
+import { ChatCardModel } from "./card-model";
 
 const {
   ArrayField,
@@ -15,6 +15,22 @@ const {
 export type RequestTarget = {
   actorUuid: string | null;
   name: string;
+};
+
+/**
+ * カードに焼き込む要求の内容。スキーマと同じ形。
+ *
+ * `emotions` が配列なのは、これがカードを**作るとき**の形だから（`SetField` は
+ * 配列を受ける）。読み出すときはモデル側の `Set<string>` になる。
+ */
+export type ResonanceRequestState = {
+  intensity: number;
+  rise: string;
+  emotions: string[];
+  forcedMatch: string;
+  possessionMode: boolean;
+  targets: RequestTarget[];
+  kaiUuid: string | null;
 };
 
 // 上昇値が妥当なRoll式かを確かめる。空は許す（怪異の rise と同じ検証）
@@ -80,7 +96,7 @@ const defineResonanceRequestSchema = () => ({
  * ボタンのハンドラは持たない。判定と共鳴値の更新を駆動するので `applications/` 側に置き、
  * `emoklore.ts` の init が `ACTIONS` へ登録する（architecture.md 課題5 を繰り返さない）。
  */
-export class ResonanceRequestModel extends EmokloreSystemDataModel {
+export class ResonanceRequestModel extends ChatCardModel {
   declare intensity: number;
   declare rise: string;
   declare emotions: Set<string>;
@@ -89,23 +105,18 @@ export class ResonanceRequestModel extends EmokloreSystemDataModel {
   declare targets: RequestTarget[];
   declare kaiUuid: string | null;
 
+  static override CARD = {
+    root: ".em-resonance-request",
+    label: "共鳴判定要求カード",
+    errorKey: "EMOKLORE.ChatMessage.resonanceRequest.ActionFailed",
+  };
+
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: CardActions<ResonanceRequestModel> = {};
+  static override ACTIONS: CardActions<ResonanceRequestModel> = {};
 
   static override defineSchema() {
     return defineResonanceRequestSchema();
   }
 
   static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.resonanceRequest"];
-
-  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
-  addListeners(html: HTMLElement): void {
-    attachCardActions(html, {
-      root: ".em-resonance-request",
-      model: this,
-      actions: ResonanceRequestModel.ACTIONS,
-      label: "共鳴判定要求カード",
-      errorKey: "EMOKLORE.ChatMessage.resonanceRequest.ActionFailed",
-    });
-  }
 }

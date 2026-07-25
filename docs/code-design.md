@@ -14,16 +14,19 @@ TypeScriptの型と、モジュールの分け方に関する規約はここが�
 | `rules/` | `config/`（型のみ） |
 | `dice/` | `rules/` |
 | `data/` | `config/` `rules/` `utils/` |
-| `documents/` | `config/` `data/` `rules/` `dice/` `utils/` |
+| `chat/` | `config/` `rules/` `data/` `utils/`。`documents/` は型のみ |
+| `documents/` | `config/` `data/` `rules/` `dice/` `chat/` `utils/` |
 | `applications/` | 上のすべて |
 | `utils/` | `config/` `rules/`。`data/` `documents/` は型のみ |
 
 - **`rules/` は何にも依存しない**。Foundry APIもi18nもUIも触らない。だから `vitest` の `environment: "node"` でそのまま動く。逆に言えば、テストしたいロジックはこの層に切り出す
 - **`import type` は依存の矢印を消さない**。型だけのimportはビルド後に消えるので、importグラフ上は逆依存が見えなくなる。`utils/charsheet-importer.ts` が `EmokloreActor` を型で借りたまま `actor.update()` を呼んでいるのがこれで、型だけ借りているように見えて実際は上の層を動かしている。**型だけ借りているのか、動かしているのかは分けて考えること**
 
-現状の例外は2つあり、どちらも [アーキテクチャ](/architecture) の「既知の構造的課題」に記録してある。`config/index.ts` が事前ローカライズの登録のために `utils/` をimportしている。もう1つは `data/messages/weapon-card.ts` で、カードのボタンハンドラが `documents/` を駆動している。
+現状の例外は1つで、[アーキテクチャ](/architecture) の「既知の構造的課題」に記録してある。`config/index.ts` が事前ローカライズの登録のために `utils/` をimportしている。
 
-**後者を表の行にしてはいけない。** 表は既に `documents/` → `data/` を許しているので、`data/` の行に `documents/` を足すと、表そのものが2層間の相互依存を許可することになる。順序を決めるための表が順序を失う。矢印は症状で、原因はハンドラの置き場所のほうにある。
+**`data/` の行に `documents/` を足してはいけない。** 表は既に `documents/` → `data/` を許しているので、足すと表そのものが2層間の相互依存を許可することになり、順序を決めるための表が順序を失う。チャットカードのボタンハンドラは判定やダメージ適用を駆動するためこの矢印を欲しがるが、**そこは表ではなくハンドラの置き場所で解く** — ハンドラは `applications/` に置き、`ACTIONS` へ外から登録する。
+
+**`chat/` から `data/` は値でも引いてよい。** カードの状態の型（`WeaponCardState` など）とボタンの出し分け（`resolveCardButtons`）はスキーマと同じ場所に置いてあり、`chat/` はそれを読む側になる。逆向き（`data/` → `chat/`）は無い。
 
 **ダイアログを開くかどうかは `applications/` が決める。** `documents/` のメソッドは検証済みの値を必須引数で受け、ダイアログを知らない。入力を集めてから呼ぶ入口は `applications/rolls.ts` にある。dnd5e は `Actor5e#rollSkill(config, dialog, message)` のようにDocument側がダイアログの可否まで持つが、それは**あちらのダイアログがRollクラスの静的メンバー（`BasicRoll.build`）で、パイプライン全体がRollの関心にある**ためで、こちらの事情とは違う。
 
@@ -98,6 +101,8 @@ export type SkillRef =
 - **それ以外は `type`**。キーのunion、`keyof typeof`、交差型、判別可能union、行データ
 
 シートのコンテキスト型（`CharacterContext` など）は**閉じた `type` のままにする**。`EmokloreDocumentSheetContext` を `extends` するとキャストは1つ減るが、基底の `[key: string]: unknown` を引き継ぐので `context.charPintSum = 1` のような打ち間違いが型チェックを素通りする（実測で確認済み）。
+
+共通の項目は `SheetContextBase<D, S>` との**交差型**で共有する。交差型には index signature が入らないので、上の性質は保たれたまま同じ8項目を書き写さずに済む。
 
 ## 型の名前
 

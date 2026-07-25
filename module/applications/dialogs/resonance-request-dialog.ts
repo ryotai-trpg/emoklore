@@ -1,5 +1,5 @@
 import { systemPath } from "../../constants";
-import type { ResonanceRequestState } from "../../utils/resonance";
+import type { ResonanceRequestState } from "../../data/messages/resonance-request";
 import { resolveActingActors } from "../../utils/targets";
 import {
   buildEmotionTags,

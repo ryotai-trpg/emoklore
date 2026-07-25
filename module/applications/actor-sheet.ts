@@ -1,6 +1,6 @@
 import { isBaseSkillKey } from "../config/base-skills";
 import { isSkillKey } from "../config/skills";
-import type { SkillRef } from "../data/character";
+import type { SkillRef } from "../data/character-like";
 import type { EmokloreActor } from "../documents/actor";
 import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
 import { requestResonanceRoll, requestSkillRoll } from "./rolls";

@@ -11,13 +11,16 @@
 ```
 module/
   emoklore.ts        … エントリ。CSS目次のimport、CONFIG登録、configのラベル事前ローカライズ、開発用フック
+  api.ts             … game.system.api に載せる公開操作。マクロとモジュールの接続面
   config/            … 静的なゲームルール定義（技能・特性・共鳴感情など）→ CONFIG.EMOKLORE
   data/              … TypeDataModelスキーマ（character / npc / kai / weapon / チャットカード）と派生値計算
   rules/             … ゲームルールの純粋関数（判定計算・成功数）。Foundry非依存でvitest対象
+  chat/              … チャットカードの組み立てと生成。1カード1ファイル
   documents/         … Actor / Item 拡張とGMへの処理委譲（queries）。判定を実行して結果を流す
-  applications/      … ApplicationV2シート・ダイアログ、判定の入口（rolls）。ダイアログを開くのはここ
+  applications/      … ApplicationV2シート・ダイアログ、判定の入口（rolls）、カードのボタンのハンドラ
+    context/         … シートがテンプレートに渡すデータの組み立て
   dice/              … カスタムRoll / Die（成功数判定: 1d10≦目標値、1クリティカル / 10ファンブル）
-  utils/             … i18n事前ローカライズ、ActiveEffect整理、チャット生成、ココフォリアインポートなど
+  utils/             … 汎用の道具と、configを翻訳・整形して素材を返すところまで
 templates/           … Handlebarsテンプレート。partials/ は引数を取る再利用部品
 css/
   emoklore.css       … @importを並べるだけの目次。規則は書かない
@@ -37,16 +40,41 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 | `config/` | 静的なルール定義のみ（純データ） | ロジック、i18n呼び出し |
 | `rules/` | ゲームルールの純粋関数（判定の目標値・成功数・ポイント合計など） | Foundry API、i18n、UI |
 | `data/` | スキーマ定義 + 派生値計算（`prepareDerivedData`）+ 判定に渡す値の収集 | UI、チャット生成、計算式の実装 |
-| `documents/` | Documentライフサイクルの薄いオーケストレーション。data層とrules層とapplications/chat層をつなぐ | 計算式の実装、ダイアログ |
-| `applications/` | シート・ダイアログ。コンテキスト整形のみ | ルール計算 |
-| `dice/` | Roll / Die / 結果の表現。判定の計算自体は `rules/` へ委譲する | ルール計算の実装、UI（判定ダイアログは `applications/`） |
-| `utils/` | 汎用ユーティリティ、i18n機構、チャット生成、インポータ | ルール計算 |
+| `chat/` | チャットカードの組み立てと生成（`renderTemplate` / `ChatMessage.create`） | ルール計算、Documentの更新、ダイアログ |
+| `documents/` | Documentライフサイクルの薄いオーケストレーション。data層とrules層とchat層をつなぐ | 計算式の実装、ダイアログ |
+| `applications/` | シート・ダイアログ・カードのボタンのハンドラ。コンテキスト整形のみ | ルール計算 |
+| `dice/` | Roll / Die / 結果の表現。判定の計算自体は `rules/` へ委譲する | ルール計算の実装、シート・ダイアログ |
+| `utils/` | 汎用ユーティリティ、i18n機構、configの翻訳・整形、インポータ | ルール計算、HTMLとDocumentの生成 |
 | `templates/` | 表示のみ。コンテキストの配列を回して並べる | lookup の組み立て、ルール判断 |
 | `css/` | 部品（components）と配置（applications）の2層 | 部品側での位置決め |
 
+**`utils/` と `chat/` の線は「素材か、成果物か」で引く。** `utils/` が返すのは文字列と行データ
+まで、`chat/` が返すのはHTMLとChatMessage。技能名の整形（`describeSkillLabel`）はシートも
+カードも使うので `utils/`、カードのHTML組み立ては `chat/` になる。
+
+**`dice/` が自分のチャットテンプレートに積むラベルは責務の内。** `EmokloreRoll` の
+`resultLabel` などは `_prepareChatRenderContext` に載せるためのもので、「結果の表現」に
+含まれる。ここで言う「置かないもの」はシートとダイアログを指す。
+
 層どうしのimportの方向（どの層がどこを読んでよいか）は [コード設計の規約](/code-design) が正。上の表は責務と「置かないもの」を決めるもので、矢印までは決めていない。
 
-## 武器カードのフック
+## モジュール連携
+
+接続面は2つある。**割り込むためのフック**と、**呼ぶためのAPI**。
+
+### 公開API
+
+`game.system.api`（実体は `module/api.ts`）に、UIを経由せずに呼ぶ意味のある操作だけを並べる。マクロからも同じ口を使う。
+
+| 操作 | 何をするか |
+|---|---|
+| `applyDamageAndReport(targets, amount, options)` | ダメージを対象へ適用し、結果をチャットに流す。権限が無ければGMへ委譲する |
+| `requestSkillCheck()` | DLからの技能判定要求をチャットに出す。内容はダイアログで尋ねる |
+| `requestResonanceCheck(preset)` | DLからの共鳴判定要求をチャットに出す |
+
+**内部の関数をここへ足さない。** 並べたぶんだけ外から見える約束が増え、動かせなくなる。本体の `System` は `api` を持たないので、`module/types/emoklore.d.ts` のモジュール拡張で名乗っている。
+
+### 武器カードのフック
 
 戦闘の自動化は他モジュール（midi-qol相当のもの）が引き取れる余地を残したいので、判定とダメージの各段にフックを置いている。`pre` が付くものは `Hooks.call` で呼ぶので、`false` を返すとその場で中断する。完了の通知は `Hooks.callAll` なので戻り値を見ない。命名と使い分けはdnd5eの規約に合わせている。
 
@@ -65,11 +93,11 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 
 **攻撃判定の `config` に `base`（基本技能かどうか）は載せていない。** これは `skill` から一意に決まる値なので、両方を載せると「通常技能のキーに `base: true`」のような矛盾した対をフックの側から作れてしまう。`base` をフックの**前**に算出するのも同じ理由で駄目で、`skill` だけを差し替えられると差し替え前の `base` と組み合わされて技能値が拾えなくなる。だからフックの**後**に `resolveAttackSkill()` から引き直す。
 
-カードのボタンは `WeaponCardModel.ACTIONS` の表で `data-action` から引いている。モジュールがここにキーを足せば、テンプレートを差し替えずにボタンを増やせる。
+カードのボタンは `WeaponCardModel.ACTIONS` の表で `data-action` から引いている。モジュールがここにキーを足せば、テンプレートを差し替えずにボタンを増やせる。**ハンドラの実体は `applications/weapon-card.ts` にあり、`emoklore.ts` の `init` が表へ登録する。** 判定とダメージ適用を駆動するので `data/` には置かない（どのカードも同じ形）。
 
 〈ストレングス〉による近接武器攻撃力の加算は `resolveStrengthBonus` が決め、`buildDamageFormula` の `bonus` に渡る。ダメージの軽減と防具は `EmokloreActor#applyDamage` に寄せてある。〈耐久〉判定も防御判定も防具も「受けるダメージから引く」という同じ形なので、`calculateAppliedDamage` の1つの引き算に流す。カードの「軽減して適用」ダイアログが、防御判定の成功数や手入力の値を `reduction` として流し、防具の既定（装備中防具の合計 `system.armor`）は `applyDamage` の1点が決める。ダイアログで部位条件により防具を外したときだけ、`armor` の上書き値がGM委譲クエリまで運ばれる（`undefined`＝自動と `0`＝防具なしの明示は意味が違うので、途中で `?? 0` に畳まない）。
 
-モジュール連携の接続面はいまこのフック群だけなので、このページに置く。ハウリングカードやイニシアチブで2つ目のフック群が生えたら、独立した「モジュール連携」ページに出す。
+モジュール連携の接続面はいまここに書いた分だけなので、このページに置く。ハウリングカードやイニシアチブで2つ目のフック群が生えたら、独立した「モジュール連携」ページに出す。
 
 ## 効果（ActiveEffect）の載せ方
 
@@ -141,11 +169,10 @@ Foundryは `Document#update` をサーバ側で権限検査するので、OWNER�
 ## 既知の構造的課題
 
 1. **スキーマ定義が `CONFIG.EMOKLORE` に依存**: `module/data/character.ts` がキー集合を得るために定義時点で `CONFIG.EMOKLORE` を読む。`CONFIG.EMOKLORE` を設定するのは自分の `init` フックなので制御下にあるが、他モジュールが `init` 中に `Actor.dataModels.character.schema` へ触ると壊れうる。`TypedObjectField` での解消は検討したうえで見送った（下記）
-2. **Actorの種別とunion（NPC・怪異は実装済み — Issue #81）**: `character`（共鳴者）・`npc`（人間NPC）・`kai`（怪異）の3種別を登録しているので、`EmokloreActor#system` は3つのunion。共通して持つ `resources.hp/mp` に触るリソース操作（`applyDamage`・MP境界）は絞り込みなしで通り、共鳴値・技能判定のように一部の種別しか持たないものは型述語（`isCharacter` / `isCharacterLike` / `isKai`、`EmokloreItem#isWeapon` と同じ形）で絞る。人間NPCは能力値・技能・派生値・技能判定を共鳴者と共有する（両者が `CharacterLikeDataModel` を継承。ルール上「人間NPCに専用ルールは無く、判定が要るなら共鳴者と同じ作り」）。怪異は能力値の標準ブロックを持たない別形状で、直接判定（ダイス数＋判定値）の攻撃を持つ。怪異の攻撃カードのボタンハンドラは `applications/`（`applyKaiDamage`）に置き `ACTIONS` へ外部登録することで、課題5（`data/` オーケストレータ）を繰り返さない。**種別は `system.json` の `documentTypes` と `CONFIG.Actor.dataModels` で必ず揃える**（作成できない種別を登録すると `system` の型が嘘になる）
+2. **Actorの種別とunion（NPC・怪異は実装済み — Issue #81）**: `character`（共鳴者）・`npc`（人間NPC）・`kai`（怪異）の3種別を登録しているので、`EmokloreActor#system` は3つのunion。共通して持つ `resources.hp/mp` に触るリソース操作（`applyDamage`・MP境界）は絞り込みなしで通り、共鳴値・技能判定のように一部の種別しか持たないものは型述語（`isCharacter` / `isCharacterLike` / `isKai`、`EmokloreItem#isWeapon` と同じ形）で絞る。人間NPCは能力値・技能・派生値・技能判定を共鳴者と共有する（両者が `CharacterLikeDataModel` を継承。ルール上「人間NPCに専用ルールは無く、判定が要るなら共鳴者と同じ作り」）。怪異は能力値の標準ブロックを持たない別形状で、直接判定（ダイス数＋判定値）の攻撃を持つ。怪異の攻撃カードのボタンハンドラは `applications/`（`applyKaiDamage`）に置き `ACTIONS` へ外部登録する（どのカードも同じ形）。**種別は `system.json` の `documentTypes` と `CONFIG.Actor.dataModels` で必ず揃える**（作成できない種別を登録すると `system` の型が嘘になる）
 3. **`config/` の副作用**: `module/config/index.ts` が import 時に `preLocalize` を呼び、`performPreLocalization` が `CONFIG.EMOKLORE` を破壊的に書き換える。この表の「`config/` に置かないもの」に反するが、dnd5e / draw-steel 由来の確立したパターンなので当面は踏襲する
 4. **`utils/charsheet-importer.ts` が2つの顔を持つ**: 純粋なパーサ（`parseSkills` / `parseEmotions` / `validateCharSheetJSON`、単体テスト済み）と、`actor.update()` と `ui.notifications` を持つ適用部（`importFromCharSheet`）が同じファイルにある。後者は `EmokloreActor` を `import type` で借りているので、**この逆依存はimportグラフに現れない**。分割は20〜30行規模だが、`buildImportIndexes()` が `CONFIG.EMOKLORE` を読むため、パーサを完全に純粋化するなら索引を引数で渡す形への変更が要る（Issue #58）
-5. **`data/messages/weapon-card.ts` がオーケストレータ**: カードのボタンハンドラ（`rollAttack` / `rollDamage` / `applyDamage`）が `actor.buildSkillRoll()` と `applyDamageToTargets()` を駆動し、`ui.notifications` とフックも持つ。`data/` の「置かないもの: UI、チャット生成」に反する。層表の `data/` の行に `documents/` を足して解決してはいけない（表が `documents/` → `data/` を許しているので、相互依存を許可することになる）。直すならハンドラの置き場所のほう
-6. **CIの穴**: 型チェックジョブはフォークからのPRで実行されない。理由は本体ソースの調達手段が無くなることで、secretsがフォークPRに渡らないため、キャッシュミス時のフォールバックである `tools/fetch-foundry.mjs` が成立しない。**Actions cache そのものはフォークPRからでもbase/デフォルトブランチのぶんをrestoreできる**（できないのは新規cacheの保存のほう）ので、ミスしなければ動きうるが、ミスしたときに落ちるだけのジョブは置いていない。lefthookには型チェックもテストも入っていない（`pre-push` 自体が無い）ので、**フォークからのPRは型チェックを一度も通さずに緑になれる**（Issue #56）
+5. **CIの穴**: 型チェックジョブはフォークからのPRで実行されない。理由は本体ソースの調達手段が無くなることで、secretsがフォークPRに渡らないため、キャッシュミス時のフォールバックである `tools/fetch-foundry.mjs` が成立しない。**Actions cache そのものはフォークPRからでもbase/デフォルトブランチのぶんをrestoreできる**（できないのは新規cacheの保存のほう）ので、ミスしなければ動きうるが、ミスしたときに落ちるだけのジョブは置いていない。lefthookには型チェックもテストも入っていない（`pre-push` 自体が無い）ので、**フォークからのPRは型チェックを一度も通さずに緑になれる**（Issue #56）
 
 ## 検討して見送ったもの
 

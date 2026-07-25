@@ -1,5 +1,5 @@
+import { createSurvivalReminderMessage } from "../chat/survival-reminder";
 import type { CombatDataModel } from "../data/combat";
-import { createSurvivalReminderMessage } from "../utils/chat";
 import type { EmokloreCombatant } from "./combatant";
 
 /**

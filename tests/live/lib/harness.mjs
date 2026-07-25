@@ -44,6 +44,9 @@ export const assertInPage = async (page, fn, ...args) => {
  * 速い環境では即座に進み、遅い環境でも取りこぼさない。
  * `soft: true` なら時間切れで例外にせず undefined を返す。呼び出し側が
  * 「起きなかったこと」を自分の言葉で報告したいときに使う。
+ *
+ * `__cardAction` はチャットカードのボタンを、DOMを介さずに押す。ハンドラの実体は
+ * バンドルの中なので、カードが公開している `ACTIONS`（モジュール向けの拡張点）から引く。
  */
 export const installPageHelpers = (page) =>
   page.eval(() => {
@@ -81,6 +84,22 @@ export const installPageHelpers = (page) =>
       const produced = window.__notes.slice(from);
       for (const n of produced) n.expected = true;
       return produced;
+    };
+
+    /**
+     * チャットカードのボタンを、DOMを介さずに押す。
+     *
+     * ハンドラの実体はバンドルの中なので直接は呼べない。カードのデータモデルが公開して
+     * いる `ACTIONS`（`data-action` の値からハンドラを引く表。モジュール向けの拡張点で、
+     * 実際のクリックもここを通る）から引いて、モデルに束ねて呼ぶ。
+     *
+     * 無いアクションを黙って素通りさせない。綴りを間違えたまま「押したつもり」で
+     * 先に進むと、何も起きていないのに通ってしまう。
+     */
+    window.__cardAction = (message, action) => {
+      const handler = message.system?.constructor?.ACTIONS?.[action];
+      if (!handler) throw new Error(`カードのアクションが無い: ${action}`);
+      return handler.call(message.system);
     };
 
     /**

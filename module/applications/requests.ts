@@ -6,23 +6,24 @@
  * 作らないためで、怪異の攻撃カードと同じ形（architecture.md 課題5）。
  */
 
+import { createResonanceOutcomeMessage } from "../chat/resonance-outcome";
+import { createResonanceRequestMessage } from "../chat/resonance-request";
+import { createSkillRequestMessage } from "../chat/skill-request";
 import { isBaseSkillKey } from "../config/base-skills";
 import { isSkillKey } from "../config/skills";
-import type { CharacterDataModel, SkillRef } from "../data/character";
-import type { ResonanceRequestModel } from "../data/messages/resonance-request";
+import type { CharacterDataModel } from "../data/character";
+import type { SkillRef } from "../data/character-like";
+import type {
+  ResonanceRequestModel,
+  ResonanceRequestState,
+} from "../data/messages/resonance-request";
 import type { SkillRequestModel } from "../data/messages/skill-request";
 import type { EmokloreRoll } from "../dice/emoklore-roll";
 import type { EmokloreActor } from "../documents/actor";
 import { raiseResonanceForActor } from "../documents/queries";
 import { HOWLING_SUCCESS, POSSESSION_RISE, type ResonanceMatch } from "../rules/resonance-roll";
 import { meetsRequirement } from "../rules/success";
-import {
-  createResonanceOutcomeMessage,
-  createResonanceRequestMessage,
-  createSkillRequestMessage,
-} from "../utils/chat";
 import { matchEmotion } from "../utils/emotion";
-import type { ResonanceRequestState } from "../utils/resonance";
 import { resolveActingActor, resolveActingActors } from "../utils/targets";
 import { promptResonanceRequest } from "./dialogs/resonance-request-dialog";
 import { promptSkillRequest } from "./dialogs/skill-request-dialog";

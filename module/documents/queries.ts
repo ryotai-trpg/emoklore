@@ -17,7 +17,7 @@
  */
 
 import { SYSTEM_ID } from "../constants";
-import type { DamageApplied } from "../utils/chat";
+import type { AppliedTarget } from "../data/messages/damage-applied";
 import type { EmokloreActor } from "./actor";
 
 type ApplyDamageQuery = {
@@ -86,7 +86,7 @@ export async function applyDamageToTargets(
   actors: EmokloreActor[],
   amount: number,
   { reduction = 0, armor }: { reduction?: number; armor?: number | undefined } = {},
-): Promise<DamageApplied[] | undefined> {
+): Promise<AppliedTarget[] | undefined> {
   if (actors.every((actor) => actor.isOwner)) return applyDamage(actors, amount, reduction, armor);
 
   // ここに来た時点で自分はGMではない。GMは常に全アクターのOWNERなので、
@@ -105,7 +105,7 @@ export async function applyDamageToTargets(
     armor,
   };
 
-  return (await gm.query(SYSTEM_ID, query)) as DamageApplied[];
+  return (await gm.query(SYSTEM_ID, query)) as AppliedTarget[];
 }
 
 /** UUIDで引いたアクターに適用する。委譲を受けた側の入口 */
@@ -114,7 +114,7 @@ async function applyDamageByUuid(
   amount: number,
   reduction: number,
   armor: number | undefined,
-): Promise<DamageApplied[]> {
+): Promise<AppliedTarget[]> {
   const resolved = await Promise.all(
     actorUuids.map((uuid) => foundry.utils.fromUuid(uuid) as Promise<EmokloreActor | null>),
   );
@@ -133,8 +133,8 @@ async function applyDamage(
   amount: number,
   reduction: number,
   armor: number | undefined,
-): Promise<DamageApplied[]> {
-  const applied: DamageApplied[] = [];
+): Promise<AppliedTarget[]> {
+  const applied: AppliedTarget[] = [];
 
   for (const actor of actors) {
     const change = await actor.applyDamage(amount, { reduction, armor });

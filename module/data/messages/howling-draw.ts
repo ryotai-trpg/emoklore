@@ -1,7 +1,29 @@
-import { attachCardActions, type CardActions } from "../../utils/chat-card";
-import { EmokloreSystemDataModel } from "../system-model";
+import type { HowlingCategory } from "../../config/howling-categories";
+import type { CardActions } from "../../utils/chat-card";
+import { ChatCardModel } from "./card-model";
 
 const { DocumentUUIDField, HTMLField, StringField } = foundry.data.fields;
+
+/**
+ * カードに焼き込む内容。スキーマと同じ形。
+ *
+ * `category` を絞ってあるのはカードを**作るとき**の形だから。読み出す側（モデルの
+ * `declare`）が素の `string` なのは、text結果では空になり、保存データが型を裏切りうるため。
+ */
+export type HowlingDrawState = {
+  actorUuid: string | null;
+  name: string;
+  kaiUuid: string | null;
+  tableUuid: string | null;
+  reactionName: string;
+  reactionImg: string;
+  category: HowlingCategory | "";
+  description: string;
+  /** 回復判定に使う技能の並び。「＊自我／心理」。判定で回復しないなら空文字 */
+  recoverySkills: string;
+  recoveryNote: string;
+  itemUuid: string | null;
+};
 
 const defineHowlingDrawSchema = () => ({
   // 引いた共鳴者。効果の適用先で、押した人がここのOWNERでなければ適用は止まる
@@ -35,7 +57,7 @@ const defineHowlingDrawSchema = () => ({
  * ボタンのハンドラは持たない。アイテムの作成を駆動するので `applications/` 側に置き、
  * `emoklore.ts` の init が `ACTIONS` へ登録する（architecture.md 課題5 を繰り返さない）。
  */
-export class HowlingDrawModel extends EmokloreSystemDataModel {
+export class HowlingDrawModel extends ChatCardModel {
   declare actorUuid: string | null;
   declare name: string;
   declare kaiUuid: string | null;
@@ -48,23 +70,18 @@ export class HowlingDrawModel extends EmokloreSystemDataModel {
   declare recoveryNote: string;
   declare itemUuid: string | null;
 
+  static override CARD = {
+    root: ".em-howling-draw",
+    label: "ハウリング反応カード",
+    errorKey: "EMOKLORE.ChatMessage.howlingDraw.ActionFailed",
+  };
+
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: CardActions<HowlingDrawModel> = {};
+  static override ACTIONS: CardActions<HowlingDrawModel> = {};
 
   static override defineSchema() {
     return defineHowlingDrawSchema();
   }
 
   static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.howlingDraw"];
-
-  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
-  addListeners(html: HTMLElement): void {
-    attachCardActions(html, {
-      root: ".em-howling-draw",
-      model: this,
-      actions: HowlingDrawModel.ACTIONS,
-      label: "ハウリング反応カード",
-      errorKey: "EMOKLORE.ChatMessage.howlingDraw.ActionFailed",
-    });
-  }
 }

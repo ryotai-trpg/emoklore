@@ -1,8 +1,12 @@
 import { systemPath } from "../../constants";
-import type { RequestedSkill } from "../../data/messages/skill-request";
-import type { SkillRequestState } from "../../utils/request";
-import { baseSkillOf, requirementChoices } from "../../utils/request";
-import { buildSkillRefGroups, parseSkillRefValue, toSkillRefValue } from "../../utils/skill";
+import type { RequestedSkill, SkillRequestState } from "../../data/messages/skill-request";
+import {
+  baseSkillOf,
+  buildSkillRefGroups,
+  parseSkillRefValue,
+  requirementChoices,
+  toSkillRefValue,
+} from "../../utils/skill";
 
 const TEMPLATE = systemPath("templates/apps/skill-request.hbs");
 

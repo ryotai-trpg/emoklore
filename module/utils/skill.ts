@@ -4,21 +4,94 @@
  * `utils/weapon.ts` と同じ立ち位置で、`config/` の定義を翻訳・整形するところまでを持つ。
  */
 
-import { baseSkills, isBaseSkillKey } from "../config/base-skills";
+import { type BaseSkillKey, baseSkills, isBaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
 import { type SkillCategory, skillCategories } from "../config/skill-categories";
 import type { SkillGroupKey } from "../config/skill-groups";
-import { isSkillKey, skills } from "../config/skills";
+import { isSkillKey, type SkillKey, skills } from "../config/skills";
+import { requiredSuccesses } from "../rules/success";
 import { typedEntries } from "./object";
 
 /**
  * 技能名の頭に付ける印。基本技能は `＊`、エクストラ技能は `★`。
  *
- * チャットの見出し（`utils/chat.ts`）と効果の適用先の選択肢
- * （`applications/active-effect-config.ts`）が同じ印を使っており、綴りを1箇所にまとめる。
+ * 直に呼ばず `describeSkillLabel` を通すこと。印を付けるかどうかの判断まで含めて
+ * 1箇所にまとめてある。
  */
-export const skillMarker = (isBase: boolean, isExtra: boolean): string =>
+const skillMarker = (isBase: boolean, isExtra: boolean): string =>
   isBase ? "＊" : isExtra ? "★" : "";
+
+/** どの技能を見せたいか。組込・基本は表から引き、カスタムは持っている値で名乗る */
+export type SkillDescriptor =
+  | { kind: "skill"; key: SkillKey }
+  | { kind: "base"; key: BaseSkillKey }
+  | { kind: "custom"; label: string; isBase: boolean; isExtra: boolean };
+
+/** 技能の名前まわり */
+export type SkillLabel = {
+  /** 翻訳済みの表示名。印は含まない */
+  label: string;
+  /** 区分の印。基本技能は `＊`、エクストラ技能は `★`、通常技能は空 */
+  marker: string;
+  /** 印つきの表示名。1本の文字列で出すところ（チャット・選択肢）はこちらを使う */
+  markedLabel: string;
+};
+
+/**
+ * 技能の名前の見せ方を決める。**技能名の見た目を決めるのはここ1箇所。**
+ *
+ * シート・チャットの見出し・判定要求カード・効果の適用先・各種の選択肢が、すべて
+ * これを通る。印の付け方を変えるならここだけを直せばよい。
+ *
+ * `CONFIG.EMOKLORE` の label は i18nInit の performPreLocalization で翻訳済みなので、
+ * ここでは参照するだけでよい。
+ */
+export const describeSkillLabel = (ref: SkillDescriptor): SkillLabel => {
+  const { label, marker } = resolveLabelParts(ref);
+
+  return { label, marker, markedLabel: `${marker}${label}` };
+};
+
+const resolveLabelParts = (ref: SkillDescriptor): { label: string; marker: string } => {
+  if (ref.kind === "custom") {
+    return { label: ref.label, marker: skillMarker(ref.isBase, ref.isExtra) };
+  }
+  if (ref.kind === "base") {
+    return { label: CONFIG.EMOKLORE.baseSkills[ref.key].label, marker: skillMarker(true, false) };
+  }
+
+  const { label, isExtra } = CONFIG.EMOKLORE.skills[ref.key];
+  return { label, marker: skillMarker(false, isExtra ?? false) };
+};
+
+/** 技能1行の見せ方。名前まわりに、判定に使う能力値の見せ方を足したもの */
+export type SkillDisplay = SkillLabel & {
+  characteristic: CharacteristicKey;
+  /** 能力値の翻訳済み表示名 */
+  characteristicLabel: string;
+  /** 能力値のFont Awesomeアイコンクラス */
+  characteristicIcon: string;
+};
+
+/**
+ * 技能1行の見せ方を組み立てる。
+ *
+ * 能力値は表ではなくアクターの保存値が正（選べる技能があり、効果でも動く）なので、
+ * 引く側から渡してもらう。
+ */
+export const describeSkill = (
+  ref: SkillDescriptor,
+  characteristic: CharacteristicKey,
+): SkillDisplay => {
+  const { label: characteristicLabel, fa } = CONFIG.EMOKLORE.characteristics[characteristic];
+
+  return {
+    ...describeSkillLabel(ref),
+    characteristic,
+    characteristicLabel,
+    characteristicIcon: fa,
+  };
+};
 
 /**
  * カスタム技能の区分の表示名。
@@ -73,16 +146,16 @@ export const buildSkillRefGroups = (): Array<{
 }> => [
   {
     label: game.i18n.localize("EMOKLORE.SkillRequest.NormalSkills"),
-    skills: typedEntries(CONFIG.EMOKLORE.skills).map(([key, { label, isExtra }]) => ({
-      value: `skill${SKILL_REF_SEPARATOR}${key}`,
-      label: `${skillMarker(false, isExtra ?? false)}${label}`,
+    skills: typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => ({
+      value: toSkillRefValue({ kind: "skill", key }),
+      label: describeSkillLabel({ kind: "skill", key }).markedLabel,
     })),
   },
   {
     label: game.i18n.localize("EMOKLORE.SkillRequest.BaseSkills"),
-    skills: typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key, { label }]) => ({
-      value: `base${SKILL_REF_SEPARATOR}${key}`,
-      label: `${skillMarker(true, false)}${label}`,
+    skills: typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key]) => ({
+      value: toSkillRefValue({ kind: "base", key }),
+      label: describeSkillLabel({ kind: "base", key }).markedLabel,
     })),
   },
 ];
@@ -127,17 +200,16 @@ export type SkillRollShortcut = {
  */
 export const toSkillRollShortcuts = (values: Iterable<string>): SkillRollShortcut[] =>
   [...values].flatMap((value): SkillRollShortcut[] => {
-    const { kind, key } = parseSkillRefValue(value);
+    const ref = toDescriptor(value);
+    if (!ref) return [];
 
-    if (kind === "base") {
-      if (!isBaseSkillKey(key)) return [];
-      const label = `${skillMarker(true, false)}${CONFIG.EMOKLORE.baseSkills[key].label}`;
-      return [{ rollType: "base-skill", key, label }];
-    }
-    if (!isSkillKey(key)) return [];
-
-    const { label, isExtra } = CONFIG.EMOKLORE.skills[key];
-    return [{ rollType: "skill", key, label: `${skillMarker(false, isExtra ?? false)}${label}` }];
+    return [
+      {
+        rollType: ref.kind === "base" ? "base-skill" : "skill",
+        key: ref.key,
+        label: describeSkillLabel(ref).markedLabel,
+      },
+    ];
   });
 
 /**
@@ -148,17 +220,47 @@ export const toSkillRollShortcuts = (values: Iterable<string>): SkillRollShortcu
  */
 export const formatSkillRefs = (values: Iterable<string>): string =>
   [...values]
-    .map((value) => {
-      const { kind, key } = parseSkillRefValue(value);
-
-      if (kind === "base") {
-        if (!isBaseSkillKey(key)) return "";
-        return `${skillMarker(true, false)}${CONFIG.EMOKLORE.baseSkills[key].label}`;
-      }
-      if (!isSkillKey(key)) return "";
-
-      const { label, isExtra } = CONFIG.EMOKLORE.skills[key];
-      return `${skillMarker(false, isExtra ?? false)}${label}`;
+    .flatMap((value) => {
+      const ref = toDescriptor(value);
+      return ref ? [describeSkillLabel(ref).markedLabel] : [];
     })
-    .filter((label) => label !== "")
     .join("／");
+
+/**
+ * 保存された「経路:キー」を、表に居ることを確かめたうえで参照に変える。
+ *
+ * 保存データのキーは外から来るので、CONFIG を引く前に型述語を通す。表に無ければ null。
+ */
+const toDescriptor = (
+  value: string,
+): { kind: "skill"; key: SkillKey } | { kind: "base"; key: BaseSkillKey } | null => {
+  const { kind, key } = parseSkillRefValue(value);
+
+  if (kind === "base") return isBaseSkillKey(key) ? { kind, key } : null;
+  return isSkillKey(key) ? { kind, key } : null;
+};
+
+/**
+ * 通常技能に対応するベース技能のキー。
+ *
+ * 技能グループのキーは基本技能のキーと同じ綴りで、〈観察眼〉なら `perception`＝〈＊知覚〉に
+ * なる（`docs/data-model.md`「グループは基本技能と同じ綴りのキーを使うが別のテーブル」）。
+ * ルールブックが「〈観察眼〉または〈＊知覚〉で判定」と併記する形をそのまま作れる。
+ *
+ * 対応が無い技能（グループを持たないもの）は null。
+ */
+export const baseSkillOf = (key: string): string | null => {
+  if (!isSkillKey(key)) return null;
+
+  const { group } = CONFIG.EMOKLORE.skills[key];
+  return group && isBaseSkillKey(group) ? group : null;
+};
+
+/** 判定要求を作るときに、指定できる成功度と要る成功数の対 */
+export const requirementChoices = (): Array<{ value: number; label: string }> =>
+  (["single", "double", "triple", "miracle"] as const).map((requirement) => ({
+    value: requiredSuccesses(requirement),
+    label: game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
+      result: game.i18n.localize(`EMOKLORE.result.${requirement}`),
+    }),
+  }));

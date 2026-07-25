@@ -1,12 +1,12 @@
 // このimportがビルド時のCSS出力のトリガになる。外すと dist/emoklore.css が
 // 生成されず、system.json の styles が指す先がなくなる（型の宣言は types/css.d.ts）
 import "../css/emoklore.css";
+import { api } from "./api";
 import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
 import { EmokloreArmorSheet } from "./applications/armor-sheet";
 import * as applications from "./applications/character-sheet";
 import { injectChatControls } from "./applications/chat-controls";
 import { EmokloreCombatTracker } from "./applications/combat-tracker";
-import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
 import { applyHowling, drawHowling } from "./applications/howling";
 import { EmokloreHowlingSheet } from "./applications/howling-sheet";
 import { applyKaiDamage } from "./applications/kai-attack";
@@ -14,6 +14,12 @@ import { EmokloreKaiSheet } from "./applications/kai-sheet";
 import { EmokloreNpcSheet } from "./applications/npc-sheet";
 import { rollRequested, rollRequestedResonance } from "./applications/requests";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
+import {
+  applyDamage,
+  applyDamageWithReduction,
+  rollAttack,
+  rollDamage,
+} from "./applications/weapon-card";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
 import { statusEffects } from "./config/status-effects";
@@ -50,6 +56,9 @@ Hooks.once("init", () => {
   console.log("Emo-klore TRPG | Initializing...");
 
   CONFIG.EMOKLORE = EMOKLORE;
+
+  // マクロとモジュールから呼べる口。中身は module/api.ts が決める
+  game.system.api = api;
 
   registerSystemSettings();
 
@@ -104,11 +113,14 @@ Hooks.once("init", () => {
   CONFIG.Dice.rolls.push(EmokloreRoll);
   CONFIG.Dice.terms.d = EmokloreDie;
 
-  // 武器カードの「軽減して適用」。ハンドラはダイアログを開くので applications/ に居り、
-  // data/ からの逆依存を作らないよう、モジュールにも開いている ACTIONS の口から登録する
+  // カードのボタンはすべて applications/ 側にハンドラを置き、モジュールにも開いている
+  // ACTIONS の口から登録する。data/ から documents/ への逆依存を作らないため
+  WeaponCardModel.ACTIONS.rollAttack = rollAttack;
+  WeaponCardModel.ACTIONS.rollDamage = rollDamage;
+  WeaponCardModel.ACTIONS.applyDamage = applyDamage;
   WeaponCardModel.ACTIONS.applyDamageWithReduction = applyDamageWithReduction;
 
-  // 怪異の攻撃カードの「ダメージ適用」も同じく applications/ 側のハンドラを ACTIONS へ登録する
+  // 怪異の攻撃カードの「ダメージ適用」
   KaiAttackCardModel.ACTIONS.applyDamage = applyKaiDamage;
 
   // DLからの判定要求。押した人のアクターで振るので、これも applications/ 側から登録する

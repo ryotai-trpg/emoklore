@@ -1,12 +1,10 @@
+import { createRollMessage } from "../../chat/message";
 import { systemPath } from "../../constants";
-import { resolveSkillRef, type SkillRef } from "../../data/character";
-import type { WeaponCardModel } from "../../data/messages/weapon-card";
+import { resolveSkillRef, type SkillRef } from "../../data/character-like";
 import type { EmokloreActor } from "../../documents/actor";
 import { normalizeReduction } from "../../rules/weapon-damage";
-import { createRollMessage } from "../../utils/chat";
 import { typedEntries } from "../../utils/object";
-import { skillMarker } from "../../utils/skill";
-import { resolveTargetActors } from "../../utils/targets";
+import { describeSkillLabel, parseSkillRefValue, toSkillRefValue } from "../../utils/skill";
 
 export type DamageReductionInput = {
   reduction: number;
@@ -18,35 +16,6 @@ const TEMPLATE = systemPath("templates/apps/apply-damage.hbs");
 
 /** 防御判定の既定。ルールブックの防御の例示が〈耐久〉 */
 const DEFAULT_DEFENSE_SKILL = "skill:endurance";
-
-/**
- * カードの「軽減して適用」ボタン。軽減値を尋ねてから適用する。
- *
- * `WeaponCardModel.ACTIONS` へは `module/emoklore.ts` の init が登録する。
- * ACTIONS はモジュールにも開いている拡張点で、ここから登録すれば
- * data/ から applications/ への import を作らずに済む。
- */
-export async function applyDamageWithReduction(this: WeaponCardModel): Promise<void> {
-  const amount = this.damageTotal;
-  if (amount === null) return;
-
-  // 対象は押した瞬間に凍結する。ダイアログを開いている間にターゲットを付け替えても、
-  // 防御判定を振った相手と適用先が食い違わないようにするため
-  const targets = resolveTargetActors();
-  if (targets.length === 0) {
-    ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoTarget", { localize: true });
-    return;
-  }
-
-  const input = await promptDamageReduction({
-    amount,
-    successCount: this.successCount,
-    targets,
-  });
-  if (!input) return;
-
-  await this.applyDamageTo(targets, { reduction: input.reduction, armor: input.armor });
-}
 
 /**
  * 軽減値を尋ねる。キャンセルされた場合は null を返す。
@@ -118,18 +87,22 @@ type DefenseSkillGroup = { label: string; options: DefenseSkillOption[] };
  * カスタム技能は対象アクターの所持アイテム依存なので、必要になったら足す。
  */
 function listDefenseSkillGroups(): DefenseSkillGroup[] {
-  // CONFIG.EMOKLORE の label は i18nInit で翻訳済み（performPreLocalization）
-  const skills = typedEntries(CONFIG.EMOKLORE.skills).map(([key, config]) => ({
-    value: `skill:${key}`,
-    label: `${skillMarker(false, config.isExtra ?? false)}${config.label}`,
-    selected: `skill:${key}` === DEFAULT_DEFENSE_SKILL,
-  }));
-  const baseSkills = typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key, config]) => ({
-    value: `base:${key}`,
-    label: `${skillMarker(true, false)}${config.label}`,
+  const skills = typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => {
+    const value = toSkillRefValue({ kind: "skill", key });
+    return {
+      value,
+      label: describeSkillLabel({ kind: "skill", key }).markedLabel,
+      selected: value === DEFAULT_DEFENSE_SKILL,
+    };
+  });
+  const baseSkills = typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key]) => ({
+    value: toSkillRefValue({ kind: "base", key }),
+    label: describeSkillLabel({ kind: "base", key }).markedLabel,
     selected: false,
   }));
 
+  // 見出しはカスタム技能の区分名を借りている。判定要求のダイアログとは別の言い回しなので、
+  // 揃えるかどうかは文言の整理（Issue #59）で決める
   return [
     { label: game.i18n.localize("EMOKLORE.Item.skill.Category.normal"), options: skills },
     { label: game.i18n.localize("EMOKLORE.Item.skill.Category.base"), options: baseSkills },
@@ -162,10 +135,9 @@ async function rollDefense(defender: EmokloreActor | null, button: HTMLElement):
 
 /** select の値（`skill:endurance` / `base:athletic`）を検証して SkillRef へ */
 function parseSkillValue(value: string): SkillRef | null {
-  const [kind, key] = value.split(":");
-  if (kind !== "skill" && kind !== "base") return null;
+  const { kind, key } = parseSkillRefValue(value);
 
-  return resolveSkillRef(key ?? "", { base: kind === "base" });
+  return resolveSkillRef(key, { base: kind === "base" });
 }
 
 /** チェックボックス1つぶんの防具。value に防御力を持たせ、readInput が合計する */

@@ -4,10 +4,10 @@ import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import { typedEntries } from "../utils/object";
 import { createDocumentData, resolveEmbeddedDocumentClass } from "../utils/sheet";
-import { skillMarker } from "../utils/skill";
+import { describeSkill, describeSkillLabel } from "../utils/skill";
 import { formatDamagePreview, formatRangeLabel } from "../utils/weapon";
 import { EmokloreActorSheet } from "./actor-sheet";
-import type { EmokloreRenderOptions } from "./types";
+import type { EmokloreRenderOptions, NpcSheetContext } from "./types";
 
 /**
  * 人間NPCのシート。
@@ -53,14 +53,12 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
       }),
     );
 
-    context.skills = typedEntries(CONFIG.EMOKLORE.skills).map(([key, { label, isExtra }]) => {
+    context.skills = typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => {
       const entry = system.skills[key];
       return {
+        ...describeSkill({ kind: "skill", key }, entry.characteristic),
         key,
         rollType: "skill",
-        label,
-        marker: skillMarker(false, isExtra ?? false),
-        characteristicIcon: CONFIG.EMOKLORE.characteristics[entry.characteristic].fa,
         level: entry.level,
         target: entry.target,
         name: `system.skills.${key}.level`,
@@ -73,20 +71,22 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
     }
 
     context.baseSkills = typedEntries(system.baseSkills).map(([key, entry]) => ({
+      ...describeSkill({ kind: "base", key }, entry.characteristic),
       key,
       rollType: "base-skill",
-      label: CONFIG.EMOKLORE.baseSkills[key].label,
-      marker: skillMarker(true, false),
-      characteristicIcon: CONFIG.EMOKLORE.characteristics[entry.characteristic].fa,
       level: entry.level,
       target: entry.target,
       name: "",
     }));
 
     context.customSkills = Object.entries(system.customSkills).map(([id, entry]) => ({
+      ...describeSkillLabel({
+        kind: "custom",
+        label: entry.label,
+        isBase: entry.isBase,
+        isExtra: entry.isExtra,
+      }),
       id,
-      label: entry.label,
-      marker: skillMarker(entry.isBase, entry.isExtra),
       level: entry.level,
       target: entry.target,
     }));
@@ -126,50 +126,3 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
     await docCls.create(docData, { parent: this.actor });
   }
 }
-
-/** 人間NPCシートの表示用コンテキスト */
-type NpcSkillRow = {
-  key: string;
-  rollType: string;
-  label: string;
-  marker: string;
-  characteristicIcon: string;
-  level: number;
-  target: number;
-  name: string;
-};
-
-type NpcSheetContext = {
-  // 基底の EmokloreDocumentSheetContext と対応する分
-  isPlay: boolean;
-  owner: boolean;
-  limited: boolean;
-  gm: boolean;
-  document: EmokloreActor;
-  system: NpcDataModel;
-  systemFields: Record<string, foundry.data.fields.DataField>;
-  flags: Record<string, unknown>;
-  characteristics: Array<{
-    key: string;
-    label: string;
-    icon: string;
-    value: number;
-    name: string;
-  }>;
-  skills: NpcSkillRow[];
-  baseSkills: NpcSkillRow[];
-  customSkills: Array<{
-    id: string;
-    label: string;
-    marker: string;
-    level: number;
-    target: number;
-  }>;
-  weapons: Array<{
-    id: string;
-    name: string;
-    img: string;
-    rangeLabel: string;
-    damagePreview: string;
-  }>;
-};
