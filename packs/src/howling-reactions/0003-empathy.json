@@ -1,0 +1,21 @@
+{
+  "_id": "emokHowling0003a",
+  "_key": "!items!emokHowling0003a",
+  "name": "共振（エンパシー）",
+  "type": "howling",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "category": "attunement",
+    "effect": "<p>対象の《怪異》が持つ共鳴感情をひとつ追加で獲得する。</p><p>どの感情を取るかはその場で決める。キャラクターシートの〔追加取得を選ぶ〕から入れること。</p>",
+    "recovery": {
+      "note": "シナリオ中継続。",
+      "skills": []
+    },
+    "notes": ""
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 300000,
+  "ownership": { "default": 0 },
+  "flags": {}
+}

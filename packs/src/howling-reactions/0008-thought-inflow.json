@@ -1,0 +1,21 @@
+{
+  "_id": "emokHowling0008a",
+  "_key": "!items!emokHowling0008a",
+  "name": "思考流入",
+  "type": "howling",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "category": "attunement",
+    "effect": "<p>共鳴者は頭の中に自分のものではない思考が流れ込む。</p><p>どんな思考が流れ込んで来たか、内容はDLが決定する。</p>",
+    "recovery": {
+      "note": "",
+      "skills": []
+    },
+    "notes": ""
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 200000,
+  "ownership": { "default": 0 },
+  "flags": {}
+}

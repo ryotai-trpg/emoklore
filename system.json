@@ -53,6 +53,20 @@
       "standard": {}
     }
   },
+  "packs": [
+    {
+      "name": "howling-reactions",
+      "label": "ハウリング反応",
+      "type": "Item",
+      "system": "emoklore"
+    },
+    {
+      "name": "resonance-tables",
+      "label": "共鳴表",
+      "type": "RollTable",
+      "system": "emoklore"
+    }
+  ],
   "license": "LICENSE",
   "background": "systems/emoklore/assets/background.webp",
   "grid": {

@@ -1,0 +1,90 @@
+{
+  "_id": "emokTableInnen1a",
+  "_key": "!tables!emokTableInnen1a",
+  "name": "汎用共鳴表：因縁タイプ",
+  "img": "icons/svg/d20-grey.svg",
+  "description": "<p>ハウリング（極限共鳴）が起きたときに1D6で引く。共鳴表は何度でも引くので、引いた印は付けない（replacement）。</p>",
+  "formula": "1d6",
+  "replacement": true,
+  "displayRoll": true,
+  "results": [
+    {
+      "_id": "emokResultInnen1",
+      "_key": "!tables.results!emokTableInnen1a.emokResultInnen1",
+      "type": "document",
+      "documentUuid": "Compendium.emoklore.howling-reactions.Item.emokHowling0007a",
+      "name": "激情酔い",
+      "img": "icons/svg/aura.svg",
+      "description": "",
+      "weight": 1,
+      "range": [1, 1],
+      "drawn": false
+    },
+    {
+      "_id": "emokResultInnen2",
+      "_key": "!tables.results!emokTableInnen1a.emokResultInnen2",
+      "type": "document",
+      "documentUuid": "Compendium.emoklore.howling-reactions.Item.emokHowling0008a",
+      "name": "思考流入",
+      "img": "icons/svg/aura.svg",
+      "description": "",
+      "weight": 1,
+      "range": [2, 2],
+      "drawn": false
+    },
+    {
+      "_id": "emokResultInnen3",
+      "_key": "!tables.results!emokTableInnen1a.emokResultInnen3",
+      "type": "document",
+      "documentUuid": "Compendium.emoklore.howling-reactions.Item.emokHowling0003a",
+      "name": "共振（エンパシー）",
+      "img": "icons/svg/aura.svg",
+      "description": "",
+      "weight": 1,
+      "range": [3, 3],
+      "drawn": false
+    },
+    {
+      "_id": "emokResultInnen4",
+      "_key": "!tables.results!emokTableInnen1a.emokResultInnen4",
+      "type": "document",
+      "documentUuid": "Compendium.emoklore.howling-reactions.Item.emokHowling0009a",
+      "name": "精神汚染",
+      "img": "icons/svg/aura.svg",
+      "description": "",
+      "weight": 1,
+      "range": [4, 4],
+      "drawn": false
+    },
+    {
+      "_id": "emokResultInnen5",
+      "_key": "!tables.results!emokTableInnen1a.emokResultInnen5",
+      "type": "document",
+      "documentUuid": "Compendium.emoklore.howling-reactions.Item.emokHowling0010a",
+      "name": "視線",
+      "img": "icons/svg/aura.svg",
+      "description": "",
+      "weight": 1,
+      "range": [5, 5],
+      "drawn": false
+    },
+    {
+      "_id": "emokResultInnen6",
+      "_key": "!tables.results!emokTableInnen1a.emokResultInnen6",
+      "type": "document",
+      "documentUuid": "Compendium.emoklore.howling-reactions.Item.emokHowling0011a",
+      "name": "侵食",
+      "img": "icons/svg/aura.svg",
+      "description": "",
+      "weight": 1,
+      "range": [6, 6],
+      "drawn": false
+    }
+  ],
+  "folder": null,
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {}
+}

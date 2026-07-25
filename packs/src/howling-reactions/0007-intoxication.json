@@ -1,0 +1,21 @@
+{
+  "_id": "emokHowling0007a",
+  "_key": "!items!emokHowling0007a",
+  "name": "激情酔い",
+  "type": "howling",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "category": "agitation",
+    "effect": "<p>共鳴者は一時的に情緒不安定になる。</p>",
+    "recovery": {
+      "note": "症状と期間はDLが決定する。",
+      "skills": []
+    },
+    "notes": ""
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 100000,
+  "ownership": { "default": 0 },
+  "flags": {}
+}

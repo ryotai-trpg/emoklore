@@ -1,0 +1,46 @@
+{
+  "_id": "emokHowling0009a",
+  "_key": "!items!emokHowling0009a",
+  "name": "精神汚染",
+  "type": "howling",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "category": "attunement",
+    "effect": "<p>1D10時間の間、判定値に【精神】を使用する技能での判定は成功数-1される。</p><p>持続時間は効果の設定シートで入れる（振った出目を値に、単位は時間）。ダイスは効果に書けないので、振るのは人の側になる。</p>",
+    "recovery": {
+      "note": "",
+      "skills": ["base:self", "skill:psychology"]
+    },
+    "notes": ""
+  },
+  "effects": [
+    {
+      "_id": "emokHowlingFx09a",
+      "_key": "!items.effects!emokHowling0009a.emokHowlingFx09a",
+      "name": "精神汚染",
+      "img": "icons/svg/aura.svg",
+      "system": {
+        "changes": [
+          {
+            "key": "system.characteristics.mentality.mod.success",
+            "type": "add",
+            "value": "-1",
+            "phase": "initial",
+            "priority": null
+          }
+        ]
+      },
+      "disabled": false,
+      "transfer": true,
+      "description": "",
+      "origin": null,
+      "duration": {},
+      "statuses": [],
+      "flags": {}
+    }
+  ],
+  "folder": null,
+  "sort": 400000,
+  "ownership": { "default": 0 },
+  "flags": {}
+}
