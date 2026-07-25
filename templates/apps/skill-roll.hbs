@@ -1,0 +1,22 @@
+{{! 本体の standard-form 体系に乗せる。name 属性は skill-roll-dialog.ts が
+    form.elements.namedItem で引くインターフェースなので変えない }}
+<div class="form-group">
+  <label for="bonus">{{localize "EMOKLORE.RollOptions.DiceBonus"}}</label>
+  <input name="bonus" id="bonus" type="number" step="1" value="{{bonus}}" autofocus>
+  <p class="hint">{{localize "EMOKLORE.RollOptions.DiceBonusHint"}}</p>
+</div>
+
+<div class="form-group">
+  <label for="success">{{localize "EMOKLORE.RollOptions.SuccessMod"}}</label>
+  <input name="success" id="success" type="number" step="1" value="{{success}}">
+</div>
+
+<div class="form-group">
+  <label for="requirement">{{localize "EMOKLORE.RollOptions.Requirement"}}</label>
+  <select name="requirement" id="requirement">
+    <option value="">{{localize "EMOKLORE.RollOptions.NoRequirement"}}</option>
+    {{#each requirements}}
+      <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+    {{/each}}
+  </select>
+</div>

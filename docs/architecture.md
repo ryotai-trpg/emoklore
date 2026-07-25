@@ -39,7 +39,7 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 | `data/` | スキーマ定義 + 派生値計算（`prepareDerivedData`）+ 判定に渡す値の収集 | UI、チャット生成、計算式の実装 |
 | `documents/` | Documentライフサイクルの薄いオーケストレーション。data層とrules層とapplications/chat層をつなぐ | 計算式の実装、ダイアログ |
 | `applications/` | シート・ダイアログ。コンテキスト整形のみ | ルール計算 |
-| `dice/` | Roll / Die / 結果の表現。判定の計算自体は `rules/` へ委譲する | ルール計算の実装 |
+| `dice/` | Roll / Die / 結果の表現。判定の計算自体は `rules/` へ委譲する | ルール計算の実装、UI（判定ダイアログは `applications/`） |
 | `utils/` | 汎用ユーティリティ、i18n機構、チャット生成、インポータ | ルール計算 |
 | `templates/` | 表示のみ。コンテキストの配列を回して並べる | lookup の組み立て、ルール判断 |
 | `css/` | 部品（components）と配置（applications）の2層 | 部品側での位置決め |

@@ -1,8 +1,9 @@
 import { isBaseSkillKey } from "../config/base-skills";
 import { isSkillKey } from "../config/skills";
+import type { SkillRef } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
-import { requestResonanceRoll } from "./rolls";
+import { requestResonanceRoll, requestSkillRoll } from "./rolls";
 import type { EmokloreActorSheetOptions } from "./types";
 
 export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
@@ -28,13 +29,19 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
     // 分割代入で TypeError になる
     const skill = dataset.skill ?? "";
 
+    // 素のクリックは即ロール、修飾キー付きなら判定オプションを尋ねる。ほとんどの判定に
+    // 修正は付かないので、毎回ダイアログを挟むと手数が増えるだけになる
+    const withOptions = event instanceof MouseEvent && event.shiftKey;
+    const roll = (ref: SkillRef) =>
+      withOptions ? requestSkillRoll(this.actor, ref) : this.actor.rollSkill(ref);
+
     switch (dataset.rollType) {
       case "skill":
         if (!isSkillKey(skill)) return undefined;
-        return this.actor.rollSkill({ kind: "skill", key: skill });
+        return roll({ kind: "skill", key: skill });
       case "base-skill":
         if (!isBaseSkillKey(skill)) return undefined;
-        return this.actor.rollSkill({ kind: "base", key: skill });
+        return roll({ kind: "base", key: skill });
       case "custom-skill": {
         // 固定表が無いので綴りは確かめようがない。判定が読むのはアクター側のミラーなので、
         // アイテムではなくそちらに居ることを確かめる（消した直後のクリックはここで止まる）。
@@ -43,7 +50,7 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
         if (!this.actor.isCharacterLike() || !(id in this.actor.system.customSkills)) {
           return undefined;
         }
-        return this.actor.rollSkill({ kind: "custom", id });
+        return roll({ kind: "custom", id });
       }
       case "resonance":
         // 強度と一致度をダイアログで尋ねてから振る
