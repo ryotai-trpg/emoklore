@@ -42,6 +42,35 @@ export function facePoints(outcome: FaceOutcome): number {
 }
 
 /**
+ * DLが判定に要求できる成功度。ルールブックの難易度の目安に対応する
+ * （ダブル＝非常に難しい、トリプル＝極めて難しい、ミラクル＝奇跡でも不可能）。
+ */
+export type SuccessRequirement = "single" | "double" | "triple" | "miracle";
+
+/** 要求を満たすのに要る成功数 */
+const REQUIRED_SUCCESSES: Record<SuccessRequirement, number> = {
+  single: 1,
+  double: 2,
+  triple: 3,
+  miracle: 4,
+};
+
+/** 要求された成功度に要る成功数を返す */
+export function requiredSuccesses(requirement: SuccessRequirement): number {
+  return REQUIRED_SUCCESSES[requirement];
+}
+
+/**
+ * 要求された成功数に届いたか。
+ *
+ * **結果名ではなく成功数で比べる。** `resolveResultName` は4〜9をすべて `miracle` に
+ * 潰すので、名前で比べるとカタストロフ（10以上）がミラクル要求を満たさなくなる。
+ */
+export function meetsRequirement(successCount: number, required: number): boolean {
+  return successCount >= required;
+}
+
+/**
  * 成功数から結果名を決める。`EMOKLORE.result.*` の言語キーに対応する。
  */
 export function resolveResultName(successCount: number): ResultName {

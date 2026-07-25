@@ -155,6 +155,8 @@ export const defineResourcesSchema = ({ resonance }: { resonance: boolean }) =>
             value: new NumberField({ required: true, integer: true, initial: 1 }),
             // 共鳴値の上限だけは計算せず手で決めるので、こちらは保存する
             max: new NumberField({ required: true, integer: true, initial: 9 }),
+            // 共鳴判定への修正の着地点（残響「ハーモニー」）。技能判定の mod と同じ形
+            mod: modifierField(),
           }),
         }
       : {}),
@@ -558,6 +560,9 @@ export class CharacterLikeDataModel extends EmokloreSystemDataModel {
       characteristicMod: this.characteristics[entry.characteristic].mod,
       skillGroupMod: group ? this.skillGroups[group].mod : NO_MODIFIER,
       globalMod: this.mod,
+      // その場の修正は保存データではなく判定のたびの入力なので、ここでは効かない組を置く。
+      // 差し込むのは判定を組み立てる documents/ 側
+      situationalMod: NO_MODIFIER,
     };
   }
 }

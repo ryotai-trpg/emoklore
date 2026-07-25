@@ -42,6 +42,7 @@ Actorは3種別あり、`EmokloreActor#system` はそれらのunion。共鳴者�
 | `resources.mp.max` | NumberField | 2 | 最大MP。**保存しない** |
 | `resources.resonance.value` | NumberField | 1 | 共鳴値。1未満にはならない |
 | `resources.resonance.max` | NumberField | 9 | 共鳴値の上限。こちらは計算しないので手で決める |
+| `resources.resonance.mod` | SchemaField | — | 共鳴判定への修正（残響「ハーモニー」）。技能側の `mod` と同じ3値で、同じく `persisted: false` |
 
 `hp.max` と `mp.max` は `persisted: false` を付けてある。`prepareDerivedData` が能力値から計算し直すので、書いても次の準備で捨てられる値だった。スキーマには残っているので[効果](/active-effect)の適用先にはでき、`phase: "final"` なら上書きが残る。
 
