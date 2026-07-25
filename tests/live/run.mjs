@@ -20,6 +20,7 @@ import * as consoleCheck from "./checks/console.mjs";
 import * as customSkill from "./checks/custom-skill.mjs";
 import * as emotionMatch from "./checks/emotion-match.mjs";
 import * as emotionPicker from "./checks/emotion-picker.mjs";
+import * as howling from "./checks/howling.mjs";
 import * as importCheck from "./checks/import.mjs";
 import * as npcKai from "./checks/npc-kai.mjs";
 import * as registration from "./checks/registration.mjs";
@@ -50,6 +51,7 @@ const CHECKS = [
   resonanceRequest,
   boundary,
   armor,
+  howling,
   activeEffect,
   combat,
   importCheck,
