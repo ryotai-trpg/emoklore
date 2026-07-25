@@ -25,22 +25,44 @@ export async function run({ page, check }) {
         actor.sheet.element.querySelector("[data-roll-type=resonance]").click();
         const dlg = await window.__waitFor(() => findApp("Dialog"), { label: "共鳴判定" });
 
-        dlg.element.querySelector("[data-action=pickEmotion]").click();
+        dlg.element.querySelector("[data-action=pickEmotions]").click();
         const picker = await window.__waitFor(() => findApp("EmotionPicker"), {
           label: "感情ピッカー",
         });
+        // 複数選択モードなので2つ選べる。押し直しで外れることもここで見る
         picker.element.querySelector("[data-emotion=hope]").click();
+        picker.element.querySelector("[data-emotion=anger]").click();
+        picker.element.querySelector("[data-emotion=anger]").click();
+        picker.element.querySelector("[data-emotion=regret]").click();
+        // グリッド側にも選択中がタグで出る
+        await window.__waitFor(() => picker.element.querySelectorAll(".tags .tag").length === 2, {
+          label: "ピッカーのタグ",
+        });
         picker.element.querySelector("button[type=submit]").click();
         await window.__waitFor(() => !findApp("EmotionPicker"), { label: "ピッカーが閉じる" });
 
         const form = dlg.element.querySelector("form") ?? dlg.element;
-        const value = form.elements.namedItem("emotion").value;
-        const label = dlg.element.querySelector("[data-emotion-label]").textContent.trim();
+        const value = form.elements.namedItem("emotions").value;
+        // 表示は本体と同じタグ。長い名前が並んでも折り返せる形になっている
+        const tags = [...dlg.element.querySelectorAll(".em-emotion-field .tag")].map((t) =>
+          t.querySelector("span").textContent.trim(),
+        );
+
+        // タグの×で外すと hidden も一緒に減る
+        dlg.element.querySelector(".em-emotion-field .tag[data-key=regret] .remove").click();
+        await window.__waitFor(() => form.elements.namedItem("emotions").value === "hope", {
+          label: "タグの削除",
+        });
+        const afterRemove = [...dlg.element.querySelectorAll(".em-emotion-field .tag")].length;
+
         await dlg.close();
         await window.__waitFor(() => !findApp("Dialog"), { soft: true, label: "ダイアログ" });
 
-        const ok = value === "hope" && label === "希望（理想）";
-        return { ok, detail: `${value} / ${label}` };
+        const ok =
+          value === "hope,regret" &&
+          tags.join("／") === "希望（理想）／後悔（傷）" &&
+          afterRemove === 1;
+        return { ok, detail: `${value} → タグ[${tags.join(" ")}] → ×で${afterRemove}件` };
       },
       TAG,
     ),
@@ -55,13 +77,13 @@ export async function run({ page, check }) {
             (x) => x.constructor.name.includes("Dialog") && x.rendered,
           );
         const actor = game.actors.getName(`${tag}_char`);
-        const rollWith = async (emotion, choice) => {
+        const rollWith = async (emotions, choice) => {
           actor.sheet.element.querySelector("[data-roll-type=resonance]").click();
           const dlg = await window.__waitFor(findDialog, { label: "共鳴判定のダイアログ" });
 
           const form = dlg.element.querySelector("form") ?? dlg.element;
           form.elements.namedItem("intensity").value = "5";
-          form.elements.namedItem("emotion").value = emotion;
+          form.elements.namedItem("emotions").value = emotions;
           form.querySelector(`[name=choice][value=${choice}]`).checked = true;
 
           const before = game.messages.size;
@@ -88,10 +110,18 @@ export async function run({ page, check }) {
           追加取得: await rollWith("fear", "auto"),
           ルーツ属性: await rollWith("loneliness", "auto"),
           一致なし: await rollWith("possession", "auto"),
+          // 《怪異》が複数の感情で鳴らすケース。どれか1つでも一致すれば成立する
+          複数指定: await rollWith("possession,anger", "auto"),
         };
         await actor.update({ "system.emotions.acquired": [] });
 
-        const expected = { 裏: "6DM≦5", 追加取得: "6DM≦5", ルーツ属性: "4DM≦5", 一致なし: "3DM≦5" };
+        const expected = {
+          裏: "6DM≦5",
+          追加取得: "6DM≦5",
+          ルーツ属性: "4DM≦5",
+          一致なし: "3DM≦5",
+          複数指定: "6DM≦5",
+        };
         const wrong = Object.keys(expected).filter((k) => results[k] !== expected[k]);
 
         return {
@@ -121,7 +151,7 @@ export async function run({ page, check }) {
         // 自動なら一致なしになる感情を指定しつつ、完全一致を手で選ぶ
         const form = dlg.element.querySelector("form") ?? dlg.element;
         form.elements.namedItem("intensity").value = "5";
-        form.elements.namedItem("emotion").value = "possession";
+        form.elements.namedItem("emotions").value = "possession";
         form.querySelector("[name=choice][value=completely]").checked = true;
 
         const before = game.messages.size;

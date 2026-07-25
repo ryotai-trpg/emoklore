@@ -144,9 +144,20 @@ export async function run({ page, check }) {
         // 枠のチップは出ず、すでに持っている感情は押し込まれた状態で始まる
         const noSlots = picker.element.querySelectorAll("[data-action=selectSlot]").length === 0;
         const preselected = isPicked(picker, "selfAssertion");
+        // 選択中はタグでも出る。グリッドの押し込み状態だけだと数えにくいため
+        const taggedAtStart = picker.element.querySelectorAll(".tags .tag").length;
 
         picker.element.querySelector("[data-emotion=fear]").click();
         await window.__waitFor(() => isPicked(picker, "fear"), { label: "恐怖が選ばれる" });
+        await window.__waitFor(() => picker.element.querySelectorAll(".tags .tag").length === 2, {
+          label: "タグが増える",
+        });
+
+        // タグの×で外すと、グリッドの押し込みも一緒に戻る
+        picker.element.querySelector(".tag[data-key=fear] .remove").click();
+        await window.__waitFor(() => !isPicked(picker, "fear"), { label: "タグの×で外れる" });
+        picker.element.querySelector("[data-emotion=fear]").click();
+        await window.__waitFor(() => isPicked(picker, "fear"), { label: "恐怖を選び直す" });
 
         picker.element.querySelector("button[type=submit]").click();
         await window.__waitFor(() => kai.system.emotions.has("fear"), {
@@ -155,7 +166,8 @@ export async function run({ page, check }) {
         await window.__waitFor(() => !findPicker(), { label: "ピッカーが閉じる" });
 
         const after = [...kai.system.emotions];
-        const ok = noSlots && preselected && after.length === original.length + 1;
+        const ok =
+          noSlots && preselected && taggedAtStart === 1 && after.length === original.length + 1;
 
         // 後続のチェックが元の感情を前提にしているので戻す
         await kai.update({ "system.emotions": original });
@@ -164,8 +176,8 @@ export async function run({ page, check }) {
         return {
           ok,
           detail: ok
-            ? `枠なし 選択済み反映 ${original.join(",")} → ${after.join(",")}`
-            : `枠なし=${noSlots} 選択済み=${preselected} ${after.join(",")}`,
+            ? `枠なし タグ${taggedAtStart}件から ${original.join(",")} → ${after.join(",")}`
+            : `枠なし=${noSlots} 選択済み=${preselected} タグ${taggedAtStart} ${after.join(",")}`,
         };
       },
       TAG,
