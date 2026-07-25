@@ -18,6 +18,9 @@ export async function run({ page, check }) {
           );
 
         const kai = game.actors.getName(`${tag}_kai`);
+        // 感情を複数持つ怪異にする。プリセットが先頭1つに切り詰められないことを見る
+        const original = [...kai.system.emotions];
+        await kai.update({ "system.emotions": [...original, "fear"] });
         await kai.sheet.render(true);
         await window.__setMode(kai.sheet, "play");
         kai.sheet.element.querySelector("[data-action=requestResonance]").click();
@@ -28,7 +31,7 @@ export async function run({ page, check }) {
         const preset = {
           intensity: form.elements.namedItem("intensity").value,
           rise: form.elements.namedItem("rise").value,
-          emotion: form.elements.namedItem("emotion").value,
+          emotions: form.elements.namedItem("emotions").value,
         };
 
         const before = game.messages.size;
@@ -42,11 +45,13 @@ export async function run({ page, check }) {
         );
         const leaked = window.__findUnresolvedKeys(card);
         await kai.sheet.close();
+        await kai.update({ "system.emotions": original });
 
         const ok =
           preset.intensity === "5" &&
           preset.rise === "1" &&
-          preset.emotion === "selfAssertion" &&
+          preset.emotions === "selfAssertion,fear" &&
+          message.system.emotions.size === 2 &&
           message.type === "resonanceRequest" &&
           message.system.kaiUuid === kai.uuid &&
           leaked.length === 0;
@@ -54,7 +59,7 @@ export async function run({ page, check }) {
         return {
           ok,
           detail: ok
-            ? `強度${preset.intensity} 上昇${preset.rise} ${preset.emotion} 怪異の参照つき`
+            ? `強度${preset.intensity} 上昇${preset.rise} ${preset.emotions} 怪異の参照つき`
             : `${JSON.stringify(preset)} type=${message.type} kai=${message.system.kaiUuid} 生キー: ${leaked.join(",")}`,
         };
       },
