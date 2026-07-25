@@ -108,14 +108,10 @@
         }
       },
       "npc": {
-        "NamePlaceholder": "名前",
         "Skills": "技能",
         "BaseSkills": "基本技能",
         "CustomSkills": "カスタム技能",
         "Weapons": "武器"
-      },
-      "kai": {
-        "NamePlaceholder": "名前"
       }
     },
     "Item": {
