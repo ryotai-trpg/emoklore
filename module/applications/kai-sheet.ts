@@ -120,8 +120,8 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
   /**
    * 共鳴判定を要求する。怪異の共鳴プリセットを初期値にして要求カードを出す。
    *
-   * 感情は怪異が持つもののうち1つを初期値にする。複数持つ怪異では、DLがどれで
-   * 鳴らすかをダイアログで選び直す。
+   * 共鳴感情は持っているものを全部渡す。共鳴者はそのどれかに一致すればよいので、
+   * 感情を多く持つ怪異ほど多くの共鳴者を鳴らせる。絞りたいDLはダイアログで外す。
    */
   static async _requestResonance(this: EmokloreKaiSheet) {
     const { resonance, emotions } = this.actor.system;
@@ -129,7 +129,7 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
     await requestResonanceCheck({
       intensity: resonance.intensity,
       rise: resonance.rise,
-      emotion: [...emotions][0] ?? "",
+      emotions: [...emotions],
       kaiUuid: this.actor.uuid ?? null,
     });
   }

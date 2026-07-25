@@ -405,7 +405,7 @@ DLからの共鳴判定・憑依判定の要求。判定要求カードと同じ
 |---|---|---|---|
 | `intensity` | NumberField | 5 | 強度（判定値） |
 | `rise` | StringField | `"1"` | 成功時の〈∞共鳴〉上昇量。ダイス式も受ける（`Roll.validate` で検証）。憑依判定では読まない |
-| `emotion` | StringField | `""` | DLが指定する共鳴感情。空なら指定なし |
+| `emotions` | SetField(StringField) | `[]` | DLが指定する共鳴感情。**《怪異》は複数持つので複数受ける**。空なら指定なし |
 | `forcedMatch` | StringField | `""` | 一致度のGM強制。空なら感情から自動で決める |
 | `possessionMode` | BooleanField | `false` | 憑依判定モード。成否によらず+1、ハウリングなし |
 | `targets` | ArrayField(SchemaField) | `[]` | 対象の `actorUuid` / `name`。**表示だけ**で、押せる相手は絞らない |

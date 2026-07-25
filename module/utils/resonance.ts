@@ -7,7 +7,7 @@
 
 import { systemPath } from "../constants";
 import type { RequestTarget } from "../data/messages/resonance-request";
-import { formatEmotion } from "./emotion";
+import { formatEmotions } from "./emotion";
 
 const REQUEST_TEMPLATE = systemPath("templates/chat/resonance-request.hbs");
 const OUTCOME_TEMPLATE = systemPath("templates/chat/resonance-outcome.hbs");
@@ -16,7 +16,7 @@ const OUTCOME_TEMPLATE = systemPath("templates/chat/resonance-outcome.hbs");
 export type ResonanceRequestState = {
   intensity: number;
   rise: string;
-  emotion: string;
+  emotions: string[];
   forcedMatch: string;
   possessionMode: boolean;
   targets: RequestTarget[];
@@ -42,7 +42,7 @@ export const renderResonanceRequestCard = (state: ResonanceRequestState): Promis
     intensity: state.intensity,
     // 憑依判定は上昇値の指定を受けない（成否によらず+1）ので、そもそも出さない
     rise: state.possessionMode ? "" : state.rise,
-    emotion: formatEmotion(state.emotion),
+    emotions: formatEmotions(state.emotions),
     forcedMatch: state.forcedMatch
       ? game.i18n.localize(`EMOKLORE.Resonance.Match${capitalize(state.forcedMatch)}`)
       : "",

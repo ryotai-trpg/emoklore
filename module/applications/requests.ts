@@ -105,7 +105,7 @@ async function rollResonanceFor(
   // 一致度はDLの強制指定が最優先。無ければ指定された感情から自動で決める
   const match = isResonanceMatch(request.forcedMatch)
     ? request.forcedMatch
-    : matchEmotion(actor.system.getOwnedEmotions(), request.emotion);
+    : matchEmotion(actor.system.getOwnedEmotions(), [...request.emotions]);
 
   const message = await actor.rollResonance(request.intensity, match);
   const roll = (message as { rolls?: EmokloreRoll[] } | undefined)?.rolls?.[0];

@@ -1,9 +1,13 @@
-import { isResonantEmotionKey } from "../../config/resonant-emotions";
 import { systemPath } from "../../constants";
-import { formatEmotion } from "../../utils/emotion";
 import type { ResonanceRequestState } from "../../utils/resonance";
 import { resolveActingActors } from "../../utils/targets";
-import { EmotionPicker } from "../emotion-picker";
+import {
+  buildEmotionTags,
+  loadEmotionTagsPartial,
+  pickEmotionsInto,
+  readEmotions,
+  removeEmotionFrom,
+} from "./emotion-field";
 
 const TEMPLATE = systemPath("templates/apps/resonance-request.hbs");
 
@@ -19,12 +23,13 @@ const TEMPLATE = systemPath("templates/apps/resonance-request.hbs");
 export async function promptResonanceRequest(
   preset: Partial<ResonanceRequestState> = {},
 ): Promise<ResonanceRequestState | null> {
-  const emotion = preset.emotion ?? "";
+  const emotions = preset.emotions ?? [];
+  await loadEmotionTagsPartial();
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     intensity: preset.intensity ?? 5,
     rise: preset.rise ?? "1",
-    emotion,
-    emotionLabel: formatEmotion(emotion),
+    emotions: emotions.join(","),
+    emotionTags: buildEmotionTags(emotions),
     possessionMode: preset.possessionMode ?? false,
   });
 
@@ -50,38 +55,14 @@ export async function promptResonanceRequest(
     },
     // content 内の data-action は ApplicationV2 のアクション機構がここに振り分ける
     actions: {
-      pickEmotion: (_event: Event, button: HTMLElement) => pickEmotion(button),
+      pickEmotions: (_event: Event, button: HTMLElement) => pickEmotionsInto(button),
+      removeEmotion: (_event: Event, target: HTMLElement) => removeEmotionFrom(target),
     },
     // 閉じられた場合はnullで返る。rejectCloseで例外にすると本物のエラーを握り潰しやすい
     rejectClose: false,
   } as Parameters<typeof foundry.applications.api.DialogV2.prompt>[0]);
 
   return (result as ResonanceRequestState | null) ?? null;
-}
-
-/** シートと同じピッカーで感情を選び、hidden とボタンの表示に書き戻す */
-async function pickEmotion(button: HTMLElement): Promise<void> {
-  const form = (button as HTMLButtonElement).form as HTMLFormElement;
-  const field = form.elements.namedItem("emotion") as HTMLInputElement;
-
-  const picked = await EmotionPicker.pickSlots([
-    {
-      key: "emotion",
-      label: game.i18n.localize("EMOKLORE.EmotionPicker.Title"),
-      // hidden の値は前回の選択かプリセット。感情キーとして名乗る前に確かめる
-      value: isResonantEmotionKey(field.value) ? field.value : null,
-    },
-  ]);
-  if (!picked) return;
-
-  const emotion = picked.emotion ?? "";
-  field.value = emotion;
-
-  const label = button.querySelector("[data-emotion-label]");
-  if (label) {
-    label.textContent =
-      formatEmotion(emotion) || game.i18n.localize("EMOKLORE.EmotionPicker.Unselected");
-  }
 }
 
 /**
@@ -102,7 +83,7 @@ function readInput(
   return {
     intensity: Number.isFinite(intensity) && intensity > 0 ? intensity : 1,
     rise: (form.elements.namedItem("rise") as HTMLInputElement).value.trim(),
-    emotion: (form.elements.namedItem("emotion") as HTMLInputElement).value,
+    emotions: readEmotions(form),
     forcedMatch: (form.elements.namedItem("forcedMatch") as HTMLSelectElement).value,
     possessionMode: (form.elements.namedItem("possessionMode") as HTMLInputElement).checked,
     targets,

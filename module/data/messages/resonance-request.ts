@@ -1,8 +1,15 @@
 import { attachCardActions, type CardActions } from "../../utils/chat-card";
 import { EmokloreSystemDataModel } from "../system-model";
 
-const { ArrayField, BooleanField, DocumentUUIDField, NumberField, SchemaField, StringField } =
-  foundry.data.fields;
+const {
+  ArrayField,
+  BooleanField,
+  DocumentUUIDField,
+  NumberField,
+  SchemaField,
+  SetField,
+  StringField,
+} = foundry.data.fields;
 
 /** 要求の対象1体ぶん。アクターを消したあとも読めるよう名前を焼き込む */
 export type RequestTarget = {
@@ -30,8 +37,15 @@ const defineResonanceRequestSchema = () => ({
     validationError: "is not a valid dice formula",
   }),
 
-  // DLが指定する共鳴感情。空なら感情の指定なし。保存値は使う前に型述語を通す
-  emotion: new StringField({ required: true, blank: true, initial: "" }),
+  // DLが指定する共鳴感情。空なら感情の指定なし。《怪異》は複数持つので複数受ける。
+  // 保存されるのは感情キー（怪異の emotions と同じ形）
+  emotions: new SetField(
+    new StringField({
+      required: true,
+      blank: false,
+      choices: Object.keys(CONFIG.EMOKLORE.resonantEmotions),
+    }),
+  ),
 
   // マッチングのGM強制。空なら感情から自動で決める。シナリオが「強制的に全員、
   // 振るダイスの数が倍になる」と指定するケースがある
@@ -69,7 +83,7 @@ const defineResonanceRequestSchema = () => ({
 export class ResonanceRequestModel extends EmokloreSystemDataModel {
   declare intensity: number;
   declare rise: string;
-  declare emotion: string;
+  declare emotions: Set<string>;
   declare forcedMatch: string;
   declare possessionMode: boolean;
   declare targets: RequestTarget[];
