@@ -1,7 +1,20 @@
-import { attachCardActions, type CardActions } from "../../utils/chat-card";
-import { EmokloreSystemDataModel } from "../system-model";
+import type { CardActions } from "../../utils/chat-card";
+import { ChatCardModel } from "./card-model";
 
 const { BooleanField, DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
+
+/** カードに焼き込む結果の内容。スキーマと同じ形 */
+export type ResonanceOutcomeState = {
+  actorUuid: string | null;
+  name: string;
+  successCount: number;
+  rise: number;
+  before: number;
+  after: number;
+  howling: boolean;
+  possessionReached: boolean;
+  kaiUuid: string | null;
+};
 
 const defineResonanceOutcomeSchema = () => ({
   // 振った共鳴者。効果の適用先を #79 がここから辿る
@@ -35,7 +48,7 @@ const defineResonanceOutcomeSchema = () => ({
  * ハウリングが起きたときだけ「共鳴表を引く」のボタンが出る。ハンドラは表を引いて
  * アイテムを作るので `applications/` 側にあり、init が `ACTIONS` へ登録する。
  */
-export class ResonanceOutcomeModel extends EmokloreSystemDataModel {
+export class ResonanceOutcomeModel extends ChatCardModel {
   declare actorUuid: string | null;
   declare name: string;
   declare successCount: number;
@@ -46,23 +59,18 @@ export class ResonanceOutcomeModel extends EmokloreSystemDataModel {
   declare possessionReached: boolean;
   declare kaiUuid: string | null;
 
+  static override CARD = {
+    root: ".em-resonance-outcome",
+    label: "共鳴結果カード",
+    errorKey: "EMOKLORE.ChatMessage.resonanceOutcome.ActionFailed",
+  };
+
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: CardActions<ResonanceOutcomeModel> = {};
+  static override ACTIONS: CardActions<ResonanceOutcomeModel> = {};
 
   static override defineSchema() {
     return defineResonanceOutcomeSchema();
   }
 
   static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.resonanceOutcome"];
-
-  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
-  addListeners(html: HTMLElement): void {
-    attachCardActions(html, {
-      root: ".em-resonance-outcome",
-      model: this,
-      actions: ResonanceOutcomeModel.ACTIONS,
-      label: "共鳴結果カード",
-      errorKey: "EMOKLORE.ChatMessage.resonanceOutcome.ActionFailed",
-    });
-  }
 }

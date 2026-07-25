@@ -1,6 +1,6 @@
 import type { EmokloreActor } from "../../documents/actor";
-import { attachCardActions, type CardActions } from "../../utils/chat-card";
-import { EmokloreSystemDataModel } from "../system-model";
+import type { CardActions } from "../../utils/chat-card";
+import { ChatCardModel } from "./card-model";
 
 const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
@@ -8,7 +8,12 @@ const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
 /** どのリソースの結果か。行の書式と境界の案内の出し分けに使う */
 export type ResourceKind = "hp" | "mp";
 
-/** 対象1体ぶんの適用結果。境界の判定に要る前後の値を焼き込む */
+/**
+ * 対象1体ぶんの適用結果。境界の判定に要る前後の値を焼き込む。
+ *
+ * `applyDamageToTargets`（GMへの委譲を含む）が返すのもこの形。適用した結果と
+ * カードに載る行は同じものなので、型を2つ持たない。
+ */
 export type AppliedTarget = {
   actorUuid: string | null;
   name: string;
@@ -16,6 +21,13 @@ export type AppliedTarget = {
   after: number;
   /** 軽減に使った防具の値。行の内訳に出す */
   armor: number;
+};
+
+/** カードに焼き込む内容。スキーマと同じ形 */
+export type DamageAppliedState = {
+  resource: ResourceKind;
+  reduction: number;
+  targets: AppliedTarget[];
 };
 
 const defineDamageAppliedSchema = () => {
@@ -43,13 +55,19 @@ const defineDamageAppliedSchema = () => {
  * ステータス付与のボタンを載せるにはリスナの配線先（system.addListeners）が要る。
  * 武器カードと同じ形のサブタイプにして、`renderChatMessageHTML` の汎用配線に乗せる。
  */
-export class DamageAppliedModel extends EmokloreSystemDataModel {
+export class DamageAppliedModel extends ChatCardModel {
   declare resource: ResourceKind;
   declare reduction: number;
   declare targets: AppliedTarget[];
 
+  static override CARD = {
+    root: ".em-damage-applied",
+    label: "境界の案内",
+    errorKey: "EMOKLORE.ChatMessage.damageApplied.ActionFailed",
+  };
+
   /** 案内のボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: CardActions<DamageAppliedModel>;
+  static override ACTIONS: CardActions<DamageAppliedModel>;
 
   static override defineSchema() {
     return defineDamageAppliedSchema();
@@ -91,17 +109,6 @@ export class DamageAppliedModel extends EmokloreSystemDataModel {
         status: game.i18n.localize(CONFIG.statusEffects[statusId]?.name ?? ""),
       }),
     );
-  }
-
-  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
-  addListeners(html: HTMLElement): void {
-    attachCardActions(html, {
-      root: ".em-damage-applied",
-      model: this,
-      actions: DamageAppliedModel.ACTIONS,
-      label: "境界の案内",
-      errorKey: "EMOKLORE.ChatMessage.damageApplied.ActionFailed",
-    });
   }
 }
 

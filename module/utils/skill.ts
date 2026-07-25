@@ -9,6 +9,7 @@ import type { CharacteristicKey } from "../config/characteristics";
 import { type SkillCategory, skillCategories } from "../config/skill-categories";
 import type { SkillGroupKey } from "../config/skill-groups";
 import { isSkillKey, skills } from "../config/skills";
+import { requiredSuccesses } from "../rules/success";
 import { typedEntries } from "./object";
 
 /**
@@ -162,3 +163,28 @@ export const formatSkillRefs = (values: Iterable<string>): string =>
     })
     .filter((label) => label !== "")
     .join("／");
+
+/**
+ * 通常技能に対応するベース技能のキー。
+ *
+ * 技能グループのキーは基本技能のキーと同じ綴りで、〈観察眼〉なら `perception`＝〈＊知覚〉に
+ * なる（`docs/data-model.md`「グループは基本技能と同じ綴りのキーを使うが別のテーブル」）。
+ * ルールブックが「〈観察眼〉または〈＊知覚〉で判定」と併記する形をそのまま作れる。
+ *
+ * 対応が無い技能（グループを持たないもの）は null。
+ */
+export const baseSkillOf = (key: string): string | null => {
+  if (!isSkillKey(key)) return null;
+
+  const { group } = CONFIG.EMOKLORE.skills[key];
+  return group && isBaseSkillKey(group) ? group : null;
+};
+
+/** 判定要求を作るときに、指定できる成功度と要る成功数の対 */
+export const requirementChoices = (): Array<{ value: number; label: string }> =>
+  (["single", "double", "triple", "miracle"] as const).map((requirement) => ({
+    value: requiredSuccesses(requirement),
+    label: game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
+      result: game.i18n.localize(`EMOKLORE.result.${requirement}`),
+    }),
+  }));

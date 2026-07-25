@@ -1,9 +1,9 @@
+import { createRollMessage } from "../../chat/message";
 import { systemPath } from "../../constants";
 import { resolveSkillRef, type SkillRef } from "../../data/character";
 import type { WeaponCardModel } from "../../data/messages/weapon-card";
 import type { EmokloreActor } from "../../documents/actor";
 import { normalizeReduction } from "../../rules/weapon-damage";
-import { createRollMessage } from "../../utils/chat";
 import { typedEntries } from "../../utils/object";
 import { skillMarker } from "../../utils/skill";
 import { resolveTargetActors } from "../../utils/targets";

@@ -1,11 +1,14 @@
+import { postMessage } from "../chat/message";
+import { buildWeaponCardMessageData } from "../chat/weapon-card";
 import type {
   ArmorDataModel,
   HowlingDataModel,
   SkillDataModel,
   WeaponDataModel,
 } from "../data/item-models";
+import type { WeaponCardSource } from "../data/messages/weapon-card";
 import type { EmokloreSystemDataModel } from "../data/system-model";
-import { localizeRangeType, renderWeaponCard, type WeaponCardState } from "../utils/weapon";
+import { localizeRangeType } from "../utils/weapon";
 import type { EmokloreActor } from "./actor";
 
 export class EmokloreItem extends Item {
@@ -73,7 +76,7 @@ export class EmokloreItem extends Item {
 
     const system = this.system;
     // 武器やアクターを消したあとでもカードが読めるよう、表示に要る値は焼き込む
-    const state: WeaponCardState & { itemUuid: string | null; actorUuid: string | null } = {
+    const state: WeaponCardSource = {
       weaponName: this.name,
       weaponImg: this.img,
       skill: system.skill,
@@ -85,17 +88,12 @@ export class EmokloreItem extends Item {
       actorUuid: actor.uuid,
     };
 
-    const messageData = {
-      type: "weapon",
-      system: state,
-      content: await renderWeaponCard(state, []),
-      speaker: ChatMessage.getSpeaker({ actor }),
-      flags: { core: { canPopout: true } },
-    };
+    // フックは完成したメッセージを書き換えられるので、組み立てと作成を分ける
+    const messageData = await buildWeaponCardMessageData(state, ChatMessage.getSpeaker({ actor }));
 
     if (Hooks.call("emoklore.preUseWeapon", this, messageData) === false) return;
 
-    const message = (await ChatMessage.create(messageData)) as ChatMessage | undefined;
+    const message = await postMessage(messageData);
     Hooks.callAll("emoklore.useWeapon", this, message);
 
     return message;

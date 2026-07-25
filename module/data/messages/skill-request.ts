@@ -1,5 +1,5 @@
-import { attachCardActions, type CardActions } from "../../utils/chat-card";
-import { EmokloreSystemDataModel } from "../system-model";
+import type { CardActions } from "../../utils/chat-card";
+import { ChatCardModel } from "./card-model";
 
 const { ArrayField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
@@ -7,6 +7,15 @@ const { ArrayField, NumberField, SchemaField, StringField } = foundry.data.field
 export type RequestedSkill = {
   kind: "skill" | "base";
   key: string;
+};
+
+/** カードに焼き込む要求の内容。スキーマと同じ形 */
+export type SkillRequestState = {
+  skills: RequestedSkill[];
+  requiredSuccess: number;
+  bonus: number;
+  successMod: number;
+  note: string;
 };
 
 const defineSkillRequestSchema = () => ({
@@ -45,30 +54,25 @@ const defineSkillRequestSchema = () => ({
  * ボタンのハンドラは持たない。判定を駆動するので `applications/` 側に置き、`emoklore.ts` の
  * init が `ACTIONS` へ登録する（architecture.md 課題5 を繰り返さない）。
  */
-export class SkillRequestModel extends EmokloreSystemDataModel {
+export class SkillRequestModel extends ChatCardModel {
   declare skills: RequestedSkill[];
   declare requiredSuccess: number;
   declare bonus: number;
   declare successMod: number;
   declare note: string;
 
+  static override CARD = {
+    root: ".em-skill-request",
+    label: "判定要求カード",
+    errorKey: "EMOKLORE.ChatMessage.skillRequest.ActionFailed",
+  };
+
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: CardActions<SkillRequestModel> = {};
+  static override ACTIONS: CardActions<SkillRequestModel> = {};
 
   static override defineSchema() {
     return defineSkillRequestSchema();
   }
 
   static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.skillRequest"];
-
-  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
-  addListeners(html: HTMLElement): void {
-    attachCardActions(html, {
-      root: ".em-skill-request",
-      model: this,
-      actions: SkillRequestModel.ACTIONS,
-      label: "判定要求カード",
-      errorKey: "EMOKLORE.ChatMessage.skillRequest.ActionFailed",
-    });
-  }
 }

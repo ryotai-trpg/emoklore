@@ -1,27 +1,20 @@
 /**
- * DLからの判定要求カードの見せ方。
+ * DLからの判定要求カードの組み立て。
  *
- * `utils/weapon.ts` と同じ立ち位置で、保存データと `config/` の定義を合流させて
- * テンプレートに渡す形まで整える。判定を振るのは `applications/` の担当。
+ * 出したら変わらないカードなので、状態は作成時に焼き込むだけ。各PLの判定結果は
+ * 別のメッセージとして出る（カードはPLから更新できない）。判定を振るのは
+ * `applications/requests.ts` の担当。
  */
 
 import { isBaseSkillKey } from "../config/base-skills";
 import { isSkillKey } from "../config/skills";
 import { systemPath } from "../constants";
-import type { RequestedSkill } from "../data/messages/skill-request";
-import { requiredSuccesses, resolveResultName } from "../rules/success";
-import { skillMarker } from "./skill";
+import type { RequestedSkill, SkillRequestState } from "../data/messages/skill-request";
+import { resolveResultName } from "../rules/success";
+import { skillMarker } from "../utils/skill";
+import { createCardMessage } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/skill-request.hbs");
-
-/** カードに焼き込む要求の内容。ChatMessage のサブタイプのスキーマと同じ形 */
-export type SkillRequestState = {
-  skills: RequestedSkill[];
-  requiredSuccess: number;
-  bonus: number;
-  successMod: number;
-  note: string;
-};
 
 /** カードに並べる技能1つぶん。`kind` と `key` はボタンの dataset に載せる */
 export type RequestedSkillRow = RequestedSkill & { label: string };
@@ -69,27 +62,13 @@ export const renderSkillRequestCard = (state: SkillRequestState): Promise<string
     note: state.note,
   });
 
-/**
- * 通常技能に対応するベース技能のキー。
- *
- * 技能グループのキーは基本技能のキーと同じ綴りで、〈観察眼〉なら `perception`＝〈＊知覚〉に
- * なる（`docs/data-model.md`「グループは基本技能と同じ綴りのキーを使うが別のテーブル」）。
- * ルールブックが「〈観察眼〉または〈＊知覚〉で判定」と併記する形をそのまま作れる。
- *
- * 対応が無い技能（グループを持たないもの）は null。
- */
-export const baseSkillOf = (key: string): string | null => {
-  if (!isSkillKey(key)) return null;
-
-  const { group } = CONFIG.EMOKLORE.skills[key];
-  return group && isBaseSkillKey(group) ? group : null;
-};
-
-/** 要求を作るときに、指定できる成功度と要る成功数の対 */
-export const requirementChoices = (): Array<{ value: number; label: string }> =>
-  (["single", "double", "triple", "miracle"] as const).map((requirement) => ({
-    value: requiredSuccesses(requirement),
-    label: game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
-      result: game.i18n.localize(`EMOKLORE.result.${requirement}`),
-    }),
-  }));
+/** DLからの判定要求をチャットに流す */
+export async function createSkillRequestMessage(
+  request: SkillRequestState,
+): Promise<ChatMessage | undefined> {
+  return createCardMessage({
+    type: "skillRequest",
+    system: request,
+    content: await renderSkillRequestCard(request),
+  });
+}

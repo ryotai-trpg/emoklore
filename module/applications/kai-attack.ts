@@ -1,6 +1,6 @@
+import { createDamageAppliedMessage } from "../chat/damage-applied";
 import type { KaiAttackCardModel } from "../data/messages/kai-attack-card";
 import { applyDamageToTargets } from "../documents/queries";
-import { createDamageAppliedMessage } from "../utils/chat";
 import { resolveTargetActors } from "../utils/targets";
 import { promptDamageReduction } from "./dialogs/apply-damage-dialog";
 

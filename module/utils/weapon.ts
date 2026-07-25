@@ -1,22 +1,18 @@
 /**
- * 武器の表示用の整形と、武器カードの組み立て。
+ * 武器の表示用の整形。
  *
- * シート（applications）とチャットカード（data/messages・documents）の両方から使うので、
- * どちらにも寄せずここに置く。ルール計算は module/rules/weapon-damage.ts が持つ。
+ * シート（`applications/`）とチャットカード（`chat/`）の両方から使うので、どちらにも
+ * 寄せずここに置く。ルール計算は `rules/weapon-damage.ts`、カードの組み立ては
+ * `chat/weapon-card.ts` が持つ。
  */
 
 import {
   type AttackSkillConfig,
-  type AttackSkillKey,
   attackSkills,
   type DamageDie,
   isAttackSkillKey,
   type RangeType,
 } from "../config/attack-skills";
-import { systemPath } from "../constants";
-import { canRollDamage } from "../rules/weapon-damage";
-
-const CARD_TEMPLATE = systemPath("templates/chat/weapon-card.hbs");
 
 /**
  * 攻撃技能の定義を引く。未知のキーは近接の既定（〈＊格闘〉）に倒す。
@@ -64,58 +60,3 @@ export const formatDamagePreview = (damageDie: DamageDie, attackPower: string): 
   // 前後に空白を入れない。一覧の列で「＋」の前後が折り返し候補になり、式が途中で割れる
   return attackPower ? `${dice}＋${attackPower}` : dice;
 };
-
-/** カードの描画に要る状態。保存されるスキーマと同じ形 */
-export type WeaponCardState = {
-  weaponName: string;
-  weaponImg: string;
-  skill: AttackSkillKey;
-  attackPower: string;
-  rangeLabel: string;
-  successCount: number | null;
-  damageTotal: number | null;
-};
-
-/** カードのどのボタンが出るか。押せるかどうかの判定にも同じものを使う */
-export type CardButtons = {
-  canRollAttack: boolean;
-  canRollDamage: boolean;
-  canApplyDamage: boolean;
-};
-
-/**
- * カードの進み具合からボタンの出し分けを決める。
- *
- * 描画とアクション側のガードで同じ条件が要る。別々に書くと、片方だけ直したときに
- * 「押せるのに何も起きない」「押せないはずが実行される」という形でずれる。
- */
-export const resolveCardButtons = (
-  state: Pick<WeaponCardState, "successCount" | "damageTotal">,
-): CardButtons => ({
-  canRollAttack: state.successCount === null,
-  canRollDamage:
-    state.successCount !== null && canRollDamage(state.successCount) && state.damageTotal === null,
-  // 適用は何度でも押せるようにしておく。狙いを変えて続けて当てることがある
-  canApplyDamage: state.damageTotal !== null,
-});
-
-/**
- * 武器カードのHTMLを組み立てる。
- *
- * 状態をモデルからではなく引数で受けるのは、更新の直前に「これから保存する状態」で
- * 描く必要があるため。カードを最初に作る時点ではモデルがまだ存在しないという事情もある。
- */
-export async function renderWeaponCard(
-  state: WeaponCardState,
-  rolls: foundry.dice.Roll[],
-): Promise<string> {
-  const [attackRoll, damageRoll] = rolls;
-
-  return foundry.applications.handlebars.renderTemplate(CARD_TEMPLATE, {
-    ...state,
-    ...resolveCardButtons(state),
-    skillLabel: localizeAttackSkill(state.skill),
-    attackHTML: attackRoll ? await attackRoll.render() : "",
-    damageHTML: damageRoll ? await damageRoll.render() : "",
-  });
-}

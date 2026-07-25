@@ -1,16 +1,13 @@
 /**
  * ハウリング反応の見せ方と、共鳴表の引き方。
  *
- * `utils/resonance.ts` と同じ立ち位置で、保存データと `config/` の定義を合流させて
- * テンプレートに渡す形まで整える。引いた結果を誰に適用するかは `applications/` の担当。
+ * `config/` の定義を翻訳して、シートに並べる行まで整える。引いた結果をカードにするのは
+ * `chat/howling-draw.ts`、誰に適用するかは `applications/howling.ts` の担当。
  */
 
 import { type HowlingCategory, howlingCategories } from "../config/howling-categories";
-import { systemPath } from "../constants";
 import type { KaiDataModel } from "../data/kai";
-import { formatSkillRefs, type SkillRollShortcut, toSkillRollShortcuts } from "./skill";
-
-const DRAW_TEMPLATE = systemPath("templates/chat/howling-draw.hbs");
+import { type SkillRollShortcut, toSkillRollShortcuts } from "./skill";
 
 /** 本体の型に出ないメンバーだけを補う。共鳴表として使うぶんだけ */
 type ResonanceTable = {
@@ -21,28 +18,12 @@ type ResonanceTable = {
 };
 
 /** 引いた結果1件。本体の TableResult のうち、カードに写すぶんだけ */
-type TableResult = {
+export type TableResult = {
   type: string;
   name: string;
   img: string | null;
   description: string;
   documentUuid: string | null;
-};
-
-/** 引いた結果カードに焼き込む内容。ChatMessage のサブタイプのスキーマと同じ形 */
-export type HowlingDrawState = {
-  actorUuid: string | null;
-  name: string;
-  kaiUuid: string | null;
-  tableUuid: string | null;
-  reactionName: string;
-  reactionImg: string;
-  category: HowlingCategory | "";
-  description: string;
-  /** 回復判定に使う技能の並び。「＊自我／心理」。判定で回復しないなら空文字 */
-  recoverySkills: string;
-  recoveryNote: string;
-  itemUuid: string | null;
 };
 
 /**
@@ -77,56 +58,6 @@ export const resolveResonanceTable = async (
   return typeof table?.roll === "function" ? table : null;
 };
 
-/**
- * 引いた結果を、カードに焼き込む形へ写す。
- *
- * document結果なら参照先の反応アイテムから、text結果なら結果そのものから読む。
- * **アイテムが消えたあとでもカードが読めるよう、表示に要る値は焼き込む**（武器カードと同じ）。
- */
-export const buildHowlingDrawState = async (
-  result: TableResult,
-  context: { actorUuid: string | null; name: string; kaiUuid: string | null; tableUuid: string },
-): Promise<HowlingDrawState> => {
-  const base = {
-    ...context,
-    reactionName: result.name,
-    reactionImg: result.img ?? "",
-    category: "" as HowlingCategory | "",
-    description: result.description,
-    recoverySkills: "",
-    recoveryNote: "",
-    itemUuid: null as string | null,
-  };
-
-  if (result.type !== "document" || !result.documentUuid) return base;
-
-  const item = (await foundry.utils.fromUuid(result.documentUuid)) as {
-    name?: string;
-    img?: string;
-    type?: string;
-    system?: {
-      category: HowlingCategory;
-      effect: string;
-      recovery: { note: string; skills: Set<string> };
-    };
-  } | null;
-
-  // 反応アイテム以外を指している表もありうる（GMが自分で組むため）。その場合は
-  // リンクとして名前だけ出し、適用のボタンは出さない
-  if (item?.type !== "howling" || !item.system) return base;
-
-  return {
-    ...base,
-    reactionName: item.name || result.name,
-    reactionImg: item.img || base.reactionImg,
-    category: item.system.category,
-    description: item.system.effect || result.description,
-    recoverySkills: formatSkillRefs(item.system.recovery.skills),
-    recoveryNote: item.system.recovery.note,
-    itemUuid: result.documentUuid,
-  };
-};
-
 /** 効果タブのハウリング区分に描く1行 */
 export type HowlingRow = {
   id: string;
@@ -136,6 +67,17 @@ export type HowlingRow = {
   /** 回復判定のショートカット。押すとその技能で判定が飛ぶ */
   recoverySkills: SkillRollShortcut[];
   recoveryNote: string;
+};
+
+/** 行に写すぶんだけを構造的に受ける（`data/` から `documents/` を参照しない決まりと同じ形） */
+type HowlingItemLike = {
+  id: string;
+  name: string;
+  img: string;
+  system: {
+    category: HowlingCategory;
+    recovery: { note: string; skills: Set<string> };
+  };
 };
 
 /**
@@ -154,29 +96,3 @@ export const prepareHowlingRows = (items: Iterable<HowlingItemLike>): HowlingRow
     recoverySkills: toSkillRollShortcuts(item.system.recovery.skills),
     recoveryNote: item.system.recovery.note,
   }));
-
-/** 行に写すぶんだけを構造的に受ける（`data/` から `documents/` を参照しない決まりと同じ形） */
-type HowlingItemLike = {
-  id: string;
-  name: string;
-  img: string;
-  system: {
-    category: HowlingCategory;
-    recovery: { note: string; skills: Set<string> };
-  };
-};
-
-/** 引いた結果カードのHTMLを組み立てる */
-export const renderHowlingDrawCard = async (state: HowlingDrawState): Promise<string> =>
-  foundry.applications.handlebars.renderTemplate(DRAW_TEMPLATE, {
-    reactionName: state.reactionName,
-    reactionImg: state.reactionImg,
-    categoryLabel: state.category ? localizeHowlingCategory(state.category) : "",
-    descriptionHTML: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      state.description,
-    ),
-    recoverySkills: state.recoverySkills,
-    recoveryNote: state.recoveryNote,
-    // 反応アイテムを指していない結果は適用しようがないので、ボタンごと出さない
-    canApply: Boolean(state.itemUuid && state.actorUuid),
-  });

@@ -1,6 +1,11 @@
+import { createMpNoticeMessage } from "../chat/damage-applied";
+import { createKaiAttackMessage } from "../chat/kai-attack-card";
+import { createRollMessage } from "../chat/message";
+import { formatRollFlavor, formatSkillName } from "../chat/roll-flavor";
 import type { CharacterDataModel, SkillRef } from "../data/character";
 import type { CharacterLikeDataModel } from "../data/character-like";
 import type { KaiDataModel } from "../data/kai";
+import type { KaiAttackCardState } from "../data/messages/kai-attack-card";
 import type { NpcDataModel } from "../data/npc";
 import { EmokloreRoll } from "../dice/emoklore-roll";
 import { buildKaiAttackSpec, substituteSuccess } from "../rules/kai-attack";
@@ -9,8 +14,6 @@ import { resolveMpBoundary } from "../rules/resource-boundary";
 import { resolveSkillRoll } from "../rules/skill-roll";
 import { type ModifierSet, NO_MODIFIER, type RollSpec, sumModifiers } from "../rules/types";
 import { calculateAppliedDamage } from "../rules/weapon-damage";
-import { createMpNoticeMessage, createRollMessage, formatSkillName } from "../utils/chat";
-import { type KaiAttackCardState, renderKaiAttackCard } from "../utils/kai";
 import type { EmokloreItem } from "./item";
 
 type ResourceKey = "hp" | "mp" | "resonance";
@@ -273,20 +276,7 @@ export class EmokloreActor extends Actor {
       damageTotal,
     };
 
-    const rolls = [judgmentRoll, damageRoll].filter(
-      (roll): roll is foundry.dice.Roll => roll !== null,
-    );
-    const created = await ChatMessage.create({
-      type: "kaiAttack",
-      system: state,
-      speaker: ChatMessage.getSpeaker({ actor: this }),
-      rolls,
-      content: await renderKaiAttackCard(state, { judgmentRoll, damageRoll }),
-      sound: CONFIG.sounds.dice,
-      flags: { core: { canPopout: true } },
-    });
-
-    return created as ChatMessage | undefined;
+    return createKaiAttackMessage(this, state, { judgmentRoll, damageRoll });
   }
 
   async rollSkill(
@@ -321,13 +311,8 @@ export class EmokloreActor extends Actor {
 
     return {
       roll: await this.#buildRoll(spec, options),
-      flavor: EmokloreActor.formatRollFlavor(formatSkillName(context)),
+      flavor: formatRollFlavor(formatSkillName(context)),
     };
-  }
-
-  /** チャットの見出し。判定の種類によらず「〈○○〉判定」の形にする */
-  static formatRollFlavor(skillName: string): string {
-    return game.i18n.localize("EMOKLORE.skillRoll", { skillName });
   }
 
   /** 判定内容からRollを作って評価する */
@@ -347,7 +332,7 @@ export class EmokloreActor extends Actor {
   ): Promise<ChatMessage | undefined> {
     return createRollMessage({
       actor: this,
-      flavor: EmokloreActor.formatRollFlavor(skillName),
+      flavor: formatRollFlavor(skillName),
       roll: await this.#buildRoll(spec, options),
     });
   }

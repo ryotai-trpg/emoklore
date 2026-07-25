@@ -1,21 +1,33 @@
+import { createDamageAppliedMessage } from "../../chat/damage-applied";
+import { type CardButtons, resolveCardButtons, updateWeaponCard } from "../../chat/weapon-card";
 import type { AttackSkillKey } from "../../config/attack-skills";
 import type { EmokloreActor } from "../../documents/actor";
 import { applyDamageToTargets } from "../../documents/queries";
 import { buildDamageFormula, resolveStrengthBonus } from "../../rules/weapon-damage";
-import { createDamageAppliedMessage } from "../../utils/chat";
-import { attachCardActions, type CardActions } from "../../utils/chat-card";
+import type { CardActions } from "../../utils/chat-card";
 import { resolveTargetActors } from "../../utils/targets";
-import {
-  type CardButtons,
-  renderWeaponCard,
-  resolveAttackSkill,
-  resolveCardButtons,
-  type WeaponCardState,
-} from "../../utils/weapon";
+import { resolveAttackSkill } from "../../utils/weapon";
 import { resolveSkillRef } from "../character";
-import { EmokloreSystemDataModel } from "../system-model";
+import { ChatCardModel } from "./card-model";
 
 const { DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
+
+/** カードの描画に要る状態。スキーマのうち、見せ方に効く分 */
+export type WeaponCardState = {
+  weaponName: string;
+  weaponImg: string;
+  skill: AttackSkillKey;
+  attackPower: string;
+  rangeLabel: string;
+  successCount: number | null;
+  damageTotal: number | null;
+};
+
+/** 保存する状態。描画には使わないがモジュール連携のために持つ参照を足したもの */
+export type WeaponCardSource = WeaponCardState & {
+  itemUuid: string | null;
+  actorUuid: string | null;
+};
 
 /**
  * カードが載っている ChatMessage。
@@ -23,7 +35,7 @@ const { DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
  * `parent` は本体の型では DataModel 止まりで、ChatMessage のメンバーが出てこない。
  * 実際に使うものだけを交差型で補う（docs/code-design.md「本体の型が足りないとき」）。
  */
-type CardMessage = ChatMessage & {
+export type WeaponCardMessage = ChatMessage & {
   rolls: foundry.dice.Roll[];
   update: (data: Record<string, unknown>) => Promise<unknown>;
 };
@@ -59,7 +71,7 @@ const defineWeaponCardSchema = () => {
  * 本体は `content` に要素があれば `rolls` を自動描画しないので、ロールをメッセージに
  * 載せたまま、カード側で見出し付きに並べられる。
  */
-export class WeaponCardModel extends EmokloreSystemDataModel {
+export class WeaponCardModel extends ChatCardModel {
   declare weaponName: string;
   declare weaponImg: string;
   declare skill: AttackSkillKey;
@@ -70,8 +82,14 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
   declare successCount: number | null;
   declare damageTotal: number | null;
 
+  static override CARD = {
+    root: ".em-weapon-card",
+    label: "武器カード",
+    errorKey: "EMOKLORE.ChatMessage.weapon.ActionFailed",
+  };
+
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
-  static ACTIONS: CardActions<WeaponCardModel>;
+  static override ACTIONS: CardActions<WeaponCardModel>;
 
   static override defineSchema() {
     return defineWeaponCardSchema();
@@ -80,8 +98,8 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
   static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.weapon"];
 
   /** カードが載っているメッセージ。parent の型が DataModel 止まりなのでここで1回だけ絞る */
-  get message(): CardMessage {
-    return this.parent as CardMessage;
+  get message(): WeaponCardMessage {
+    return this.parent as WeaponCardMessage;
   }
 
   get attackRoll(): foundry.dice.Roll | undefined {
@@ -198,38 +216,17 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
     if (applied.length > 0) await createDamageAppliedMessage(applied, { reduction });
   }
 
-  /**
-   * ロールと状態をカードに書き戻す。
-   *
-   * `content` を毎回組み直すのは、ボタンの出し分けと結果の表示が状態と一緒に変わるため。
-   * 作成時と違って更新では `sound` が鳴らないので、ダイス音はここで明示的に鳴らす。
-   */
+  /** ロールと状態をカードに書き戻す。描き直しとダイス音は chat/weapon-card.ts が持つ */
   async #applyRoll(rolls: foundry.dice.Roll[], changes: Partial<WeaponCardState>): Promise<void> {
     const system = { ...this.toObject(), ...changes } as WeaponCardState;
-    const content = await renderWeaponCard(system, rolls);
 
-    await this.message.update({ content, rolls, system });
-
-    // モジュールが CONFIG.sounds を空にしている場合があるので、あるときだけ鳴らす
-    const sound = CONFIG.sounds.dice;
-    if (sound) foundry.audio.AudioHelper.play({ src: sound }, true);
+    await updateWeaponCard(this.message, system, rolls);
   }
 
   async #resolveActor(): Promise<EmokloreActor | undefined> {
     if (!this.actorUuid) return undefined;
 
     return ((await foundry.utils.fromUuid(this.actorUuid)) as EmokloreActor | null) ?? undefined;
-  }
-
-  /** ボタンに反応する。`renderChatMessageHTML` から呼ばれる（配線は utils/chat-card.ts） */
-  addListeners(html: HTMLElement): void {
-    attachCardActions(html, {
-      root: ".em-weapon-card",
-      model: this,
-      actions: WeaponCardModel.ACTIONS,
-      label: "武器カード",
-      errorKey: "EMOKLORE.ChatMessage.weapon.ActionFailed",
-    });
   }
 }
 
