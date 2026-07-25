@@ -67,6 +67,11 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
       };
     });
 
+    // プレイ画面では未修得（Lv.0）の技能を並べない（共鳴者シートと同じ）。編集では全技能を出す
+    if (context.isPlay) {
+      context.skills = context.skills.filter((skill) => skill.level > 0);
+    }
+
     context.baseSkills = typedEntries(system.baseSkills).map(([key, entry]) => ({
       key,
       rollType: "base-skill",

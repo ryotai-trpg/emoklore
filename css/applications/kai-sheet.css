@@ -7,6 +7,15 @@
 }
 
 .emoklore.sheet.kai {
+  /* 単一パート（.em-kai）を .window-content（本体が flex 縦積み）の中で伸ばし、はみ出しを
+     スクロールさせる。flex の子は min-height: auto だと縮まずスクロールが効かないので 0 にする */
+  .em-kai {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: var(--spacer-4);
+  }
+
   .em-kai__header {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);

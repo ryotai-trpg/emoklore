@@ -10,8 +10,10 @@
   {{/if}}
 
   <div class="em-npc__resources">
-    <label class="em-npc__resource">
-      <span>{{localize "EMOKLORE.Actor.character.FIELDS.resources.hp.value.label"}}</span>
+    <label class="em-npc__resource"
+      data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.hp.label"}}">
+      {{! HP/MPのアイコンは共鳴者のメータと同じものを使う（fa-heart / fa-wand-magic-sparkles） }}
+      <i class="fa-solid fa-heart em-npc__resource-icon" inert></i>
       {{#if isPlay}}
         <span class="em-npc__resource-value">{{system.resources.hp.value}} / {{system.resources.hp.max}}</span>
       {{else}}
@@ -22,8 +24,9 @@
         </span>
       {{/if}}
     </label>
-    <label class="em-npc__resource">
-      <span>{{localize "EMOKLORE.Actor.character.FIELDS.resources.mp.value.label"}}</span>
+    <label class="em-npc__resource"
+      data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.mp.label"}}">
+      <i class="fa-solid fa-wand-magic-sparkles em-npc__resource-icon" inert></i>
       {{#if isPlay}}
         <span class="em-npc__resource-value">{{system.resources.mp.value}} / {{system.resources.mp.max}}</span>
       {{else}}

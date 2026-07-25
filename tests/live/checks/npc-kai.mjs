@@ -202,4 +202,83 @@ export async function run({ page, check }) {
       TAG,
     ),
   );
+
+  await check("npcのプレイ画面は未修得（Lv.0）技能を隠す", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const sheet = game.actors.getName(`${tag}_npc`).sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        // 通常技能の行は data-roll-type=skill。プレイ/編集を跨いで数えられる
+        const count = () => sheet.element.querySelectorAll("[data-roll-type=skill]").length;
+        await window.__setMode(sheet, "play");
+        const play = count();
+        await window.__setMode(sheet, "edit");
+        const edit = count();
+        await window.__setMode(sheet, "play");
+        const all = Object.keys(CONFIG.EMOKLORE.skills).length;
+        // フィクスチャは search だけ Lv.2。プレイは修得済みのみ、編集は全技能
+        const ok = edit === all && play > 0 && play < edit;
+        return { ok, detail: `閲覧${play} → 編集${edit}（全${all}）` };
+      },
+      TAG,
+    ),
+  );
+
+  await check("npcのHP/MPが共鳴者と同じアイコンで出る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const sheet = game.actors.getName(`${tag}_npc`).sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        const el = sheet.element;
+        const hp = !!el.querySelector(".em-npc__resource-icon.fa-heart");
+        const mp = !!el.querySelector(".em-npc__resource-icon.fa-wand-magic-sparkles");
+        // 「現在」の生ラベルは出ていない（アイコンに置き換えた）
+        const noLabel = !(el.querySelector(".em-npc__resources")?.textContent ?? "").includes(
+          "現在",
+        );
+        return {
+          ok: hp && mp && noLabel,
+          detail: `HP=fa-heart:${hp} MP=fa-wand-magic-sparkles:${mp} 「現在」なし=${noLabel}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
+  await check("npc・kaiのシート本体がスクロールできる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const results = [];
+        for (const [type, sel] of [
+          ["npc", ".em-npc"],
+          ["kai", ".em-kai"],
+        ]) {
+          const sheet = game.actors.getName(`${tag}_${type}`).sheet;
+          if (!sheet.rendered) await sheet.render(true);
+          // 編集モードは全項目が出て確実にはみ出す。枠を小さくして溢れさせる
+          await window.__setMode(sheet, "edit");
+          await sheet.setPosition({ height: 220 });
+          const part = sheet.element.querySelector(sel);
+          await window.__waitFor(() => part.scrollHeight > part.clientHeight + 4, {
+            soft: true,
+            label: `${type}のはみ出し`,
+          });
+          const overflowY = getComputedStyle(part).overflowY;
+          const scrolls =
+            (overflowY === "auto" || overflowY === "scroll") &&
+            part.scrollHeight > part.clientHeight + 4;
+          results.push(
+            `${type}=${scrolls}(${overflowY} ${part.scrollHeight}>${part.clientHeight})`,
+          );
+          await window.__setMode(sheet, "play");
+          if (!scrolls) return { ok: false, detail: results.join(" ") };
+        }
+        return { ok: true, detail: results.join(" ") };
+      },
+      TAG,
+    ),
+  );
 }
