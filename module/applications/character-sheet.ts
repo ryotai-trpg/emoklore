@@ -12,6 +12,7 @@ import {
 import { CHARACTERISTIC_MAX, CHARACTERISTIC_MIN } from "../rules/limits";
 import { getSetting, setSetting } from "../settings";
 import { prepareActiveEffectCategories } from "../utils/effects";
+import { prepareHowlingRows } from "../utils/howling";
 import { typedEntries } from "../utils/object";
 import {
   createDocumentData,
@@ -623,9 +624,31 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       }));
   }
 
+  /**
+   * 効果タブの表示用データ。
+   *
+   * ハウリング反応はアイテムそのものを別区分に並べる。反応が持つ効果は一時的／永続的の
+   * 区分から除いてあり、**同じ反応が2行に分かれて見えないようにする**。効果を持たない
+   * 反応（RPだけのもの）も並ぶのは、それも受けている状態には違いないため。
+   */
   private _prepareEffectsContext(context: CharacterContext): void {
     context.tab = context.tabs.effects;
-    context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
+
+    const items = (this.actor.itemTypes.howling ?? []) as EmokloreItem[];
+    context.howlings = prepareHowlingRows(
+      items.flatMap((item) =>
+        // 埋め込みドキュメントなので id は必ずある（アイテムタブの行と同じ扱い）
+        item.isHowling()
+          ? [{ id: item.id!, name: item.name, img: item.img, system: item.system }]
+          : [],
+      ),
+    );
+
+    context.effects = prepareActiveEffectCategories(
+      [...this.actor.allApplicableEffects()].filter(
+        (effect) => (effect.parent as { type?: string } | null)?.type !== "howling",
+      ),
+    );
   }
 
   /**

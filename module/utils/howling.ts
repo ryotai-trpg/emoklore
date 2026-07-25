@@ -8,7 +8,7 @@
 import { type HowlingCategory, howlingCategories } from "../config/howling-categories";
 import { systemPath } from "../constants";
 import type { KaiDataModel } from "../data/kai";
-import { formatSkillRefs } from "./skill";
+import { formatSkillRefs, type SkillRollShortcut, toSkillRollShortcuts } from "./skill";
 
 const DRAW_TEMPLATE = systemPath("templates/chat/howling-draw.hbs");
 
@@ -124,6 +124,45 @@ export const buildHowlingDrawState = async (
     recoverySkills: formatSkillRefs(item.system.recovery.skills),
     recoveryNote: item.system.recovery.note,
     itemUuid: result.documentUuid,
+  };
+};
+
+/** 効果タブのハウリング区分に描く1行 */
+export type HowlingRow = {
+  id: string;
+  name: string;
+  img: string;
+  categoryLabel: string;
+  /** 回復判定のショートカット。押すとその技能で判定が飛ぶ */
+  recoverySkills: SkillRollShortcut[];
+  recoveryNote: string;
+};
+
+/**
+ * いま受けているハウリング反応を、効果タブに描く形へ写す。
+ *
+ * **アイテムそのものを並べる。** 反応が持つ効果（transfer）は一時的／永続的の区分から
+ * 除いてあり、代わりにこの行が「いま何を受けているか」を1件1行で見せる。効果を持たない
+ * 反応（RPだけのもの）も同じように並ぶのは、それも受けている状態には違いないため。
+ */
+export const prepareHowlingRows = (items: Iterable<HowlingItemLike>): HowlingRow[] =>
+  [...items].map((item) => ({
+    id: item.id,
+    name: item.name,
+    img: item.img,
+    categoryLabel: localizeHowlingCategory(item.system.category),
+    recoverySkills: toSkillRollShortcuts(item.system.recovery.skills),
+    recoveryNote: item.system.recovery.note,
+  }));
+
+/** 行に写すぶんだけを構造的に受ける（`data/` から `documents/` を参照しない決まりと同じ形） */
+type HowlingItemLike = {
+  id: string;
+  name: string;
+  img: string;
+  system: {
+    category: HowlingCategory;
+    recovery: { note: string; skills: Set<string> };
   };
 };
 

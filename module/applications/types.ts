@@ -11,6 +11,7 @@ import type {
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import type { ModifierSet } from "../rules/types";
+import type { HowlingRow } from "../utils/howling";
 import type { ValueSegment } from "./helpers";
 
 /**
@@ -291,6 +292,8 @@ export type CharacterContext = {
   weapons?: WeaponRow[];
   armors?: ArmorRow[];
   effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;
+  /** いま受けているハウリング反応。効果タブの専用区分に並ぶ */
+  howlings?: HowlingRow[];
   // 基底の EmokloreDocumentSheetContext と対応する分
   isPlay: boolean;
   owner: boolean;

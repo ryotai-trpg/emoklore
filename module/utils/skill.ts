@@ -112,6 +112,34 @@ export const skillRefChoices: Record<string, string> = Object.fromEntries([
   ]),
 ]);
 
+/** 判定のショートカットに要る形。`rollType` はシートの `data-roll-type` の値と対応する */
+export type SkillRollShortcut = {
+  rollType: "skill" | "base-skill";
+  key: string;
+  label: string;
+};
+
+/**
+ * 「経路:キー」の並びを、判定のショートカットに要る形へ写す。
+ *
+ * `formatSkillRefs` が1本の文字列にするのに対し、こちらは技能ごとにボタンを並べたい
+ * ところで使う。表に無いものは落とす（理由は `formatSkillRefs` と同じ）。
+ */
+export const toSkillRollShortcuts = (values: Iterable<string>): SkillRollShortcut[] =>
+  [...values].flatMap((value): SkillRollShortcut[] => {
+    const { kind, key } = parseSkillRefValue(value);
+
+    if (kind === "base") {
+      if (!isBaseSkillKey(key)) return [];
+      const label = `${skillMarker(true, false)}${CONFIG.EMOKLORE.baseSkills[key].label}`;
+      return [{ rollType: "base-skill", key, label }];
+    }
+    if (!isSkillKey(key)) return [];
+
+    const { label, isExtra } = CONFIG.EMOKLORE.skills[key];
+    return [{ rollType: "skill", key, label: `${skillMarker(false, isExtra ?? false)}${label}` }];
+  });
+
 /**
  * 「経路:キー」の並びを表示名にする。「＊自我／心理」。
  *
