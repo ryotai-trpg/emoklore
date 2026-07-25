@@ -613,6 +613,32 @@
           "resonanceTable": {
             "label": "共鳴表",
             "hint": "ハウリングが起きたときに引く表。RollTableをここへドラッグする。"
+          },
+          "attacks": {
+            "element": {
+              "name": {
+                "placeholder": "名前"
+              },
+              "diceCount": {
+                "label": "ダイス"
+              },
+              "target": {
+                "label": "判定値"
+              },
+              "damage": {
+                "label": "ダメージ式",
+                "placeholder": "@successd3+3"
+              },
+              "mpCost": {
+                "label": "消費MP"
+              },
+              "judgeless": {
+                "label": "判定なし"
+              },
+              "fixedSuccess": {
+                "label": "固定成功数"
+              }
+            }
           }
         },
         "Emotions": "共鳴感情",
@@ -620,12 +646,7 @@
         "RequestResonance": "共鳴判定を要求",
         "ResonanceTable": "共鳴表",
         "Mutation": "憑依時の変異",
-        "Attacks": "攻撃",
-        "AttackName": "名前",
-        "AttackDice": "ダイス",
-        "AttackTarget": "判定値",
-        "AttackDamage": "ダメージ式",
-        "FixedSuccess": "固定成功数"
+        "Attacks": "攻撃"
       }
     },
     "skillRoll": "〈{skillName}〉判定",

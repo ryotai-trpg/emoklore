@@ -613,6 +613,32 @@
           "resonanceTable": {
             "label": "Resonance Table",
             "hint": "The table drawn from when howling occurs. Drag a RollTable here."
+          },
+          "attacks": {
+            "element": {
+              "name": {
+                "placeholder": "Name"
+              },
+              "diceCount": {
+                "label": "Dice"
+              },
+              "target": {
+                "label": "Target"
+              },
+              "damage": {
+                "label": "Damage Formula",
+                "placeholder": "@successd3+3"
+              },
+              "mpCost": {
+                "label": "MP Cost"
+              },
+              "judgeless": {
+                "label": "No Roll"
+              },
+              "fixedSuccess": {
+                "label": "Fixed Successes"
+              }
+            }
           }
         },
         "Emotions": "Resonant Emotions",
@@ -620,12 +646,7 @@
         "RequestResonance": "Request Resonance Roll",
         "ResonanceTable": "Resonance Table",
         "Mutation": "Possession Mutation",
-        "Attacks": "Attacks",
-        "AttackName": "Name",
-        "AttackDice": "Dice",
-        "AttackTarget": "Target",
-        "AttackDamage": "Damage Formula",
-        "FixedSuccess": "Fixed Successes"
+        "Attacks": "Attacks"
       }
     },
     "skillRoll": "{skillName} Roll",

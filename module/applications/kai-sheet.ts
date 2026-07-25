@@ -1,3 +1,4 @@
+import type { SchemaField } from "@common/data/fields.mjs";
 import { systemPath } from "../constants";
 import type { KaiAttack, KaiDataModel } from "../data/kai";
 import type { EmokloreActor } from "../documents/actor";
@@ -66,6 +67,10 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
         .filter((emotion) => selected.has(emotion.key))
         .map((emotion) => ({ key: emotion.key, label: formatEmotion(emotion.key) })),
     );
+
+    // 本体の getField は DataField を返すので、要素のスキーマとして名乗り直す。
+    // attacks が ArrayField(SchemaField) であることは data/kai.ts の定義側で決まっている
+    context.attackFields = (system.schema.getField("attacks.element") as SchemaField).fields;
 
     context.mutationHTML = await enrichDocumentHTML(this.actor, system.mutation);
     context.resonanceTableLink = system.resonanceTable

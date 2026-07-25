@@ -1,5 +1,6 @@
 import type { ApplicationRenderContext, ApplicationTab } from "@client/applications/_types.mjs";
 import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
+import type { SchemaField } from "@common/data/fields.mjs";
 import type { CharacterDataModel } from "../data/character";
 import type {
   ArmorDataModel,
@@ -409,4 +410,13 @@ export type KaiSheetContext = SheetContextBase<EmokloreActor, KaiDataModel> & {
   mutationHTML: string;
   /** 共鳴表への @UUID リンク。参照が無ければ空文字 */
   resonanceTableLink: string;
+  /**
+   * 攻撃1件ぶんのフィールド。ラベルとプレースホルダを引くために積む。
+   *
+   * `attacks` は ArrayField なので、要素のフィールドは
+   * `systemFields.attacks.element.fields` に居る（本体は要素の `name` を
+   * "element" に固定する）。テンプレートから毎回この道を辿ると読めないので、
+   * コンテキスト側で解決しておく
+   */
+  attackFields: SchemaField["fields"];
 };
