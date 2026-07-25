@@ -45,6 +45,75 @@ const REACTION = {
 };
 
 export async function run({ page, check }) {
+  await check("同梱の共鳴表が2つのパックから引ける形で入っている", () =>
+    assertInPage(page, async () => {
+      const reactions = game.packs.get("emoklore.howling-reactions");
+      const tables = game.packs.get("emoklore.resonance-tables");
+      if (!reactions || !tables) {
+        return { ok: false, detail: `パックが無い（反応=${!!reactions} 表=${!!tables}）` };
+      }
+
+      const table = await tables.getDocument("emokTableInnen1a");
+      // 結果はすべて反応アイテムを指す。UUIDが1つでも切れていると引いた先が空になる
+      const linked = await Promise.all(
+        table.results.map((result) => foundry.utils.fromUuid(result.documentUuid)),
+      );
+      const broken = linked.filter((item) => item?.type !== "howling").length;
+
+      const ok =
+        reactions.metadata.type === "Item" &&
+        tables.metadata.type === "RollTable" &&
+        reactions.index.size === 6 &&
+        table.results.size === 6 &&
+        // 共鳴表は1D6で何度でも引く。引いた印を付ける表にすると引き切って空になる
+        table.replacement === true &&
+        table.formula === "1d6" &&
+        broken === 0;
+
+      return {
+        ok,
+        detail: ok
+          ? `反応${reactions.index.size}件・${table.name}（${table.formula} 戻す）`
+          : `反応${reactions.index.size} 結果${table.results.size} formula=${table.formula} replacement=${table.replacement} 切れたUUID=${broken}`,
+      };
+    }),
+  );
+
+  await check("同梱の反応の効果が v14 の形で乗る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_char`);
+        const source = await game.packs
+          .get("emoklore.howling-reactions")
+          .getDocument("emokHowling0009a");
+
+        const baseline = actor.system.characteristics.mentality.mod.success;
+        const [applied] = await actor.createEmbeddedDocuments("Item", [source.toObject()]);
+        const withEffect = actor.system.characteristics.mentality.mod.success;
+
+        // 素の changes ではなく system.changes に書けていること（互換シム頼りにしない）
+        const change = applied.effects.contents[0]?.system?.changes?.[0];
+        await applied.delete();
+        const afterDelete = actor.system.characteristics.mentality.mod.success;
+
+        const ok =
+          withEffect === baseline - 1 &&
+          afterDelete === baseline &&
+          change?.type === "add" &&
+          change?.phase === "initial";
+
+        return {
+          ok,
+          detail: ok
+            ? `精神汚染で成功数 ${baseline} → ${withEffect}（type=${change.type} phase=${change.phase}）`
+            : `${baseline} → ${withEffect} → ${afterDelete} change=${JSON.stringify(change)}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
   await check("ハウリング反応シートが描画される", () =>
     assertInPage(
       page,
