@@ -1,3 +1,4 @@
+import { formatRollFlavor, resonanceSkillName } from "../../chat/roll-flavor";
 import { systemPath } from "../../constants";
 import type { OwnedEmotions } from "../../rules/emotion-match";
 import { normalizeIntensity, type ResonanceMatch } from "../../rules/resonance-roll";
@@ -52,14 +53,12 @@ export async function promptResonanceRoll({
     // DialogV2 の既定の classes は ["dialog"] だけで emoklore も standard-form も
     // 付かない。本体のフォーム体系に乗せるには明示的に渡す必要がある
     classes: ["emoklore", "standard-form"],
-    window: {
-      title: game.i18n.localize("EMOKLORE.skillRoll", {
-        skillName: game.i18n.localize("EMOKLORE.Resonance.Name"),
-      }),
-    },
+    // 見出しは判定を振る側と同じ形にする。label は本体が _loc を通すので生キーでよいが、
+    // title は展開が要るのでここで組み立てる
+    window: { title: formatRollFlavor(resonanceSkillName()) },
     content,
     ok: {
-      label: game.i18n.localize("EMOKLORE.Resonance.RollButton"),
+      label: "EMOKLORE.Resonance.RollButton",
       callback: (_event: Event, button: HTMLElement) => readInput(button, owned),
     },
     // content 内の data-action は ApplicationV2 のアクション機構がここに振り分ける

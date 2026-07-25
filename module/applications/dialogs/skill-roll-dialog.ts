@@ -52,10 +52,11 @@ export async function promptSkillRoll({
     // DialogV2 の既定の classes は ["dialog"] だけで emoklore も standard-form も
     // 付かない。本体のフォーム体系に乗せるには明示的に渡す必要がある
     classes: ["emoklore", "standard-form"],
-    window: { title: game.i18n.localize("EMOKLORE.RollOptions.Title") },
+    // title と label は本体が _loc を通すので、キーをそのまま渡す
+    window: { title: "EMOKLORE.RollOptions.Title" },
     content,
     ok: {
-      label: game.i18n.localize("EMOKLORE.Resonance.RollButton"),
+      label: "EMOKLORE.Resonance.RollButton",
       callback: (_event: Event, button: HTMLElement) => readInput(button),
     },
     // 閉じられた場合はnullで返る。rejectCloseで例外にすると本物のエラーを握り潰しやすい
