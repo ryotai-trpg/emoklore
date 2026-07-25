@@ -60,6 +60,12 @@ export async function run({ page, check }) {
       );
       const broken = linked.filter((item) => item?.type !== "howling").length;
 
+      // system.json の packs[].label はi18nキーで書いてある。本体は
+      // CompendiumCollection のコンストラクタで _loc に通すが、それが走るのは
+      // i18n の初期化より後だという前提に乗っているので、解決を確かめておく
+      const labels = [reactions.metadata.label, tables.metadata.label];
+      const unresolved = labels.filter((label) => label.startsWith("EMOKLORE."));
+
       const ok =
         reactions.metadata.type === "Item" &&
         tables.metadata.type === "RollTable" &&
@@ -68,13 +74,14 @@ export async function run({ page, check }) {
         // 共鳴表は1D6で何度でも引く。引いた印を付ける表にすると引き切って空になる
         table.replacement === true &&
         table.formula === "1d6" &&
-        broken === 0;
+        broken === 0 &&
+        unresolved.length === 0;
 
       return {
         ok,
         detail: ok
-          ? `反応${reactions.index.size}件・${table.name}（${table.formula} 戻す）`
-          : `反応${reactions.index.size} 結果${table.results.size} formula=${table.formula} replacement=${table.replacement} 切れたUUID=${broken}`,
+          ? `反応${reactions.index.size}件・${table.name}（${table.formula} 戻す）／パック名=${labels.join("・")}`
+          : `反応${reactions.index.size} 結果${table.results.size} formula=${table.formula} replacement=${table.replacement} 切れたUUID=${broken} 未解決のパック名=${unresolved.join("・") || "なし"}`,
       };
     }),
   );
