@@ -627,6 +627,7 @@
     },
     "skillRoll": "{skillName} Roll",
     "successMod": "Successes {mod}",
+    "resonantEmotion": "{emotion} ({attribute})",
     "Effect": {
       "Source": "Source",
       "Temporary": "Temporary",
@@ -747,7 +748,6 @@
       "Section": "Howling",
       "Recover": "Recovery Check"
     },
-    "resonantEmotion": "{emotion} ({attribute})",
     "result": {
       "fumble": "Fumble",
       "failure": "Failure",
