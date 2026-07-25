@@ -36,7 +36,8 @@
     "Item": {
       "weapon": { "htmlFields": ["notes"] },
       "armor": { "htmlFields": ["notes"] },
-      "skill": { "htmlFields": ["notes"] }
+      "skill": { "htmlFields": ["notes"] },
+      "howling": { "htmlFields": ["effect", "notes"] }
     },
     "ChatMessage": {
       "weapon": {},

@@ -7,6 +7,7 @@ import * as applications from "./applications/character-sheet";
 import { injectChatControls } from "./applications/chat-controls";
 import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
+import { EmokloreHowlingSheet } from "./applications/howling-sheet";
 import { applyKaiDamage } from "./applications/kai-attack";
 import { EmokloreKaiSheet } from "./applications/kai-sheet";
 import { EmokloreNpcSheet } from "./applications/npc-sheet";
@@ -17,7 +18,12 @@ import { EMOKLORE } from "./config/index";
 import { statusEffects } from "./config/status-effects";
 import { CharacterDataModel } from "./data/character";
 import { CombatDataModel } from "./data/combat";
-import { ArmorDataModel, SkillDataModel, WeaponDataModel } from "./data/item-models";
+import {
+  ArmorDataModel,
+  HowlingDataModel,
+  SkillDataModel,
+  WeaponDataModel,
+} from "./data/item-models";
 import { KaiDataModel } from "./data/kai";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
 import { KaiAttackCardModel } from "./data/messages/kai-attack-card";
@@ -69,6 +75,7 @@ Hooks.once("init", () => {
     weapon: WeaponDataModel,
     armor: ArmorDataModel,
     skill: SkillDataModel,
+    howling: HowlingDataModel,
   } as typeof CONFIG.Item.dataModels;
   CONFIG.ChatMessage.dataModels = {
     weapon: WeaponCardModel,
@@ -213,6 +220,18 @@ Hooks.once("init", () => {
       types: ["skill"],
       makeDefault: true,
       label: "EMOKLORE.Sheet.class.skill",
+    },
+  );
+
+  DocumentSheetConfig.registerSheet(
+    Item,
+    "emoklore",
+    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
+    EmokloreHowlingSheet as unknown as typeof foundry.applications.api.ApplicationV2,
+    {
+      types: ["howling"],
+      makeDefault: true,
+      label: "EMOKLORE.Sheet.class.howling",
     },
   );
 

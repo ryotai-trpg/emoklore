@@ -14,6 +14,7 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | Item | `weapon` | `WeaponDataModel` |
 | Item | `armor` | `ArmorDataModel` |
 | Item | `skill` | `SkillDataModel` |
+| Item | `howling` | `HowlingDataModel` |
 | ChatMessage | `weapon` | `WeaponCardModel` |
 | ChatMessage | `kaiAttack` | `KaiAttackCardModel` |
 | ChatMessage | `damageApplied` | `DamageAppliedModel` |
@@ -328,6 +329,36 @@ Itemにしてあるのは、コンペンディウムに入れて配ったり他�
 `characteristic` が `characteristicOptions` の外を指していたら `prepareDerivedData` が先頭に戻す。作者が参照能力値を絞ったあとも古い値が残ると、アクターが持たない能力値を引いてしまうため。
 
 **特化（分野）は持たない。** 組込技能の8件にある `specialization` に相当するものは無い。
+
+## Item `howling`
+
+ハウリング反応。共鳴判定がトリプル以上だったときに共鳴表（RollTable）から引く先で、引いた結果は共鳴者の持ち物になる。
+
+**Itemなのは、効果をActiveEffectで持てる唯一の器だから。** 本体の `TableResult` は `hasTypeData` を持たず（結果そのものにシステムデータを載せられない）、`Card` は metadata に `embedded` を持たない（ActiveEffectを埋め込めない）。「状態になって、条件を満たすと戻る」を、アイテムを持っている間だけ効果が乗る本体の仕組みにそのまま重ねられるので、**回復とはこのアイテムを消すこと**になる。
+
+| パス | 型 | 制約 | 意味 |
+|---|---|---|---|
+| `category` | StringField | 分類7種、既定 `unclassified` | 分類。表示だけに使う |
+| `effect` | HTMLField | | 効果とルール処理の記述。`htmlFields` に宣言済み |
+| `recovery.note` | StringField | 既定 `""` | 判定に落ちない回復条件の自由記述 |
+| `recovery.skills` | SetField(StringField) | 「経路:キー」48種 | 回復判定に使う技能 |
+| `notes` | HTMLField | | フレーバーテキスト。`htmlFields` に宣言済み |
+
+分類は次の7種。**どこからも読まれない純粋なラベル**で、公式サイトにも分類がゲーム上どう働くかの規定は無い。
+
+| キー | 日本語名 |
+|---|---|
+| `reflex` | 反射 |
+| `denial` | 否認 |
+| `agitation` | 翻弄 |
+| `rejection` | 拒絶 |
+| `attunement` | 同調 |
+| `acceptance` | 受容 |
+| `unclassified` | 分類不能 |
+
+`recovery.skills` の値は `skill:psychology` `base:self` のように「経路:キー」で持つ。通常技能（35件）と基本技能（13件）は別々の表に居るので、キーだけではどちらの表を引くか決まらないため。カスタム技能はアクター固有なので、配り物の反応からは指せない（選択肢に出ない）。
+
+**機械的な修正はここに書かない。** 「判定値に【精神】を使用する技能での判定は成功数-1される」のような効果は、このアイテムに付けた[効果（ActiveEffect）](/active-effect)が持つ。`effect` はその読み下しで、「即座に〈∞共鳴〉レベルが1増加する」のように一度きりで効果に落ちないものも、文として置いたまま人が処理する。
 
 ## ChatMessage `weapon`
 

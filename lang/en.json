@@ -8,7 +8,8 @@
     "Item": {
       "weapon": "Weapon",
       "armor": "Armor",
-      "skill": "Custom Skill"
+      "skill": "Custom Skill",
+      "howling": "Howling Reaction"
     },
     "Combat": {
       "standard": "Standard"
@@ -40,7 +41,8 @@
         "activeEffect": "Effect Sheet",
         "skill": "Skill Sheet",
         "npc": "NPC Sheet",
-        "kai": "Apparition Sheet"
+        "kai": "Apparition Sheet",
+        "howling": "Howling Reaction Sheet"
       },
       "toggleMode": "Toggle Play/Edit mode",
       "character": {
@@ -139,6 +141,39 @@
           "base": "Base Skill",
           "normal": "Normal Skill",
           "extra": "Extra Skill"
+        }
+      },
+      "howling": {
+        "FIELDS": {
+          "category": {
+            "label": "Category"
+          },
+          "effect": {
+            "label": "Effect",
+            "hint": "Write the effect text as printed. Roll modifiers belong in an Active Effect."
+          },
+          "recovery": {
+            "note": {
+              "label": "Recovery Condition",
+              "hint": "For conditions no check can express, such as \"the DL decides the symptoms and duration\"."
+            },
+            "skills": {
+              "label": "Recovery Check Skills",
+              "hint": "Only for reactions recovered by a check, such as \"recovers on a success with *Ego or Psychology\"."
+            }
+          },
+          "notes": {
+            "label": "Flavor"
+          }
+        },
+        "Category": {
+          "reflex": "Reflex",
+          "denial": "Denial",
+          "agitation": "Agitation",
+          "rejection": "Rejection",
+          "attunement": "Attunement",
+          "acceptance": "Acceptance",
+          "unclassified": "Unclassified"
         }
       }
     },

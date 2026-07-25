@@ -4,9 +4,11 @@
  * `utils/weapon.ts` と同じ立ち位置で、`config/` の定義を翻訳・整形するところまでを持つ。
  */
 
+import { baseSkills, isBaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
 import { type SkillCategory, skillCategories } from "../config/skill-categories";
 import type { SkillGroupKey } from "../config/skill-groups";
+import { isSkillKey, skills } from "../config/skills";
 import { typedEntries } from "./object";
 
 /**
@@ -94,3 +96,41 @@ export const parseSkillRefValue = (value: string): StoredSkillRef => {
 /** 参照を「経路:キー」に戻す。選択の初期値を組むときに使う */
 export const toSkillRefValue = ({ kind, key }: StoredSkillRef): string =>
   `${kind}${SKILL_REF_SEPARATOR}${key}`;
+
+/**
+ * スキーマの choices に渡す表。キーは「経路:キー」、値は翻訳済み文字列ではなくi18nキー。
+ *
+ * 通常技能と基本技能を1本に混ぜてある。`choices` は組にしか使えず optgroup を作れないが、
+ * 48件の表示名に重複が無いので（`npm run check:schema-doc` が見ている表そのもの）、
+ * 印が無くても取り違えは起きない。印を付けた並びが要るところは `buildSkillRefGroups`。
+ */
+export const skillRefChoices: Record<string, string> = Object.fromEntries([
+  ...Object.entries(skills).map(([key, { label }]) => [`skill${SKILL_REF_SEPARATOR}${key}`, label]),
+  ...Object.entries(baseSkills).map(([key, { label }]) => [
+    `base${SKILL_REF_SEPARATOR}${key}`,
+    label,
+  ]),
+]);
+
+/**
+ * 「経路:キー」の並びを表示名にする。「＊自我／心理」。
+ *
+ * 保存データの値は外から来るので、表に無いものは落とす（configのキーを改名しても、
+ * 古いデータは尻切れの表示になるだけで済む）。区切りは `formatCharacteristicOptions` と同じ。
+ */
+export const formatSkillRefs = (values: Iterable<string>): string =>
+  [...values]
+    .map((value) => {
+      const { kind, key } = parseSkillRefValue(value);
+
+      if (kind === "base") {
+        if (!isBaseSkillKey(key)) return "";
+        return `${skillMarker(true, false)}${CONFIG.EMOKLORE.baseSkills[key].label}`;
+      }
+      if (!isSkillKey(key)) return "";
+
+      const { label, isExtra } = CONFIG.EMOKLORE.skills[key];
+      return `${skillMarker(false, isExtra ?? false)}${label}`;
+    })
+    .filter((label) => label !== "")
+    .join("／");

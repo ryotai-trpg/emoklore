@@ -8,7 +8,8 @@
     "Item": {
       "weapon": "武器",
       "armor": "防具",
-      "skill": "カスタム技能"
+      "skill": "カスタム技能",
+      "howling": "ハウリング反応"
     },
     "Combat": {
       "standard": "標準"
@@ -40,7 +41,8 @@
         "activeEffect": "効果シート",
         "skill": "技能シート",
         "npc": "NPCシート",
-        "kai": "怪異シート"
+        "kai": "怪異シート",
+        "howling": "ハウリング反応シート"
       },
       "toggleMode": "プレイ・編集モード切替",
       "character": {
@@ -139,6 +141,39 @@
           "base": "ベース技能",
           "normal": "通常技能",
           "extra": "エクストラ技能"
+        }
+      },
+      "howling": {
+        "FIELDS": {
+          "category": {
+            "label": "分類"
+          },
+          "effect": {
+            "label": "効果",
+            "hint": "ルールブックの効果文をそのまま書く。判定への修正は効果（ActiveEffect）で付ける。"
+          },
+          "recovery": {
+            "note": {
+              "label": "回復条件",
+              "hint": "「症状と期間はDLが決定する」「シナリオ中継続」など、判定に落ちない条件を書く。"
+            },
+            "skills": {
+              "label": "回復判定に使う技能",
+              "hint": "「〈＊自我〉あるいは〈心理〉の成功で回復する」のように、判定で回復するものだけ選ぶ。"
+            }
+          },
+          "notes": {
+            "label": "フレーバー"
+          }
+        },
+        "Category": {
+          "reflex": "反射",
+          "denial": "否認",
+          "agitation": "翻弄",
+          "rejection": "拒絶",
+          "attunement": "同調",
+          "acceptance": "受容",
+          "unclassified": "分類不能"
         }
       }
     },

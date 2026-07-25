@@ -9,6 +9,7 @@ import { attackSkills } from "../module/config/attack-skills.ts";
 import { baseSkills } from "../module/config/base-skills.ts";
 import { characteristics } from "../module/config/characteristics.ts";
 import { emotionAttributes } from "../module/config/emotion-attributes.ts";
+import { howlingCategories } from "../module/config/howling-categories.ts";
 import { resonantEmotions } from "../module/config/resonant-emotions.ts";
 import { skillGroups } from "../module/config/skill-groups.ts";
 import { skills } from "../module/config/skills.ts";
@@ -26,6 +27,7 @@ const TABLES = [
   { name: "skills", table: skills, requireFullCoverage: true },
   { name: "attackSkills", table: attackSkills, requireFullCoverage: true },
   { name: "emotionAttributes", table: emotionAttributes, requireFullCoverage: true },
+  { name: "howlingCategories", table: howlingCategories, requireFullCoverage: true },
   { name: "resonantEmotions", table: resonantEmotions, requireFullCoverage: false },
 ];
 
