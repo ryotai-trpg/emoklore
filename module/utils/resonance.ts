@@ -8,6 +8,7 @@
 import { systemPath } from "../constants";
 import type { RequestTarget } from "../data/messages/resonance-request";
 import { formatEmotions } from "./emotion";
+import { resolveResonanceTable } from "./howling";
 
 const REQUEST_TEMPLATE = systemPath("templates/chat/resonance-request.hbs");
 const OUTCOME_TEMPLATE = systemPath("templates/chat/resonance-outcome.hbs");
@@ -50,9 +51,16 @@ export const renderResonanceRequestCard = (state: ResonanceRequestState): Promis
     targets: state.targets.map((target) => target.name).join("、"),
   });
 
-/** 共鳴判定の結果カードのHTMLを組み立てる */
-export const renderResonanceOutcomeCard = (state: ResonanceOutcomeState): Promise<string> =>
-  foundry.applications.handlebars.renderTemplate(OUTCOME_TEMPLATE, {
+/**
+ * 共鳴判定の結果カードのHTMLを組み立てる。
+ *
+ * ハウリングを引くボタンは、怪異に共鳴表が紐づいているときだけ出す。押しても何も
+ * 起きないボタンを並べるより、DLに「表を用意していない」と気付かせるほうがよい。
+ */
+export const renderResonanceOutcomeCard = async (state: ResonanceOutcomeState): Promise<string> => {
+  const canDraw = state.howling && Boolean(await resolveResonanceTable(state.kaiUuid));
+
+  return foundry.applications.handlebars.renderTemplate(OUTCOME_TEMPLATE, {
     line: game.i18n.localize(
       state.rise > 0
         ? "EMOKLORE.ChatMessage.resonanceOutcome.Raised"
@@ -60,8 +68,10 @@ export const renderResonanceOutcomeCard = (state: ResonanceOutcomeState): Promis
       { name: state.name, before: state.before, after: state.after, rise: state.rise },
     ),
     howling: state.howling,
+    canDraw,
     possessionReached: state.possessionReached,
   });
+};
 
 /** 一致度のキーを言語キーの綴りに直す。`root` → `MatchRoot` */
 const capitalize = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);

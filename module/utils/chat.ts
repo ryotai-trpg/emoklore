@@ -4,6 +4,7 @@ import type { SurvivalTarget } from "../data/messages/survival-reminder";
 import type { EmokloreRoll } from "../dice/emoklore-roll";
 import type { EmokloreActor } from "../documents/actor";
 import { resolveHpBoundary } from "../rules/resource-boundary";
+import { type HowlingDrawState, renderHowlingDrawCard } from "./howling";
 import { renderSkillRequestCard, type SkillRequestState } from "./request";
 import {
   type ResonanceOutcomeState,
@@ -175,6 +176,30 @@ export async function createResonanceOutcomeMessage(
     system: outcome,
     speaker: ChatMessage.getSpeaker({ actor }),
     content: await renderResonanceOutcomeCard(outcome),
+    flags: { core: { canPopout: true } },
+  });
+
+  return created as ChatMessage | undefined;
+}
+
+/**
+ * 共鳴表から引いた反応をチャットに流す。
+ *
+ * 引いた 1D6 をメッセージに載せるので、ダイスの演出も判定と同じように出る。発言者を
+ * 共鳴者にするのは結果カードと同じ理由で、誰のハウリングかが並びだけで分かるようにするため。
+ */
+export async function createHowlingDrawMessage(
+  state: HowlingDrawState,
+  roll: foundry.dice.Roll | null,
+  actor: EmokloreActor | null,
+): Promise<ChatMessage | undefined> {
+  const created = await ChatMessage.create({
+    type: "howlingDraw",
+    system: state,
+    content: await renderHowlingDrawCard(state),
+    rolls: roll ? [roll] : [],
+    sound: roll ? CONFIG.sounds.dice : null,
+    speaker: actor ? ChatMessage.getSpeaker({ actor }) : undefined,
     flags: { core: { canPopout: true } },
   });
 

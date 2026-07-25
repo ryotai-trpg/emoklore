@@ -1,6 +1,66 @@
 {{! Effects Tab }}
 <section class="tab effects {{tab.cssClass}}" data-group="primary" data-tab="effects">
   <ol class="em-data-table">
+    {{! ハウリング反応はアイテムそのものを並べる。反応が持つ効果は下の区分から除いてあり、
+        「いま何を受けているか」を1件1行で見せる。受けていなければ区分ごと出さない }}
+    {{#if howlings.length}}
+      <li class="em-data-table__section" data-effect-type="howling">
+        <div class="em-data-table__head">
+          <div class="em-data-table__name">{{localize "EMOKLORE.Howling.Section"}}</div>
+          <div class="em-data-table__cell">{{localize "EMOKLORE.Item.howling.FIELDS.category.label"}}</div>
+          <div class="em-data-table__cell">{{localize "EMOKLORE.Item.howling.FIELDS.recovery.note.label"}}</div>
+          <div class="em-data-table__controls"></div>
+        </div>
+
+        <ol class="em-data-table__body">
+          {{#each howlings as |howling|}}
+            <li
+              class="em-data-table__row"
+              data-item-id="{{howling.id}}"
+              data-document-class="Item"
+            >
+              <div class="em-data-table__name">
+                <img class="em-data-table__image" src="{{howling.img}}" height="24" width="24" />
+                <div>{{howling.name}}</div>
+              </div>
+              <div class="em-data-table__cell">{{howling.categoryLabel}}</div>
+              <div class="em-data-table__cell em-data-table__cell--wrap">
+                {{! 判定で回復するものは技能ごとにショートカットを出す。押すと判定が飛ぶ }}
+                {{#each howling.recoverySkills as |skill|}}
+                  <a
+                    data-action="roll"
+                    data-roll-type="{{skill.rollType}}"
+                    data-skill="{{skill.key}}"
+                    data-tooltip="EMOKLORE.Howling.Recover"
+                  >{{skill.label}}</a>
+                {{/each}}
+                {{#if howling.recoveryNote}}<span>{{howling.recoveryNote}}</span>{{/if}}
+              </div>
+              <div class="em-data-table__controls">
+                <a
+                  class="em-data-table__control"
+                  data-action="viewDoc"
+                  data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
+                >
+                  <i class="fas fa-edit"></i>
+                </a>
+                {{#if @root.editable}}
+                  {{! 回復＝反応そのものを消すこと。付いている効果もまとめて外れる }}
+                  <a
+                    class="em-data-table__control"
+                    data-action="deleteDoc"
+                    data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
+                  >
+                    <i class="fas fa-trash"></i>
+                  </a>
+                {{/if}}
+              </div>
+            </li>
+          {{/each}}
+        </ol>
+      </li>
+    {{/if}}
+
     {{#each effects as |section sid|}}
       {{! 区分ごとに1項目。見出しと明細のolを li の中に収める（ol直下にolは置けない） }}
       <li class="em-data-table__section" data-effect-type="{{section.type}}">

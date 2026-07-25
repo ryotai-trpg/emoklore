@@ -12,6 +12,7 @@ import {
 import { CHARACTERISTIC_MAX, CHARACTERISTIC_MIN } from "../rules/limits";
 import { getSetting, setSetting } from "../settings";
 import { prepareActiveEffectCategories } from "../utils/effects";
+import { prepareHowlingRows } from "../utils/howling";
 import { typedEntries } from "../utils/object";
 import {
   createDocumentData,
@@ -31,6 +32,7 @@ import {
   buildSkillLevelSegments,
   buildValueSegments,
   EMOTION_KEYS,
+  getAcquiredEmotionRows,
   getEmotionRows,
   resolveSegmentValue,
 } from "./helpers";
@@ -89,6 +91,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       toggleSidebar: this._toggleSidebar,
       createSkill: this._createSkill,
       pickEmotions: this._pickEmotions,
+      pickAcquiredEmotions: this._pickAcquiredEmotions,
     },
   };
 
@@ -159,6 +162,11 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     context.config = CONFIG.EMOKLORE;
     context.emotionRows = getEmotionRows(
       context.system.emotions,
+      context.config.resonantEmotions,
+      context.config.emotionAttributes,
+    );
+    context.acquiredEmotionRows = getAcquiredEmotionRows(
+      context.system.emotions.acquired,
       context.config.resonantEmotions,
       context.config.emotionAttributes,
     );
@@ -306,6 +314,22 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     await this.actor.update(
       Object.fromEntries(EMOTION_KEYS.map((key) => [`system.emotions.${key}`, picked[key] ?? ""])),
     );
+  }
+
+  /**
+   * 追加取得した共鳴感情を選び直す。
+   *
+   * 共振（ハウリングの「対象の《怪異》が持つ共鳴感情をひとつ追加で獲得する」）や怪異の
+   * 付与で増える枠で、枚数が決まらないので複数選択モードで開く（怪異シートと同じ形）。
+   * どの感情を取るかはルール上その場で決まるので、選ぶのは人の側になる。
+   */
+  static async _pickAcquiredEmotions(this: EmokloreCharacterSheet, event: Event) {
+    event.preventDefault();
+
+    const picked = await EmotionPicker.pickMany(this.actor.system.emotions.acquired);
+    if (!picked) return;
+
+    await this.actor.update({ "system.emotions.acquired": picked });
   }
 
   /**
@@ -623,9 +647,31 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       }));
   }
 
+  /**
+   * 効果タブの表示用データ。
+   *
+   * ハウリング反応はアイテムそのものを別区分に並べる。反応が持つ効果は一時的／永続的の
+   * 区分から除いてあり、**同じ反応が2行に分かれて見えないようにする**。効果を持たない
+   * 反応（RPだけのもの）も並ぶのは、それも受けている状態には違いないため。
+   */
   private _prepareEffectsContext(context: CharacterContext): void {
     context.tab = context.tabs.effects;
-    context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
+
+    const items = (this.actor.itemTypes.howling ?? []) as EmokloreItem[];
+    context.howlings = prepareHowlingRows(
+      items.flatMap((item) =>
+        // 埋め込みドキュメントなので id は必ずある（アイテムタブの行と同じ扱い）
+        item.isHowling()
+          ? [{ id: item.id!, name: item.name, img: item.img, system: item.system }]
+          : [],
+      ),
+    );
+
+    context.effects = prepareActiveEffectCategories(
+      [...this.actor.allApplicableEffects()].filter(
+        (effect) => (effect.parent as { type?: string } | null)?.type !== "howling",
+      ),
+    );
   }
 
   /**

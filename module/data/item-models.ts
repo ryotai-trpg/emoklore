@@ -5,13 +5,16 @@ import {
   type RangeType,
 } from "../config/attack-skills";
 import { type CharacteristicKey, characteristicChoices } from "../config/characteristics";
+import { type HowlingCategory, howlingCategoryChoices } from "../config/howling-categories";
 import { type SkillCategory, skillCategoryChoices } from "../config/skill-categories";
 import { type SkillGroupKey, skillGroupChoices } from "../config/skill-groups";
 import { SKILL_LEVEL_MAX, SKILL_LEVEL_MIN } from "../rules/limits";
+import { skillRefChoices } from "../utils/skill";
 import { resolveAttackSkill } from "../utils/weapon";
 import { EmokloreSystemDataModel } from "./system-model";
 
-const { BooleanField, HTMLField, NumberField, SetField, StringField } = foundry.data.fields;
+const { BooleanField, HTMLField, NumberField, SchemaField, SetField, StringField } =
+  foundry.data.fields;
 
 const defineWeaponDataModelSchema = () => {
   return {
@@ -207,4 +210,55 @@ export class SkillDataModel extends EmokloreSystemDataModel {
       this.characteristic = fallback ?? "physical";
     }
   }
+}
+
+/**
+ * ハウリング反応。共鳴表（RollTable）が引く先で、引いた結果は共鳴者の持ち物になる。
+ *
+ * **Itemなのは、効果をActiveEffectで持てる唯一の器だから。** `TableResult` は
+ * `hasTypeData` を持たず、`Card` は `embedded` を持たない（どちらも本体の metadata）。
+ * 「状態になって、条件を満たすと戻る」を、アイテムを持っている間だけ効果が乗る本体の
+ * 仕組み（transfer）にそのまま重ねられる — 回復とは、このアイテムを消すことになる。
+ */
+const defineHowlingDataModelSchema = () => {
+  return {
+    // 分類は表示だけに使う。効果も回復もここからは導けない（config/howling-categories.ts）
+    category: new StringField({
+      required: true,
+      blank: false,
+      // choices の値は翻訳済み文字列ではなくi18nキー。描画時に本体が解決する
+      choices: howlingCategoryChoices,
+      initial: "unclassified" satisfies HowlingCategory,
+    }),
+    // 効果とルール処理の記述。機械的な修正は ActiveEffect が持ち、ここはその読み下し。
+    // 「即座に〈∞共鳴〉レベルが1増加する」のような一度きりの効果は効果に落とせないので、
+    // 文として置いたまま人が処理する
+    effect: new HTMLField({ required: true, blank: true }),
+    recovery: new SchemaField({
+      // 「症状と期間はDLが決定する」「シナリオ中継続」など、判定に落ちない条件
+      note: new StringField({ required: true, blank: true, initial: "" }),
+      // 「〈＊自我〉あるいは〈心理〉の成功で回復する」を持てるよう複数を許す。
+      // 値は「経路:キー」で、通常技能と基本技能を1本の選択肢に混ぜている（utils/skill.ts）。
+      // カスタム技能は各アクター固有なので、配り物の反応からは指せない
+      skills: new SetField(
+        new StringField({ required: true, blank: false, choices: skillRefChoices }),
+      ),
+    }),
+    // フレーバーテキスト。他のアイテム種別と同じ名前で揃える
+    notes: new HTMLField({ required: true, blank: true }),
+  };
+};
+
+export class HowlingDataModel extends EmokloreSystemDataModel {
+  declare category: HowlingCategory;
+  declare effect: string;
+  // skills の中身は「経路:キー」。判定に使うときは parseSkillRefValue を通す
+  declare recovery: { note: string; skills: Set<string> };
+  declare notes: string;
+
+  static override defineSchema() {
+    return defineHowlingDataModelSchema();
+  }
+
+  static override LOCALIZATION_PREFIXES = ["EMOKLORE.Item.howling"];
 }

@@ -93,11 +93,17 @@
       {{/if}}
     </label>
   </div>
-  {{#if resonanceTableLink}}
-    <div class="em-kai__resonance-table">
-      <span>{{localize "EMOKLORE.Actor.kai.ResonanceTable"}}</span>
-      {{{resonanceTableLink}}}
-    </div>
+  {{! 編集では RollTable をドラッグして紐づける（DocumentUUIDField が受け口を描く）。
+      閲覧では紐づいているときだけリンクを出す }}
+  {{#if isPlay}}
+    {{#if resonanceTableLink}}
+      <div class="em-kai__resonance-table">
+        <span>{{localize "EMOKLORE.Actor.kai.ResonanceTable"}}</span>
+        {{{resonanceTableLink}}}
+      </div>
+    {{/if}}
+  {{else}}
+    {{formGroup systemFields.resonanceTable value=system.resonanceTable}}
   {{/if}}
 </section>
 

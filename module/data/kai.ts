@@ -88,8 +88,10 @@ const defineKaiDataModelSchema = () => ({
     }),
   }),
 
-  // 使用する共鳴表／デッキへの参照。引く処理は #79。ここでは参照を持つだけ
-  resonanceTable: new DocumentUUIDField({ nullable: true, initial: null }),
+  // 使用する共鳴表への参照。ハウリングが起きたら共鳴結果カードのボタンがここを引く。
+  // 引く側は `RollTable#roll()` を使う（`draw()` は replacement:false の表で書き込みが
+  // 走り、PLがGM所有の表を引くと権限エラーになる。utils/howling.ts を参照）
+  resonanceTable: new DocumentUUIDField({ type: "RollTable", nullable: true, initial: null }),
 
   // 憑依時の変異など、機械的効果に落ちない自由記述
   mutation: new HTMLField({ required: true, blank: true }),

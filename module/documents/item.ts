@@ -1,4 +1,9 @@
-import type { ArmorDataModel, SkillDataModel, WeaponDataModel } from "../data/item-models";
+import type {
+  ArmorDataModel,
+  HowlingDataModel,
+  SkillDataModel,
+  WeaponDataModel,
+} from "../data/item-models";
 import type { EmokloreSystemDataModel } from "../data/system-model";
 import { localizeRangeType, renderWeaponCard, type WeaponCardState } from "../utils/weapon";
 import type { EmokloreActor } from "./actor";
@@ -38,6 +43,15 @@ export class EmokloreItem extends Item {
    */
   isSkill(): this is EmokloreItem & { type: "skill"; system: SkillDataModel } {
     return this.type === "skill";
+  }
+
+  /**
+   * ハウリング反応かどうか。真なら system を HowlingDataModel として読める。
+   *
+   * 効果タブは所持アイテムのうちこれだけを別区分に分けるので、絞り込みはここを通る。
+   */
+  isHowling(): this is EmokloreItem & { type: "howling"; system: HowlingDataModel } {
+    return this.type === "howling";
   }
 
   /**

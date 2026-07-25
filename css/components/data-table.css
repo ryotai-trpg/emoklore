@@ -51,6 +51,13 @@
     justify-content: center;
   }
 
+  /* 複数の要素が入るセル（ハウリングの回復条件など）は詰めずに折り返す */
+  .em-data-table__cell--wrap {
+    flex-wrap: wrap;
+    gap: var(--spacer-4);
+    font-size: var(--font-size-12);
+  }
+
   /* 名前だけは左寄せで、はみ出したら切る */
   .em-data-table__name {
     display: flex;

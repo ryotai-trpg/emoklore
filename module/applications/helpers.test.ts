@@ -8,6 +8,7 @@ import {
   buildEmotionColumns,
   buildSkillLevelSegments,
   buildValueSegments,
+  getAcquiredEmotionRows,
   getEmotionRows,
   resolveSegmentValue,
 } from "./helpers";
@@ -60,6 +61,35 @@ describe("getEmotionRows", () => {
 
   it("3つのキーを必ず埋める", () => {
     expect(Object.keys(rowsFor({}))).toEqual(["surface", "hidden", "root"]);
+  });
+});
+
+describe("getAcquiredEmotionRows", () => {
+  const acquiredRowsFor = (acquired: Iterable<string>) =>
+    getAcquiredEmotionRows(acquired, resonantEmotions, emotionAttributes);
+
+  it("追加取得した順に感情名と属性名を返す", () => {
+    expect(acquiredRowsFor(["hope", "possession"])).toEqual([
+      { label: "希望", attribute: "理想" },
+      { label: "独占", attribute: "欲望" },
+    ]);
+  });
+
+  // 3枠と違って枠そのものが無いので、既知でないキーは行ごと落とす
+  it("既知でない感情は行にしない", () => {
+    expect(acquiredRowsFor(["unknownEmotion", "hope"])).toEqual([
+      { label: "希望", attribute: "理想" },
+    ]);
+  });
+
+  it("属性の定義が欠けていても感情名だけは返す", () => {
+    expect(getAcquiredEmotionRows(["hope"], resonantEmotions, {})).toEqual([
+      { label: "希望", attribute: "" },
+    ]);
+  });
+
+  it("1つも取得していなければ空になる", () => {
+    expect(acquiredRowsFor([])).toEqual([]);
   });
 });
 

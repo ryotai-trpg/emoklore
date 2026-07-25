@@ -2,10 +2,16 @@ import type { ApplicationRenderContext, ApplicationTab } from "@client/applicati
 import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { CharacterDataModel } from "../data/character";
-import type { ArmorDataModel, SkillDataModel, WeaponDataModel } from "../data/item-models";
+import type {
+  ArmorDataModel,
+  HowlingDataModel,
+  SkillDataModel,
+  WeaponDataModel,
+} from "../data/item-models";
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import type { ModifierSet } from "../rules/types";
+import type { HowlingRow } from "../utils/howling";
 import type { ValueSegment } from "./helpers";
 
 /**
@@ -265,6 +271,8 @@ export type CharacterContext = {
   system: CharacterDataModel;
   // テンプレートが system.emotions も参照するので、紛れないよう emotionRows にしている
   emotionRows: Record<EmotionKey, EmotionRow>;
+  /** 追加取得した共鳴感情。枚数が決まらないので配列 */
+  acquiredEmotionRows: EmotionRow[];
   characteristics?: CharacteristicsMap;
   charPointSum?: number;
   charPointMax?: number;
@@ -286,6 +294,8 @@ export type CharacterContext = {
   weapons?: WeaponRow[];
   armors?: ArmorRow[];
   effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;
+  /** いま受けているハウリング反応。効果タブの専用区分に並ぶ */
+  howlings?: HowlingRow[];
   // 基底の EmokloreDocumentSheetContext と対応する分
   isPlay: boolean;
   owner: boolean;
@@ -332,6 +342,30 @@ export type ArmorContext = {
   /** 適用条件の行を閲覧で出すか。未記入なら出さない */
   showCoverage: boolean;
   /** enrichHTML 済みの備考 */
+  notesHTML: string;
+  isPlay: boolean;
+  owner: boolean;
+  limited: boolean;
+  gm: boolean;
+  document: EmokloreItem;
+  systemFields: Record<string, foundry.data.fields.DataField>;
+  flags: Record<string, unknown>;
+};
+
+/**
+ * ハウリング反応シートのコンテキスト。
+ *
+ * CharacterContext と同じく、基底は継承せず必要なものを並べ直している（理由は上を参照）。
+ */
+export type HowlingContext = {
+  system: HowlingDataModel;
+  /** 分類の翻訳済み表示名。「反射」「同調」など */
+  categoryLabel: string;
+  /** 回復判定に使う技能の並び。「＊自我／心理」。指定が無ければ空文字 */
+  recoverySkillLabel: string;
+  /** enrichHTML 済みの効果 */
+  effectHTML: string;
+  /** enrichHTML 済みのフレーバー */
   notesHTML: string;
   isPlay: boolean;
   owner: boolean;

@@ -131,6 +131,28 @@ export const getEmotionRows = (
   return rows;
 };
 
+/**
+ * 追加取得した共鳴感情の並び。
+ *
+ * 表・裏・ルーツと違って枚数が決まらないので配列で返す。共振（ハウリング）や怪異の付与で
+ * 後から増える枠で、感情マッチングは3枠とこちらを合わせて見る。
+ *
+ * 表に無いキーは落とす。configのキーを改名しても、古いデータが尻切れの表示になるだけで済む。
+ *
+ * game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
+ */
+export const getAcquiredEmotionRows = (
+  acquired: Iterable<string>,
+  resonantEmotions: Record<string, ResonantEmotionConfig>,
+  emotionAttributes: Record<string, EmotionAttributeConfig>,
+): EmotionRow[] =>
+  [...acquired].flatMap((key) => {
+    const emotion = resonantEmotions[key];
+    if (!emotion) return [];
+
+    return [{ label: emotion.label, attribute: emotionAttributes[emotion.attribute]?.label ?? "" }];
+  });
+
 /** 段で値を選ぶ入力の1段ぶん */
 export type ValueSegment = {
   value: number;

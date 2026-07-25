@@ -36,7 +36,8 @@
     "Item": {
       "weapon": { "htmlFields": ["notes"] },
       "armor": { "htmlFields": ["notes"] },
-      "skill": { "htmlFields": ["notes"] }
+      "skill": { "htmlFields": ["notes"] },
+      "howling": { "htmlFields": ["effect", "notes"] }
     },
     "ChatMessage": {
       "weapon": {},
@@ -45,7 +46,8 @@
       "survivalReminder": {},
       "skillRequest": {},
       "resonanceRequest": {},
-      "resonanceOutcome": {}
+      "resonanceOutcome": {},
+      "howlingDraw": { "htmlFields": ["description"] }
     },
     "Combat": {
       "standard": {}

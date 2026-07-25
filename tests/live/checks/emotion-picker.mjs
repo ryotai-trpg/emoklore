@@ -183,4 +183,58 @@ export async function run({ page, check }) {
       TAG,
     ),
   );
+
+  await check("追加取得は3枠と別に選べて、行にも出る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const findPicker = () =>
+          [...foundry.applications.instances.values()].find(
+            (app) => app.constructor.name === "EmotionPicker" && app.rendered,
+          );
+
+        const actor = game.actors.getName(`${tag}_char`);
+        const slotsBefore = { ...actor.system.emotions };
+
+        const sheet = actor.sheet;
+        await sheet.render(true);
+        await window.__setMode(sheet, "edit");
+        sheet.element.querySelector("[data-action=pickAcquiredEmotions]").click();
+        const picker = await window.__waitFor(findPicker, { label: "感情ピッカー" });
+
+        // 追加取得は枚数が決まらないので、3枠のスロットは出ない
+        const noSlots = picker.element.querySelectorAll("[data-action=selectSlot]").length === 0;
+
+        picker.element.querySelector("[data-emotion=jealousy]").click();
+        picker.element.querySelector("button[type=submit]").click();
+        await window.__waitFor(() => actor.system.emotions.acquired.has("jealousy"), {
+          label: "追加取得の書き戻し",
+        });
+        await window.__waitFor(() => !findPicker(), { label: "ピッカーが閉じる" });
+
+        // 3枠は触られていない。行には ＋ 付きで並ぶ
+        const slotsKept = ["surface", "hidden", "root"].every(
+          (key) => actor.system.emotions[key] === slotsBefore[key],
+        );
+        const shown = await window.__waitFor(() => sheet.element.textContent.includes("＋嫉妬"), {
+          soft: true,
+          timeout: 1000,
+          label: "追加取得の行",
+        });
+
+        // 感情マッチングを見る後続のチェックが素の3枠を前提にしているので戻す
+        await actor.update({ "system.emotions.acquired": [] });
+        await window.__setMode(sheet, "play");
+
+        const ok = noSlots && slotsKept && Boolean(shown);
+        return {
+          ok,
+          detail: ok
+            ? "枠なしで嫉妬を追加取得、行に ＋嫉妬 が出た"
+            : `枠なし=${noSlots} 3枠そのまま=${slotsKept} 行の表示=${Boolean(shown)}`,
+        };
+      },
+      TAG,
+    ),
+  );
 }
