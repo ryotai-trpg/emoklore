@@ -182,7 +182,7 @@ export class EmotionPicker extends (HandlebarsApplicationMixin(
       tags: this.#multiple
         ? Array.from(this.#selected).map((key) => ({ key, label: formatEmotion(key) }))
         : [],
-      hint: game.i18n.localize(
+      hint: _loc(
         this.#multiple ? "EMOKLORE.EmotionPicker.HintMany" : "EMOKLORE.EmotionPicker.HintSlots",
       ),
       columns: columns.map((column) => ({
@@ -197,7 +197,7 @@ export class EmotionPicker extends (HandlebarsApplicationMixin(
         label: slot.label,
         value: slot.value
           ? resonantEmotions[slot.value].label
-          : game.i18n.localize("EMOKLORE.EmotionPicker.Unselected"),
+          : _loc("EMOKLORE.EmotionPicker.Unselected"),
         active: slot.key === this.#activeSlot,
         filled: slot.value !== null,
       })),

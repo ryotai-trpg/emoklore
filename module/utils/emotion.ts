@@ -24,7 +24,7 @@ export const formatEmotion = (emotion: string): string => {
   if (!isResonantEmotionKey(emotion)) return "";
 
   const { label, attribute } = CONFIG.EMOKLORE.resonantEmotions[emotion];
-  return game.i18n.localize("EMOKLORE.resonantEmotion", {
+  return _loc("EMOKLORE.resonantEmotion", {
     emotion: label,
     attribute: CONFIG.EMOKLORE.emotionAttributes[attribute].label,
   });
@@ -35,4 +35,4 @@ export const formatEmotions = (emotions: Iterable<string>): string =>
   [...emotions]
     .map(formatEmotion)
     .filter((label) => label !== "")
-    .join(game.i18n.localize("EMOKLORE.Common.separator"));
+    .join(_loc("EMOKLORE.Common.separator"));

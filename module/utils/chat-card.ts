@@ -64,7 +64,7 @@ export function attachCardActions<M>(
       .catch((error: unknown) => {
         // 本体が i18nInit で TYPES.ChatMessage.<種別> を typeLabels に入れる。
         // カードごとに表示名を持たなくても、種別から引ける
-        const cardName = game.i18n.localize(CONFIG.ChatMessage.typeLabels[type] ?? type);
+        const cardName = _loc(CONFIG.ChatMessage.typeLabels[type] ?? type);
         console.error(`emoklore | ${cardName}の操作に失敗しました`, error);
         ui.notifications?.error("EMOKLORE.ChatMessage.Common.ActionFailed", {
           format: { card: cardName },

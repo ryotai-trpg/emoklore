@@ -300,7 +300,7 @@ export class CharacterLikeDataModel extends EmokloreSystemDataModel {
                   initial: characteristicOptions?.[0] ?? characteristic,
                   // choices の値は翻訳済み文字列ではなくi18nキーを入れる。テンプレートが
                   // formInput に localize=true を渡しており、描画時に本体が解決する。
-                  // ここで localize すると、スキーマ定義時に game.i18n へ依存してしまう
+                  // ここで localize すると、スキーマ定義時に翻訳の読み込みへ依存してしまう
                   ...(characteristicOptions
                     ? {
                         choices: Object.fromEntries(
@@ -379,7 +379,7 @@ export class CharacterLikeDataModel extends EmokloreSystemDataModel {
           typedEntries(CONFIG.EMOKLORE.skillGroups).map(([group]) => [
             group,
             new SchemaField({
-              // label は持たない。game.i18n.localize した結果を initial に焼き込むと、
+              // label は持たない。_loc した結果を initial に焼き込むと、
               // アクター作成後に言語を切り替えても古いラベルが残る
               mod: modifierField(),
             }),

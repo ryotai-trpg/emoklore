@@ -33,7 +33,7 @@ export type TableResult = {
  * preLocalize の対象にしていない）。翻訳は引く側で行う（`localizeSkillCategory` と同じ）。
  */
 export const localizeHowlingCategory = (category: HowlingCategory): string =>
-  game.i18n.localize(howlingCategories[category].label);
+  _loc(howlingCategories[category].label);
 
 /**
  * 怪異に紐づいた共鳴表を引く。

@@ -74,7 +74,7 @@ export type EmotionColumn = { attribute: string; label: string; emotions: Emotio
  * 感情の表の定義順。
  *
  * どちらの label も i18nInit の performPreLocalization で翻訳済みなので、
- * ここでは参照するだけでよい。game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
+ * ここでは参照するだけでよい。翻訳を呼ばない純粋関数なので、そのまま単体テストできる。
  */
 export const buildEmotionColumns = (
   resonantEmotions: Record<string, ResonantEmotionConfig>,
@@ -109,7 +109,7 @@ export const buildEmotionColumns = (
  * （`EMOKLORE.emotionAttributes.`）がそのままシートに出る。キーを作らないので、
  * 未選択・未知の感情はどちらも空文字になる。
  *
- * game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
+ * 翻訳を呼ばない純粋関数なので、そのまま単体テストできる。
  */
 export const getEmotionRows = (
   // 見るのは3枠だけ。`system.emotions` は追加取得（`acquired`）も持つが、行に出すのは
@@ -139,7 +139,7 @@ export const getEmotionRows = (
  *
  * 表に無いキーは落とす。configのキーを改名しても、古いデータが尻切れの表示になるだけで済む。
  *
- * game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
+ * 翻訳を呼ばない純粋関数なので、そのまま単体テストできる。
  */
 export const getAcquiredEmotionRows = (
   acquired: Iterable<string>,
@@ -166,7 +166,7 @@ export type ValueSegment = {
  * 塗り（どこまで色が乗るか）はCSSの `:has()` で出すので、ここでは持たない。
  * 選択の即時反映を再描画待ちにしないため。
  *
- * game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
+ * 翻訳を呼ばない純粋関数なので、そのまま単体テストできる。
  */
 export const buildValueSegments = (min: number, max: number, current: number): ValueSegment[] => {
   const segments: ValueSegment[] = [];

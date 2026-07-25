@@ -68,13 +68,13 @@ export class EmokloreRoll extends foundry.dice.Roll {
 
   /** 判定結果の表示。チャットカードの見出しに出る「成功」「ダブル」など */
   get resultLabel(): string {
-    return game.i18n.localize(`EMOKLORE.result.${this.resultName}`);
+    return _loc(`EMOKLORE.result.${this.resultName}`);
   }
 
   /** 成功数修正の表示。修正がなければ空文字 */
   get successModLabel(): string {
     if (this.successMod === 0) return "";
-    return game.i18n.localize("EMOKLORE.successMod", { mod: formatSigned(this.successMod) });
+    return _loc("EMOKLORE.successMod", { mod: formatSigned(this.successMod) });
   }
 
   /**
@@ -88,14 +88,14 @@ export class EmokloreRoll extends foundry.dice.Roll {
   get requirementLabel(): string {
     if (this.requiredSuccess <= 0) return "";
 
-    const requirement = game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
-      result: game.i18n.localize(`EMOKLORE.result.${resolveResultName(this.requiredSuccess)}`),
+    const requirement = _loc("EMOKLORE.RollOptions.AtLeast", {
+      result: _loc(`EMOKLORE.result.${resolveResultName(this.requiredSuccess)}`),
     });
     const key = meetsRequirement(this.successCount, this.requiredSuccess)
       ? "EMOKLORE.RollOptions.Met"
       : "EMOKLORE.RollOptions.Missed";
 
-    return game.i18n.localize(key, { requirement });
+    return _loc(key, { requirement });
   }
 
   /**

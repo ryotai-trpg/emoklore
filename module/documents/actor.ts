@@ -256,7 +256,7 @@ export class EmokloreActor extends Actor {
     }
 
     const state: KaiAttackCardState = {
-      attackName: attack.name || game.i18n.localize("EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"),
+      attackName: attack.name || _loc("EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"),
       actorUuid: this.uuid ?? null,
       mpCost: attack.mpCost,
       judgeless: attack.judgeless,

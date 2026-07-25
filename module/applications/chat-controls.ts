@@ -50,7 +50,7 @@ export function injectChatControls(elements: Record<string, HTMLElement>): void 
     button.type = "button";
     button.className = `ui-control icon fa-solid ${icon} ${cls}`;
     button.dataset.tooltip = "";
-    button.ariaLabel = game.i18n.localize(label);
+    button.ariaLabel = _loc(label);
     button.addEventListener("click", () => {
       void run();
     });

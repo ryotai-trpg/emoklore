@@ -3,7 +3,7 @@
  *
  * config には翻訳済みの文字列ではなくi18nキーを置いておき、`i18nInit` の時点で
  * その場の値を翻訳結果に差し替える。こうするとスキーマ定義や config の読み込みが
- * `game.i18n` の準備完了を待たずに済む。
+ * 翻訳の読み込み完了を待たずに済む。
  */
 
 /** どのキーを翻訳対象にするかの登録内容 */
@@ -39,7 +39,7 @@ function localizeObject(obj: Record<string, unknown>, keys?: string[]): void {
   for (const [k, v] of Object.entries(obj)) {
     const type = typeof v;
     if (type === "string") {
-      obj[k] = game.i18n.localize(v as string);
+      obj[k] = _loc(v as string);
       continue;
     }
 
@@ -61,7 +61,7 @@ function localizeObject(obj: Record<string, unknown>, keys?: string[]): void {
     for (const key of keys) {
       const value = foundry.utils.getProperty(v as Record<string, unknown>, key);
       if (typeof value !== "string") continue;
-      foundry.utils.setProperty(v as Record<string, unknown>, key, game.i18n.localize(value));
+      foundry.utils.setProperty(v as Record<string, unknown>, key, _loc(value));
     }
   }
 }

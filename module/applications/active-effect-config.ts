@@ -68,8 +68,6 @@ const buildCustomSkillOptions = (effect: { parent?: unknown }): Option[] => {
 /** 修正の適用先の選択肢。表ごとに optgroup へ分ける */
 const buildTargetGroups = (customSkills: Option[]): OptionGroup[] => {
   const { characteristics, skillGroups, skills, baseSkills } = CONFIG.EMOKLORE;
-  const localize = (key: string) => game.i18n.localize(key);
-
   const toOptions = <K extends string>(
     collection: ModifierCollection,
     table: Record<K, { label: string }>,
@@ -82,45 +80,41 @@ const buildTargetGroups = (customSkills: Option[]): OptionGroup[] => {
 
   return [
     {
-      label: localize("EMOKLORE.Effect.TargetGroup.global"),
-      options: [
-        { value: GLOBAL_TARGET_ID, label: localize("EMOKLORE.Effect.TargetGroup.everyRoll") },
-      ],
+      label: _loc("EMOKLORE.Effect.TargetGroup.global"),
+      options: [{ value: GLOBAL_TARGET_ID, label: _loc("EMOKLORE.Effect.TargetGroup.everyRoll") }],
     },
     {
-      label: localize("EMOKLORE.Effect.TargetGroup.characteristics"),
+      label: _loc("EMOKLORE.Effect.TargetGroup.characteristics"),
       options: toOptions("characteristics", characteristics),
     },
     {
-      label: localize("EMOKLORE.Effect.TargetGroup.skillGroups"),
+      label: _loc("EMOKLORE.Effect.TargetGroup.skillGroups"),
       options: toOptions("skillGroups", skillGroups),
     },
     {
       // ★ はエクストラ技能の印。シートやチャットの表記と揃える
-      label: localize("EMOKLORE.Effect.TargetGroup.skills"),
+      label: _loc("EMOKLORE.Effect.TargetGroup.skills"),
       options: toOptions("skills", skills, (key, label) =>
         skills[key].isExtra ? `★${label}` : label,
       ),
     },
     {
       // ＊ は基本技能の印。技能グループと綴りが同じキーがあるので、印で見分けが付く
-      label: localize("EMOKLORE.Effect.TargetGroup.baseSkills"),
+      label: _loc("EMOKLORE.Effect.TargetGroup.baseSkills"),
       options: toOptions("baseSkills", baseSkills, (_key, label) => `＊${label}`),
     },
     // 持っていなければ optgroup ごと出さない
     ...(customSkills.length > 0
       ? [
           {
-            label: localize("EMOKLORE.Effect.TargetGroup.customSkills"),
+            label: _loc("EMOKLORE.Effect.TargetGroup.customSkills"),
             options: customSkills,
           },
         ]
       : []),
     {
-      label: localize("EMOKLORE.Effect.TargetGroup.other"),
-      options: [
-        { value: RAW_KEY_TARGET_ID, label: localize("EMOKLORE.Effect.TargetGroup.rawKey") },
-      ],
+      label: _loc("EMOKLORE.Effect.TargetGroup.other"),
+      options: [{ value: RAW_KEY_TARGET_ID, label: _loc("EMOKLORE.Effect.TargetGroup.rawKey") }],
     },
   ];
 };
@@ -180,7 +174,7 @@ export class EmokloreActiveEffectConfig extends foundry.applications.sheets.Acti
         targetGroups: buildTargetGroups(buildCustomSkillOptions(this.document)),
         aspects: MODIFIER_ASPECTS.map((aspect) => ({
           value: aspect,
-          label: game.i18n.localize(`EMOKLORE.Effect.Aspect.${aspect}`),
+          label: _loc(`EMOKLORE.Effect.Aspect.${aspect}`),
         })),
         phases: this.#buildPhaseOptions(),
         // 読み取れないキーは選択式で表せないので、生の入力に倒す。
@@ -202,7 +196,7 @@ export class EmokloreActiveEffectConfig extends foundry.applications.sheets.Acti
   #buildPhaseOptions(): Option[] {
     return typedEntries(ActiveEffect.CHANGE_PHASES).map(([value]) => ({
       value,
-      label: game.i18n.localize(`EMOKLORE.Effect.Phase.${value}`),
+      label: _loc(`EMOKLORE.Effect.Phase.${value}`),
     }));
   }
 

@@ -38,7 +38,7 @@ export const isSkillCategory = (value: string): value is SkillCategory => value 
  * スキーマの choices に渡す表。値は翻訳済み文字列ではなくi18nキー。
  *
  * 描画時に formInput の localize が解決する（`attackSkillChoices` と同じ理由で、
- * スキーマ定義の時点で `game.i18n` に触らない）
+ * スキーマ定義の時点で翻訳に触らない）
  */
 export const skillCategoryChoices: Record<string, string> = Object.fromEntries(
   Object.entries(definitions).map(([key, { label }]) => [key, label]),

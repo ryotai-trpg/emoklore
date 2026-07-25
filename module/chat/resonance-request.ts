@@ -30,7 +30,7 @@ const isResonanceMatch = (value: string): value is ResonanceMatch => value in MA
 
 /** DLが強制した一致度の表示。強制していなければ空文字 */
 const formatForcedMatch = (forcedMatch: string): string =>
-  isResonanceMatch(forcedMatch) ? game.i18n.localize(MATCH_LABELS[forcedMatch]) : "";
+  isResonanceMatch(forcedMatch) ? _loc(MATCH_LABELS[forcedMatch]) : "";
 
 /** 共鳴判定の要求カードのHTMLを組み立てる */
 export const renderResonanceRequestCard = (state: ResonanceRequestState): Promise<string> =>

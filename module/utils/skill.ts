@@ -105,7 +105,7 @@ export const describeSkill = (
  * preLocalize の対象にしていない）。翻訳は引く側で行う。
  */
 export const localizeSkillCategory = (category: SkillCategory): string =>
-  game.i18n.localize(skillCategories[category].label);
+  _loc(skillCategories[category].label);
 
 /** 能力値の表示名。CONFIG.EMOKLORE の label は i18nInit で翻訳済み */
 const localizeCharacteristic = (key: CharacteristicKey): string =>
@@ -122,7 +122,7 @@ export const formatCharacteristicOptions = (options: Iterable<CharacteristicKey>
 
 /** 技能グループの表示名。所属しないカスタム技能は「なし」 */
 export const formatSkillGroup = (group: SkillGroupKey | ""): string =>
-  group ? CONFIG.EMOKLORE.skillGroups[group].label : game.i18n.localize("EMOKLORE.Common.none");
+  group ? CONFIG.EMOKLORE.skillGroups[group].label : _loc("EMOKLORE.Common.none");
 
 /**
  * 表に居る技能への参照。保存データや選択の値に書ける形。
@@ -150,14 +150,14 @@ export const buildSkillRefGroups = (): Array<{
   skills: Array<{ value: string; label: string }>;
 }> => [
   {
-    label: game.i18n.localize("EMOKLORE.SkillRequest.NormalSkills"),
+    label: _loc("EMOKLORE.SkillRequest.NormalSkills"),
     skills: typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => ({
       value: toSkillRefValue({ kind: "skill", key }),
       label: describeSkillLabel({ kind: "skill", key }).markedLabel,
     })),
   },
   {
-    label: game.i18n.localize("EMOKLORE.SkillRequest.BaseSkills"),
+    label: _loc("EMOKLORE.SkillRequest.BaseSkills"),
     skills: typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key]) => ({
       value: toSkillRefValue({ kind: "base", key }),
       label: describeSkillLabel({ kind: "base", key }).markedLabel,
@@ -269,8 +269,8 @@ export const baseSkillOf = (key: string): string | null => {
  * `utils/` を読めない（`docs/code-design.md` の層とimportの方向）ので共有しない。
  */
 export const formatSuccessRequirement = (result: ResultName): string =>
-  game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
-    result: game.i18n.localize(`EMOKLORE.result.${result}`),
+  _loc("EMOKLORE.RollOptions.AtLeast", {
+    result: _loc(`EMOKLORE.result.${result}`),
   });
 
 /** 要求された成功数の表示。「ダブル成功以上」。指定なしは空文字 */

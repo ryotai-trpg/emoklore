@@ -7,17 +7,17 @@ export function prepareActiveEffectCategories(
   const categories: Record<EffectCategory["type"], EffectCategory> = {
     temporary: {
       type: "temporary" as const,
-      label: game.i18n.localize("EMOKLORE.Effect.Temporary"),
+      label: _loc("EMOKLORE.Effect.Temporary"),
       effects: [],
     },
     passive: {
       type: "passive" as const,
-      label: game.i18n.localize("EMOKLORE.Effect.Passive"),
+      label: _loc("EMOKLORE.Effect.Passive"),
       effects: [],
     },
     inactive: {
       type: "inactive" as const,
-      label: game.i18n.localize("EMOKLORE.Effect.Inactive"),
+      label: _loc("EMOKLORE.Effect.Inactive"),
       effects: [],
     },
   };

@@ -27,7 +27,7 @@ export const resolveAttackSkill = (skill: string): AttackSkillConfig =>
 
 /** 間合いの表示名。「近接」「遠隔」 */
 export const localizeRangeType = (rangeType: RangeType): string =>
-  game.i18n.localize(`EMOKLORE.Item.weapon.RangeType.${rangeType}`);
+  _loc(`EMOKLORE.Item.weapon.RangeType.${rangeType}`);
 
 /**
  * 参照技能の表示名。
@@ -35,8 +35,7 @@ export const localizeRangeType = (rangeType: RangeType): string =>
  * attackSkills の label は preLocalize の対象外（スキーマの choices と共有しているため）
  * なので、翻訳は引く側で行う。
  */
-export const localizeAttackSkill = (skill: string): string =>
-  game.i18n.localize(resolveAttackSkill(skill).label);
+export const localizeAttackSkill = (skill: string): string => _loc(resolveAttackSkill(skill).label);
 
 /**
  * 武器の射程の表示。
@@ -54,7 +53,7 @@ export const formatRangeLabel = (rangeType: RangeType, range: string): string =>
  * 遠隔攻撃はダイスを振らず成功数がそのままダメージになるので、ダイス部分が消える。
  */
 export const formatDamagePreview = (damageDie: DamageDie, attackPower: string): string => {
-  const successes = game.i18n.localize("EMOKLORE.Item.weapon.SuccessCount");
+  const successes = _loc("EMOKLORE.Item.weapon.SuccessCount");
   const dice = damageDie ? `${successes}${damageDie.toUpperCase()}` : successes;
 
   // 前後に空白を入れない。一覧の列で「＋」の前後が折り返し候補になり、式が途中で割れる

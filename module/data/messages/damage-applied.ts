@@ -103,7 +103,7 @@ export class DamageAppliedModel extends ChatCardModel {
     ui.notifications?.info("EMOKLORE.ChatMessage.damageApplied.StatusApplied", {
       format: {
         name: actor.name,
-        status: game.i18n.localize(CONFIG.statusEffects[statusId]?.name ?? ""),
+        status: _loc(CONFIG.statusEffects[statusId]?.name ?? ""),
       },
     });
   }
