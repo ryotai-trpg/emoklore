@@ -99,6 +99,29 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 
 モジュール連携の接続面はいまここに書いた分だけなので、このページに置く。ハウリングカードやイニシアチブで2つ目のフック群が生えたら、独立した「モジュール連携」ページに出す。
 
+## 自動化の程度
+
+**既定はすべて自動で、設定で切れる。** ルールブックの処理をどこまで肩代わりしてほしいかは卓ごとに分かれるので、止めるつまみを用意している。逆に、新しい自動化を足すつもりはない（[ロードマップ](/roadmap)「実装しないこと: 高度な自動化」）。
+
+判断は1箇所ずつに閉じてある。**設定を読むのはこの表の場所だけ**で、`rules/` は設定を知らない（純粋関数のままにしておく）。
+
+| 設定 | 判断する場所 | 切ると |
+|---|---|---|
+| `autoArmorReduction` | `EmokloreActor#applyDamage` | 装備中防具の合計が乗らない。ダイアログから明示的に渡した上書き値は効く |
+| `autoHpBoundaryNotice` | `chat/damage-applied.ts` の `buildHpEntry` | 結果の行だけが残り、状態付与のボタンが出ない |
+| `autoMpBoundaryNotice` | `EmokloreActor#_onUpdate` | 案内カードそのものが出ない |
+| `autoSurvivalReminder` | `EmokloreCombat#_onEndRound` | リマインダが出ない |
+| `autoResonanceRise` | `applications/requests.ts` の `raiseResonance` | 結果カードは出るが〈∞共鳴〉が動かない |
+| `autoEmotionMatch` | `applications/requests.ts` の `resolveRollInput` | 振るたびに共鳴判定ダイアログで尋ねる |
+| `skillRollDialog` | `applications/actor-sheet.ts` の `#onRoll` | 素のクリックでも判定オプションを尋ねる（手元の好みなので client スコープ） |
+| `damageResultVisibility` | `chat/damage-applied.ts` の `resolveVisibility` | 結果カードをDLだけに、またはチャット欄の選択に従わせる |
+
+**怪異の装甲は `autoArmorReduction` に含めない。** あれは装備ではなく本人が常に持つ平坦な軽減で、HPやMPと同じくアクターの値そのものになる。
+
+**MP境界の案内には `damageResultVisibility` を効かせない。** あれは「敵のHPを伏せる」ための設定で、こちらは自分のシートを編集した結果の案内なので伏せる理由が無い。
+
+公開範囲は本体の `messageMode`（`ChatMessage#_preCreate` が `applyMode` へ渡す）に写している。**渡さなければ `applyMode` 自体が走らない**ので、既定の「全員に出す」は何も渡さないことで表している。判定メッセージ側への適用は Issue #16 に残っている。
+
 ## 効果（ActiveEffect）の載せ方
 
 本体の ActiveEffect は**適用が2フェーズある**（`change.phase` の `initial` / `final`）。設計に効いているのはこれ。

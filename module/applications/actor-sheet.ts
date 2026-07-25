@@ -2,6 +2,7 @@ import { isBaseSkillKey } from "../config/base-skills";
 import { isSkillKey } from "../config/skills";
 import type { SkillRef } from "../data/character-like";
 import type { EmokloreActor } from "../documents/actor";
+import { getSetting } from "../settings";
 import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
 import { requestResonanceRoll, requestSkillRoll } from "./rolls";
 import type { EmokloreActorSheetOptions } from "./types";
@@ -29,9 +30,11 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
     // 分割代入で TypeError になる
     const skill = dataset.skill ?? "";
 
-    // 素のクリックは即ロール、修飾キー付きなら判定オプションを尋ねる。ほとんどの判定に
-    // 修正は付かないので、毎回ダイアログを挟むと手数が増えるだけになる
-    const withOptions = event instanceof MouseEvent && event.shiftKey;
+    // 既定は「素のクリックで即ロール、修飾キー付きで尋ねる」。ほとんどの判定に修正は
+    // 付かないので、毎回ダイアログを挟むと手数が増えるだけになる。毎回尋ねたい人は
+    // 設定で切り替えられる（手元の好みなので client スコープ）
+    const withOptions =
+      getSetting("skillRollDialog") === "always" || (event instanceof MouseEvent && event.shiftKey);
     const roll = (ref: SkillRef) =>
       withOptions ? requestSkillRoll(this.actor, ref) : this.actor.rollSkill(ref);
 

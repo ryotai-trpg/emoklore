@@ -1,5 +1,6 @@
 import { createSurvivalReminderMessage } from "../chat/survival-reminder";
 import type { CombatDataModel } from "../data/combat";
+import { getSetting } from "../settings";
 import type { EmokloreCombatant } from "./combatant";
 
 /**
@@ -51,6 +52,8 @@ export class EmokloreCombat extends Combat {
    */
   override async _onEndRound(context: Parameters<Combat["_onEndRound"]>[0]): Promise<void> {
     await super._onEndRound(context);
+
+    if (!getSetting("autoSurvivalReminder")) return;
 
     const targets = this.combatants
       .filter((combatant) => combatant.actor?.statuses.has("cardiacArrest"))

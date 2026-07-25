@@ -23,9 +23,11 @@ import type { EmokloreActor } from "../documents/actor";
 import { raiseResonanceForActor } from "../documents/queries";
 import { HOWLING_SUCCESS, POSSESSION_RISE, type ResonanceMatch } from "../rules/resonance-roll";
 import { meetsRequirement } from "../rules/success";
+import { getSetting } from "../settings";
 import { matchEmotion } from "../utils/emotion";
 import { resolveActingActor, resolveActingActors } from "../utils/targets";
 import { promptResonanceRequest } from "./dialogs/resonance-request-dialog";
+import { promptResonanceRoll } from "./dialogs/resonance-roll-dialog";
 import { promptSkillRequest } from "./dialogs/skill-request-dialog";
 
 /**
@@ -103,24 +105,16 @@ async function rollResonanceFor(
   actor: EmokloreActor & { system: CharacterDataModel },
   request: ResonanceRequestModel,
 ): Promise<void> {
-  // 一致度はDLの強制指定が最優先。無ければ指定された感情から自動で決める
-  const match = isResonanceMatch(request.forcedMatch)
-    ? request.forcedMatch
-    : matchEmotion(actor.system.getOwnedEmotions(), [...request.emotions]);
+  const resolved = await resolveRollInput(actor, request);
+  // 尋ねる設定でキャンセルされたら、この1体は振らずに次へ
+  if (!resolved) return;
 
-  const message = await actor.rollResonance(request.intensity, match);
+  const message = await actor.rollResonance(resolved.intensity, resolved.match);
   const roll = (message as { rolls?: EmokloreRoll[] } | undefined)?.rolls?.[0];
   if (!roll) return;
 
   const successCount = roll.successCount;
-  // 憑依判定は成否によらず1上がる。共鳴判定は成功したときだけ上昇値ぶん
-  const rise = request.possessionMode
-    ? POSSESSION_RISE
-    : successCount > 0
-      ? await evaluateRise(request.rise)
-      : 0;
-
-  const changed = await raiseResonanceForActor(actor, rise);
+  const changed = await raiseResonance(actor, request, successCount);
   if (!changed) {
     ui.notifications?.warn("EMOKLORE.ChatMessage.resonanceRequest.NoGM", { localize: true });
     return;
@@ -140,6 +134,67 @@ async function rollResonanceFor(
       meetsRequirement(successCount, actor.system.characteristics.mentality.value),
     kaiUuid: request.kaiUuid,
   });
+}
+
+/**
+ * 何を振るかを決める。強度は要求の値、一致度はDLの強制指定が最優先。
+ *
+ * 強制指定が無いときは、指定された感情から自動で決める。自動判定を切ってあれば、
+ * PL側の手動フローと同じダイアログで人に決めてもらう（強度は要求の値を初期値に置く）。
+ *
+ * @returns キャンセルされたら null
+ */
+async function resolveRollInput(
+  actor: EmokloreActor & { system: CharacterDataModel },
+  request: ResonanceRequestModel,
+): Promise<{ intensity: number; match: ResonanceMatch } | null> {
+  if (isResonanceMatch(request.forcedMatch)) {
+    return { intensity: request.intensity, match: request.forcedMatch };
+  }
+
+  const emotions = [...request.emotions];
+  if (getSetting("autoEmotionMatch")) {
+    return {
+      intensity: request.intensity,
+      match: matchEmotion(actor.system.getOwnedEmotions(), emotions),
+    };
+  }
+
+  const input = await promptResonanceRoll({
+    intensity: request.intensity,
+    emotions,
+    owned: actor.system.getOwnedEmotions(),
+  });
+
+  return input ? { intensity: input.intensity, match: input.emotionMatch } : null;
+}
+
+/**
+ * 判定のあとの〈∞共鳴〉の変化。
+ *
+ * 自動上昇を切ってあれば値を動かさず、現在値をそのまま前後の値として返す。委譲も
+ * 起こさないので、GMが繋いでいなくても結果カードは出る。
+ *
+ * @returns 変化の前後。委譲が必要なのにGMが誰も接続していなければ undefined
+ */
+async function raiseResonance(
+  actor: EmokloreActor & { system: CharacterDataModel },
+  request: ResonanceRequestModel,
+  successCount: number,
+): Promise<{ before: number; after: number } | undefined> {
+  if (!getSetting("autoResonanceRise")) {
+    const current = actor.system.resources.resonance.value;
+    return { before: current, after: current };
+  }
+
+  // 憑依判定は成否によらず1上がる。共鳴判定は成功したときだけ上昇値ぶん
+  const rise = request.possessionMode
+    ? POSSESSION_RISE
+    : successCount > 0
+      ? await evaluateRise(request.rise)
+      : 0;
+
+  return raiseResonanceForActor(actor, rise);
 }
 
 /**

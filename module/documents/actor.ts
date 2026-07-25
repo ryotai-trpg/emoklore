@@ -14,6 +14,7 @@ import { resolveMpBoundary } from "../rules/resource-boundary";
 import { resolveSkillRoll } from "../rules/skill-roll";
 import { type ModifierSet, NO_MODIFIER, type RollSpec, sumModifiers } from "../rules/types";
 import { calculateAppliedDamage } from "../rules/weapon-damage";
+import { getSetting } from "../settings";
 import type { EmokloreItem } from "./item";
 
 /** ダメージ適用の結果。チャットに「HP: 15 → 12」と出すために使う */
@@ -88,8 +89,8 @@ export class EmokloreActor extends Actor {
    * `reduction` は軽減量の共通の口。〈耐久〉判定・防御判定はどちらも「受けるダメージを
    * 【成功数】点軽減する」という形で、武器カードの「軽減して適用」がここへ渡してくる。
    * 防具は同じ引き算のもう1つの項。未指定なら共鳴者・人間NPCは装備中防具の合計
-   * （`system.armor`）が自動で乗り、ダイアログで部位条件により外したときだけ上書き値が
-   * 渡ってくる。
+   * （`system.armor`）が自動で乗り（設定 `autoArmorReduction` で切れる）、ダイアログで
+   * 部位条件により外したときだけ上書き値が渡ってくる。
    *
    * 怪異の装甲は本人が常に持つ平坦な軽減なので、`reduction` / `armor` を渡す側に
    * 足させず、ここで自前で上乗せする（防具アイテムの概念を持たないため独立に扱う）。
@@ -98,9 +99,11 @@ export class EmokloreActor extends Actor {
     amount: number,
     { reduction = 0, armor }: { reduction?: number; armor?: number | undefined } = {},
   ): Promise<HpChange | undefined> {
-    // 防具の既定は「装備中防具の合計」（共鳴者・人間NPCだけ）。この1行だけが既定を決める
-    // （「自動で乗せるか」をシステム設定にするときはここに差す）
-    const armorApplied = armor ?? (this.isCharacterLike() ? this.system.armor : 0);
+    // 防具の既定は「装備中防具の合計」（共鳴者・人間NPCだけ）。この1行だけが既定を決める。
+    // 自動で乗せるかは設定で切れる。切っても、ダイアログから明示的に渡された上書き値は効く
+    const autoArmor = getSetting("autoArmorReduction") && this.isCharacterLike();
+    const armorApplied = armor ?? (autoArmor ? this.system.armor : 0);
+    // 怪異の装甲は装備ではなく本人が常に持つ平坦な軽減なので、上の設定に関わらず効く
     const kaiArmor = this.isKai() ? this.system.resources.armor : 0;
 
     const hp = this.system.resources.hp;
@@ -174,6 +177,8 @@ export class EmokloreActor extends Actor {
 
     const before = foundry.utils.getProperty(options, "emoklore.mpBefore");
     if (typeof before !== "number") return;
+
+    if (!getSetting("autoMpBoundaryNotice")) return;
 
     const after = this.system.resources.mp.value;
     if (!resolveMpBoundary({ before, after })) return;
