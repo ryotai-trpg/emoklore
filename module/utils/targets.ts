@@ -90,3 +90,25 @@ export function resolveActingActor(): EmokloreActor | undefined {
 
   return owned.length === 1 ? owned[0] : undefined;
 }
+
+/**
+ * 判定を振る側のアクターを集める。1回の操作で複数体ぶん振りたいとき用。
+ *
+ * 選択中のトークンが複数あればその全部、無ければ `resolveActingActor` の1体。
+ * DLが共鳴者を並べて選び、まとめて共鳴判定を振らせる導線がこれにあたる。
+ * PLが自分のトークンを1つ選んでいるだけなら結果は1体で、単数の入口と変わらない。
+ */
+export function resolveActingActors(): EmokloreActor[] {
+  const board = canvas as TokenBoard | null | undefined;
+  const controlled = board?.tokens?.controlled ?? [];
+
+  // 同じアクターのトークンを2つ選んでいても1回だけ振る
+  const actors = new Set<EmokloreActor>();
+  for (const token of controlled) {
+    if (token.actor) actors.add(token.actor);
+  }
+  if (actors.size > 0) return Array.from(actors);
+
+  const single = resolveActingActor();
+  return single ? [single] : [];
+}

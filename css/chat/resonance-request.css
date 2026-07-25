@@ -1,0 +1,51 @@
+/* DLからの共鳴判定要求カードと、その結果カード。
+   シートの外に出るので .emoklore スコープに入れない */
+
+.em-resonance-request {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+}
+
+.em-resonance-request__head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-4);
+  font-weight: bold;
+}
+
+/* 条件は「強度: 5」の対なので定義リストで表す */
+.em-resonance-request__terms {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0 var(--spacer-8);
+  margin: 0;
+  font-size: var(--font-size-12);
+}
+
+.em-resonance-request__terms dt {
+  font-weight: bold;
+}
+
+.em-resonance-request__terms dd {
+  margin: 0;
+}
+
+.em-resonance-outcome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+}
+
+.em-resonance-outcome__line {
+  margin: 0;
+}
+
+/* ハウリングと憑依の案内。本文より小さくして、結果の行を主役に保つ */
+.em-resonance-outcome__notice {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacer-4);
+  margin: 0;
+  font-size: var(--font-size-12);
+}

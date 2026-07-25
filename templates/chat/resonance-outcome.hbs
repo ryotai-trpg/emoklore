@@ -1,0 +1,18 @@
+{{! Resonance Outcome Card }}
+<div class="em-resonance-outcome">
+  <p class="em-resonance-outcome__line">{{line}}</p>
+
+  {{#if howling}}
+    <p class="em-resonance-outcome__notice">
+      <i class="fa-solid fa-tower-broadcast" inert></i>
+      {{localize "EMOKLORE.ChatMessage.resonanceOutcome.Howling"}}
+    </p>
+  {{/if}}
+
+  {{#if possessionReached}}
+    <p class="em-resonance-outcome__notice">
+      <i class="fa-solid fa-ghost" inert></i>
+      {{localize "EMOKLORE.ChatMessage.resonanceOutcome.PossessionReached"}}
+    </p>
+  {{/if}}
+</div>

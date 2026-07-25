@@ -43,7 +43,9 @@
       "kaiAttack": {},
       "damageApplied": {},
       "survivalReminder": {},
-      "skillRequest": {}
+      "skillRequest": {},
+      "resonanceRequest": {},
+      "resonanceOutcome": {}
     },
     "Combat": {
       "standard": {}
