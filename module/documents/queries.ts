@@ -32,6 +32,15 @@ type ApplyDamageQuery = {
   armor?: number | undefined;
 };
 
+type RaiseResonanceQuery = {
+  type: "raiseResonance";
+  actorUuid: string;
+  amount: number;
+};
+
+/** GMに肩代わりしてもらう操作。`type` で振り分ける */
+type EmokloreQuery = ApplyDamageQuery | RaiseResonanceQuery;
+
 /** 本体の型に出ないメンバーだけを補う */
 type QueryableUser = { query: (name: string, data: unknown) => Promise<unknown> };
 
@@ -44,15 +53,22 @@ export function registerQueries(): void {
   const queries = CONFIG.queries as Record<string, (data: unknown) => Promise<unknown>>;
 
   queries[SYSTEM_ID] = async (data) => {
-    const query = data as Partial<ApplyDamageQuery> | null;
-    if (query?.type !== "applyDamage") return null;
+    const query = data as Partial<EmokloreQuery> | null;
 
-    return applyDamageByUuid(
-      query.actorUuids ?? [],
-      query.amount ?? 0,
-      query.reduction ?? 0,
-      query.armor,
-    );
+    if (query?.type === "applyDamage") {
+      return applyDamageByUuid(
+        query.actorUuids ?? [],
+        query.amount ?? 0,
+        query.reduction ?? 0,
+        query.armor,
+      );
+    }
+
+    if (query?.type === "raiseResonance") {
+      return raiseResonanceByUuid(query.actorUuid ?? "", query.amount ?? 0);
+    }
+
+    return null;
   };
 }
 
@@ -127,4 +143,37 @@ async function applyDamage(
   }
 
   return applied;
+}
+
+/**
+ * 〈∞共鳴〉を上げる。
+ *
+ * 自分のアクターを自分で振る経路では権限があるので委譲は起きない。DLが代打で
+ * 振ったときや、共鳴者を所有していないユーザーが押したときのための口。
+ *
+ * @returns 変化の前後。触れないうえにGMも接続していなければ undefined
+ */
+export async function raiseResonanceForActor(
+  actor: EmokloreActor,
+  amount: number,
+): Promise<{ before: number; after: number } | undefined> {
+  if (actor.isOwner) return actor.raiseResonance(amount);
+
+  // ここに来た時点で自分はGMではない（GMは常に全アクターのOWNER）
+  const gm = game.users?.activeGM as QueryableUser | null | undefined;
+  if (!gm || !actor.uuid) return undefined;
+
+  const query: RaiseResonanceQuery = { type: "raiseResonance", actorUuid: actor.uuid, amount };
+
+  return (await gm.query(SYSTEM_ID, query)) as { before: number; after: number } | undefined;
+}
+
+/** UUIDで引いたアクターの共鳴値を上げる。委譲を受けた側の入口 */
+async function raiseResonanceByUuid(
+  actorUuid: string,
+  amount: number,
+): Promise<{ before: number; after: number } | undefined> {
+  const actor = (await foundry.utils.fromUuid(actorUuid)) as EmokloreActor | null;
+
+  return actor ? actor.raiseResonance(amount) : undefined;
 }

@@ -5,6 +5,12 @@ import type { EmokloreRoll } from "../dice/emoklore-roll";
 import type { EmokloreActor } from "../documents/actor";
 import { resolveHpBoundary } from "../rules/resource-boundary";
 import { renderSkillRequestCard, type SkillRequestState } from "./request";
+import {
+  type ResonanceOutcomeState,
+  type ResonanceRequestState,
+  renderResonanceOutcomeCard,
+  renderResonanceRequestCard,
+} from "./resonance";
 import { skillMarker } from "./skill";
 
 const DAMAGE_APPLIED_TEMPLATE = systemPath("templates/chat/damage-applied.hbs");
@@ -130,6 +136,45 @@ export async function createSkillRequestMessage(
     type: "skillRequest",
     system: request,
     content: await renderSkillRequestCard(request),
+    flags: { core: { canPopout: true } },
+  });
+
+  return created as ChatMessage | undefined;
+}
+
+/**
+ * DLからの共鳴判定・憑依判定の要求をチャットに流す。
+ *
+ * 判定要求カードと同じく、出したら変わらない。各共鳴者の結果は別のメッセージになる。
+ */
+export async function createResonanceRequestMessage(
+  request: ResonanceRequestState,
+): Promise<ChatMessage | undefined> {
+  const created = await ChatMessage.create({
+    type: "resonanceRequest",
+    system: request,
+    content: await renderResonanceRequestCard(request),
+    flags: { core: { canPopout: true } },
+  });
+
+  return created as ChatMessage | undefined;
+}
+
+/**
+ * 共鳴判定のあと始末をチャットに流す。〈∞共鳴〉の変化とハウリングの発生。
+ *
+ * 発言者を振った共鳴者にするのは、DLが1回の操作で複数人ぶん振ったときに、
+ * どの結果が誰のものかがチャットの並びだけで分かるようにするため。
+ */
+export async function createResonanceOutcomeMessage(
+  actor: EmokloreActor,
+  outcome: ResonanceOutcomeState,
+): Promise<ChatMessage | undefined> {
+  const created = await ChatMessage.create({
+    type: "resonanceOutcome",
+    system: outcome,
+    speaker: ChatMessage.getSpeaker({ actor }),
+    content: await renderResonanceOutcomeCard(outcome),
     flags: { core: { canPopout: true } },
   });
 

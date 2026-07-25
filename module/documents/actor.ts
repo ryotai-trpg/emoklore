@@ -123,6 +123,26 @@ export class EmokloreActor extends Actor {
     return { before, after: this.system.resources.hp.value, armor: armorApplied + kaiArmor };
   }
 
+  /**
+   * 〈∞共鳴〉を上げる。共鳴判定に成功したときと、憑依判定を振ったとき。
+   *
+   * 上限で止めない。ルールブックはレベル10で【逸脱】としており、上限を超えたことが
+   * 見えるほうがDLの判断材料になる（`resources.resonance.max` はバーの目盛りで、
+   * ルール上の天井ではない）。
+   *
+   * @returns 変化の前後。共鳴者でなければ undefined
+   */
+  async raiseResonance(amount: number): Promise<{ before: number; after: number } | undefined> {
+    if (!this.isCharacter()) return undefined;
+
+    const before = this.system.resources.resonance.value;
+    if (amount <= 0) return { before, after: before };
+
+    await this.update({ "system.resources.resonance.value": before + amount });
+
+    return { before, after: this.system.resources.resonance.value };
+  }
+
   async adjustResource(resource: ResourceKey, point: number): Promise<this | undefined> {
     // resonance は共鳴者だけが持つ。ここを抜けると resource は "hp" | "mp"（全種別が同形で持つ）
     if (resource === "resonance") {
