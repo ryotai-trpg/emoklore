@@ -73,6 +73,47 @@ export const createEmotionOptions = (): Array<{ value: string; label: string; gr
   });
 };
 
+/** 感情ピッカーの1マス。`key` は保存する感情キー、`label` は翻訳済みの表示名 */
+export type EmotionCell = { key: string; label: string };
+
+/** 感情ピッカーの1列。1つの感情属性とそこに属する感情 */
+export type EmotionColumn = { attribute: string; label: string; emotions: EmotionCell[] };
+
+/**
+ * 感情ピッカーの列を組み立てる。属性ごとに1列、その中に属する感情を並べる。
+ *
+ * 感情の定義は属性キーを1つ持つだけの平らな表なので、属性から感情を引く向きは
+ * ここで作る。列の並びは属性の表の順（欲望・情念・理想・関係・傷）で、列の中は
+ * 感情の表の定義順。
+ *
+ * どちらの label も i18nInit の performPreLocalization で翻訳済みなので、
+ * ここでは参照するだけでよい。game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
+ */
+export const buildEmotionColumns = (
+  resonantEmotions: Record<string, ResonantEmotionConfig>,
+  emotionAttributes: Record<string, EmotionAttributeConfig>,
+): EmotionColumn[] => {
+  const columns = new Map<string, EmotionColumn>();
+
+  for (const [attribute, { label }] of Object.entries(emotionAttributes)) {
+    columns.set(attribute, { attribute, label, emotions: [] });
+  }
+
+  for (const [key, { label, attribute }] of Object.entries(resonantEmotions)) {
+    // 属性の表に載っていない感情にも列を作る。落とすとその感情を選ぶ手段が消える
+    let column = columns.get(attribute);
+    if (!column) {
+      column = { attribute, label: "", emotions: [] };
+      columns.set(attribute, column);
+    }
+
+    column.emotions.push({ key, label });
+  }
+
+  // 感情を1つも持たない属性は列にしない。空の列だけが並ぶのを避ける
+  return Array.from(columns.values()).filter((column) => column.emotions.length > 0);
+};
+
 /**
  * 共鳴感情の表示名と、対応する属性の表示名を引く。
  *

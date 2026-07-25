@@ -5,6 +5,7 @@ import {
   BIOGRAPHY_FIELDS,
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
+  buildEmotionColumns,
   buildSkillLevelSegments,
   buildValueSegments,
   getEmotionRows,
@@ -59,6 +60,60 @@ describe("getEmotionRows", () => {
 
   it("3つのキーを必ず埋める", () => {
     expect(Object.keys(rowsFor({}))).toEqual(["surface", "hidden", "root"]);
+  });
+});
+
+describe("buildEmotionColumns", () => {
+  it("属性ごとに列を作り、列の中は感情の定義順に並べる", () => {
+    const columns = buildEmotionColumns(
+      { hope: { label: "希望", attribute: "ideal" }, order: { label: "秩序", attribute: "ideal" } },
+      emotionAttributes,
+    );
+
+    expect(columns).toEqual([
+      {
+        attribute: "ideal",
+        label: "理想",
+        emotions: [
+          { key: "hope", label: "希望" },
+          { key: "order", label: "秩序" },
+        ],
+      },
+    ]);
+  });
+
+  // 列の並びはルールブックの属性の並び。感情の表がどの順で定義されていても変わらない
+  it("列の並びは属性の表の順にする", () => {
+    const columns = buildEmotionColumns(resonantEmotions, emotionAttributes);
+
+    expect(columns.map((column) => column.attribute)).toEqual(["desire", "ideal"]);
+  });
+
+  it("感情を1つも持たない属性は列にしない", () => {
+    const columns = buildEmotionColumns(
+      { hope: { label: "希望", attribute: "ideal" } },
+      emotionAttributes,
+    );
+
+    expect(columns.map((column) => column.attribute)).toEqual(["ideal"]);
+  });
+
+  // 落とすとその感情を選ぶ手段が消える。属性の表に足し忘れたことが分かるよう、
+  // 見出しは空のまま列として出す
+  it("属性の表に無い感情も列を作って出す", () => {
+    const columns = buildEmotionColumns(
+      {
+        hope: { label: "希望", attribute: "ideal" },
+        chaos: { label: "混沌", attribute: "unknown" },
+      },
+      emotionAttributes,
+    );
+
+    expect(columns).toContainEqual({
+      attribute: "unknown",
+      label: "",
+      emotions: [{ key: "chaos", label: "混沌" }],
+    });
   });
 });
 
