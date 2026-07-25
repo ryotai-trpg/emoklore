@@ -84,7 +84,9 @@ export const createEmotionOptions = (): Array<{ value: string; label: string; gr
  * game.i18n を呼ばない純粋関数なので、そのまま単体テストできる。
  */
 export const getEmotionRows = (
-  emotions: Record<string, string | undefined>,
+  // 見るのは3枠だけ。`system.emotions` は追加取得（`acquired`）も持つが、行に出すのは
+  // 表・裏・ルーツなので、余りを受け取らない形で宣言する
+  emotions: Partial<Record<EmotionKey, string>>,
   resonantEmotions: Record<string, ResonantEmotionConfig>,
   emotionAttributes: Record<string, EmotionAttributeConfig>,
 ): Record<EmotionKey, EmotionRow> => {
