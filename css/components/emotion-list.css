@@ -1,5 +1,4 @@
-/* 共鳴感情の編集欄。現在の3行と、ピッカーを開くボタンを縦に積む。
-   編集モードのヘッダに出る */
+/* 共鳴感情の編集まわり。シートのヘッダとダイアログで共通に使う部品。 */
 
 .emoklore {
   .em-emotion-list {
@@ -21,4 +20,19 @@
     min-height: 0;
     line-height: 1.4;
   }
+}
+
+/* ダイアログの感情入力。タグの行とピッカーを開くボタンを縦に積む */
+.emoklore .em-emotion-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacer-4);
+  width: 100%;
+}
+
+/* 本体のタグは multi-select の右寄せ列に置く前提で justify-content: flex-end。
+   こちらは見出しの下に敷くので、行頭から並べる */
+.emoklore .tags.input-element-tags {
+  justify-content: flex-start;
 }

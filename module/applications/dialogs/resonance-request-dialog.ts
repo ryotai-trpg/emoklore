@@ -1,8 +1,13 @@
 import { systemPath } from "../../constants";
-import { formatEmotions } from "../../utils/emotion";
 import type { ResonanceRequestState } from "../../utils/resonance";
 import { resolveActingActors } from "../../utils/targets";
-import { pickEmotionsInto, readEmotions } from "./emotion-field";
+import {
+  buildEmotionTags,
+  loadEmotionTagsPartial,
+  pickEmotionsInto,
+  readEmotions,
+  removeEmotionFrom,
+} from "./emotion-field";
 
 const TEMPLATE = systemPath("templates/apps/resonance-request.hbs");
 
@@ -19,11 +24,12 @@ export async function promptResonanceRequest(
   preset: Partial<ResonanceRequestState> = {},
 ): Promise<ResonanceRequestState | null> {
   const emotions = preset.emotions ?? [];
+  await loadEmotionTagsPartial();
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     intensity: preset.intensity ?? 5,
     rise: preset.rise ?? "1",
     emotions: emotions.join(","),
-    emotionLabel: formatEmotions(emotions),
+    emotionTags: buildEmotionTags(emotions),
     possessionMode: preset.possessionMode ?? false,
   });
 
@@ -50,6 +56,7 @@ export async function promptResonanceRequest(
     // content 内の data-action は ApplicationV2 のアクション機構がここに振り分ける
     actions: {
       pickEmotions: (_event: Event, button: HTMLElement) => pickEmotionsInto(button),
+      removeEmotion: (_event: Event, target: HTMLElement) => removeEmotionFrom(target),
     },
     // 閉じられた場合はnullで返る。rejectCloseで例外にすると本物のエラーを握り潰しやすい
     rejectClose: false,

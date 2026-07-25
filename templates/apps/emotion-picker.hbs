@@ -32,6 +32,11 @@
   </div>
   {{/unless}}
 
+  {{#if multiple}}
+  {{! 選んだ感情はグリッドの押し込み状態だけだと数えにくいので、上にまとめて出す }}
+  {{> "systems/emoklore/templates/apps/partials/emotion-tags.hbs" tags=tags}}
+  {{/if}}
+
   <p class="hint">{{hint}}</p>
 
   <div class="em-emotion-picker__columns">

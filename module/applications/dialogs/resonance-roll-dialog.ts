@@ -1,8 +1,14 @@
 import { systemPath } from "../../constants";
 import type { OwnedEmotions } from "../../rules/emotion-match";
 import { normalizeIntensity, type ResonanceMatch } from "../../rules/resonance-roll";
-import { formatEmotions, matchEmotion } from "../../utils/emotion";
-import { pickEmotionsInto, readEmotions } from "./emotion-field";
+import { matchEmotion } from "../../utils/emotion";
+import {
+  buildEmotionTags,
+  loadEmotionTagsPartial,
+  pickEmotionsInto,
+  readEmotions,
+  removeEmotionFrom,
+} from "./emotion-field";
 
 export type ResonanceRollInput = {
   intensity: number;
@@ -32,10 +38,11 @@ export async function promptResonanceRoll({
   owned: OwnedEmotions;
   emotions?: readonly string[];
 }): Promise<ResonanceRollInput | null> {
+  await loadEmotionTagsPartial();
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     intensity,
     emotions: emotions.join(","),
-    emotionLabel: formatEmotions(emotions),
+    emotionTags: buildEmotionTags(emotions),
   });
 
   // prompt は static メソッドで中身が this.wait(...) なので、変数に取り出して呼ぶと
@@ -58,6 +65,7 @@ export async function promptResonanceRoll({
     // content 内の data-action は ApplicationV2 のアクション機構がここに振り分ける
     actions: {
       pickEmotions: (_event: Event, button: HTMLElement) => pickEmotionsInto(button),
+      removeEmotion: (_event: Event, target: HTMLElement) => removeEmotionFrom(target),
     },
     // 閉じられた場合はnullで返る。rejectCloseで例外にすると本物のエラーを握り潰しやすい
     rejectClose: false,
