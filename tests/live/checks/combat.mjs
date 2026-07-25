@@ -101,6 +101,40 @@ export async function run({ page, check }) {
     }),
   );
 
+  // 本体の CombatTracker#_onRender は renderData.find が空振りしても `"turn" in data` を
+  // 見るので、表示していないCombatの更新で落ちる（#100）。差分を先に外して super へ渡している
+  await check("表示していないCombatの更新でトラッカーが落ちない", () =>
+    assertInPage(page, async () => {
+      const combat = await Combat.implementation.create({});
+      try {
+        await ui.combat.render({ force: true });
+        if (ui.combat.viewed?.id === combat.id) {
+          return {
+            ok: false,
+            detail: "作ったCombatが表示中になっていて、一致しない更新を作れない",
+          };
+        }
+
+        // 本体が update のときに載せてくるのと同じ形。実際の経路では render が await
+        // されないので未処理のPromise拒否になる。ここでは await して直接受ける
+        try {
+          await ui.combat.render({
+            parts: ["tracker"],
+            renderContext: "updateCombat",
+            // biome-ignore lint: 本体が差分に載せるIDのキーそのもの。改名すると再現しない
+            renderData: [{ _id: combat.id, round: 1 }],
+          });
+        } catch (err) {
+          return { ok: false, detail: `トラッカーの再描画が落ちた: ${err.message}` };
+        }
+
+        return { ok: true, detail: "表示中のCombatに一致しない差分でも再描画が通った" };
+      } finally {
+        await combat.delete();
+      }
+    }),
+  );
+
   await check("ラウンド終了で心肺停止者に生存リマインダが出て、ボタンで判定が飛ぶ", () =>
     assertInPage(
       page,
