@@ -32,7 +32,8 @@ const defineResonanceOutcomeSchema = () => ({
  * こちらは「その結果どうなったか」の記録だから。要求カードに書き戻せないのと同じ理由で
  * （PLは作成者でないカードを更新できない）、結果は各自のメッセージとして並ぶ。
  *
- * ボタンはまだ無い。ハウリングの「表を引く／カードを引く」は #79 が `ACTIONS` に足す。
+ * ハウリングが起きたときだけ「共鳴表を引く」のボタンが出る。ハンドラは表を引いて
+ * アイテムを作るので `applications/` 側にあり、init が `ACTIONS` へ登録する。
  */
 export class ResonanceOutcomeModel extends EmokloreSystemDataModel {
   declare actorUuid: string | null;

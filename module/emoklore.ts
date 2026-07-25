@@ -7,6 +7,7 @@ import * as applications from "./applications/character-sheet";
 import { injectChatControls } from "./applications/chat-controls";
 import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-dialog";
+import { applyHowling, drawHowling } from "./applications/howling";
 import { EmokloreHowlingSheet } from "./applications/howling-sheet";
 import { applyKaiDamage } from "./applications/kai-attack";
 import { EmokloreKaiSheet } from "./applications/kai-sheet";
@@ -26,6 +27,7 @@ import {
 } from "./data/item-models";
 import { KaiDataModel } from "./data/kai";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
+import { HowlingDrawModel } from "./data/messages/howling-draw";
 import { KaiAttackCardModel } from "./data/messages/kai-attack-card";
 import { ResonanceOutcomeModel } from "./data/messages/resonance-outcome";
 import { ResonanceRequestModel } from "./data/messages/resonance-request";
@@ -85,6 +87,7 @@ Hooks.once("init", () => {
     skillRequest: SkillRequestModel,
     resonanceRequest: ResonanceRequestModel,
     resonanceOutcome: ResonanceOutcomeModel,
+    howlingDraw: HowlingDrawModel,
   } as typeof CONFIG.ChatMessage.dataModels;
   // Combat は単一種別 standard。エンカウンターのイニシアチブ基準を system に持たせる
   CONFIG.Combat.dataModels = {
@@ -111,6 +114,10 @@ Hooks.once("init", () => {
   // DLからの判定要求。押した人のアクターで振るので、これも applications/ 側から登録する
   SkillRequestModel.ACTIONS.rollRequested = rollRequested;
   ResonanceRequestModel.ACTIONS.rollResonance = rollRequestedResonance;
+
+  // ハウリング。共鳴結果カードから表を引き、引いた結果カードから反応を共鳴者に乗せる
+  ResonanceOutcomeModel.ACTIONS.drawHowling = drawHowling;
+  HowlingDrawModel.ACTIONS.applyHowling = applyHowling;
 
   // トークンに付けられる状態をエモクロアのものに差し替える。既定はD&D風の
   // dead/blind/prone… で、ルールブックの【気絶】【心肺停止】などが1つも無い。

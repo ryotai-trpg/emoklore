@@ -7,6 +7,14 @@
       <i class="fa-solid fa-tower-broadcast" inert></i>
       {{localize "EMOKLORE.ChatMessage.resonanceOutcome.Howling"}}
     </p>
+    {{! 怪異に共鳴表が紐づいていないときは案内だけ。押しても何も起きないボタンは出さない }}
+    {{#if canDraw}}
+      <div class="em-resonance-outcome__actions">
+        <button type="button" data-action="drawHowling">
+          {{localize "EMOKLORE.ChatMessage.resonanceOutcome.Draw"}}
+        </button>
+      </div>
+    {{/if}}
   {{/if}}
 
   {{#if possessionReached}}

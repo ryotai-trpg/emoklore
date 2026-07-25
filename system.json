@@ -46,7 +46,8 @@
       "survivalReminder": {},
       "skillRequest": {},
       "resonanceRequest": {},
-      "resonanceOutcome": {}
+      "resonanceOutcome": {},
+      "howlingDraw": { "htmlFields": ["description"] }
     },
     "Combat": {
       "standard": {}

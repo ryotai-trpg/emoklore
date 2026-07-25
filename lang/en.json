@@ -238,9 +238,14 @@
       "resonanceOutcome": {
         "Raised": "{name} ∞Resonance Lv.{before} → Lv.{after} (+{rise})",
         "Unchanged": "{name} ∞Resonance stays at Lv.{after}",
-        "Howling": "Triple or better: Howling occurs. Draw from the resonance table or the howling deck.",
+        "Howling": "Triple or better: Howling occurs. Draw from the resonance table.",
+        "Draw": "Draw from the resonance table",
         "PossessionReached": "Successes met Mentality. Possession takes hold if the *Self check fails.",
         "ActionFailed": "The resonance outcome card action failed."
+      },
+      "howlingDraw": {
+        "Apply": "Apply",
+        "ActionFailed": "The howling reaction card action failed."
       }
     },
     "Combat": {
@@ -559,6 +564,10 @@
             "rise": {
               "label": "Rise"
             }
+          },
+          "resonanceTable": {
+            "label": "Resonance Table",
+            "hint": "The table drawn from when howling occurs. Drag a RollTable here."
           }
         },
         "Emotions": "Resonant Emotions",
@@ -684,6 +693,17 @@
       "MatchCompletely": "Perfect Match",
       "RollButton": "Roll",
       "NotCharacter": "Only resonants can make resonance rolls."
+    },
+    "Howling": {
+      "RecoveryBySkill": "Recovers on a success with {skills}",
+      "NoTable": "This apparition has no resonance table set.",
+      "Exhausted": "The resonance table is drawn out. Reset the drawn marks on the table.",
+      "NoActor": "The resonant could not be found.",
+      "NotOwner": "You do not have permission to modify this resonant.",
+      "NoReaction": "The howling reaction could not be found.",
+      "Applied": "Applied \"{reaction}\" to {name}.",
+      "Section": "Howling",
+      "Recover": "Recovery Check"
     },
     "resonantEmotion": "{emotion} ({attribute})",
     "result": {

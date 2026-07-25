@@ -238,9 +238,14 @@
       "resonanceOutcome": {
         "Raised": "{name} 〈∞共鳴〉Lv.{before} → Lv.{after}（+{rise}）",
         "Unchanged": "{name} 〈∞共鳴〉Lv.{after} のまま",
-        "Howling": "トリプル以上：ハウリング（極限共鳴）が発生。共鳴表かハウリングカードを引いてください",
+        "Howling": "トリプル以上：ハウリング（極限共鳴）が発生。共鳴表を引いてください",
+        "Draw": "共鳴表を引く",
         "PossessionReached": "成功数が【精神】以上。〈＊自我〉判定に失敗すると【憑依】が成立します",
         "ActionFailed": "共鳴結果カードの操作に失敗しました"
+      },
+      "howlingDraw": {
+        "Apply": "適用",
+        "ActionFailed": "ハウリング反応カードの操作に失敗しました"
       }
     },
     "Combat": {
@@ -559,6 +564,10 @@
             "rise": {
               "label": "上昇値"
             }
+          },
+          "resonanceTable": {
+            "label": "共鳴表",
+            "hint": "ハウリングが起きたときに引く表。RollTableをここへドラッグする。"
           }
         },
         "Emotions": "共鳴感情",
@@ -685,6 +694,17 @@
       "MatchCompletely": "完全一致",
       "RollButton": "ロール",
       "NotCharacter": "共鳴判定は共鳴者だけが振れます"
+    },
+    "Howling": {
+      "RecoveryBySkill": "{skills} の成功で回復",
+      "NoTable": "この怪異に共鳴表が設定されていません",
+      "Exhausted": "共鳴表を引き切っています。表の「引いた」印を戻してください",
+      "NoActor": "共鳴者が見つかりません",
+      "NotOwner": "この共鳴者を操作する権限がありません",
+      "NoReaction": "ハウリング反応が見つかりません",
+      "Applied": "{name} に「{reaction}」を適用しました",
+      "Section": "ハウリング",
+      "Recover": "回復判定"
     },
     "result": {
       "fumble": "ファンブル",

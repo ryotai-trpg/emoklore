@@ -1,0 +1,37 @@
+{{! Howling Draw Card — 共鳴表から引いた反応 }}
+<div class="em-howling-draw">
+  <header class="em-howling-draw__head">
+    {{#if reactionImg}}
+      <img class="em-howling-draw__image" src="{{reactionImg}}" alt="" />
+    {{/if}}
+    <div class="em-howling-draw__title">
+      <span class="em-howling-draw__name">{{reactionName}}</span>
+      {{#if categoryLabel}}
+        <span class="em-howling-draw__category">{{categoryLabel}}</span>
+      {{/if}}
+    </div>
+  </header>
+
+  {{#if descriptionHTML}}
+    <div class="em-howling-draw__description">{{{descriptionHTML}}}</div>
+  {{/if}}
+
+  {{! 回復条件は技能と自由記述の2本立て。書かれているぶんだけ出す }}
+  {{#if recoverySkills}}
+    <p class="em-howling-draw__recovery">
+      {{localize "EMOKLORE.Howling.RecoveryBySkill" skills=recoverySkills}}
+    </p>
+  {{/if}}
+  {{#if recoveryNote}}
+    <p class="em-howling-draw__recovery">{{recoveryNote}}</p>
+  {{/if}}
+
+  {{! 反応アイテムを指していない結果（text結果やGMが別のものを繋いだ結果）は適用しようがない }}
+  {{#if canApply}}
+    <div class="em-howling-draw__actions">
+      <button type="button" data-action="applyHowling">
+        {{localize "EMOKLORE.ChatMessage.howlingDraw.Apply"}}
+      </button>
+    </div>
+  {{/if}}
+</div>
