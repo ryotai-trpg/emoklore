@@ -9,7 +9,12 @@ import type { CharacteristicKey } from "../config/characteristics";
 import { type SkillCategory, skillCategories } from "../config/skill-categories";
 import type { SkillGroupKey } from "../config/skill-groups";
 import { isSkillKey, type SkillKey, skills } from "../config/skills";
-import { requiredSuccesses } from "../rules/success";
+import {
+  type ResultName,
+  requiredSuccesses,
+  resolveResultName,
+  SUCCESS_REQUIREMENTS,
+} from "../rules/success";
 import { typedEntries } from "./object";
 
 /**
@@ -256,11 +261,25 @@ export const baseSkillOf = (key: string): string | null => {
   return group && isBaseSkillKey(group) ? group : null;
 };
 
+/**
+ * 成功度を「ダブル成功以上」の形にする。
+ *
+ * 要求の表示は判定要求カード・要求ダイアログ・判定オプションの3箇所で要る。
+ * `dice/emoklore-roll.ts` にも同じ組み立てがあるが、あちらは `dice/` から
+ * `utils/` を読めない（`docs/code-design.md` の層とimportの方向）ので共有しない。
+ */
+export const formatSuccessRequirement = (result: ResultName): string =>
+  game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
+    result: game.i18n.localize(`EMOKLORE.result.${result}`),
+  });
+
+/** 要求された成功数の表示。「ダブル成功以上」。指定なしは空文字 */
+export const formatRequirement = (requiredSuccess: number): string =>
+  requiredSuccess > 0 ? formatSuccessRequirement(resolveResultName(requiredSuccess)) : "";
+
 /** 判定要求を作るときに、指定できる成功度と要る成功数の対 */
 export const requirementChoices = (): Array<{ value: number; label: string }> =>
-  (["single", "double", "triple", "miracle"] as const).map((requirement) => ({
+  SUCCESS_REQUIREMENTS.map((requirement) => ({
     value: requiredSuccesses(requirement),
-    label: game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
-      result: game.i18n.localize(`EMOKLORE.result.${requirement}`),
-    }),
+    label: formatSuccessRequirement(requirement),
   }));

@@ -55,6 +55,13 @@ const REQUIRED_SUCCESSES: Record<SuccessRequirement, number> = {
   miracle: 4,
 };
 
+/**
+ * 選べる成功度の並び。難易度の目安の順に出す。
+ *
+ * 表から起こすので、要求を足したときに並びだけ書き忘れることがない
+ */
+export const SUCCESS_REQUIREMENTS = Object.keys(REQUIRED_SUCCESSES) as SuccessRequirement[];
+
 /** 要求された成功度に要る成功数を返す */
 export function requiredSuccesses(requirement: SuccessRequirement): number {
   return REQUIRED_SUCCESSES[requirement];

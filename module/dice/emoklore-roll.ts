@@ -77,7 +77,14 @@ export class EmokloreRoll extends foundry.dice.Roll {
     return game.i18n.localize("EMOKLORE.successMod", { mod: formatSigned(this.successMod) });
   }
 
-  /** 要求された成功数への到達の表示。要求がなければ空文字 */
+  /**
+   * 要求された成功数への到達の表示。要求がなければ空文字。
+   *
+   * 「○○以上」の組み立ては `utils/skill.ts` の `formatSuccessRequirement` と同じだが、
+   * 共有しない。`dice/` がimportしてよいのは `rules/` だけで、ここへ `utils/` を
+   * 足すと「Roll / Die / 結果の表現」という薄い層でなくなる
+   * （`docs/code-design.md` の層とimportの方向）。
+   */
   get requirementLabel(): string {
     if (this.requiredSuccess <= 0) return "";
 

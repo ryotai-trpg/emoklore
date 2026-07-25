@@ -1,6 +1,7 @@
 import { systemPath } from "../constants";
 import type { KaiAttack, KaiDataModel } from "../data/kai";
 import type { EmokloreActor } from "../documents/actor";
+import { formatEmotion } from "../utils/emotion";
 import { enrichDocumentHTML } from "../utils/sheet";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { EmotionPicker } from "./emotion-picker";
@@ -63,13 +64,7 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
     ).flatMap((column) =>
       column.emotions
         .filter((emotion) => selected.has(emotion.key))
-        .map((emotion) => ({
-          key: emotion.key,
-          label: game.i18n.localize("EMOKLORE.resonantEmotion", {
-            emotion: emotion.label,
-            attribute: column.label,
-          }),
-        })),
+        .map((emotion) => ({ key: emotion.key, label: formatEmotion(emotion.key) })),
     );
 
     context.mutationHTML = await enrichDocumentHTML(this.actor, system.mutation);
