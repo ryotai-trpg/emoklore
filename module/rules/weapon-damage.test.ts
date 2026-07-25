@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDamageFormula,
+  calculateAppliedDamage,
   canRollDamage,
   normalizeReduction,
   resolveStrengthBonus,
@@ -118,5 +119,28 @@ describe("normalizeReduction", () => {
   it("数値でない入力は0として扱う", () => {
     expect(normalizeReduction(Number.NaN)).toBe(0);
     expect(normalizeReduction(Number.POSITIVE_INFINITY)).toBe(0);
+  });
+});
+
+describe("calculateAppliedDamage", () => {
+  it("軽減も防具も無ければ素通し", () => {
+    expect(calculateAppliedDamage({ amount: 7 })).toBe(7);
+  });
+
+  it("軽減だけを引く", () => {
+    expect(calculateAppliedDamage({ amount: 7, reduction: 2 })).toBe(5);
+  });
+
+  it("防具だけを引く。装甲がダメージを上回れば0で止まる", () => {
+    expect(calculateAppliedDamage({ amount: 7, armor: 2 })).toBe(5);
+    expect(calculateAppliedDamage({ amount: 7, armor: 35 })).toBe(0);
+  });
+
+  it("軽減と防具は併用できる", () => {
+    expect(calculateAppliedDamage({ amount: 10, reduction: 2, armor: 3 })).toBe(5);
+  });
+
+  it("マイナスにはならない", () => {
+    expect(calculateAppliedDamage({ amount: 1, reduction: 5, armor: 5 })).toBe(0);
   });
 });

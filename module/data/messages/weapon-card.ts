@@ -180,14 +180,14 @@ export class WeaponCardModel extends EmokloreSystemDataModel {
    */
   async applyDamageTo(
     targets: EmokloreActor[],
-    { reduction = 0 }: { reduction?: number } = {},
+    { reduction = 0, armor }: { reduction?: number; armor?: number | undefined } = {},
   ): Promise<void> {
     // canApplyDamage と同じ条件だが、ダメージ量の型を絞るためここでは直接見る
     const amount = this.damageTotal;
     if (amount === null) return;
 
     // 権限の有無とGMへの委譲は documents/queries.ts が引き受ける
-    const applied = await applyDamageToTargets(targets, amount, { reduction });
+    const applied = await applyDamageToTargets(targets, amount, { reduction, armor });
     if (!applied) {
       ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoGM", { localize: true });
       return;

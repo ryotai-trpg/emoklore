@@ -16,6 +16,8 @@ export type AppliedTarget = {
   name: string;
   before: number;
   after: number;
+  /** 軽減に使った防具の値。行の内訳に出す */
+  armor: number;
 };
 
 const defineDamageAppliedSchema = () => {
@@ -30,6 +32,7 @@ const defineDamageAppliedSchema = () => {
         name: new StringField({ required: true, blank: true, initial: "" }),
         before: new NumberField({ required: true, integer: true, initial: 0 }),
         after: new NumberField({ required: true, integer: true, initial: 0 }),
+        armor: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
       }),
     ),
   };

@@ -33,6 +33,7 @@
     },
     "Item": {
       "weapon": { "htmlFields": ["notes"] },
+      "armor": { "htmlFields": ["notes"] },
       "skill": { "htmlFields": ["notes"] }
     },
     "ChatMessage": {

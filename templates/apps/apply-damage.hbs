@@ -41,3 +41,28 @@
     </p>
   </div>
 </fieldset>
+
+<fieldset {{#unless hasArmorChoices}}disabled{{/unless}}>
+  <legend>{{localize "EMOKLORE.ApplyDamage.Armor"}}</legend>
+  {{#if hasArmorChoices}}
+    <div class="form-group stacked">
+      <div class="form-fields">
+        {{#each armorPieces as |piece|}}
+          <label>
+            <input type="checkbox" name="armorPiece" value="{{piece.defense}}" checked>
+            {{piece.label}}
+          </label>
+        {{/each}}
+      </div>
+      <p class="hint">{{localize "EMOKLORE.ApplyDamage.ArmorHint"}}</p>
+    </div>
+  {{else}}
+    <p class="hint">
+      {{#if canRollDefense}}
+        {{localize "EMOKLORE.ApplyDamage.ArmorNone"}}
+      {{else}}
+        {{localize "EMOKLORE.ApplyDamage.ArmorMultiTargetHint"}}
+      {{/if}}
+    </p>
+  {{/if}}
+</fieldset>

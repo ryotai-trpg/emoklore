@@ -70,3 +70,19 @@ export function normalizeReduction(value: number): number {
   if (!Number.isFinite(value)) return 0;
   return Math.max(0, Math.floor(value));
 }
+
+/** ダメージ適用の入力。reduction は防御判定など、armor は装備中防具の防御力 */
+export type AppliedDamageParams = {
+  amount: number;
+  reduction?: number;
+  armor?: number;
+};
+
+/** 実際にHPから引く量。軽減も防具も同じ引き算に流れ、0未満にはならない */
+export function calculateAppliedDamage({
+  amount,
+  reduction = 0,
+  armor = 0,
+}: AppliedDamageParams): number {
+  return Math.max(0, amount - reduction - armor);
+}

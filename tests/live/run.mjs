@@ -12,6 +12,7 @@
 // 検証を足すときは checks/ にファイルを1つ作って CHECKS に並べる。
 
 import * as activeEffect from "./checks/active-effect.mjs";
+import * as armor from "./checks/armor.mjs";
 import * as boundary from "./checks/boundary.mjs";
 import * as characterSheet from "./checks/character-sheet.mjs";
 import * as consoleCheck from "./checks/console.mjs";
@@ -37,6 +38,7 @@ const CHECKS = [
   customSkill,
   weapon,
   boundary,
+  armor,
   activeEffect,
   importCheck,
   consoleCheck,

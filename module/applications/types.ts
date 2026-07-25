@@ -2,7 +2,7 @@ import type { ApplicationRenderContext, ApplicationTab } from "@client/applicati
 import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
 import type { CharacteristicKey } from "../config/characteristics";
 import type { CharacterDataModel } from "../data/character";
-import type { SkillDataModel, WeaponDataModel } from "../data/item-models";
+import type { ArmorDataModel, SkillDataModel, WeaponDataModel } from "../data/item-models";
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import type { ModifierSet } from "../rules/types";
@@ -148,6 +148,17 @@ export type WeaponRow = {
   rangeLabel: string;
   /** 「【成功数】D3 ＋ 1D3」形式のダメージ式 */
   damagePreview: string;
+  equipped: boolean;
+};
+
+/** 防具1行の表示用データ。武器と同じく読むだけの一覧で、装備トグルだけが書ける */
+export type ArmorRow = {
+  id: string;
+  name: string;
+  img: string;
+  defense: number;
+  coverage: string;
+  equipped: boolean;
 };
 
 export type CharacteristicsMap = Record<
@@ -274,6 +285,7 @@ export type CharacterContext = {
   tabs: Record<string, ApplicationTab>;
   tab?: unknown;
   weapons?: WeaponRow[];
+  armors?: ArmorRow[];
   effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;
   // 基底の EmokloreDocumentSheetContext と対応する分
   isPlay: boolean;
@@ -300,6 +312,26 @@ export type SkillContext = {
   groupLabel: string;
   /** レベルの行を出すか。ベース技能はレベルを持たないので出さない */
   showLevel: boolean;
+  /** enrichHTML 済みの備考 */
+  notesHTML: string;
+  isPlay: boolean;
+  owner: boolean;
+  limited: boolean;
+  gm: boolean;
+  document: EmokloreItem;
+  systemFields: Record<string, foundry.data.fields.DataField>;
+  flags: Record<string, unknown>;
+};
+
+/**
+ * 防具シートのコンテキスト。
+ *
+ * CharacterContext と同じく、基底は継承せず必要なものを並べ直している（理由は上を参照）。
+ */
+export type ArmorContext = {
+  system: ArmorDataModel;
+  /** 適用条件の行を閲覧で出すか。未記入なら出さない */
+  showCoverage: boolean;
   /** enrichHTML 済みの備考 */
   notesHTML: string;
   isPlay: boolean;

@@ -31,6 +31,11 @@ export const createFixtures = (page) =>
       type: "character",
     });
     made.push(target.name);
+    // 防具は装備を外して持たせる。装備したままだと武器・境界チェックのHP検算が
+    // 全部ずれる（「未装備は軽減に数えない」の回帰も兼ねる）。防具チェックが装備して戻す
+    await target.createEmbeddedDocuments("Item", [
+      { name: `${tag}_鎧`, type: "armor", system: { defense: 2, equipped: false } },
+    ]);
     const importee = await Actor.implementation.create({
       name: `${tag}_import`,
       type: "character",

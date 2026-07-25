@@ -77,6 +77,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
       createDoc: this._createDoc,
       deleteDoc: this._deleteDoc,
       toggleEffect: this._toggleEffect,
+      toggleEquipped: this._toggleEquipped,
       importCharacter: this._importCharacter,
       selectSegment: this._selectSegment,
       toggleSidebar: this._toggleSidebar,
@@ -209,6 +210,17 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
   static async _toggleEffect(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
     const effect = getEmbeddedDocument(target, this.actor);
     if (effect) await effect.update({ disabled: !effect.disabled });
+  }
+
+  /**
+   * アイテムタブの装備チェックボックス。
+   *
+   * アイテムの値の編集だがシートのフォームには載せられない（同じ name の入力を
+   * 2箇所に描けない）ので、name を持たないチェックボックスから直接アイテムへ書く。
+   */
+  static async _toggleEquipped(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
+    const item = getEmbeddedDocument(target, this.actor);
+    if (item) await item.update({ "system.equipped": (target as HTMLInputElement).checked });
   }
 
   static async _importCharacter(this: EmokloreCharacterSheet, event: Event, _target: HTMLElement) {
@@ -550,6 +562,19 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         img: item.img,
         rangeLabel: formatRangeLabel(item.system.rangeType, item.system.range),
         damagePreview: formatDamagePreview(item.system.damageDie, item.system.attackPower),
+        equipped: item.system.equipped,
+      }));
+
+    const armors = (this.actor.itemTypes.armor ?? []) as EmokloreItem[];
+    context.armors = armors
+      .filter((item) => item.isArmor())
+      .map((item) => ({
+        id: item.id!,
+        name: item.name,
+        img: item.img,
+        defense: item.system.defense,
+        coverage: item.system.coverage,
+        equipped: item.system.equipped,
       }));
   }
 

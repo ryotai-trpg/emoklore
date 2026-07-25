@@ -8,7 +8,11 @@ import { typedEntries } from "../../utils/object";
 import { skillMarker } from "../../utils/skill";
 import { resolveTargetActors } from "../../utils/targets";
 
-export type DamageReductionInput = { reduction: number };
+export type DamageReductionInput = {
+  reduction: number;
+  /** 防具の上書き値。全チェックのままなら送らず、既定（装備合計を自動で）に任せる */
+  armor?: number | undefined;
+};
 
 const TEMPLATE = systemPath("templates/apps/apply-damage.hbs");
 
@@ -41,7 +45,7 @@ export async function applyDamageWithReduction(this: WeaponCardModel): Promise<v
   });
   if (!input) return;
 
-  await this.applyDamageTo(targets, { reduction: input.reduction });
+  await this.applyDamageTo(targets, { reduction: input.reduction, armor: input.armor });
 }
 
 /**
@@ -60,9 +64,10 @@ export async function promptDamageReduction({
   successCount: number | null;
   targets: EmokloreActor[];
 }): Promise<DamageReductionInput | null> {
-  // 防御判定のショートカットは対象1体のときだけ。複数の対象は各自の軽減が別々で、
-  // 1つの入力に流し込めない（1体ずつターゲットして適用してもらう）
+  // 防御判定のショートカットと防具のチェックは対象1体のときだけ。複数の対象は
+  // 各自の軽減・装備が別々で、1つの入力に流し込めない（1体ずつ適用してもらう）
   const defender = targets.length === 1 ? (targets[0] ?? null) : null;
+  const armorPieces = defender ? listEquippedArmor(defender) : [];
 
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     summary: game.i18n.localize("EMOKLORE.ApplyDamage.Summary", {
@@ -74,6 +79,8 @@ export async function promptDamageReduction({
     }),
     canRollDefense: !!defender,
     defenseSkillGroups: listDefenseSkillGroups(),
+    armorPieces,
+    hasArmorChoices: armorPieces.length > 0,
   });
 
   // prompt は static メソッドで中身が this.wait(...) なので、変数に取り出して呼ぶと
@@ -161,11 +168,46 @@ function parseSkillValue(value: string): SkillRef | null {
   return resolveSkillRef(key ?? "", { base: kind === "base" });
 }
 
+/** チェックボックス1つぶんの防具。value に防御力を持たせ、readInput が合計する */
+type ArmorPieceContext = { defense: number; label: string };
+
+/** 対象の装備中防具。部位の条件が書いてあれば添えて、外すかの判断材料にする */
+function listEquippedArmor(defender: EmokloreActor): ArmorPieceContext[] {
+  return [...defender.items]
+    .filter((item) => item.isArmor())
+    .filter((item) => item.system.equipped)
+    .map((item) => ({
+      defense: item.system.defense,
+      label: game.i18n.localize(
+        item.system.coverage
+          ? "EMOKLORE.ApplyDamage.ArmorPieceWithCoverage"
+          : "EMOKLORE.ApplyDamage.ArmorPiece",
+        { name: item.name, defense: item.system.defense, coverage: item.system.coverage },
+      ),
+    }));
+}
+
 function readInput(button: HTMLElement): DamageReductionInput {
   const form = (button as HTMLButtonElement).form as HTMLFormElement;
   const reduction = (form.elements.namedItem("reduction") as HTMLInputElement).valueAsNumber;
 
   // callback が null/undefined を返すと本体が "ok" 文字列にすり替える
   // （create-skill-dialog.ts と同じ罠）。必ずオブジェクトを返し、未入力は0に倒す
-  return { reduction: normalizeReduction(reduction) };
+  const input: DamageReductionInput = { reduction: normalizeReduction(reduction) };
+
+  // 防具のチェックが1つでも外れていたら、チェック済みの合計で上書きする。
+  // 全チェックのままなら送らず、既定の「装備合計を自動で」に任せる
+  // （ActiveEffect で system.armor を修正している場合と食い違わせないため）
+  const boxes = form.elements.namedItem("armorPiece");
+  const pieces =
+    boxes instanceof RadioNodeList
+      ? ([...boxes] as HTMLInputElement[])
+      : boxes instanceof HTMLInputElement
+        ? [boxes]
+        : [];
+  if (pieces.length > 0 && pieces.some((box) => !box.checked)) {
+    input.armor = pieces.reduce((sum, box) => (box.checked ? sum + Number(box.value) : sum), 0);
+  }
+
+  return input;
 }

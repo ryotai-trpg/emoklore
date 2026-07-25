@@ -4,13 +4,19 @@ import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-ro
 import { resolveMpBoundary } from "../rules/resource-boundary";
 import { resolveSkillRoll } from "../rules/skill-roll";
 import type { RollSpec } from "../rules/types";
+import { calculateAppliedDamage } from "../rules/weapon-damage";
 import { createMpNoticeMessage, createRollMessage, formatSkillName } from "../utils/chat";
 import type { EmokloreItem } from "./item";
 
 type ResourceKey = "hp" | "mp" | "resonance";
 
 /** ダメージ適用の結果。チャットに「HP: 15 → 12」と出すために使う */
-export type HpChange = { before: number; after: number };
+export type HpChange = {
+  before: number;
+  after: number;
+  /** 軽減に使った防具の値。結果行の内訳に出す */
+  armor: number;
+};
 
 /**
  * system を CharacterDataModel として扱う。
@@ -54,15 +60,20 @@ export class EmokloreActor extends Actor {
    *
    * `reduction` は軽減量の共通の口。〈耐久〉判定・防御判定はどちらも「受けるダメージを
    * 【成功数】点軽減する」という形で、武器カードの「軽減して適用」がここへ渡してくる。
-   * 防具を入れるならそれも同じ引き算になる。
+   * 防具は同じ引き算のもう1つの項。未指定なら装備中防具の合計（`system.armor`）が
+   * 自動で乗り、ダイアログで部位条件により外したときだけ上書き値が渡ってくる。
    */
   async applyDamage(
     amount: number,
-    { reduction = 0 }: { reduction?: number } = {},
+    { reduction = 0, armor }: { reduction?: number; armor?: number | undefined } = {},
   ): Promise<HpChange | undefined> {
+    // 防具の既定は「装備中防具の合計」。この1行だけが既定を決める
+    // （「自動で乗せるか」をシステム設定にするときはここに差す）
+    const armorApplied = armor ?? this.system.armor;
+
     const hp = this.system.resources.hp;
     const before = hp.value;
-    const applied = Math.max(0, amount - reduction);
+    const applied = calculateAppliedDamage({ amount, reduction, armor: armorApplied });
     const updates = {
       "system.resources.hp.value": Math.clamp(before - applied, 0, hp.max),
     };
@@ -73,7 +84,7 @@ export class EmokloreActor extends Actor {
     Hooks.callAll("emoklore.applyDamage", this, applied);
 
     // フックが updates を書き換えている場合があるので、結果は保存後の値から取る
-    return { before, after: this.system.resources.hp.value };
+    return { before, after: this.system.resources.hp.value, armor: armorApplied };
   }
 
   async adjustResource(resource: ResourceKey, point: number): Promise<this | undefined> {
