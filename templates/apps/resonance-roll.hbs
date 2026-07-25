@@ -9,8 +9,8 @@
 {{! 感情はシートと同じピッカーで選ぶ。保存するキーは hidden が持ち、ボタンは表示だけ }}
 <div class="form-group">
   <label>{{localize "EMOKLORE.EmotionPicker.Title"}}</label>
-  <input type="hidden" name="emotion" value="{{emotion}}">
-  <button type="button" data-action="pickEmotion">
+  <input type="hidden" name="emotions" value="{{emotions}}">
+  <button type="button" data-action="pickEmotions">
     <i class="fa-solid fa-heart" inert></i>
     <span data-emotion-label>{{#if emotionLabel}}{{emotionLabel}}{{else}}{{localize
       "EMOKLORE.EmotionPicker.Unselected"}}{{/if}}</span>

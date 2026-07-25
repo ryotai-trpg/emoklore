@@ -27,7 +27,7 @@ import { promptSkillRoll } from "./dialogs/skill-roll-dialog";
 export async function requestResonanceRoll(
   actor: EmokloreActor,
   options: Record<string, unknown> = {},
-  preset: { intensity?: number; emotion?: string } = {},
+  preset: { intensity?: number; emotions?: readonly string[] } = {},
 ): Promise<ChatMessage | undefined> {
   // 一致度は選んだ感情とアクターの共鳴感情から自動で決まるので、突き合わせ先を渡す。
   // 共鳴判定は共鳴者だけが振れるが、判定側でも弾くのでここでは持っている分だけ渡す

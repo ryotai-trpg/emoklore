@@ -29,7 +29,8 @@
   "EMOKLORE": {
     "Common": {
       "colon": "：",
-      "none": "なし"
+      "none": "なし",
+      "separator": "／"
     },
     "Sheet": {
       "class": {

@@ -15,8 +15,8 @@ import type { ResonanceMatch } from "../rules/resonance-roll";
 const attributeOf = (emotion: string): string | undefined =>
   isResonantEmotionKey(emotion) ? CONFIG.EMOKLORE.resonantEmotions[emotion].attribute : undefined;
 
-/** 共鳴者の感情と、DLが指定した感情から一致度を決める */
-export const matchEmotion = (owned: OwnedEmotions, requested: string): ResonanceMatch =>
+/** 共鳴者の感情と、DLが指定した感情（複数可）から一致度を決める */
+export const matchEmotion = (owned: OwnedEmotions, requested: readonly string[]): ResonanceMatch =>
   resolveEmotionMatch({ owned, requested, attributeOf });
 
 /** 感情の表示名。「怒り（情念）」。未選択・未知のキーは空文字 */
@@ -29,3 +29,10 @@ export const formatEmotion = (emotion: string): string => {
     attribute: CONFIG.EMOKLORE.emotionAttributes[attribute].label,
   });
 };
+
+/** 感情の一覧の表示。「怒り（情念）／恨み（情念）」。未知のキーは落とす */
+export const formatEmotions = (emotions: Iterable<string>): string =>
+  [...emotions]
+    .map(formatEmotion)
+    .filter((label) => label !== "")
+    .join(game.i18n.localize("EMOKLORE.Common.separator"));

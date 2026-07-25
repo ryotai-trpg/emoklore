@@ -20,8 +20,13 @@ export type OwnedEmotions = {
 
 export type EmotionMatchParams = {
   owned: OwnedEmotions;
-  /** DLが指定した感情。未指定なら空文字 */
-  requested: string;
+  /**
+   * DLが指定した感情。空なら指定なし。
+   *
+   * 複数を受けるのは、《怪異》が共鳴感情を複数持つため。DLは「∞共鳴感情：
+   * [憧憬（理想）][恨み（情念）]」の形でまとめて鳴らす
+   */
+  requested: readonly string[];
   /**
    * 感情キーから属性キーを引く。
    *
@@ -37,15 +42,19 @@ export type EmotionMatchParams = {
  * 完全一致は持っている感情のどれかが指定と同一のとき、ルーツ属性一致はルーツの
  * 感情属性が指定の属性と同じとき。**重複せず大きい方だけ**を採るので、完全一致を
  * 先に見て抜ける（ルーツそのものが指定と同一なら、属性も当然一致している）。
+ *
+ * 指定が複数あるときも同じで、**いずれか1つでも一致すれば成立**し、いちばん大きい
+ * 一致度を採る。ルールブックの「重複せず大きい方のみ」を感情の数だけ広げた形で、
+ * 多くの感情を持つ《怪異》ほど多くの共鳴者を鳴らせる。
  */
 export function resolveEmotionMatch({
   owned,
   requested,
   attributeOf,
 }: EmotionMatchParams): ResonanceMatch {
-  if (!requested) return "none";
+  if (requested.length === 0) return "none";
 
-  if (owned.all.includes(requested)) return "completely";
+  if (requested.some((emotion) => owned.all.includes(emotion))) return "completely";
 
   if (!owned.root) return "none";
 
@@ -53,5 +62,5 @@ export function resolveEmotionMatch({
   // 属性を引けない感情どうしを「どちらも undefined だから一致」にしない
   if (!rootAttribute) return "none";
 
-  return rootAttribute === attributeOf(requested) ? "root" : "none";
+  return requested.some((emotion) => attributeOf(emotion) === rootAttribute) ? "root" : "none";
 }
