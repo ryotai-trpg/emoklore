@@ -2,11 +2,10 @@ import { systemPath } from "../constants";
 import type { KaiAttack, KaiDataModel } from "../data/kai";
 import type { EmokloreActor } from "../documents/actor";
 import { enrichDocumentHTML } from "../utils/sheet";
-import { resolveTargetActors } from "../utils/targets";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { EmotionPicker } from "./emotion-picker";
 import { buildEmotionColumns } from "./helpers";
-import { requestResonanceRoll } from "./rolls";
+import { requestResonanceCheck } from "./requests";
 import type { EmokloreRenderOptions } from "./types";
 
 /** 攻撃を1件足すときの既定値。スキーマの initial と揃える */
@@ -24,8 +23,8 @@ const DEFAULT_ATTACK: KaiAttack = {
  * 怪異のシート。
  *
  * HP/装甲/MP・固定イニシアチブ・共鳴感情・共鳴判定のプリセット・共鳴表参照・憑依変異・
- * 攻撃リストを持つ。攻撃はカードに出して振り、共鳴プリセットからは対象の共鳴者に共鳴判定を
- * 要求する（#75 で全共鳴者への要求カードに置き換わるまでの暫定）。
+ * 攻撃リストを持つ。攻撃はカードに出して振り、共鳴プリセットからは共鳴判定の要求カードを
+ * チャットに出す。
  */
 export class EmokloreKaiSheet extends EmokloreActorSheet {
   // type: "kai" にしか登録しないので actor は怪異に絞れる
@@ -119,20 +118,20 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
   }
 
   /**
-   * 共鳴判定を要求する。暫定は、ターゲットした共鳴者に怪異の共鳴プリセットの強度を
-   * 差し込んで共鳴判定を振らせる。全共鳴者への要求カード・感情マッチング自動化は #75。
+   * 共鳴判定を要求する。怪異の共鳴プリセットを初期値にして要求カードを出す。
+   *
+   * 共鳴感情は持っているものを全部渡す。共鳴者はそのどれかに一致すればよいので、
+   * 感情を多く持つ怪異ほど多くの共鳴者を鳴らせる。絞りたいDLはダイアログで外す。
    */
   static async _requestResonance(this: EmokloreKaiSheet) {
-    const targets = resolveTargetActors().filter((actor) => actor.isCharacter());
-    if (targets.length === 0) {
-      ui.notifications?.warn("EMOKLORE.Actor.kai.NoResonanceTarget", { localize: true });
-      return;
-    }
+    const { resonance, emotions } = this.actor.system;
 
-    const intensity = this.actor.system.resonance.intensity;
-    for (const target of targets) {
-      await requestResonanceRoll(target, {}, { intensity });
-    }
+    await requestResonanceCheck({
+      intensity: resonance.intensity,
+      rise: resonance.rise,
+      emotions: [...emotions],
+      kaiUuid: this.actor.uuid ?? null,
+    });
   }
 }
 

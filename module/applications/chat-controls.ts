@@ -7,10 +7,23 @@
  * `renderChatLog` を待つ形だと掴めない。
  */
 
-import { requestSkillCheck } from "./requests";
+import { requestResonanceCheck, requestSkillCheck } from "./requests";
 
-/** 差したボタンの目印。付け替えのたびに呼ばれるので、これで二重を防ぐ */
-const BUTTON_CLASS = "em-request-skill";
+/** 差すボタン。目印のクラスで二重を防ぐ（要素は使い回されたまま親だけが移る） */
+const BUTTONS = [
+  {
+    cls: "em-request-skill",
+    icon: "fa-hand-point-right",
+    label: "EMOKLORE.SkillRequest.Title",
+    run: requestSkillCheck,
+  },
+  {
+    cls: "em-request-resonance",
+    icon: "fa-tower-broadcast",
+    label: "EMOKLORE.SkillRequest.ResonanceTitle",
+    run: requestResonanceCheck,
+  },
+];
 
 /** 本体の型に出ないメンバーだけを補う */
 type GamemasterUser = { isGM: boolean };
@@ -25,17 +38,23 @@ export function injectChatControls(elements: Record<string, HTMLElement>): void 
   if (!(game.user as GamemasterUser | null | undefined)?.isGM) return;
 
   const controls = elements["#chat-controls"];
-  if (!controls || controls.querySelector(`.${BUTTON_CLASS}`)) return;
-
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = `ui-control icon fa-solid fa-hand-point-right ${BUTTON_CLASS}`;
-  button.dataset.tooltip = "";
-  button.ariaLabel = game.i18n.localize("EMOKLORE.SkillRequest.Title");
-  button.addEventListener("click", () => {
-    void requestSkillCheck();
-  });
+  if (!controls) return;
 
   // DL用のボタン（書き出し・削除）の並びに置く。無ければ末尾に足す
-  (controls.querySelector(".control-buttons") ?? controls).append(button);
+  const place = controls.querySelector(".control-buttons") ?? controls;
+
+  for (const { cls, icon, label, run } of BUTTONS) {
+    if (controls.querySelector(`.${cls}`)) continue;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `ui-control icon fa-solid ${icon} ${cls}`;
+    button.dataset.tooltip = "";
+    button.ariaLabel = game.i18n.localize(label);
+    button.addEventListener("click", () => {
+      void run();
+    });
+
+    place.append(button);
+  }
 }

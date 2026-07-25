@@ -1,0 +1,43 @@
+{{! 本体の standard-form 体系に乗せる。name 属性は resonance-request-dialog.ts が
+    form.elements.namedItem で引くインターフェースなので変えない }}
+<div class="form-group">
+  <label for="intensity">{{localize "EMOKLORE.Resonance.Intensity"}}</label>
+  <input name="intensity" id="intensity" type="number" min="1" value="{{intensity}}" autofocus>
+</div>
+
+<div class="form-group">
+  <label for="rise">{{localize "EMOKLORE.Resonance.Rise"}}</label>
+  <input name="rise" id="rise" type="text" value="{{rise}}">
+  <p class="hint">{{localize "EMOKLORE.SkillRequest.RiseHint"}}</p>
+</div>
+
+{{! 感情はシートと同じピッカーで選ぶ。保存するキーは hidden が持ち、ボタンは表示だけ }}
+<div class="form-group stacked">
+  <label>{{localize "EMOKLORE.EmotionPicker.Title"}}</label>
+  {{! 感情は数も長さも決まらないので、本体のタグと同じ形で折り返して見せる }}
+  <div class="em-emotion-field">
+    <input type="hidden" name="emotions" value="{{emotions}}">
+    {{> "systems/emoklore/templates/apps/partials/emotion-tags.hbs" tags=emotionTags}}
+    <button type="button" data-action="pickEmotions">
+      <i class="fa-solid fa-heart" inert></i>
+      <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
+    </button>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="forcedMatch">{{localize "EMOKLORE.Resonance.Match"}}</label>
+  <select name="forcedMatch" id="forcedMatch">
+    <option value="">{{localize "EMOKLORE.Resonance.MatchAuto"}}</option>
+    <option value="none">{{localize "EMOKLORE.Resonance.MatchNone"}}</option>
+    <option value="root">{{localize "EMOKLORE.Resonance.MatchRoot"}}</option>
+    <option value="completely">{{localize "EMOKLORE.Resonance.MatchCompletely"}}</option>
+  </select>
+  <p class="hint">{{localize "EMOKLORE.SkillRequest.ForcedMatchHint"}}</p>
+</div>
+
+<div class="form-group">
+  <label for="possessionMode">{{localize "EMOKLORE.SkillRequest.Possession"}}</label>
+  <input name="possessionMode" id="possessionMode" type="checkbox" {{#if possessionMode}}checked{{/if}}>
+  <p class="hint">{{localize "EMOKLORE.SkillRequest.PossessionHint"}}</p>
+</div>

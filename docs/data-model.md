@@ -19,6 +19,8 @@ ActiveEffectでどのキーを変更できるかは [効果（ActiveEffect）](/
 | ChatMessage | `damageApplied` | `DamageAppliedModel` |
 | ChatMessage | `survivalReminder` | `SurvivalReminderModel` |
 | ChatMessage | `skillRequest` | `SkillRequestModel` |
+| ChatMessage | `resonanceRequest` | `ResonanceRequestModel` |
+| ChatMessage | `resonanceOutcome` | `ResonanceOutcomeModel` |
 | Combat | `standard` | `CombatDataModel` |
 
 **種別は `system.json` の `documentTypes` と `CONFIG.*.dataModels` の両方に書く。** 片方だけでは噛み合わない。`documentTypes` に無い種別を `dataModels` に登録すると、作成できないのに `system` の型だけが増えて嘘になる（警告も出ない）。
@@ -394,6 +396,35 @@ DLからの判定要求。**出したら変わらない** — 本体は作成者
 | `note` | StringField | `""` | 機械に落ちない条件の補足 |
 
 判定値修正は持たない。DLが状況で与えるものではなく、状態異常や極限共鳴の[効果](/active-effect)の側にあるため。
+
+## ChatMessage `resonanceRequest`
+
+DLからの共鳴判定・憑依判定の要求。判定要求カードと同じく**出したら変わらない**。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `intensity` | NumberField | 5 | 強度（判定値） |
+| `rise` | StringField | `"1"` | 成功時の〈∞共鳴〉上昇量。ダイス式も受ける（`Roll.validate` で検証）。憑依判定では読まない |
+| `emotions` | SetField(StringField) | `[]` | DLが指定する共鳴感情。**《怪異》は複数持つので複数受ける**。空なら指定なし |
+| `forcedMatch` | StringField | `""` | 一致度のGM強制。空なら感情から自動で決める |
+| `possessionMode` | BooleanField | `false` | 憑依判定モード。成否によらず+1、ハウリングなし |
+| `targets` | ArrayField(SchemaField) | `[]` | 対象の `actorUuid` / `name`。**表示だけ**で、押せる相手は絞らない |
+| `kaiUuid` | DocumentUUIDField | `null` | 判定の出どころの怪異。どの共鳴表を引くかを #79 がここから辿る |
+
+## ChatMessage `resonanceOutcome`
+
+共鳴判定のあと始末。〈∞共鳴〉の変化とハウリングの発生を1体ぶん記録する。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `actorUuid` / `name` | DocumentUUIDField / StringField | `null` / `""` | 振った共鳴者 |
+| `successCount` | NumberField | 0 | 判定の成功数 |
+| `rise` / `before` / `after` | NumberField | 0 / 1 / 1 | 上がった量と、前後の〈∞共鳴〉 |
+| `howling` | BooleanField | `false` | トリプル以上でハウリング発生。憑依判定では起きない |
+| `possessionReached` | BooleanField | `false` | 憑依判定で成功数が【精神】以上に届いたか |
+| `kaiUuid` | DocumentUUIDField | `null` | 引く共鳴表を辿るための怪異。#79 が使う |
+
+ボタンはまだ無い。ハウリングの「表を引く／カードを引く」は #79 が `ACTIONS` に足す。
 
 ## Combat `standard`
 

@@ -10,7 +10,7 @@ import { applyDamageWithReduction } from "./applications/dialogs/apply-damage-di
 import { applyKaiDamage } from "./applications/kai-attack";
 import { EmokloreKaiSheet } from "./applications/kai-sheet";
 import { EmokloreNpcSheet } from "./applications/npc-sheet";
-import { rollRequested } from "./applications/requests";
+import { rollRequested, rollRequestedResonance } from "./applications/requests";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
@@ -21,6 +21,8 @@ import { ArmorDataModel, SkillDataModel, WeaponDataModel } from "./data/item-mod
 import { KaiDataModel } from "./data/kai";
 import { DamageAppliedModel } from "./data/messages/damage-applied";
 import { KaiAttackCardModel } from "./data/messages/kai-attack-card";
+import { ResonanceOutcomeModel } from "./data/messages/resonance-outcome";
+import { ResonanceRequestModel } from "./data/messages/resonance-request";
 import { SkillRequestModel } from "./data/messages/skill-request";
 import { SurvivalReminderModel } from "./data/messages/survival-reminder";
 import { WeaponCardModel } from "./data/messages/weapon-card";
@@ -74,6 +76,8 @@ Hooks.once("init", () => {
     damageApplied: DamageAppliedModel,
     survivalReminder: SurvivalReminderModel,
     skillRequest: SkillRequestModel,
+    resonanceRequest: ResonanceRequestModel,
+    resonanceOutcome: ResonanceOutcomeModel,
   } as typeof CONFIG.ChatMessage.dataModels;
   // Combat は単一種別 standard。エンカウンターのイニシアチブ基準を system に持たせる
   CONFIG.Combat.dataModels = {
@@ -99,6 +103,7 @@ Hooks.once("init", () => {
 
   // DLからの判定要求。押した人のアクターで振るので、これも applications/ 側から登録する
   SkillRequestModel.ACTIONS.rollRequested = rollRequested;
+  ResonanceRequestModel.ACTIONS.rollResonance = rollRequestedResonance;
 
   // トークンに付けられる状態をエモクロアのものに差し替える。既定はD&D風の
   // dead/blind/prone… で、ルールブックの【気絶】【心肺停止】などが1つも無い。

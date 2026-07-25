@@ -1,0 +1,37 @@
+{{! Resonance Request Card }}
+<div class="em-resonance-request">
+  <header class="em-resonance-request__head">
+    <i class="fa-solid fa-tower-broadcast" inert></i>
+    <span>{{#if possessionMode}}{{localize "EMOKLORE.ChatMessage.resonanceRequest.PossessionTitle"}}{{else}}{{localize
+      "EMOKLORE.ChatMessage.resonanceRequest.Title"}}{{/if}}</span>
+  </header>
+
+  <dl class="em-resonance-request__terms">
+    <dt>{{localize "EMOKLORE.Resonance.Intensity"}}</dt>
+    <dd>{{intensity}}</dd>
+    {{#if rise}}
+      <dt>{{localize "EMOKLORE.Resonance.Rise"}}</dt>
+      <dd>{{rise}}</dd>
+    {{/if}}
+    {{#if emotions}}
+      <dt>{{localize "EMOKLORE.EmotionPicker.Title"}}</dt>
+      <dd>{{emotions}}</dd>
+    {{/if}}
+    {{#if forcedMatch}}
+      <dt>{{localize "EMOKLORE.Resonance.Match"}}</dt>
+      <dd>{{forcedMatch}}</dd>
+    {{/if}}
+    {{#if targets}}
+      <dt>{{localize "EMOKLORE.ChatMessage.resonanceRequest.Targets"}}</dt>
+      <dd>{{targets}}</dd>
+    {{/if}}
+  </dl>
+
+  {{! カードの内容は全員に同じものが配られるので、DL専用のボタンは作れない。
+      1つのボタンが「選択中のトークン全員」と「自分1人」の両方を兼ねる }}
+  <div class="em-resonance-request__actions">
+    <button type="button" data-action="rollResonance">
+      {{localize "EMOKLORE.ChatMessage.resonanceRequest.Roll"}}
+    </button>
+  </div>
+</div>
