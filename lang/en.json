@@ -29,7 +29,8 @@
   "EMOKLORE": {
     "Common": {
       "colon": ": ",
-      "none": "None"
+      "none": "None",
+      "separator": " / "
     },
     "Sheet": {
       "class": {
@@ -189,6 +190,22 @@
         "NoActor": "No actor to roll with. Select a token or assign a character.",
         "NotCharacterLike": "This actor type has no skill checks.",
         "ActionFailed": "The check request card action failed."
+      },
+      "resonanceRequest": {
+        "Title": "Resonance Check Requested",
+        "PossessionTitle": "Possession Check Requested",
+        "Targets": "Targets",
+        "Roll": "Roll Resonance",
+        "NoActor": "No character to roll with. Select a token or assign a character.",
+        "NoGM": "You lack permission to raise resonance. A connected GM is required.",
+        "ActionFailed": "The resonance request card action failed."
+      },
+      "resonanceOutcome": {
+        "Raised": "{name} ∞Resonance Lv.{before} → Lv.{after} (+{rise})",
+        "Unchanged": "{name} ∞Resonance stays at Lv.{after}",
+        "Howling": "Triple or better: Howling occurs. Draw from the resonance table or the howling deck.",
+        "PossessionReached": "Successes met Mentality. Possession takes hold if the *Self check fails.",
+        "ActionFailed": "The resonance outcome card action failed."
       }
     },
     "Combat": {
@@ -592,7 +609,12 @@
       "NormalSkills": "Skills",
       "BaseSkills": "Base Skills",
       "Note": "Note",
-      "NotePlaceholder": "Any condition that applies only to this check"
+      "NotePlaceholder": "Any condition that applies only to this check",
+      "ResonanceTitle": "Request a Resonance Check",
+      "RiseHint": "How much ∞Resonance rises on success. Dice formulas such as 1D3 are accepted.",
+      "ForcedMatchHint": "Automatic derives the match from each character's emotions.",
+      "Possession": "Possession check",
+      "PossessionHint": "∞Resonance rises by 1 regardless of the result, no Howling, and successes are compared to Mentality."
     },
     "RollOptions": {
       "Title": "Roll Options",
@@ -618,6 +640,10 @@
     "Resonance": {
       "Name": "♾️Resonance",
       "Intensity": "Intensity",
+      "Rise": "Increase",
+      "Match": "Match",
+      "MatchAuto": "Automatic",
+      "MatchAutoHint": "Derived from the chosen emotion and your own resonant emotions. Choose manually when the Dealer dictates the match.",
       "MatchNone": "No Match",
       "MatchRoot": "Root Attribute Match",
       "MatchCompletely": "Perfect Match",

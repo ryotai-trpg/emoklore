@@ -18,6 +18,7 @@ import * as characterSheet from "./checks/character-sheet.mjs";
 import * as combat from "./checks/combat.mjs";
 import * as consoleCheck from "./checks/console.mjs";
 import * as customSkill from "./checks/custom-skill.mjs";
+import * as emotionMatch from "./checks/emotion-match.mjs";
 import * as emotionPicker from "./checks/emotion-picker.mjs";
 import * as importCheck from "./checks/import.mjs";
 import * as npcKai from "./checks/npc-kai.mjs";
@@ -44,6 +45,7 @@ const CHECKS = [
   weapon,
   npcKai,
   emotionPicker,
+  emotionMatch,
   boundary,
   armor,
   activeEffect,
