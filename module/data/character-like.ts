@@ -257,7 +257,13 @@ export class CharacterLikeDataModel extends EmokloreSystemDataModel {
        * 毎回入れ直す。保存しないがスキーマには置く（initiative と同じ理由。
        * ActiveEffect（final）で防御力を修正する余地もこれで残る）
        */
-      armor: new NumberField({ required: true, integer: true, min: 0, initial: 0, persisted: false }),
+      armor: new NumberField({
+        required: true,
+        integer: true,
+        min: 0,
+        initial: 0,
+        persisted: false,
+      }),
 
       characteristics: new SchemaField(
         Object.fromEntries(
