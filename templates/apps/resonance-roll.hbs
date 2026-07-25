@@ -2,14 +2,32 @@
     form.elements.namedItem で引くインターフェースなので変えない }}
 <div class="form-group">
   <label for="intensity">{{localize "EMOKLORE.Resonance.Intensity"}}</label>
-  <input name="intensity" id="intensity" type="number" placeholder="1" min="1" max="9"
+  <input name="intensity" id="intensity" type="number" placeholder="1" min="1"
     {{#if intensity}}value="{{intensity}}"{{/if}} autofocus>
 </div>
 
+{{! 感情はシートと同じピッカーで選ぶ。保存するキーは hidden が持ち、ボタンは表示だけ }}
+<div class="form-group">
+  <label>{{localize "EMOKLORE.EmotionPicker.Title"}}</label>
+  <input type="hidden" name="emotion" value="{{emotion}}">
+  <button type="button" data-action="pickEmotion">
+    <i class="fa-solid fa-heart" inert></i>
+    <span data-emotion-label>{{#if emotionLabel}}{{emotionLabel}}{{else}}{{localize
+      "EMOKLORE.EmotionPicker.Unselected"}}{{/if}}</span>
+  </button>
+</div>
+
 <div class="form-group stacked">
+  <label>{{localize "EMOKLORE.Resonance.Match"}}</label>
   <div class="form-fields">
-    <label><input type="radio" name="choice" value="none" checked> {{localize "EMOKLORE.Resonance.MatchNone"}}</label>
-    <label><input type="radio" name="choice" value="root"> {{localize "EMOKLORE.Resonance.MatchRoot"}}</label>
-    <label><input type="radio" name="choice" value="completely"> {{localize "EMOKLORE.Resonance.MatchCompletely"}}</label>
+    <label><input type="radio" name="choice" value="auto" checked> {{localize
+      "EMOKLORE.Resonance.MatchAuto"}}</label>
+    <label><input type="radio" name="choice" value="none"> {{localize
+      "EMOKLORE.Resonance.MatchNone"}}</label>
+    <label><input type="radio" name="choice" value="root"> {{localize
+      "EMOKLORE.Resonance.MatchRoot"}}</label>
+    <label><input type="radio" name="choice" value="completely"> {{localize
+      "EMOKLORE.Resonance.MatchCompletely"}}</label>
   </div>
+  <p class="hint">{{localize "EMOKLORE.Resonance.MatchAutoHint"}}</p>
 </div>

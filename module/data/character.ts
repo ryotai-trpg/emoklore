@@ -1,5 +1,6 @@
 import type { ResonantEmotionKey } from "../config/resonant-emotions";
 import { normalizeResonance } from "../rules/derived-values";
+import type { OwnedEmotions } from "../rules/emotion-match";
 import type { ModifierSet } from "../rules/types";
 import { CharacterLikeDataModel, defineResourcesSchema } from "./character-like";
 
@@ -86,6 +87,22 @@ export class CharacterDataModel extends CharacterLikeDataModel {
   }
 
   static override LOCALIZATION_PREFIXES = ["EMOKLORE.Actor.character"];
+
+  /**
+   * 感情マッチングに渡す形で共鳴感情を集める。
+   *
+   * 完全一致は表・裏・ルーツ・追加取得の4種すべてを見て、属性一致はルーツだけを見る。
+   * 未選択の枠は空文字なので落とす（`resolveEmotionMatch` に空を渡すと、指定なしの
+   * 要求と噛み合って偽の一致になる）。
+   */
+  getOwnedEmotions(): OwnedEmotions {
+    const { surface, hidden, root, acquired } = this.emotions;
+
+    return {
+      all: [surface, hidden, root, ...acquired].filter((key): key is string => !!key),
+      root: root || undefined,
+    };
+  }
 
   override prepareDerivedData() {
     super.prepareDerivedData();

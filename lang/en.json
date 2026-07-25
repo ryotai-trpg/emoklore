@@ -618,6 +618,9 @@
     "Resonance": {
       "Name": "♾️Resonance",
       "Intensity": "Intensity",
+      "Match": "Match",
+      "MatchAuto": "Automatic",
+      "MatchAutoHint": "Derived from the chosen emotion and your own resonant emotions. Choose manually when the Dealer dictates the match.",
       "MatchNone": "No Match",
       "MatchRoot": "Root Attribute Match",
       "MatchCompletely": "Perfect Match",

@@ -619,6 +619,9 @@
     "Resonance": {
       "Name": "♾️共鳴",
       "Intensity": "強度",
+      "Match": "一致度",
+      "MatchAuto": "自動",
+      "MatchAutoHint": "選んだ感情と自分の共鳴感情から決まります。DLが一致度を指定したときは手で選んでください",
       "MatchNone": "一致なし",
       "MatchRoot": "ルーツ属性一致",
       "MatchCompletely": "完全一致",
