@@ -1,5 +1,5 @@
 import type { CardActions } from "../../utils/chat-card";
-import { ChatCardModel } from "./card-model";
+import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const {
   ArrayField,
@@ -105,10 +105,9 @@ export class ResonanceRequestModel extends ChatCardModel {
   declare targets: RequestTarget[];
   declare kaiUuid: string | null;
 
-  static override CARD = {
+  static override CARD: CardIdentity = {
     root: ".em-resonance-request",
-    label: "共鳴判定要求カード",
-    errorKey: "EMOKLORE.ChatMessage.resonanceRequest.ActionFailed",
+    type: "resonanceRequest",
   };
 
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
@@ -117,6 +116,4 @@ export class ResonanceRequestModel extends ChatCardModel {
   static override defineSchema() {
     return defineResonanceRequestSchema();
   }
-
-  static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.resonanceRequest"];
 }

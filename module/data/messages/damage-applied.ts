@@ -1,6 +1,6 @@
 import type { EmokloreActor } from "../../documents/actor";
 import type { CardActions } from "../../utils/chat-card";
-import { ChatCardModel } from "./card-model";
+import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
@@ -60,10 +60,9 @@ export class DamageAppliedModel extends ChatCardModel {
   declare reduction: number;
   declare targets: AppliedTarget[];
 
-  static override CARD = {
+  static override CARD: CardIdentity = {
     root: ".em-damage-applied",
-    label: "境界の案内",
-    errorKey: "EMOKLORE.ChatMessage.damageApplied.ActionFailed",
+    type: "damageApplied",
   };
 
   /** 案内のボタン。`data-action` の値と対応する。モジュールはここに足せる */
@@ -72,8 +71,6 @@ export class DamageAppliedModel extends ChatCardModel {
   static override defineSchema() {
     return defineDamageAppliedSchema();
   }
-
-  static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.damageApplied"];
 
   /**
    * 境界の案内から状態を付与する。付与だけで、外すのはトークンのHUDから。

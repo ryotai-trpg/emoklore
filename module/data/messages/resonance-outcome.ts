@@ -1,5 +1,5 @@
 import type { CardActions } from "../../utils/chat-card";
-import { ChatCardModel } from "./card-model";
+import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const { BooleanField, DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
 
@@ -59,10 +59,9 @@ export class ResonanceOutcomeModel extends ChatCardModel {
   declare possessionReached: boolean;
   declare kaiUuid: string | null;
 
-  static override CARD = {
+  static override CARD: CardIdentity = {
     root: ".em-resonance-outcome",
-    label: "共鳴結果カード",
-    errorKey: "EMOKLORE.ChatMessage.resonanceOutcome.ActionFailed",
+    type: "resonanceOutcome",
   };
 
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
@@ -71,6 +70,4 @@ export class ResonanceOutcomeModel extends ChatCardModel {
   static override defineSchema() {
     return defineResonanceOutcomeSchema();
   }
-
-  static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.resonanceOutcome"];
 }

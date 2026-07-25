@@ -1,7 +1,7 @@
 import type { AttackSkillKey } from "../../config/attack-skills";
 import { canRollDamage } from "../../rules/weapon-damage";
 import type { CardActions } from "../../utils/chat-card";
-import { ChatCardModel } from "./card-model";
+import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const { DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
 
@@ -101,10 +101,9 @@ export class WeaponCardModel extends ChatCardModel {
   declare successCount: number | null;
   declare damageTotal: number | null;
 
-  static override CARD = {
+  static override CARD: CardIdentity = {
     root: ".em-weapon-card",
-    label: "武器カード",
-    errorKey: "EMOKLORE.ChatMessage.weapon.ActionFailed",
+    type: "weapon",
   };
 
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
@@ -113,8 +112,6 @@ export class WeaponCardModel extends ChatCardModel {
   static override defineSchema() {
     return defineWeaponCardSchema();
   }
-
-  static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.weapon"];
 
   /** カードが載っているメッセージ。parent の型が DataModel 止まりなのでここで1回だけ絞る */
   get message(): WeaponCardMessage {

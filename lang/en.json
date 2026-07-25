@@ -11,6 +11,16 @@
       "skill": "Custom Skill",
       "howling": "Howling Reaction"
     },
+    "ChatMessage": {
+      "weapon": "Weapon Card",
+      "kaiAttack": "Apparition Attack Card",
+      "damageApplied": "Threshold Notice",
+      "survivalReminder": "Survival Roll Reminder",
+      "skillRequest": "Roll Request Card",
+      "resonanceRequest": "Resonance Request Card",
+      "resonanceOutcome": "Resonance Outcome Card",
+      "howlingDraw": "Howling Reaction Card"
+    },
     "Combat": {
       "standard": "Standard"
     }
@@ -220,7 +230,8 @@
     },
     "ChatMessage": {
       "Common": {
-        "ActorMissing": "The target character could not be found."
+        "ActorMissing": "The target character could not be found.",
+        "ActionFailed": "The {card} action failed."
       },
       "weapon": {
         "Attack": "Attack",
@@ -228,7 +239,6 @@
         "NoActor": "A weapon with no owner cannot be used.",
         "ActorMissing": "The character who used this weapon could not be found.",
         "UnknownSkill": "This weapon references an unknown skill, so the attack cannot be rolled.",
-        "ActionFailed": "The weapon card action failed.",
         "Apply": "Apply Damage",
         "ApplyWithReduction": "Apply with Reduction",
         "NoTarget": "No target. Target a token first.",
@@ -245,13 +255,11 @@
         "MpZero": "MP reached 0: roll *Self. On success, MP becomes 1; on failure, Faint.",
         "ApplyStatus": "Apply [{status}]",
         "StatusApplied": "Applied [{status}] to {name}.",
-        "NoPermission": "You lack permission to apply a status to this character.",
-        "ActionFailed": "The action failed."
+        "NoPermission": "You lack permission to apply a status to this character."
       },
       "survivalReminder": {
         "Prompt": "End of round. Characters in Cardiac Arrest roll *Survival (Endurance or Grit may substitute). On failure, Dead.",
-        "Roll": "Roll Survival",
-        "ActionFailed": "The action failed."
+        "Roll": "Roll Survival"
       },
       "kaiAttack": {
         "Judgment": "Judgment",
@@ -259,14 +267,12 @@
         "Judgeless": "No roll · successes",
         "SuccessCount": "Successes",
         "MpCost": "MP cost",
-        "UnnamedAttack": "Attack",
-        "ActionFailed": "The action failed."
+        "UnnamedAttack": "Attack"
       },
       "skillRequest": {
         "Title": "Check Requested",
         "NoActor": "No actor to roll with. Select a token or assign a character.",
-        "NotCharacterLike": "This actor type has no skill checks.",
-        "ActionFailed": "The check request card action failed."
+        "NotCharacterLike": "This actor type has no skill checks."
       },
       "resonanceRequest": {
         "Title": "Resonance Check Requested",
@@ -274,20 +280,17 @@
         "Targets": "Targets",
         "Roll": "Roll Resonance",
         "NoActor": "No character to roll with. Select a token or assign a character.",
-        "NoGM": "You lack permission to raise resonance. A connected GM is required.",
-        "ActionFailed": "The resonance request card action failed."
+        "NoGM": "You lack permission to raise resonance. A connected GM is required."
       },
       "resonanceOutcome": {
         "Raised": "{name} ∞Resonance Lv.{before} → Lv.{after} (+{rise})",
         "Unchanged": "{name} ∞Resonance stays at Lv.{after}",
         "Howling": "Triple or better: Howling occurs. Draw from the resonance table.",
         "Draw": "Draw from the resonance table",
-        "PossessionReached": "Successes met Mentality. Possession takes hold if the *Self check fails.",
-        "ActionFailed": "The resonance outcome card action failed."
+        "PossessionReached": "Successes met Mentality. Possession takes hold if the *Self check fails."
       },
       "howlingDraw": {
-        "Apply": "Apply",
-        "ActionFailed": "The howling reaction card action failed."
+        "Apply": "Apply"
       }
     },
     "Combat": {

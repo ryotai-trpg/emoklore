@@ -28,8 +28,7 @@ export type CardActions<M> = Record<string, CardAction<M>>;
  * @param root   カードの根を指すセレクタ。見つからなければ何もしない
  * @param model  ハンドラの `this` に束縛するデータモデル
  * @param actions `data-action` の値から処理を引く表。モジュールはここに足せる
- * @param label  失敗をコンソールに出すときのカード名（日本語）
- * @param errorKey 失敗を通知に出すときの言語キー
+ * @param type   ChatMessage のサブタイプ。失敗したときの表示名をここから引く
  */
 export function attachCardActions<M>(
   html: HTMLElement,
@@ -37,14 +36,12 @@ export function attachCardActions<M>(
     root,
     model,
     actions,
-    label,
-    errorKey,
+    type,
   }: {
     root: string;
     model: M;
     actions: CardActions<M>;
-    label: string;
-    errorKey: string;
+    type: string;
   },
 ): void {
   const card = html.querySelector(root);
@@ -65,8 +62,13 @@ export function attachCardActions<M>(
     action
       .call(model, target)
       .catch((error: unknown) => {
-        console.error(`emoklore | ${label}の操作に失敗しました`, error);
-        ui.notifications?.error(errorKey, { localize: true });
+        // 本体が i18nInit で TYPES.ChatMessage.<種別> を typeLabels に入れる。
+        // カードごとに表示名を持たなくても、種別から引ける
+        const cardName = game.i18n.localize(CONFIG.ChatMessage.typeLabels[type] ?? type);
+        console.error(`emoklore | ${cardName}の操作に失敗しました`, error);
+        ui.notifications?.error("EMOKLORE.ChatMessage.Common.ActionFailed", {
+          format: { card: cardName },
+        });
       })
       .finally(() => {
         if (button) button.disabled = false;
