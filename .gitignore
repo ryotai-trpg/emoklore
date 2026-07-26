@@ -12,6 +12,9 @@ foundry-config.yaml
 # 実機検証の環境設定（雛形は .env.example。docs/testing.md参照）
 .env
 
+# スクリーンショットの採取先（npm run shots:live。docs/testing.md参照）
+shots/
+
 # 各自のローカル環境メモ・ローカル固有スキル（docs/contributing.md「ドキュメントの方針」参照）
 CLAUDE.local.md
 .claude/skills/
