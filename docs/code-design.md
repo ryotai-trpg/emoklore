@@ -21,7 +21,7 @@ TypeScriptの型と、モジュールの分け方に関する規約はここが�
 
 - **`rules/` は何にも依存しない**。Foundry APIもi18nもUIも触らない。だから `vitest` の `environment: "node"` でそのまま動く。逆に言えば、テストしたいロジックはこの層に切り出す
 - **`constants.ts` と `settings.ts` はどの層から読んでもよい**。表に行を作っていないのは、層ではなく横断する道具だから。ただし `rules/` だけは例外で、**設定を読ませない** — 読んだ瞬間に純粋関数でなくなる。自動化を切るかどうかの判断は呼び出し側（[アーキテクチャ](/architecture)「自動化の程度」の表）に置く
-- **`import type` は依存の矢印を消さない**。型だけのimportはビルド後に消えるので、importグラフ上は逆依存が見えなくなる。`utils/charsheet-importer.ts` が `EmokloreActor` を型で借りたまま `actor.update()` を呼んでいるのがこれで、型だけ借りているように見えて実際は上の層を動かしている。**型だけ借りているのか、動かしているのかは分けて考えること**
+- **`import type` は依存の矢印を消さない**。型だけのimportはビルド後に消えるので、importグラフ上は逆依存が見えなくなる。**型だけ借りているのか、動かしているのかは分けて考えること** — `utils/sheet.ts` が `EmokloreActor` を型で借りるのは、所持アイテムと効果を引くだけで動かさないので借用。`actor.update()` を呼び始めたらそれは上の層を動かしているので、置き場所は `utils/` ではなく `documents/` になる（保管所の取り込みが `EmokloreActor#importFromCharSheet` にあるのはこのため）
 
 現状の例外は1つで、[アーキテクチャ](/architecture) の「既知の構造的課題」に記録してある。`config/index.ts` が事前ローカライズの登録のために `utils/` をimportしている。
 

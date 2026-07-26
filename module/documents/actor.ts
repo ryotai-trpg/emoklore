@@ -15,6 +15,8 @@ import { resolveSkillRoll } from "../rules/skill-roll";
 import { type ModifierSet, NO_MODIFIER, type RollSpec, sumModifiers } from "../rules/types";
 import { calculateAppliedDamage } from "../rules/weapon-damage";
 import { getSetting } from "../settings";
+import { buildCharSheetImport, type CharSheetJSON } from "../utils/charsheet-importer";
+import { joinList } from "../utils/format";
 import type { EmokloreItem } from "./item";
 
 /** ダメージ適用の結果。チャットに「HP: 15 → 12」と出すために使う */
@@ -265,6 +267,37 @@ export class EmokloreActor extends Actor {
     };
 
     return createKaiAttackMessage(this, state, { judgmentRoll, damageRoll });
+  }
+
+  /**
+   * キャラクター保管所のJSONを取り込む。
+   *
+   * 読み取りと組み立ては `utils/charsheet-importer.ts` が持ち、ここは書き込みと通知だけ。
+   * **適用側をアクターに置くのは、`utils/` から `documents/` を動かさないため** — 型で
+   * 借りるだけなら import グラフに出ないので、逆依存が見えないまま残る
+   * （`docs/code-design.md` の「`import type` は依存の矢印を消さない」）。
+   *
+   * 貼り付けられた文字列の妥当性は `validateCharSheetJSON` が先に見ている。
+   */
+  async importFromCharSheet(jsonData: CharSheetJSON): Promise<void> {
+    const { updateData, name, unrecognizedEmotions, unrecognizedSkills } =
+      buildCharSheetImport(jsonData);
+
+    await this.update(updateData);
+
+    ui.notifications?.info("EMOKLORE.Import.Success", { format: { name: name || this.name } });
+
+    // 取り込めなかったものは黙って捨てず知らせる（表記ゆれの発見に必要）
+    if (unrecognizedEmotions.length > 0) {
+      ui.notifications?.warn("EMOKLORE.Import.WarnUnknownEmotions", {
+        format: { labels: joinList(unrecognizedEmotions) },
+      });
+    }
+    if (unrecognizedSkills.length > 0) {
+      ui.notifications?.warn("EMOKLORE.Import.WarnUnknownSkills", {
+        format: { labels: joinList(unrecognizedSkills) },
+      });
+    }
   }
 
   async rollSkill(
