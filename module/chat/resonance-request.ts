@@ -7,13 +7,30 @@
 
 import { systemPath } from "../constants";
 import type { ResonanceRequestState } from "../data/messages/resonance-request";
+import type { ResonanceMatch } from "../rules/resonance-roll";
 import { formatEmotions } from "../utils/emotion";
 import { createCardMessage } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/resonance-request.hbs");
 
-/** 一致度のキーを言語キーの綴りに直す。`root` → `MatchRoot` */
-const capitalize = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
+/**
+ * 一致度の表示に使うキー。
+ *
+ * 値を大文字化してキーを作ると、綴りが実行時にしか決まらず静的に追えない。
+ * 表にしておけば check:i18n が参照として拾える
+ */
+const MATCH_LABELS: Record<ResonanceMatch, string> = {
+  none: "EMOKLORE.Resonance.MatchNone",
+  root: "EMOKLORE.Resonance.MatchRoot",
+  completely: "EMOKLORE.Resonance.MatchCompletely",
+};
+
+/** 保存データ由来の文字列なので、引く前に絞る。空文字ならDLが強制していない */
+const isResonanceMatch = (value: string): value is ResonanceMatch => value in MATCH_LABELS;
+
+/** DLが強制した一致度の表示。強制していなければ空文字 */
+const formatForcedMatch = (forcedMatch: string): string =>
+  isResonanceMatch(forcedMatch) ? _loc(MATCH_LABELS[forcedMatch]) : "";
 
 /** 共鳴判定の要求カードのHTMLを組み立てる */
 export const renderResonanceRequestCard = (state: ResonanceRequestState): Promise<string> =>
@@ -22,9 +39,7 @@ export const renderResonanceRequestCard = (state: ResonanceRequestState): Promis
     // 憑依判定は上昇値の指定を受けない（成否によらず+1）ので、そもそも出さない
     rise: state.possessionMode ? "" : state.rise,
     emotions: formatEmotions(state.emotions),
-    forcedMatch: state.forcedMatch
-      ? game.i18n.localize(`EMOKLORE.Resonance.Match${capitalize(state.forcedMatch)}`)
-      : "",
+    forcedMatch: formatForcedMatch(state.forcedMatch),
     possessionMode: state.possessionMode,
     targets: state.targets.map((target) => target.name).join("、"),
   });

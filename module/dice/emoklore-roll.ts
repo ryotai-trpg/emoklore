@@ -68,27 +68,34 @@ export class EmokloreRoll extends foundry.dice.Roll {
 
   /** 判定結果の表示。チャットカードの見出しに出る「成功」「ダブル」など */
   get resultLabel(): string {
-    return game.i18n.localize(`EMOKLORE.result.${this.resultName}`);
+    return _loc(`EMOKLORE.result.${this.resultName}`);
   }
 
   /** 成功数修正の表示。修正がなければ空文字 */
   get successModLabel(): string {
     if (this.successMod === 0) return "";
-    return game.i18n.localize("EMOKLORE.successMod", { mod: formatSigned(this.successMod) });
+    return _loc("EMOKLORE.successMod", { mod: formatSigned(this.successMod) });
   }
 
-  /** 要求された成功数への到達の表示。要求がなければ空文字 */
+  /**
+   * 要求された成功数への到達の表示。要求がなければ空文字。
+   *
+   * 「○○以上」の組み立ては `utils/skill.ts` の `formatSuccessRequirement` と同じだが、
+   * 共有しない。`dice/` がimportしてよいのは `rules/` だけで、ここへ `utils/` を
+   * 足すと「Roll / Die / 結果の表現」という薄い層でなくなる
+   * （`docs/code-design.md` の層とimportの方向）。
+   */
   get requirementLabel(): string {
     if (this.requiredSuccess <= 0) return "";
 
-    const requirement = game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
-      result: game.i18n.localize(`EMOKLORE.result.${resolveResultName(this.requiredSuccess)}`),
+    const requirement = _loc("EMOKLORE.RollOptions.AtLeast", {
+      result: _loc(`EMOKLORE.result.${resolveResultName(this.requiredSuccess)}`),
     });
     const key = meetsRequirement(this.successCount, this.requiredSuccess)
       ? "EMOKLORE.RollOptions.Met"
       : "EMOKLORE.RollOptions.Missed";
 
-    return game.i18n.localize(key, { requirement });
+    return _loc(key, { requirement });
   }
 
   /**

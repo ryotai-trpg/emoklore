@@ -1,6 +1,6 @@
 import type { HowlingCategory } from "../../config/howling-categories";
 import type { CardActions } from "../../utils/chat-card";
-import { ChatCardModel } from "./card-model";
+import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const { DocumentUUIDField, HTMLField, StringField } = foundry.data.fields;
 
@@ -70,10 +70,9 @@ export class HowlingDrawModel extends ChatCardModel {
   declare recoveryNote: string;
   declare itemUuid: string | null;
 
-  static override CARD = {
+  static override CARD: CardIdentity = {
     root: ".em-howling-draw",
-    label: "ハウリング反応カード",
-    errorKey: "EMOKLORE.ChatMessage.howlingDraw.ActionFailed",
+    type: "howlingDraw",
   };
 
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
@@ -82,6 +81,4 @@ export class HowlingDrawModel extends ChatCardModel {
   static override defineSchema() {
     return defineHowlingDrawSchema();
   }
-
-  static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.howlingDraw"];
 }

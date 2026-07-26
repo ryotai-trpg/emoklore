@@ -6,7 +6,7 @@
     <h1 class="em-kai__name">{{document.name}}</h1>
   {{else}}
     <input class="em-kai__name-input" type="text" name="name" value="{{document.name}}"
-      placeholder="{{localize "EMOKLORE.Sheet.kai.NamePlaceholder"}}" />
+      placeholder="{{localize "DOCUMENT.FIELDS.name.label"}}" />
   {{/if}}
 </header>
 
@@ -142,21 +142,23 @@
           {{#if damage}}<span class="em-kai__attack-damage">{{damage}}</span>{{/if}}
           {{#if mpCost}}<span class="em-kai__attack-mp">{{localize "EMOKLORE.ChatMessage.kaiAttack.MpCost"}}{{mpCost}}</span>{{/if}}
         {{else}}
+          {{! ラベルとプレースホルダはスキーマから引く（コンテキストの attackFields）。
+              name 属性だけは添字が要るのでここで組み立てる }}
           <input class="em-kai__attack-name-input" type="text" name="system.attacks.{{@index}}.name"
-            value="{{name}}" placeholder="{{localize "EMOKLORE.Actor.kai.AttackName"}}" />
+            value="{{name}}" placeholder="{{@root.attackFields.name.placeholder}}" />
           <div class="em-kai__attack-fields">
-            <label>{{localize "EMOKLORE.Actor.kai.AttackDice"}}
+            <label>{{@root.attackFields.diceCount.label}}
               <input type="number" name="system.attacks.{{@index}}.diceCount" value="{{diceCount}}" min="0" /></label>
-            <label>{{localize "EMOKLORE.Actor.kai.AttackTarget"}}
+            <label>{{@root.attackFields.target.label}}
               <input type="number" name="system.attacks.{{@index}}.target" value="{{target}}" min="0" /></label>
-            <label>{{localize "EMOKLORE.Actor.kai.AttackDamage"}}
+            <label>{{@root.attackFields.damage.label}}
               <input type="text" name="system.attacks.{{@index}}.damage" value="{{damage}}"
-                placeholder="@successd3+3" /></label>
-            <label>{{localize "EMOKLORE.ChatMessage.kaiAttack.MpCost"}}
+                placeholder="{{@root.attackFields.damage.placeholder}}" /></label>
+            <label>{{@root.attackFields.mpCost.label}}
               <input type="number" name="system.attacks.{{@index}}.mpCost" value="{{mpCost}}" min="0" /></label>
-            <label class="em-kai__attack-flag">{{localize "EMOKLORE.ChatMessage.kaiAttack.Judgeless"}}
+            <label class="em-kai__attack-flag">{{@root.attackFields.judgeless.label}}
               <input type="checkbox" name="system.attacks.{{@index}}.judgeless" {{checked judgeless}} /></label>
-            <label>{{localize "EMOKLORE.Actor.kai.FixedSuccess"}}
+            <label>{{@root.attackFields.fixedSuccess.label}}
               <input type="number" name="system.attacks.{{@index}}.fixedSuccess" value="{{fixedSuccess}}" min="0" /></label>
           </div>
           <a class="em-kai__attack-delete" data-action="deleteAttack" data-tooltip="APPLICATION.ACTIONS.Delete">

@@ -1,5 +1,5 @@
 import type { CardActions } from "../../utils/chat-card";
-import { ChatCardModel } from "./card-model";
+import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const { BooleanField, DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
 
@@ -43,10 +43,9 @@ export class KaiAttackCardModel extends ChatCardModel {
   declare successCount: number | null;
   declare damageTotal: number | null;
 
-  static override CARD = {
+  static override CARD: CardIdentity = {
     root: ".em-kai-attack-card",
-    label: "怪異の攻撃カード",
-    errorKey: "EMOKLORE.ChatMessage.kaiAttack.ActionFailed",
+    type: "kaiAttack",
   };
 
   /** カードのボタン。`data-action` の値と対応する。ハンドラは applications/ 側から登録する */
@@ -55,6 +54,4 @@ export class KaiAttackCardModel extends ChatCardModel {
   static override defineSchema() {
     return defineKaiAttackCardSchema();
   }
-
-  static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.kaiAttack"];
 }

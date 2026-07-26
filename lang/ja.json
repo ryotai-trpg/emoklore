@@ -11,6 +11,16 @@
       "skill": "カスタム技能",
       "howling": "ハウリング反応"
     },
+    "ChatMessage": {
+      "weapon": "武器カード",
+      "kaiAttack": "怪異の攻撃カード",
+      "damageApplied": "境界の案内",
+      "survivalReminder": "生存判定リマインダ",
+      "skillRequest": "判定要求カード",
+      "resonanceRequest": "共鳴判定要求カード",
+      "resonanceOutcome": "共鳴結果カード",
+      "howlingDraw": "ハウリング反応カード"
+    },
     "Combat": {
       "standard": "標準"
     }
@@ -98,14 +108,10 @@
         }
       },
       "npc": {
-        "NamePlaceholder": "名前",
         "Skills": "技能",
         "BaseSkills": "基本技能",
         "CustomSkills": "カスタム技能",
         "Weapons": "武器"
-      },
-      "kai": {
-        "NamePlaceholder": "名前"
       }
     },
     "Item": {
@@ -220,7 +226,8 @@
     },
     "ChatMessage": {
       "Common": {
-        "ActorMissing": "対象のキャラクターが見つかりません。"
+        "ActorMissing": "対象のキャラクターが見つかりません。",
+        "ActionFailed": "{card}の操作に失敗しました。"
       },
       "weapon": {
         "Attack": "攻撃判定",
@@ -228,7 +235,6 @@
         "NoActor": "持ち主のいない武器は使えません。",
         "ActorMissing": "この武器を使ったキャラクターが見つかりません。",
         "UnknownSkill": "この武器の参照技能が不明なため、攻撃判定を振れません。",
-        "ActionFailed": "武器カードの操作に失敗しました。",
         "Apply": "ダメージを適用",
         "ApplyWithReduction": "軽減して適用",
         "NoTarget": "ターゲットがいません。対象のトークンをターゲットしてください。",
@@ -245,13 +251,11 @@
         "MpZero": "MPが0になった: 〈＊自我〉判定。成功でMPが1になり、失敗で【失神】。",
         "ApplyStatus": "【{status}】を付与",
         "StatusApplied": "{name}に【{status}】を付与しました。",
-        "NoPermission": "このキャラクターに状態を付与する権限がありません。",
-        "ActionFailed": "操作に失敗しました。"
+        "NoPermission": "このキャラクターに状態を付与する権限がありません。"
       },
       "survivalReminder": {
         "Prompt": "ラウンド終了。【心肺停止】のキャラクターは〈＊生存〉判定（〈耐久〉〈根性〉で代用可）。失敗で【死亡】。",
-        "Roll": "〈生存〉判定",
-        "ActionFailed": "操作に失敗しました。"
+        "Roll": "〈生存〉判定"
       },
       "kaiAttack": {
         "Judgment": "判定",
@@ -259,14 +263,12 @@
         "Judgeless": "判定なし・成功数",
         "SuccessCount": "成功数",
         "MpCost": "消費MP",
-        "UnnamedAttack": "攻撃",
-        "ActionFailed": "操作に失敗しました"
+        "UnnamedAttack": "攻撃"
       },
       "skillRequest": {
         "Title": "判定の要求",
         "NoActor": "振るアクターが決まりません。トークンを選ぶか、担当キャラクターを設定してください",
-        "NotCharacterLike": "この種別は技能判定を持ちません",
-        "ActionFailed": "判定要求カードの操作に失敗しました"
+        "NotCharacterLike": "この種別は技能判定を持ちません"
       },
       "resonanceRequest": {
         "Title": "共鳴判定の要求",
@@ -274,20 +276,17 @@
         "Targets": "対象",
         "Roll": "共鳴判定を振る",
         "NoActor": "振る共鳴者が決まりません。トークンを選ぶか、担当キャラクターを設定してください",
-        "NoGM": "共鳴値を上げる権限がありません。GMの接続が必要です",
-        "ActionFailed": "共鳴判定要求カードの操作に失敗しました"
+        "NoGM": "共鳴値を上げる権限がありません。GMの接続が必要です"
       },
       "resonanceOutcome": {
         "Raised": "{name} 〈∞共鳴〉Lv.{before} → Lv.{after}（+{rise}）",
         "Unchanged": "{name} 〈∞共鳴〉Lv.{after} のまま",
         "Howling": "トリプル以上：ハウリング（極限共鳴）が発生。共鳴表を引いてください",
         "Draw": "共鳴表を引く",
-        "PossessionReached": "成功数が【精神】以上。〈＊自我〉判定に失敗すると【憑依】が成立します",
-        "ActionFailed": "共鳴結果カードの操作に失敗しました"
+        "PossessionReached": "成功数が【精神】以上。〈＊自我〉判定に失敗すると【憑依】が成立します"
       },
       "howlingDraw": {
-        "Apply": "適用",
-        "ActionFailed": "ハウリング反応カードの操作に失敗しました"
+        "Apply": "適用"
       }
     },
     "Combat": {
@@ -610,6 +609,32 @@
           "resonanceTable": {
             "label": "共鳴表",
             "hint": "ハウリングが起きたときに引く表。RollTableをここへドラッグする。"
+          },
+          "attacks": {
+            "element": {
+              "name": {
+                "placeholder": "名前"
+              },
+              "diceCount": {
+                "label": "ダイス"
+              },
+              "target": {
+                "label": "判定値"
+              },
+              "damage": {
+                "label": "ダメージ式",
+                "placeholder": "@successd3+3"
+              },
+              "mpCost": {
+                "label": "消費MP"
+              },
+              "judgeless": {
+                "label": "判定なし"
+              },
+              "fixedSuccess": {
+                "label": "固定成功数"
+              }
+            }
           }
         },
         "Emotions": "共鳴感情",
@@ -617,12 +642,7 @@
         "RequestResonance": "共鳴判定を要求",
         "ResonanceTable": "共鳴表",
         "Mutation": "憑依時の変異",
-        "Attacks": "攻撃",
-        "AttackName": "名前",
-        "AttackDice": "ダイス",
-        "AttackTarget": "判定値",
-        "AttackDamage": "ダメージ式",
-        "FixedSuccess": "固定成功数"
+        "Attacks": "攻撃"
       }
     },
     "skillRoll": "〈{skillName}〉判定",

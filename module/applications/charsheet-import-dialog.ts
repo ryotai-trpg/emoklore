@@ -75,7 +75,7 @@ export class CharSheetImportDialog extends (HandlebarsApplicationMixin(
     const jsonInput = textarea?.value ?? "";
 
     if (!jsonInput || jsonInput.trim() === "") {
-      ui.notifications?.error(game.i18n.localize("EMOKLORE.Import.ErrorEmptyInput"));
+      ui.notifications?.error("EMOKLORE.Import.ErrorEmptyInput", { localize: true });
       return;
     }
 
@@ -83,7 +83,7 @@ export class CharSheetImportDialog extends (HandlebarsApplicationMixin(
     const validation = validateCharSheetJSON(jsonInput);
 
     if (!validation.valid) {
-      ui.notifications?.error(game.i18n.localize(validation.error));
+      ui.notifications?.error(validation.error, { localize: true });
       return;
     }
 
@@ -93,7 +93,7 @@ export class CharSheetImportDialog extends (HandlebarsApplicationMixin(
       this.close();
     } catch (error) {
       console.error("emoklore | キャラクターの取り込みに失敗しました", error);
-      ui.notifications?.error(game.i18n.localize("EMOKLORE.Import.ErrorImportFailed"));
+      ui.notifications?.error("EMOKLORE.Import.ErrorImportFailed", { localize: true });
     }
   }
 

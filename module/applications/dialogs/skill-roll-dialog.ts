@@ -1,6 +1,11 @@
 import { systemPath } from "../../constants";
-import { requiredSuccesses, type SuccessRequirement } from "../../rules/success";
+import {
+  requiredSuccesses,
+  SUCCESS_REQUIREMENTS,
+  type SuccessRequirement,
+} from "../../rules/success";
 import type { ModifierSet } from "../../rules/types";
+import { formatSuccessRequirement } from "../../utils/skill";
 
 export type SkillRollInput = {
   /** その場かぎりの修正。`resolveSkillRoll` の5系統目に入る */
@@ -10,9 +15,6 @@ export type SkillRollInput = {
 };
 
 const TEMPLATE = systemPath("templates/apps/skill-roll.hbs");
-
-/** 選べる成功度。ルールブックの難易度の目安の並びに合わせる */
-const REQUIREMENTS: readonly SuccessRequirement[] = ["single", "double", "triple", "miracle"];
 
 /**
  * 判定のオプションを尋ねる。ダイスボーナス・成功数修正・必要成功数の3つ。
@@ -36,11 +38,9 @@ export async function promptSkillRoll({
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     bonus,
     success,
-    requirements: REQUIREMENTS.map((value) => ({
+    requirements: SUCCESS_REQUIREMENTS.map((value) => ({
       value,
-      label: game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
-        result: game.i18n.localize(`EMOKLORE.result.${value}`),
-      }),
+      label: formatSuccessRequirement(value),
       selected: value === requirement,
     })),
   });
@@ -52,10 +52,11 @@ export async function promptSkillRoll({
     // DialogV2 の既定の classes は ["dialog"] だけで emoklore も standard-form も
     // 付かない。本体のフォーム体系に乗せるには明示的に渡す必要がある
     classes: ["emoklore", "standard-form"],
-    window: { title: game.i18n.localize("EMOKLORE.RollOptions.Title") },
+    // title と label は本体が _loc を通すので、キーをそのまま渡す
+    window: { title: "EMOKLORE.RollOptions.Title" },
     content,
     ok: {
-      label: game.i18n.localize("EMOKLORE.Resonance.RollButton"),
+      label: "EMOKLORE.Resonance.RollButton",
       callback: (_event: Event, button: HTMLElement) => readInput(button),
     },
     // 閉じられた場合はnullで返る。rejectCloseで例外にすると本物のエラーを握り潰しやすい
@@ -91,4 +92,4 @@ function readInput(button: HTMLElement): SkillRollInput {
 
 /** selectの値はDOM由来なので、成功度として名乗る前に確かめる */
 const isRequirement = (value: string): value is SuccessRequirement =>
-  (REQUIREMENTS as readonly string[]).includes(value);
+  (SUCCESS_REQUIREMENTS as readonly string[]).includes(value);

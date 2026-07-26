@@ -80,10 +80,7 @@ export async function applyHowling(this: HowlingDrawModel): Promise<void> {
 
   await actor.createEmbeddedDocuments("Item", [item.toObject()]);
 
-  ui.notifications?.info(
-    game.i18n.localize("EMOKLORE.Howling.Applied", {
-      reaction: this.reactionName,
-      name: actor.name,
-    }),
-  );
+  ui.notifications?.info("EMOKLORE.Howling.Applied", {
+    format: { reaction: this.reactionName, name: actor.name },
+  });
 }

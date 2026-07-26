@@ -39,10 +39,8 @@ export async function promptDamageReduction({
   const armorPieces = defender ? listEquippedArmor(defender) : [];
 
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
-    summary: game.i18n.localize("EMOKLORE.ApplyDamage.Summary", {
-      target:
-        defender?.name ??
-        game.i18n.localize("EMOKLORE.ApplyDamage.TargetCount", { count: targets.length }),
+    summary: _loc("EMOKLORE.ApplyDamage.Summary", {
+      target: defender?.name ?? _loc("EMOKLORE.ApplyDamage.TargetCount", { count: targets.length }),
       damage: amount,
       successCount: successCount ?? "?",
     }),
@@ -59,10 +57,11 @@ export async function promptDamageReduction({
     // DialogV2 の既定の classes は ["dialog"] だけで emoklore も standard-form も
     // 付かない。本体のフォーム体系に乗せるには明示的に渡す必要がある
     classes: ["emoklore", "standard-form"],
-    window: { title: game.i18n.localize("EMOKLORE.ApplyDamage.Title") },
+    // title と label は本体が _loc を通すので、キーをそのまま渡す
+    window: { title: "EMOKLORE.ApplyDamage.Title" },
     content,
     ok: {
-      label: game.i18n.localize("EMOKLORE.ChatMessage.weapon.Apply"),
+      label: "EMOKLORE.ChatMessage.weapon.Apply",
       callback: (_event: Event, button: HTMLElement) => readInput(button),
     },
     // content 内の data-action は ApplicationV2 のアクション機構がここに振り分ける
@@ -104,8 +103,8 @@ function listDefenseSkillGroups(): DefenseSkillGroup[] {
   // 見出しはカスタム技能の区分名を借りている。判定要求のダイアログとは別の言い回しなので、
   // 揃えるかどうかは文言の整理（Issue #59）で決める
   return [
-    { label: game.i18n.localize("EMOKLORE.Item.skill.Category.normal"), options: skills },
-    { label: game.i18n.localize("EMOKLORE.Item.skill.Category.base"), options: baseSkills },
+    { label: _loc("EMOKLORE.Item.skill.Category.normal"), options: skills },
+    { label: _loc("EMOKLORE.Item.skill.Category.base"), options: baseSkills },
   ];
 }
 
@@ -150,7 +149,7 @@ function listEquippedArmor(defender: EmokloreActor): ArmorPieceContext[] {
     .filter((item) => item.system.equipped)
     .map((item) => ({
       defense: item.system.defense,
-      label: game.i18n.localize(
+      label: _loc(
         item.system.coverage
           ? "EMOKLORE.ApplyDamage.ArmorPieceWithCoverage"
           : "EMOKLORE.ApplyDamage.ArmorPiece",

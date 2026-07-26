@@ -42,10 +42,11 @@ export async function promptCreateSkill(): Promise<CreateSkillInput | null> {
   const result = await foundry.applications.api.DialogV2.prompt({
     // 既定の classes は ["dialog"] だけ。emoklore も standard-form も付かない
     classes: ["emoklore", "standard-form"],
-    window: { title: game.i18n.localize("EMOKLORE.Skill.Create") },
+    // title と label は本体が _loc を通すので、キーをそのまま渡す
+    window: { title: "EMOKLORE.Skill.Create" },
     content,
     ok: {
-      label: game.i18n.localize("EMOKLORE.Skill.Create"),
+      label: "EMOKLORE.Skill.Create",
       callback: (_event: Event, button: HTMLElement) => readInput(button),
     },
     // 閉じたときに例外にすると、本物のエラーを握り潰しやすい

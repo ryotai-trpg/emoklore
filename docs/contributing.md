@@ -105,7 +105,7 @@ feat: add resonance roll dialog
 ## コーディング方針
 
 - TypeScript は **`strict: true`** に加えていくつかのフラグを有効にしている（一覧は `tsconfig.json`）。**型・命名・層のimport方向の規約は [コード設計の規約](/code-design) が正**。`any` の禁止、`as` の使いどころ、本体の型が足りないときの補い方もそちらにある
-- UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す。プレースホルダの展開は `game.i18n.localize(stringId, data)` に統合されており、`format` は使わない（ランタイムaliasとして残るが型に出ない）
+- UI文字列は `lang/ja.json` が正で、`en.json` はそれに追従する。スキーマの `label` などは `module/utils/localization.ts` の事前ローカライズ機構を通す。**翻訳を引くのは本体のグローバル `_loc`**（`game.i18n.localize` に束縛されたもので、本体自身がこれを使う）。プレースホルダの展開は `_loc(stringId, data)` に統合されており、`format` は使わない（ランタイムaliasとして残るが型に出ない）。本体が解決してくれる場所にはキーをそのまま渡す — 一覧は [UI設計の規約](/ui-design#翻訳は本体に解決させる) にある
 - フォーマット・lintは [Biome](https://biomejs.dev/)（設定: `biome.json`）。手動実行は `npm run check`（修正適用）/ `npm run lint`（検証のみ）。Biomeは型アサーションの組み込みルールを持たないため、二重キャストの禁止はGritQLプラグイン（`tools/no-double-cast.grit`）で実装している
 - 設計の方向性・既知の構造的課題は [アーキテクチャ](/architecture) を参照
 

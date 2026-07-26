@@ -17,14 +17,17 @@ export type CardType =
   | "resonanceOutcome"
   | "howlingDraw";
 
-/** カードごとに違うのはこの3つだけ。配線そのものは基底が持つ */
+/** カードごとに違うのはこの2つだけ。配線そのものは基底が持つ */
 export type CardIdentity = {
   /** カードの根を指すセレクタ。見つからなければ配線しない */
   root: string;
-  /** 失敗をコンソールに出すときのカード名（日本語） */
-  label: string;
-  /** 失敗を通知に出すときの言語キー */
-  errorKey: string;
+  /**
+   * ChatMessage のサブタイプ。
+   *
+   * 失敗したときの表示名はここから引く。本体が `TYPES.ChatMessage.<種別>` を
+   * `CONFIG.ChatMessage.typeLabels` に入れるので、カードごとに名前を持たなくてよい
+   */
+  type: CardType;
 };
 
 /**

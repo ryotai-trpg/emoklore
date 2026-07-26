@@ -26,12 +26,11 @@ type NoticeContext = {
 type EntryContext = { line: string; notice?: NoticeContext };
 
 /** 状態の表示名。CONFIG.statusEffects の name はi18nキー */
-const statusLabel = (statusId: string): string =>
-  game.i18n.localize(CONFIG.statusEffects[statusId]?.name ?? "");
+const statusLabel = (statusId: string): string => _loc(CONFIG.statusEffects[statusId]?.name ?? "");
 
 /** 状態の付与ボタンの文言。HPの案内とMPの案内で同じ形 */
 const applyStatusLabel = (statusId: string): string =>
-  game.i18n.localize("EMOKLORE.ChatMessage.damageApplied.ApplyStatus", {
+  _loc("EMOKLORE.ChatMessage.damageApplied.ApplyStatus", {
     status: statusLabel(statusId),
   });
 
@@ -55,7 +54,7 @@ function buildHpEntry(
         : armor > 0
           ? "EMOKLORE.ChatMessage.weapon.AppliedWithArmor"
           : "EMOKLORE.ChatMessage.weapon.Applied";
-  const line = game.i18n.localize(lineKey, { name, before, after, reduction, armor });
+  const line = _loc(lineKey, { name, before, after, reduction, armor });
 
   // 案内は設定で切れる。切ると結果の行だけが残る
   if (!getSetting("autoHpBoundaryNotice")) return { line };
@@ -72,7 +71,7 @@ function buildHpEntry(
   return {
     line,
     notice: {
-      text: game.i18n.localize(textKey),
+      text: _loc(textKey),
       statusId,
       buttonLabel: applyStatusLabel(statusId),
       actorUuid,
@@ -141,13 +140,13 @@ export async function createMpNoticeMessage(
 ): Promise<ChatMessage | undefined> {
   const actorUuid = actor.uuid ?? null;
   const entry: EntryContext = {
-    line: game.i18n.localize("EMOKLORE.ChatMessage.damageApplied.MpLine", {
+    line: _loc("EMOKLORE.ChatMessage.damageApplied.MpLine", {
       name: actor.name,
       before,
       after,
     }),
     notice: {
-      text: game.i18n.localize("EMOKLORE.ChatMessage.damageApplied.MpZero"),
+      text: _loc("EMOKLORE.ChatMessage.damageApplied.MpZero"),
       statusId: "faint",
       buttonLabel: applyStatusLabel("faint"),
       actorUuid,

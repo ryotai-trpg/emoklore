@@ -1,6 +1,6 @@
 import type { EmokloreActor } from "../../documents/actor";
 import type { CardActions } from "../../utils/chat-card";
-import { ChatCardModel } from "./card-model";
+import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
@@ -40,10 +40,9 @@ export class SurvivalReminderModel extends ChatCardModel {
   declare round: number;
   declare targets: SurvivalTarget[];
 
-  static override CARD = {
+  static override CARD: CardIdentity = {
     root: ".em-survival-reminder",
-    label: "生存判定リマインダ",
-    errorKey: "EMOKLORE.ChatMessage.survivalReminder.ActionFailed",
+    type: "survivalReminder",
   };
 
   /** ボタン。`data-action` の値と対応する。モジュールはここに足せる */
@@ -52,8 +51,6 @@ export class SurvivalReminderModel extends ChatCardModel {
   static override defineSchema() {
     return defineSurvivalReminderSchema();
   }
-
-  static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.survivalReminder"];
 
   /**
    * 〈生存〉判定を振るショートカット。振るだけで、成否の反映（【死亡】付与など）はしない。

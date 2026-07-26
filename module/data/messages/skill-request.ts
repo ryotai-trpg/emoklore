@@ -1,5 +1,5 @@
 import type { CardActions } from "../../utils/chat-card";
-import { ChatCardModel } from "./card-model";
+import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const { ArrayField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
@@ -61,10 +61,9 @@ export class SkillRequestModel extends ChatCardModel {
   declare successMod: number;
   declare note: string;
 
-  static override CARD = {
+  static override CARD: CardIdentity = {
     root: ".em-skill-request",
-    label: "判定要求カード",
-    errorKey: "EMOKLORE.ChatMessage.skillRequest.ActionFailed",
+    type: "skillRequest",
   };
 
   /** カードのボタン。`data-action` の値と対応する。モジュールはここに足せる */
@@ -73,6 +72,4 @@ export class SkillRequestModel extends ChatCardModel {
   static override defineSchema() {
     return defineSkillRequestSchema();
   }
-
-  static override LOCALIZATION_PREFIXES = ["EMOKLORE.ChatMessage.skillRequest"];
 }

@@ -46,10 +46,11 @@ export async function promptResonanceRequest(
     // DialogV2 の既定の classes は ["dialog"] だけで emoklore も standard-form も
     // 付かない。本体のフォーム体系に乗せるには明示的に渡す必要がある
     classes: ["emoklore", "standard-form"],
-    window: { title: game.i18n.localize("EMOKLORE.SkillRequest.ResonanceTitle") },
+    // title と label は本体が _loc を通すので、キーをそのまま渡す
+    window: { title: "EMOKLORE.SkillRequest.ResonanceTitle" },
     content,
     ok: {
-      label: game.i18n.localize("EMOKLORE.SkillRequest.Post"),
+      label: "EMOKLORE.SkillRequest.Post",
       callback: (_event: Event, button: HTMLElement) =>
         readInput(button, targets, preset.kaiUuid ?? null),
     },

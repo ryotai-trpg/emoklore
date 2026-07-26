@@ -164,6 +164,34 @@ HP・MP・共鳴の3本のバーは、`.em-resources` が持つ行トラック�
 
 :::
 
+## 翻訳は本体に解決させる
+
+TS側で翻訳を引くときは本体のグローバル `_loc` を使う（`game.i18n.localize` に束縛されたもので、本体自身がこれを使う。型は `client/global.d.mts` に出ている）。
+
+**本体が `_loc` を通す場所には、キーをそのまま渡す。** 自前で引くと、本体が同じことを二度やるうえ、キーで書けることが読む人に伝わらない。
+
+<!-- Handlebarsの {{...}} をVueの補間として解釈させないため v-pre で囲む -->
+::: v-pre
+
+| 場所 | 渡すもの | 本体の解決先 |
+|---|---|---|
+| `ApplicationV2` の `window.title`、`_getHeaderControls` の `label` | キー | `ApplicationV2#title` の `_loc` |
+| `DialogV2` の `ok.label` / `buttons[].label` | キー | `DialogV2` のボタン組み立て |
+| `data-tooltip` | キー | `TooltipManager` が `game.i18n.has()` で判定して解決 |
+| `CONFIG.statusEffects` の `name`、`system.json` の `packs[].label` | キー | `ActiveEffect.fromStatusEffect` / `CompendiumCollection` |
+| スキーマの `label` / `hint` / `placeholder` | `lang/*.json` の `FIELDS` に書く | `i18nInit` の `localizeSchema` |
+| `TABS` のタブ名 | `labelPrefix` にキーの接頭辞 | `_prepareTabs` が `.<タブid>` を足す |
+
+展開が要るとき（`{{localize "KEY" name=...}}`）だけ、テンプレートかTS側で解決する。
+
+**フォームの入力はスキーマから描く。** `{{formGroup フィールド value=...}}` はラベル・ヒント・入力欄をまとめて出し、`{{formInput}}` は入力欄だけを出す。どちらも `label` / `hint` / `placeholder` をフィールドから読むので、**テンプレートに文字列を書かなくてよい**。`choices` にi18nキーが入っている場合だけ `localize=true` を添える。
+
+- 配列の要素のフィールドは `<配列>.element.fields.<名前>` に居る（本体が要素の `name` を `"element"` に固定する）。キーの側も `FIELDS.<配列>.element.<名前>` になる
+- **要素まで辿る道はテンプレートに書かない。** 読めなくなるので、`applications/` のコンテキスト整形で解決して積む
+- 閲覧モードの読み取り専用表示も、ラベルは `{{systemFields.<名前>.label}}` から引く。スキーマに無い派生値（武器のダメージ式など）だけキーを直接引き、理由をコメントに書く
+
+:::
+
 ## 同じ入力を2箇所に描かない
 
 シートはルート要素が1つの `<form>` で、`submitOnChange: true` で動いている。**同じ `name` の入力を2箇所に描くと、値が壊れる。**

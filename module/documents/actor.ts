@@ -1,7 +1,7 @@
 import { createMpNoticeMessage } from "../chat/damage-applied";
 import { createKaiAttackMessage } from "../chat/kai-attack-card";
 import { createRollMessage } from "../chat/message";
-import { formatRollFlavor, formatSkillName } from "../chat/roll-flavor";
+import { formatRollFlavor, formatSkillName, resonanceSkillName } from "../chat/roll-flavor";
 import type { CharacterDataModel } from "../data/character";
 import type { CharacterLikeDataModel, SkillRef } from "../data/character-like";
 import type { KaiDataModel } from "../data/kai";
@@ -213,7 +213,7 @@ export class EmokloreActor extends Actor {
       mod: sumModifiers(this.system.resources.resonance.mod, situational),
     });
 
-    return this.#postRoll(spec, game.i18n.localize("EMOKLORE.Resonance.Name"), options);
+    return this.#postRoll(spec, resonanceSkillName(), options);
   }
 
   /**
@@ -256,7 +256,7 @@ export class EmokloreActor extends Actor {
     }
 
     const state: KaiAttackCardState = {
-      attackName: attack.name || game.i18n.localize("EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"),
+      attackName: attack.name || _loc("EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"),
       actorUuid: this.uuid ?? null,
       mpCost: attack.mpCost,
       judgeless: attack.judgeless,

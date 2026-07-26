@@ -23,7 +23,7 @@ export const renderResonanceOutcomeCard = async (state: ResonanceOutcomeState): 
   const canDraw = state.howling && Boolean(await resolveResonanceTable(state.kaiUuid));
 
   return foundry.applications.handlebars.renderTemplate(TEMPLATE, {
-    line: game.i18n.localize(
+    line: _loc(
       state.rise > 0
         ? "EMOKLORE.ChatMessage.resonanceOutcome.Raised"
         : "EMOKLORE.ChatMessage.resonanceOutcome.Unchanged",

@@ -10,8 +10,7 @@ import { isBaseSkillKey } from "../config/base-skills";
 import { isSkillKey } from "../config/skills";
 import { systemPath } from "../constants";
 import type { RequestedSkill, SkillRequestState } from "../data/messages/skill-request";
-import { resolveResultName } from "../rules/success";
-import { describeSkillLabel } from "../utils/skill";
+import { describeSkillLabel, formatRequirement } from "../utils/skill";
 import { createCardMessage } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/skill-request.hbs");
@@ -36,15 +35,6 @@ export const describeRequestedSkill = ({ kind, key }: RequestedSkill): Requested
   }
 
   return { kind, key, label: key };
-};
-
-/** 要求された成功度の表示。「ダブル成功以上」。指定なしは空文字 */
-export const formatRequirement = (requiredSuccess: number): string => {
-  if (requiredSuccess <= 0) return "";
-
-  return game.i18n.localize("EMOKLORE.RollOptions.AtLeast", {
-    result: game.i18n.localize(`EMOKLORE.result.${resolveResultName(requiredSuccess)}`),
-  });
 };
 
 /** 判定要求カードのHTMLを組み立てる */

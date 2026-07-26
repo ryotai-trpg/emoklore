@@ -21,13 +21,19 @@ export function formatSkillName({
   specialization,
 }: SkillRollContext): string {
   const { markedLabel } = describeSkillLabel({ kind: "custom", label, isBase, isExtra });
-  const suffix = specialization
-    ? `${game.i18n.localize("EMOKLORE.Common.colon")}${specialization}`
-    : "";
+  const suffix = specialization ? `${_loc("EMOKLORE.Common.colon")}${specialization}` : "";
 
   return `${markedLabel}${suffix}`;
 }
 
 /** チャットの見出し。判定の種類によらず「〈○○〉判定」の形にする */
 export const formatRollFlavor = (skillName: string): string =>
-  game.i18n.localize("EMOKLORE.skillRoll", { skillName });
+  _loc("EMOKLORE.skillRoll", { skillName });
+
+/**
+ * 共鳴判定の判定名。
+ *
+ * 技能の表に載らない特別な判定なので、`describeSkillLabel` を通らない。
+ * 判定を振る側とダイアログの見出しの両方が要るので、ここに1つ置く。
+ */
+export const resonanceSkillName = (): string => _loc("EMOKLORE.Resonance.Name");
