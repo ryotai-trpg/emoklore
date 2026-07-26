@@ -4,7 +4,7 @@ import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import { typedEntries } from "../utils/object";
 import { createDocumentData, resolveEmbeddedDocumentClass } from "../utils/sheet";
-import { describeSkill, describeSkillLabel } from "../utils/skill";
+import { describeSkill, describeSkillLabel, SHEET_CONTEXT } from "../utils/skill";
 import { formatDamagePreview, formatRangeLabel } from "../utils/weapon";
 import { EmokloreActorSheet } from "./actor-sheet";
 import type { EmokloreRenderOptions, NpcSheetContext } from "./types";
@@ -56,7 +56,7 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
     context.skills = typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => {
       const entry = system.skills[key];
       return {
-        ...describeSkill({ kind: "skill", key }, entry.characteristic),
+        ...describeSkill({ kind: "skill", key }, entry.characteristic, SHEET_CONTEXT),
         key,
         rollType: "skill",
         level: entry.level,
@@ -71,7 +71,7 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
     }
 
     context.baseSkills = typedEntries(system.baseSkills).map(([key, entry]) => ({
-      ...describeSkill({ kind: "base", key }, entry.characteristic),
+      ...describeSkill({ kind: "base", key }, entry.characteristic, SHEET_CONTEXT),
       key,
       rollType: "base-skill",
       level: entry.level,
@@ -80,12 +80,15 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
     }));
 
     context.customSkills = Object.entries(system.customSkills).map(([id, entry]) => ({
-      ...describeSkillLabel({
-        kind: "custom",
-        label: entry.label,
-        isBase: entry.isBase,
-        isExtra: entry.isExtra,
-      }),
+      ...describeSkillLabel(
+        {
+          kind: "custom",
+          label: entry.label,
+          isBase: entry.isBase,
+          isExtra: entry.isExtra,
+        },
+        SHEET_CONTEXT,
+      ),
       id,
       level: entry.level,
       target: entry.target,

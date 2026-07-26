@@ -5,7 +5,8 @@
   @param key   技能のキー
 --}}
 <div class="em-skill-row em-skill-row--edit" data-skill="{{key}}">
-  <span class="em-skill-row__name">{{skill.label}}</span>
+  {{! 分野はこの行の入力欄が持つので、名前には含めない（displayLabel ではなく markedLabel） }}
+  <span class="em-skill-row__name">{{skill.markedLabel}}</span>
 
   {{! 分野は技能によって有無が変わる。列を保つため、無い技能でも枠だけ置く }}
   <span class="em-skill-row__spec">
@@ -23,7 +24,7 @@
     label=skill.label
     clearTo=0}}
 
-  <span class="em-skill-row__target">{{skill.target}}</span>
+  <span class="em-target">{{skill.target}}</span>
 
   {{#if skill.field.fields.characteristic.choices}}
   <span class="em-skill-row__stat">

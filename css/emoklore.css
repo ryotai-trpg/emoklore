@@ -13,6 +13,8 @@
 @import url("./components/sidebar.css");
 @import url("./components/emotion-list.css");
 @import url("./components/stat-row.css");
+/* 目標値は技能の行とチップが共有するので、両方より先に置く */
+@import url("./components/target.css");
 @import url("./components/skill-row.css");
 @import url("./components/chip.css");
 @import url("./components/field-list.css");

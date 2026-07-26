@@ -5,13 +5,15 @@
   @param key   技能のキー
 --}}
 <div class="em-skill-row" data-skill="{{key}}">
-  <a class="em-skill-row__name" data-action="roll" data-roll-type="skill" data-skill="{{key}}">
-    {{#if skill.specialization}}
-      {{localize "EMOKLORE.Format.specialization" name=skill.label specialization=skill.specialization}}
-    {{else}}{{skill.label}}{{/if}}
-  </a>
+  {{! 印も分野も displayLabel が持つ。カスタム技能の行と同じ名乗り方になる }}
+  <a
+    class="em-skill-row__name"
+    data-action="roll"
+    data-roll-type="skill"
+    data-skill="{{key}}"
+  >{{skill.displayLabel}}</a>
   <span class="em-skill-row__level">{{localize "EMOKLORE.Format.level" level=skill.level}}</span>
   <progress class="em-progress em-progress--sm" value="{{skill.level}}" max="3"></progress>
-  <span class="em-skill-row__target">{{skill.target}}</span>
+  <span class="em-target">{{skill.target}}</span>
   <i class="em-skill-row__stat fa-solid {{skill.characteristicIcon}}"></i>
 </div>

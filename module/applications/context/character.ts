@@ -22,7 +22,7 @@ import { prepareActiveEffectCategories } from "../../utils/effects";
 import { prepareHowlingRows } from "../../utils/howling";
 import { typedEntries } from "../../utils/object";
 import { enrichDocumentHTML } from "../../utils/sheet";
-import { describeSkill } from "../../utils/skill";
+import { describeSkill, SHEET_CONTEXT } from "../../utils/skill";
 import { formatDamagePreview, formatRangeLabel } from "../../utils/weapon";
 import {
   BIOGRAPHY_PAIRED_COUNT,
@@ -88,7 +88,12 @@ const buildSkills = (actor: CharacterActor): Record<string, SkillRow> =>
       return [
         key,
         {
-          ...describeSkill({ kind: "skill", key }, entry.characteristic),
+          // 分野は名前の一部として名乗る。組み立ては describeSkill が持つ
+          ...describeSkill(
+            { kind: "skill", key, specialization: entry.specialization },
+            entry.characteristic,
+            SHEET_CONTEXT,
+          ),
           field: actor.system.schema.getField(["skills", key]),
           isExtra: isExtra ?? false,
           level: entry.level,
@@ -105,7 +110,7 @@ const buildSkills = (actor: CharacterActor): Record<string, SkillRow> =>
 /** 基本技能の表示用データ。目標値と能力値はアクター側が正 */
 const buildBaseSkills = (actor: CharacterActor): BaseSkillRow[] =>
   typedEntries(actor.system.baseSkills).map(([key, { characteristic, target }]) => ({
-    ...describeSkill({ kind: "base", key }, characteristic),
+    ...describeSkill({ kind: "base", key }, characteristic, SHEET_CONTEXT),
     key,
     target,
   }));
@@ -129,6 +134,7 @@ const buildCustomSkills = (actor: CharacterActor): CustomSkillRow[] =>
       ...describeSkill(
         { kind: "custom", label: entry.label, isBase: entry.isBase, isExtra: entry.isExtra },
         entry.characteristic,
+        SHEET_CONTEXT,
       ),
       id,
       level: entry.level,

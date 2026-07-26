@@ -12,9 +12,9 @@
     data-action="roll"
     data-roll-type="custom-skill"
     data-item-id="{{skill.id}}"
-  >{{skill.markedLabel}}</a>
+  >{{skill.displayLabel}}</a>
   <span class="em-skill-row__level">{{localize "EMOKLORE.Format.level" level=skill.level}}</span>
   <progress class="em-progress em-progress--sm" value="{{skill.level}}" max="3"></progress>
-  <span class="em-skill-row__target">{{skill.target}}</span>
+  <span class="em-target">{{skill.target}}</span>
   <i class="em-skill-row__stat fa-solid {{skill.characteristicIcon}}"></i>
 </div>

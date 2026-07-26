@@ -30,7 +30,9 @@
     text-align: left;
   }
 
-  .em-chip__target {
-    font-variant-numeric: tabular-nums;
+  /* 技能行の名前と同じ太さにする。行とチップで密度は違ってよいが、
+     同じ「技能の名前」が場所によって違う書体で出るのは別物に見える */
+  .em-chip__name {
+    font-weight: 600;
   }
 }
