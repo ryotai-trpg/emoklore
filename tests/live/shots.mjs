@@ -58,8 +58,8 @@ const VIEWPORT = { width: 1440, height: 1600 };
 /** 共鳴者シートの既定寸法（`applications/character-sheet.ts` の DEFAULT_OPTIONS） */
 const CHARACTER_SIZE = { width: 760, height: 710 };
 
-/** 幅の変種。601 は現在の min-width、480 は下限を打ち消したときだけ撮れる */
-const WIDTHS = [601, 1000, ...(PROBE ? [{ width: 480, probe: true }] : [])].map((w) =>
+/** 幅の変種。580 は現在の min-width、480 は下限を打ち消したときだけ撮れる */
+const WIDTHS = [580, 1000, ...(PROBE ? [{ width: 480, probe: true }] : [])].map((w) =>
   typeof w === "number" ? { width: w } : w,
 );
 

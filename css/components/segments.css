@@ -9,6 +9,8 @@
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
+    /* 段の区切り。1px は罫線と同じ幅の意味なので --spacer-* には寄せない
+       （2pxにすると段の間が溝に見える） */
     gap: 1px;
     width: 100%;
     min-width: 0;

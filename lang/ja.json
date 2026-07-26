@@ -231,7 +231,6 @@
       "damage": "{dice}＋{attackPower}",
       "resonantEmotion": "{emotion}（{attribute}）",
       "emotionAttribute": "（{attribute}）",
-      "acquiredEmotion": "＋{name}",
       "separator": "／"
     },
     "Sheet": {
@@ -527,6 +526,10 @@
               "label": "共鳴"
             }
           },
+          "kana": {
+            "label": "ふりがな",
+            "placeholder": "くが あかり"
+          },
           "biography": {
             "age": {
               "label": "年齢"
@@ -733,6 +736,8 @@
       "Title": "共鳴感情",
       "Open": "感情を選ぶ",
       "OpenAcquired": "追加取得を選ぶ",
+      "AcquiredSection": "追加取得した共鳴感情",
+      "NoAcquired": "まだありません",
       "Unselected": "未選択",
       "Clear": "外す",
       "Confirm": "決定",

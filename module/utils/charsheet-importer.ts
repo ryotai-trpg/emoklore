@@ -72,6 +72,25 @@ const EMOTION_PATTERNS = {
 } as const;
 
 /**
+ * 例: ふりがな:てすと　てすと。共鳴感情と同じくメモ欄に入っている。
+ *
+ * 値の前の空白を飛ばすのに `\s*` を使わない。**改行まで飛び越えてしまう**ので、
+ * 「ふりがな:」が空のときに次の行（`共鳴感情・表: …`）を読みとして取り込む。
+ * 取り込み元のメモはまさにその並びになっている。
+ */
+const KANA_PATTERN = /ふりがな[:：][^\S\n]*(\S[^\n]*)/;
+
+/**
+ * memo欄からふりがなを取り出す。
+ *
+ * 感情と違って索引に照らす必要がない（自由記述で、そのまま表示するだけ）ので、
+ * 見つかった行をそのまま返す。無ければ空文字。
+ */
+export function parseKana(memo: string): string {
+  return memo.match(KANA_PATTERN)?.[1]?.trim() ?? "";
+}
+
+/**
  * memo欄から共鳴感情を取り出す。
  *
  * 正規のシートからのコピーであれば索引に無いラベルは来ないため、
@@ -236,6 +255,10 @@ export async function importFromCharSheet(
       updateData[`system.emotions.${key}`] = value;
     }
     unrecognizedEmotions.push(...unrecognized);
+
+    // ふりがなも同じメモ欄にある
+    const kana = parseKana(data.memo);
+    if (kana) updateData["system.kana"] = kana;
 
     // メモ欄はそのまま経歴の備考に入れておく
     updateData["system.biography.note"] = data.memo;

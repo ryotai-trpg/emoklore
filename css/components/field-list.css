@@ -1,10 +1,11 @@
-/* ラベルと値を積む項目リスト。経歴タブで使う */
+/* ラベルと値を積む項目リスト。共鳴者の経歴タブと、アイテムシートの詳細
+   （武器・防具・技能・ハウリング）が共有する。**ここを触ると両方が動く。** */
 
 .emoklore {
   .em-field-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacer-12);
   }
 
   .em-field {

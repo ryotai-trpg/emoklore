@@ -1,8 +1,10 @@
 {{!--
-  共鳴感情の3行と、追加取得したぶん。「感情名: 属性」の対なので定義リストで表す。
+  共鳴感情の3枠。「感情名: 属性」の対なので定義リストで表す。
+
+  枠は表・裏・ルーツの3つで固定。**追加取得したぶんはここに出さない** — 件数に上限が
+  無く、ヘッダの高さがそれで決まってしまうため、効果タブが持つ（`actor/effects.hbs`）。
 
   @param rows 表・裏・ルーツの表示用データ（label と attribute。未選択は空文字）
-  @param acquired 追加取得した共鳴感情（共振や怪異の付与で増える。枚数は決まらない）
 --}}
 <dl class="em-meter__emotions">
   <dt>{{rows.surface.label}}</dt>
@@ -11,9 +13,4 @@
   <dd>{{#if rows.hidden.attribute}}{{localize "EMOKLORE.Format.emotionAttribute" attribute=rows.hidden.attribute}}{{/if}}</dd>
   <dt>{{rows.root.label}}</dt>
   <dd>{{#if rows.root.attribute}}{{localize "EMOKLORE.Format.emotionAttribute" attribute=rows.root.attribute}}{{/if}}</dd>
-  {{! 3枠と見分けが付くよう ＋ を頭に付ける（技能の ＊ / ★ と同じ扱い） }}
-  {{#each acquired}}
-    <dt>{{localize "EMOKLORE.Format.acquiredEmotion" name=this.label}}</dt>
-    <dd>{{#if this.attribute}}{{localize "EMOKLORE.Format.emotionAttribute" attribute=this.attribute}}{{/if}}</dd>
-  {{/each}}
 </dl>

@@ -231,7 +231,6 @@
       "damage": "{dice} + {attackPower}",
       "resonantEmotion": "{emotion} ({attribute})",
       "emotionAttribute": "({attribute})",
-      "acquiredEmotion": "+{name}",
       "separator": " / "
     },
     "Sheet": {
@@ -527,6 +526,10 @@
               "label": "Resonance"
             }
           },
+          "kana": {
+            "label": "Reading",
+            "placeholder": "Akari Kuga"
+          },
           "biography": {
             "age": {
               "label": "Age"
@@ -733,6 +736,8 @@
       "Title": "Resonant Emotions",
       "Open": "Choose Emotions",
       "OpenAcquired": "Choose Acquired",
+      "AcquiredSection": "Acquired resonant emotions",
+      "NoAcquired": "None yet",
       "Unselected": "Not Selected",
       "Clear": "Remove",
       "Confirm": "Confirm",

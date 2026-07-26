@@ -20,18 +20,23 @@
   .em-meter__icon {
     display: flex;
     align-items: flex-end;
-    font-size: 1.1em;
+    font-size: var(--font-size-16);
   }
 
+  /* 箱は「何文字ぶんか」で決まるので em にする。3桁までを想定した 2em で、
+     文字サイズを変えると箱も一緒に動く（px で固めると数字がはみ出す） */
   .em-meter__value input[type="number"] {
     padding: var(--spacer-4);
     height: 1.3em;
     width: 2em;
-    font-size: 1.1em;
+    font-size: var(--font-size-16);
   }
 
+  /* 最大値は現在値より一段小さく。`small` は絶対キーワードで13px相当だが、
+     **ユーザーのフォントサイズ設定に追従しない**（本体は `configureUI` で `:root` の
+     font-size を変える）。`--font-size-13` は同じ13pxで、そちらは追従する */
   .em-meter__max {
-    font-size: small;
+    font-size: var(--font-size-13);
   }
 
   .em-meter .em-progress {
@@ -55,13 +60,18 @@
     /* 本体の button.icon は --button-size で箱を決める（.inline-control の
        既定は24px）。font-size だけ上げると字面が箱をはみ出してホバーの
        背景が欠けるので、箱のほうを --button-size で広げる。
-       見た目とホバーは本体のアイコンボタンに任せる */
+       見た目とホバーは本体のアイコンボタンに任せる。
+
+       **字面は箱から出す。** ここだけ `--font-size-24` に寄せてはいけない —
+       本体は `@media (max-width: 480px)` でフォントの段階を圧縮し
+       （`--font-size-24: 1.5rem → 1.25rem`）、`--button-size` の rem は圧縮しない。
+       トークン化すると狭いウィンドウで字面だけ縮んで箱と合わなくなる */
     .em-meter__action {
       grid-column: 1;
       grid-row: 1 / span 2;
       align-self: flex-start;
       --button-size: 2.25rem;
-      font-size: 1.5rem;
+      font-size: calc(var(--button-size) * 2 / 3);
     }
 
     /* MPの数値と同じ行・同じ下端に揃える */
@@ -73,13 +83,23 @@
   }
 
   /* 感情3行。親の行に載せると2行目（HPバーの行）が文字の高さまで広がって
-     HPの数値とバーが離れてしまうので、ここは独立した均等3行にする */
+     HPの数値とバーが離れてしまうので、ここは独立した3行にする。
+
+     **列も行も固定にする。** 感情名は47種の閉じた表から来るので最大の幅が分かって
+     おり（いちばん長いのが「自己顕示（欲望）」＝全角7文字）、可変長のテキストでは
+     ない。固定にすると、
+       - 3枠が未選択でも場所が残るので、共鳴バーの長さが選択の有無で変わらない
+       - 1行目の上端が親の1行目の上端＝HPの見出しの上端にそのまま揃う
+     align-content: start がないと3行が余白に散り、この上端が動く */
   .em-meter__emotions {
     grid-column: 2;
     grid-row: 1 / span 3;
     display: grid;
-    grid-template-columns: auto auto;
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: var(--emoklore-emotion-name-width) var(
+        --emoklore-emotion-attribute-width
+      );
+    grid-auto-rows: var(--emoklore-emotion-row-height);
+    align-content: start;
     align-items: center;
     justify-content: start;
     column-gap: var(--spacer-4);
@@ -89,10 +109,15 @@
     dd {
       margin: 0;
       min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
+    /* 幅は --emoklore-emotion-attribute-width がこの文字サイズから出している。
+       片方だけ変えると属性が切れるので、変えるなら両方を見ること */
     dd {
-      font-size: 0.8em;
+      font-size: var(--emoklore-emotion-attribute-font);
     }
   }
 }

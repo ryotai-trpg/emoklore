@@ -20,6 +20,9 @@ export class CharacterDataModel extends CharacterLikeDataModel {
     resonance: { value: number; max: number; mod: ModifierSet };
   };
 
+  /** 名前のふりがな。名前そのものは Document 側が持つので、読みだけをここに置く */
+  declare kana: string;
+
   declare emotions: {
     surface?: string;
     hidden?: string;
@@ -45,6 +48,10 @@ export class CharacterDataModel extends CharacterLikeDataModel {
       ...super.defineSchema(),
       // 共鳴値（〈∞共鳴〉）を足す。基底の hp/mp だけの resources を差し替える
       resources: defineResourcesSchema({ resonance: true }),
+
+      // 名前のふりがな。経歴ではなく名前の一部なので biography には入れない。
+      // 取り込み元（キャラクターシート倉庫）はメモ欄に「ふりがな:」の行で持っている
+      kana: new StringField(),
 
       emotions: new SchemaField({
         surface: new StringField(),

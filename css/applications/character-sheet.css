@@ -1,7 +1,17 @@
 /* キャラクターシート固有のレイアウト。部品の中身ではなく配置と寸法を持つ */
 
+/* リサイズの下限。本体は `_updatePosition` で computed の min-width を実際に読むので、
+   この値がそのまま「これ以上は縮められない幅」になる。
+
+   **中身の実寸から出した値。** 技能リストの名前の列が `auto`（＝いちばん長い技能名の幅）
+   なので、ここが下限を決めている。組込の48技能は閉じた表で最長が分かっており
+   （「ストレングス」「アクロバット」＝全角6文字）、それが1行に収まる最小は実測で560px。
+   580px はそこに1刻みの余裕を持たせたもの。
+
+   分野（特化）は自由記述なので、長いものを入れればどの幅でも折り返す。保証できるのは
+   表に載っている名前までで、それより広くしても「安全」にはならない。 */
 .emoklore.sheet.character:not(.minimized, .minimizing, .maximizing) {
-  min-width: 601px;
+  min-width: 580px;
   min-height: 420px;
 }
 
@@ -41,7 +51,10 @@
     padding: var(--spacer-12);
   }
 
-  /* ヘッダ。名前とリソースを横に並べ、下端で揃える。
+  /* ヘッダ。名前とリソースを横に並べ、**上端で揃える**。
+     ふりがな・HPの見出し・共鳴感情の1行目が同じ高さから始まり、ヘッダの上端が
+     1本の線として読める。下端で揃えると、名前の大きさが変わるたびにこの線が動く。
+
      高さは中身なりにする。以前は .container の div に height: 100% が付いていたが、
      親の header が高さを持たないので効いていなかった。header 自身に移すと
      .window-content の高さに解決してしまい、ヘッダがシート全体に広がる。
@@ -51,16 +64,42 @@
   .em-sheet-header {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    align-items: flex-end;
+    align-items: start;
     gap: var(--spacer-8);
     container-type: inline-size;
   }
 
+  /* ふりがなと名前。ふりがなが上端の線に乗り、名前がその下にぶら下がる */
+  .em-sheet-header__identity {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ふりがなは名前の読みなので、名前より一段小さく控えめにする */
+  .em-sheet-header__kana {
+    min-width: 0;
+    padding: 0 var(--spacer-8);
+    font-size: var(--font-size-12);
+    color: var(--color-text-subtle);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    input {
+      width: 100%;
+      height: initial;
+      padding: inherit;
+      font-size: inherit;
+    }
+  }
+
   /* 文字サイズは容器に追従させ、それでも収まらないときに切り詰める。
-     シート最小幅（601px）でも名前が枠を破らないための二段構え */
+     シート最小幅でも名前が枠を破らないための二段構え */
   .em-sheet-header__name {
     min-width: 0;
     font-size: clamp(1.5rem, 6cqi, var(--font-size-48));
+    line-height: 1.1;
     padding: 0 var(--spacer-8);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -122,9 +161,11 @@
       gap: var(--spacer-16);
     }
 
-    /* 備考はリッチテキスト。本体の既定では潰れるので高さを与える */
+    /* 備考はリッチテキスト。本体の既定では潰れるので高さを与える。
+       rem にしてユーザーのフォントサイズ設定に追従させる（アイテムシートの
+       notes も同じ形で 8rem） */
     .editor-container {
-      min-height: 150px;
+      min-height: 9rem;
     }
   }
 

@@ -69,6 +69,65 @@ export async function run({ page, check }) {
     ),
   );
 
+  await check("最小幅まで縮めても組込の技能名が折り返さない", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_char`);
+        const sheet = actor.sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        await window.__setMode(sheet, "play");
+
+        // 下限は「いちばん長い技能名が1行に収まるか」で決まっている。閲覧モードは
+        // 修得済みしか出さないので、全技能をLv.1にして最長のものを画面に出す
+        const before = Object.fromEntries(
+          Object.keys(CONFIG.EMOKLORE.skills).map((key) => [
+            `system.skills.${key}.level`,
+            actor.system.skills[key].level,
+          ]),
+        );
+        await actor.update(Object.fromEntries(Object.keys(before).map((path) => [path, 1])));
+        const position = { ...sheet.position };
+
+        try {
+          await window.__waitFor(
+            () =>
+              sheet.element.querySelectorAll(".em-skill-row[data-skill]").length ===
+              Object.keys(CONFIG.EMOKLORE.skills).length,
+            { label: "全技能の描画" },
+          );
+
+          // 下限より狭い値を渡すと本体が min-width まで戻す（_updatePosition の clamp）。
+          // つまりこれで「CSSが宣言している下限」そのものを測れる
+          sheet.setPosition({ width: 100 });
+          await new Promise((r) => requestAnimationFrame(() => r()));
+          const floor = Math.round(sheet.element.getBoundingClientRect().width);
+
+          // 分野つきは自由記述なのでどの幅でも折り返しうる。守れるのは表に載っている名前まで
+          const wrapped = [...sheet.element.querySelectorAll(".em-skill-row[data-skill]")]
+            .map((row) => row.querySelector(".em-skill-row__name"))
+            .filter((name) => {
+              const line = Number.parseFloat(getComputedStyle(name).lineHeight) || 20;
+              return name.getBoundingClientRect().height > line * 1.4;
+            })
+            .map((name) => name.textContent.trim());
+
+          return {
+            ok: wrapped.length === 0,
+            detail:
+              wrapped.length === 0
+                ? `下限${floor}px で全${Object.keys(before).length}件が1行`
+                : `下限${floor}px で折り返し: ${wrapped.slice(0, 4).join(" ")}`,
+          };
+        } finally {
+          await actor.update(before);
+          sheet.setPosition(position);
+        }
+      },
+      TAG,
+    ),
+  );
+
   await check("未解決の翻訳キーが表示されていない", () =>
     assertInPage(
       page,
