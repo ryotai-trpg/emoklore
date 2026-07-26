@@ -214,31 +214,41 @@ export type StoredSkillRef = {
 /** 選択肢の value は「経路:キー」。selectの値は1本の文字列にしかならないので繋ぐ */
 const SKILL_REF_SEPARATOR = ":";
 
+/** 技能をひとつ選ばせる select の選択肢1件 */
+export type SkillRefOption = { value: string; label: string; selected: boolean };
+
+/** optgroup 1つぶん。通常技能と基本技能の2グループに分ける */
+export type SkillRefGroup = { label: string; skills: SkillRefOption[] };
+
 /**
  * 技能をひとつ選ばせるときの選択肢。通常技能と基本技能の2グループに分ける。
  *
  * 印（★ / ＊）を付けてシートの表記と揃える。47感情のような一望の必要は無いので、
  * 専用のピッカーは作らず optgroup 付きの素の select で足りる。
+ *
+ * @param selected 初期選択にする「経路:キー」。複数選択の select では渡さない
  */
-export const buildSkillRefGroups = (): Array<{
-  label: string;
-  skills: Array<{ value: string; label: string }>;
-}> => [
-  {
-    label: _loc("EMOKLORE.SkillRequest.NormalSkills"),
-    skills: typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => ({
-      value: toSkillRefValue({ kind: "skill", key }),
-      label: describeSkillLabel({ kind: "skill", key }).markedLabel,
-    })),
-  },
-  {
-    label: _loc("EMOKLORE.SkillRequest.BaseSkills"),
-    skills: typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key]) => ({
-      value: toSkillRefValue({ kind: "base", key }),
-      label: describeSkillLabel({ kind: "base", key }).markedLabel,
-    })),
-  },
-];
+export const buildSkillRefGroups = (selected?: string): SkillRefGroup[] => {
+  const toOption = (
+    ref: { kind: "skill"; key: SkillKey } | { kind: "base"; key: BaseSkillKey },
+  ) => {
+    const value = toSkillRefValue(ref);
+    return { value, label: describeSkillLabel(ref).markedLabel, selected: value === selected };
+  };
+
+  return [
+    {
+      label: _loc("EMOKLORE.SkillRequest.NormalSkills"),
+      skills: typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => toOption({ kind: "skill", key })),
+    },
+    {
+      label: _loc("EMOKLORE.SkillRequest.BaseSkills"),
+      skills: typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key]) =>
+        toOption({ kind: "base", key }),
+      ),
+    },
+  ];
+};
 
 /** 「経路:キー」を分解する。value は自分で組んだものなので、経路は base 以外を skill に倒す */
 export const parseSkillRefValue = (value: string): StoredSkillRef => {
