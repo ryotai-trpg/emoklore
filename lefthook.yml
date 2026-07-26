@@ -20,10 +20,13 @@ pre-commit:
       glob: "system.json"
       run: npm run check:manifest-urls
 
-    # 上のbiomeジョブのglobがjsonを含むため、lang/を編集すると整形だけ走って
-    # ja/enの整合はCIまで分からなかった。2ファイルを突き合わせるのでこちらも全体を見る
+    # 上のbiomeジョブのglobがjsonを含むため、lang/だけを触ると整形しか走らない。
+    # 2ファイルの突き合わせと表記の検査はどちらも全体を見るのでファイルを渡さない。
+    # module/ も引き金にするのは、通知に渡すキーの検査が呼び出し側を読むため
     - name: lang
-      glob: "lang/*.json"
+      glob:
+        - "lang/*.json"
+        - "module/**/*.ts"
       run: npm run check:lang
 
     # キーと参照側の突き合わせ。lang・テンプレート・moduleのどれを触っても
