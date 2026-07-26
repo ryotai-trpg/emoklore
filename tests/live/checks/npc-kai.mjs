@@ -384,4 +384,38 @@ export async function run({ page, check }) {
       TAG,
     ),
   );
+
+  // 行の開く・消すはアクターシートの基底が持つ。行の解決を data-item-id の手辿りではなく
+  // getEmbeddedDocument に任せているので、data-document-class が付いていないと何も起きない
+  await check("npcの武器行を開けて消せる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_npc`);
+        const sheet = actor.sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        await window.__setMode(sheet, "edit");
+
+        const item = actor.itemTypes.weapon[0];
+        const row = () => sheet.element.querySelector(`.em-npc__weapon[data-item-id="${item.id}"]`);
+
+        row().querySelector("[data-action=viewDoc]").click();
+        await window.__waitFor(() => item.sheet?.rendered, { label: "武器シートの表示" });
+        const opened = item.sheet.rendered;
+        await item.sheet.close();
+
+        row().querySelector("[data-action=deleteDoc]").click();
+        await window.__waitFor(() => !actor.items.get(item.id), { label: "武器の削除" });
+        await window.__waitFor(() => !row(), { label: "行の消失" });
+
+        await window.__setMode(sheet, "play");
+
+        return {
+          ok: opened && !actor.items.get(item.id),
+          detail: opened ? "開く→武器シート / 消す→行ごと消えた" : "武器シートが開かなかった",
+        };
+      },
+      TAG,
+    ),
+  );
 }
