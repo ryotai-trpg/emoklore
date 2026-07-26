@@ -59,8 +59,9 @@
     background: var(--color-data-background);
   }
 
+  /* ヘッダの3行と同じ「感情の属性」なので、同じトークンを引く */
   .em-acquired__attribute {
-    font-size: 0.8em;
+    font-size: var(--emoklore-emotion-attribute-font);
     color: var(--color-text-subtle);
   }
 }

@@ -1,6 +1,10 @@
 /* アイテムシート共通のレイアウト。templates/item/header.hbs と、
    種別ごとの詳細（.em-item-detail）を使うシートで成立する */
 
+/* リサイズの下限。**内容から導ける値ではない。**
+   実測では280pxまで詰めても文字は折り返さず、横にも溢れない（能力値や項目の並びが
+   `auto-fill` で段数を変えるだけ）。共鳴者シートと違って「これ以上詰めると壊れる幅」が
+   無いので、ここは「これ以上小さいと読めない」という使い勝手の値になる。 */
 .emoklore.sheet.item:not(.minimized, .minimizing, .maximizing) {
   min-width: 320px;
   min-height: 320px;

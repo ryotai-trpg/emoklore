@@ -1,6 +1,10 @@
 /* 怪異シートのレイアウト。templates/actor/kai-sheet.hbs と対。
    HP/装甲/MP・共鳴感情・共鳴プリセット・憑依変異・攻撃リストを縦に並べる */
 
+/* リサイズの下限。**内容から導ける値ではない。**
+   実測では300pxまで詰めても文字は折り返さず、横にも溢れない（能力値や項目の並びが
+   `auto-fill` で段数を変えるだけ）。共鳴者シートと違って「これ以上詰めると壊れる幅」が
+   無いので、ここは「これ以上小さいと読めない」という使い勝手の値になる。 */
 .emoklore.sheet.kai:not(.minimized, .minimizing, .maximizing) {
   min-width: 360px;
   min-height: 360px;

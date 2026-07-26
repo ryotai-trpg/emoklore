@@ -11,7 +11,7 @@
 
 /* 境界の案内。HPの行より一段控えめに、行の下へぶら下げる */
 .em-damage-applied__notice {
-  margin: 2px 0 4px;
+  margin: var(--spacer-2) 0 var(--spacer-4);
   color: var(--color-text-subtle);
   font-size: var(--font-size-12);
 }

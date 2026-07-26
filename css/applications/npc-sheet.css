@@ -1,6 +1,10 @@
 /* 人間NPCシートのレイアウト。templates/actor/npc-sheet.hbs と対。
    能力値・技能・武器を1画面に縦に並べる軽量シート */
 
+/* リサイズの下限。**内容から導ける値ではない。**
+   実測では300pxまで詰めても文字は折り返さず、横にも溢れない（能力値や項目の並びが
+   `auto-fill` で段数を変えるだけ）。共鳴者シートと違って「これ以上詰めると壊れる幅」が
+   無いので、ここは「これ以上小さいと読めない」という使い勝手の値になる。 */
 .emoklore.sheet.npc:not(.minimized, .minimizing, .maximizing) {
   min-width: 360px;
   min-height: 320px;
@@ -57,9 +61,11 @@
     gap: var(--spacer-4);
   }
 
-  /* HP/MPアイコンは共鳴者のメータ（.em-meter__icon）と同じ寸法感に揃える */
+  /* HP/MPアイコンは共鳴者のメータ（.em-meter__icon）と同じ寸法にする。
+     **同じトークンを引く。** かつて 1.1em と書いてあり、メータ側をトークンに
+     寄せたときに黙って揃わなくなっていた */
   .em-npc__resource-icon {
-    font-size: 1.1em;
+    font-size: var(--font-size-16);
   }
 
   .em-npc__resource-edit {
