@@ -6,7 +6,7 @@
    外側の余白は持たない（置く側の責務）。行では列の間隔として、チップでは
    flex の gap として、置く側がそれぞれ決める */
 
-.emoklore {
+@layer components {
   .em-target {
     border: 1px solid;
     border-radius: var(--emoklore-progress-radius-small);

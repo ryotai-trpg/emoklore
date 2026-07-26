@@ -1,6 +1,6 @@
 /* 共鳴感情の編集まわり。シートのヘッダとダイアログで共通に使う部品。 */
 
-.emoklore {
+@layer components {
   .em-emotion-list {
     display: flex;
     flex-direction: column;
@@ -64,19 +64,15 @@
     font-size: var(--emoklore-emotion-attribute-font);
     color: var(--color-text-subtle);
   }
-}
 
-/* ダイアログの感情入力。タグの行とピッカーを開くボタンを縦に積む */
-.emoklore .em-emotion-field {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--spacer-4);
-  width: 100%;
-}
-
-/* 本体のタグは multi-select の右寄せ列に置く前提で justify-content: flex-end。
-   こちらは見出しの下に敷くので、行頭から並べる */
-.emoklore .tags.input-element-tags {
-  justify-content: flex-start;
+  /* ダイアログの感情入力。タグの行とピッカーを開くボタンを縦に積む。
+     本体の .tags を行頭から並べ直すぶんは css/base.css が持つ（本体のクラスに
+     当てる規則は下敷きに集める決まり） */
+  .em-emotion-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacer-4);
+    width: 100%;
+  }
 }

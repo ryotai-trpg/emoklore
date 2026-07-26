@@ -4,7 +4,7 @@
    塗りは :has() で出す。checked の段と、それより前の段を塗る。
    再描画を待たないので、押した瞬間に反応する */
 
-.emoklore {
+@layer components {
   .em-segments {
     display: grid;
     grid-auto-flow: column;

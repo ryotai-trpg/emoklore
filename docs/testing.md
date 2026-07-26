@@ -201,6 +201,31 @@ npm run shots:live -- --out after
 `--probe` が要るのは、本体が `_updatePosition` で位置をCSSの `min-width` に丸めるため。
 打ち消さないと「いまの下限が下限だ」としか観測できず、**実際にどこで破綻するかが分からない**。
 
+### 前後比較にはノイズの下限がある
+
+**PNGはバイト一致しない。** シートの後ろにはシーンのキャンバスが写り込んでいて、
+そこが実行ごとに変わる。窓の影も外周に滲む。素の `cmp` や `compare -metric AE` で
+比べると、何も変えていなくても差が出る。
+
+外周40pxを落とすと大半は消える。
+
+```shell
+compare -metric AE <(magick before.png -shave 40x40 png:-) \
+                   <(magick after.png  -shave 40x40 png:-) null:
+```
+
+それでも残るものがある。**同じコードで2回撮って比べた実測では、64枚中11枚が一致しなかった**
+（ダークの共鳴者シート8枚すべてと、`card-resonance-outcome`、幅1000のライト2枚）。
+半透明の窓越しにキャンバスが透けるダークテーマで特に出る。
+
+なので **「差が出た＝壊した」ではない**。差が出たら、
+
+1. 差分画像を見る（`compare -highlight-color red before.png after.png diff.png`）
+2. 差分のbboxを取る（`magick a.png b.png -compose difference -composite -colorspace Gray -threshold 0 -format "%@" info:`）。窓の外だけならキャンバス
+3. 判断がつかなければ**同じコードでもう一度撮って、ノイズの集合と比べる**。差の集合がノイズの集合に含まれていれば変更由来ではない
+
+`compare` の値は指数表記（`3.89238e+07`）で出るので、そのまま数値比較しない。
+
 ### 見本データ
 
 `verify:live` の検証用データとは別に用意する（`tests/live/lib/shot-fixtures.mjs`）。あちらは

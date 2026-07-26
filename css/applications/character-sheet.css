@@ -1,217 +1,219 @@
 /* キャラクターシート固有のレイアウト。部品の中身ではなく配置と寸法を持つ */
 
-/* リサイズの下限。本体は `_updatePosition` で computed の min-width を実際に読むので、
-   この値がそのまま「これ以上は縮められない幅」になる。
+@layer applications {
+  /* リサイズの下限。本体は `_updatePosition` で computed の min-width を実際に読むので、
+     この値がそのまま「これ以上は縮められない幅」になる。
 
-   **中身の実寸から出した値。** 技能リストの名前の列が `auto`（＝いちばん長い技能名の幅）
-   なので、ここが下限を決めている。組込の48技能は閉じた表で最長が分かっており
-   （「ストレングス」「アクロバット」＝全角6文字）、それが1行に収まる最小は実測で560px。
-   580px はそこに1刻みの余裕を持たせたもの。
+     **中身の実寸から出した値。** 技能リストの名前の列が `auto`（＝いちばん長い技能名の幅）
+     なので、ここが下限を決めている。組込の48技能は閉じた表で最長が分かっており
+     （「ストレングス」「アクロバット」＝全角6文字）、それが1行に収まる最小は実測で560px。
+     580px はそこに1刻みの余裕を持たせたもの。
 
-   分野（特化）は自由記述なので、長いものを入れればどの幅でも折り返す。保証できるのは
-   表に載っている名前までで、それより広くしても「安全」にはならない。 */
-.emoklore.sheet.character:not(.minimized, .minimizing, .maximizing) {
-  min-width: 580px;
-  min-height: 420px;
-}
-
-.emoklore.sheet.character {
-  /* パートは .window-content 直下に兄弟として並ぶ。入れ子は作れないので、
-     サイドバーと内容を横に置くにはグリッドで配置するしかない。
-
-     本体は .window-content を flex 縦積み＋overflow: hidden にしている。
-     グリッドに変えても高さの決まり方（親のflexで flex: 1）は変わらない。
-
-     3行目を minmax(0, 1fr) にするのが要点。1fr だと最小が auto になり、
-     中身の高さがそのまま行を押し広げて独立スクロールが効かなくなる */
-  .window-content {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr);
+     分野（特化）は自由記述なので、長いものを入れればどの幅でも折り返す。保証できるのは
+     表に載っている名前までで、それより広くしても「安全」にはならない。 */
+  .emoklore.sheet.character:not(.minimized, .minimizing, .maximizing) {
+    min-width: 580px;
+    min-height: 420px;
   }
 
-  .em-sheet-header,
-  nav.tabs {
-    grid-column: 1 / -1;
-  }
+  .emoklore.sheet.character {
+    /* パートは .window-content 直下に兄弟として並ぶ。入れ子は作れないので、
+       サイドバーと内容を横に置くにはグリッドで配置するしかない。
 
-  .em-sidebar {
-    grid-column: 1;
-    grid-row: 3;
-  }
+       本体は .window-content を flex 縦積み＋overflow: hidden にしている。
+       グリッドに変えても高さの決まり方（親のflexで flex: 1）は変わらない。
 
-  /* タブは中身だけを持つ。カードはサイドバーへ出したので2列組みは要らない。
-
-     サイドバーとの間隔はグリッドの column-gap ではなくサイドバー自身が持つ。
-     gap にすると、畳んで幅が0になっても隙間だけが残る */
-  section.tab {
-    grid-column: 2;
-    grid-row: 3;
-    overflow: auto;
-    padding: var(--spacer-12);
-  }
-
-  /* ヘッダ。名前とリソースを横に並べ、**上端で揃える**。
-     ふりがな・HPの見出し・共鳴感情の1行目が同じ高さから始まり、ヘッダの上端が
-     1本の線として読める。下端で揃えると、名前の大きさが変わるたびにこの線が動く。
-
-     高さは中身なりにする。以前は .container の div に height: 100% が付いていたが、
-     親の header が高さを持たないので効いていなかった。header 自身に移すと
-     .window-content の高さに解決してしまい、ヘッダがシート全体に広がる。
-
-     名前の列は minmax(0, 1fr)。grid item の既定は min-width: auto なので、
-     これがないと長い名前が列を押し広げてリソースを枠外へ追い出す */
-  .em-sheet-header {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    gap: var(--spacer-8);
-    container-type: inline-size;
-  }
-
-  /* ふりがなと名前。ふりがなが上端の線に乗り、名前がその下にぶら下がる */
-  .em-sheet-header__identity {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ふりがなは名前の読みなので、名前より一段小さく控えめにする */
-  .em-sheet-header__kana {
-    min-width: 0;
-    padding: 0 var(--spacer-8);
-    font-size: var(--font-size-12);
-    color: var(--color-text-subtle);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    input {
-      width: 100%;
-      height: initial;
-      padding: inherit;
-      font-size: inherit;
-    }
-  }
-
-  /* 文字サイズは容器に追従させ、それでも収まらないときに切り詰める。
-     シート最小幅でも名前が枠を破らないための二段構え */
-  .em-sheet-header__name {
-    min-width: 0;
-    font-size: clamp(1.5rem, 6cqi, var(--font-size-48));
-    line-height: 1.1;
-    padding: 0 var(--spacer-8);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    input {
-      width: 100%;
-      height: initial;
-      padding: inherit;
-    }
-  }
-
-  /* min-width: 0 がないと長い技能名が列を押し広げる */
-  .em-skills-column {
-    min-width: 0;
-  }
-
-  /* 作成ボタンは技能リストの外側にあるので、リスト側の padding が効かない。
-     左右はリストと同じ量に合わせ、上は技能行との間を空ける */
-  .em-skill-list__footer {
-    padding: 0 var(--spacer-8) var(--spacer-8);
-    margin-block-start: var(--spacer-4);
-  }
-
-  /* アイテムタブは名前より式のほうが長いので、部品の既定（2fr 1fr 1fr）から
-     配分を変える。列の内訳は置く側が決める（部品は位置決めを持たない） */
-  .tab.items {
-    .em-data-table__head,
-    .em-data-table__row {
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) minmax(0, 1fr) 48px 70px;
+       3行目を minmax(0, 1fr) にするのが要点。1fr だと最小が auto になり、
+       中身の高さがそのまま行を押し広げて独立スクロールが効かなくなる */
+    .window-content {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto auto minmax(0, 1fr);
     }
 
-    /* ダメージ式は途中で折り返すと読めなくなるので、切り詰めて全文はツールチップに任せる */
-    .em-data-table__cell {
+    .em-sheet-header,
+    nav.tabs {
+      grid-column: 1 / -1;
+    }
+
+    .em-sidebar {
+      grid-column: 1;
+      grid-row: 3;
+    }
+
+    /* タブは中身だけを持つ。カードはサイドバーへ出したので2列組みは要らない。
+
+       サイドバーとの間隔はグリッドの column-gap ではなくサイドバー自身が持つ。
+       gap にすると、畳んで幅が0になっても隙間だけが残る */
+    section.tab {
+      grid-column: 2;
+      grid-row: 3;
+      overflow: auto;
+      padding: var(--spacer-12);
+    }
+
+    /* ヘッダ。名前とリソースを横に並べ、**上端で揃える**。
+       ふりがな・HPの見出し・共鳴感情の1行目が同じ高さから始まり、ヘッダの上端が
+       1本の線として読める。下端で揃えると、名前の大きさが変わるたびにこの線が動く。
+
+       高さは中身なりにする。以前は .container の div に height: 100% が付いていたが、
+       親の header が高さを持たないので効いていなかった。header 自身に移すと
+       .window-content の高さに解決してしまい、ヘッダがシート全体に広がる。
+
+       名前の列は minmax(0, 1fr)。grid item の既定は min-width: auto なので、
+       これがないと長い名前が列を押し広げてリソースを枠外へ追い出す */
+    .em-sheet-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: var(--spacer-8);
+      container-type: inline-size;
+    }
+
+    /* ふりがなと名前。ふりがなが上端の線に乗り、名前がその下にぶら下がる */
+    .em-sheet-header__identity {
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ふりがなは名前の読みなので、名前より一段小さく控えめにする */
+    .em-sheet-header__kana {
+      min-width: 0;
+      padding: 0 var(--spacer-8);
+      font-size: var(--font-size-12);
+      color: var(--color-text-subtle);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      display: block;
-      text-align: center;
+
+      input {
+        width: 100%;
+        height: initial;
+        padding: inherit;
+        font-size: inherit;
+      }
     }
 
-    /* 装備チェックボックスの列。切り詰め用の block 上書きのままでは中央に置けない */
-    .em-data-table__cell--toggle {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: visible;
-    }
-  }
+    /* 文字サイズは容器に追従させ、それでも収まらないときに切り詰める。
+       シート最小幅でも名前が枠を破らないための二段構え */
+    .em-sheet-header__name {
+      min-width: 0;
+      font-size: clamp(1.5rem, 6cqi, var(--font-size-48));
+      line-height: 1.1;
+      padding: 0 var(--spacer-8);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
-  /* 経歴タブの入力フォーム。
-     ラベルと入力の縦積みは本体の `.form-group.stacked` に任せる（`biography.hbs` の
-     `formGroup` が `stacked=true` を渡す）。以前はここで本体の `.form-group` を
-     `flex-direction` / `align-items` / `gap` の3つで打ち消し、さらに `.form-group.stacked`
-     を `row` に戻していた — 打ち消しの打ち消しになっていた */
-  .tab.biography {
-    div.flexrow {
-      gap: var(--spacer-16);
-    }
-
-    /* 備考はリッチテキスト。本体の既定では潰れるので高さを与える。
-       rem にしてユーザーのフォントサイズ設定に追従させる（アイテムシートの
-       notes も同じ形で 8rem） */
-    .editor-container {
-      min-height: 9rem;
-    }
-  }
-
-  /* ヘッダのリソース。HPとMPを左列に縦2段、共鳴は右列で全行ぶち抜き。
-
-     行は「見出し / バー」×2 の4本を親が持ち、各メータが subgrid でそれを共有する。
-     こうするとHP・MP・共鳴の3本のバーが同じ行トラック（1本目が2行目、
-     2本目が4行目）に載るので、中身の量が変わっても横一線に揃う。
-     以前は各メータが独立に高さを解決していて、揃うのは偶然だった。
-
-     列幅を px で決めないのは、共鳴の内部（感情名の幅）と手計算で
-     一致させる必要が出てしまうため。かつて 145px と 49+56+40px が
-     暗黙に結合していた */
-  .em-resources {
-    display: grid;
-    grid-template-columns: minmax(5rem, max-content) minmax(0, max-content);
-    grid-template-rows: repeat(4, auto);
-    justify-content: center;
-    align-items: end;
-    column-gap: var(--spacer-16);
-
-    .em-meter {
-      grid-template-rows: subgrid;
+      input {
+        width: 100%;
+        height: initial;
+        padding: inherit;
+      }
     }
 
-    .em-meter--hp {
-      grid-column: 1;
-      grid-row: 1 / span 2;
+    /* min-width: 0 がないと長い技能名が列を押し広げる */
+    .em-skills-column {
+      min-width: 0;
     }
 
-    .em-meter--mp {
-      grid-column: 1;
-      grid-row: 3 / span 2;
+    /* 作成ボタンは技能リストの外側にあるので、リスト側の padding が効かない。
+       左右はリストと同じ量に合わせ、上は技能行との間を空ける */
+    .em-skill-list__footer {
+      padding: 0 var(--spacer-8) var(--spacer-8);
+      margin-block-start: var(--spacer-4);
     }
 
-    .em-meter--resonance {
-      grid-column: 2;
-      grid-row: 1 / span 4;
-
-      /* 見出しは上3行を使い、バーはMPのバーと同じ4行目に落とす */
-      .em-meter__head {
-        grid-row: 1 / span 3;
+    /* アイテムタブは名前より式のほうが長いので、部品の既定（2fr 1fr 1fr）から
+       配分を変える。列の内訳は置く側が決める（部品は位置決めを持たない） */
+    .tab.items {
+      .em-data-table__head,
+      .em-data-table__row {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) minmax(0, 1fr) 48px 70px;
       }
 
-      .em-progress {
-        grid-row: 4;
+      /* ダメージ式は途中で折り返すと読めなくなるので、切り詰めて全文はツールチップに任せる */
+      .em-data-table__cell {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+        text-align: center;
+      }
+
+      /* 装備チェックボックスの列。切り詰め用の block 上書きのままでは中央に置けない */
+      .em-data-table__cell--toggle {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: visible;
+      }
+    }
+
+    /* 経歴タブの入力フォーム。
+       ラベルと入力の縦積みは本体の `.form-group.stacked` に任せる（`biography.hbs` の
+       `formGroup` が `stacked=true` を渡す）。以前はここで本体の `.form-group` を
+       `flex-direction` / `align-items` / `gap` の3つで打ち消し、さらに `.form-group.stacked`
+       を `row` に戻していた — 打ち消しの打ち消しになっていた */
+    .tab.biography {
+      div.flexrow {
+        gap: var(--spacer-16);
+      }
+
+      /* 備考はリッチテキスト。本体の既定では潰れるので高さを与える。
+         rem にしてユーザーのフォントサイズ設定に追従させる（アイテムシートの
+         notes も同じ形で 8rem） */
+      .editor-container {
+        min-height: 9rem;
+      }
+    }
+
+    /* ヘッダのリソース。HPとMPを左列に縦2段、共鳴は右列で全行ぶち抜き。
+
+       行は「見出し / バー」×2 の4本を親が持ち、各メータが subgrid でそれを共有する。
+       こうするとHP・MP・共鳴の3本のバーが同じ行トラック（1本目が2行目、
+       2本目が4行目）に載るので、中身の量が変わっても横一線に揃う。
+       以前は各メータが独立に高さを解決していて、揃うのは偶然だった。
+
+       列幅を px で決めないのは、共鳴の内部（感情名の幅）と手計算で
+       一致させる必要が出てしまうため。かつて 145px と 49+56+40px が
+       暗黙に結合していた */
+    .em-resources {
+      display: grid;
+      grid-template-columns: minmax(5rem, max-content) minmax(0, max-content);
+      grid-template-rows: repeat(4, auto);
+      justify-content: center;
+      align-items: end;
+      column-gap: var(--spacer-16);
+
+      .em-meter {
+        grid-template-rows: subgrid;
+      }
+
+      .em-meter--hp {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+      }
+
+      .em-meter--mp {
+        grid-column: 1;
+        grid-row: 3 / span 2;
+      }
+
+      .em-meter--resonance {
+        grid-column: 2;
+        grid-row: 1 / span 4;
+
+        /* 見出しは上3行を使い、バーはMPのバーと同じ4行目に落とす */
+        .em-meter__head {
+          grid-row: 1 / span 3;
+        }
+
+        .em-progress {
+          grid-row: 4;
+        }
       }
     }
   }

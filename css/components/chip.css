@@ -4,7 +4,7 @@
    地・枠・角丸・ホバーはすべて本体の --button-* が持っているので、
    ここで持つのは並べ方と、1行ぶんに詰めるための寸法だけにする */
 
-.emoklore {
+@layer components {
   .em-chip-list {
     display: flex;
     flex-direction: row;

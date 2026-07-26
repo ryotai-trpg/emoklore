@@ -1,87 +1,89 @@
 /* 武器カードはシートの外に出るため、.emoklore スコープに入れない。
    自前のクラスはすべて em- 接頭辞なので、本体や他モジュールとは衝突しない */
 
-/* ダメージ適用の結果。対象1体につき1行の一覧なので ul で組み、
-   箇条書きの記号と既定の字下げだけ落とす */
-.em-damage-applied {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+@layer chat {
+  /* ダメージ適用の結果。対象1体につき1行の一覧なので ul で組み、
+     箇条書きの記号と既定の字下げだけ落とす */
+  .em-damage-applied {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 
-/* 境界の案内。HPの行より一段控えめに、行の下へぶら下げる */
-.em-damage-applied__notice {
-  margin: var(--spacer-2) 0 var(--spacer-4);
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-12);
-}
+  /* 境界の案内。HPの行より一段控えめに、行の下へぶら下げる */
+  .em-damage-applied__notice {
+    margin: var(--spacer-2) 0 var(--spacer-4);
+    color: var(--color-text-subtle);
+    font-size: var(--font-size-12);
+  }
 
-.em-weapon-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacer-8);
-}
+  .em-weapon-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacer-8);
+  }
 
-/* 画像と見出しを横に並べる。見出しの列は minmax(0, 1fr)。
-   grid item の既定は min-width: auto なので、これがないと長い武器名が枠を破る */
-.em-weapon-card__head {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: var(--spacer-8);
-}
+  /* 画像と見出しを横に並べる。見出しの列は minmax(0, 1fr)。
+     grid item の既定は min-width: auto なので、これがないと長い武器名が枠を破る */
+  .em-weapon-card__head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacer-8);
+  }
 
-/* 中身が変わらない枠なので寸法を固定する。rem にしてフォントサイズ設定に追従させる */
-.em-weapon-card__image {
-  width: 2.25rem;
-  height: 2.25rem;
-  border: none;
-  border-radius: var(--emoklore-box-radius);
-  object-fit: cover;
-}
+  /* 中身が変わらない枠なので寸法を固定する。rem にしてフォントサイズ設定に追従させる */
+  .em-weapon-card__image {
+    width: 2.25rem;
+    height: 2.25rem;
+    border: none;
+    border-radius: var(--emoklore-box-radius);
+    object-fit: cover;
+  }
 
-.em-weapon-card__title {
-  min-width: 0;
-}
+  .em-weapon-card__title {
+    min-width: 0;
+  }
 
-.em-weapon-card__name {
-  overflow: hidden;
-  font-weight: bold;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+  .em-weapon-card__name {
+    overflow: hidden;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
-/* 間合い・参照技能・攻撃力の並び。武器名より控えめにする */
-.em-weapon-card__meta {
-  overflow: hidden;
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-12);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+  /* 間合い・参照技能・攻撃力の並び。武器名より控えめにする */
+  .em-weapon-card__meta {
+    overflow: hidden;
+    color: var(--color-text-subtle);
+    font-size: var(--font-size-12);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
-.em-weapon-card__sep {
-  opacity: 0.5;
-}
+  .em-weapon-card__sep {
+    opacity: 0.5;
+  }
 
-.em-weapon-card__roll-label {
-  margin: 0 0 var(--spacer-2);
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-12);
-}
+  .em-weapon-card__roll-label {
+    margin: 0 0 var(--spacer-2);
+    color: var(--color-text-subtle);
+    font-size: var(--font-size-12);
+  }
 
-/* ボタンは縦に積む。チャットの幅は狭く、横並びにすると文字が潰れる */
-.em-weapon-card__buttons {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacer-4);
-}
+  /* ボタンは縦に積む。チャットの幅は狭く、横並びにすると文字が潰れる */
+  .em-weapon-card__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacer-4);
+  }
 
-/* 地・枠・角丸・ホバーは本体の --button-* が持っているので塗り直さない。
-   アイコンと文字の間隔だけ足す */
-.em-weapon-card__buttons button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacer-4);
+  /* 地・枠・角丸・ホバーは本体の --button-* が持っているので塗り直さない。
+     アイコンと文字の間隔だけ足す */
+  .em-weapon-card__buttons button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacer-4);
+  }
 }

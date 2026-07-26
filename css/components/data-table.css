@@ -1,6 +1,6 @@
 /* 見出し行と明細行を同じグリッドで揃える表。ActiveEffect の一覧で使う */
 
-.emoklore {
+@layer components {
   .em-data-table {
     list-style: none;
     margin: 0;

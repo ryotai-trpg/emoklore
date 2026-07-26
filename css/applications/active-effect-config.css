@@ -2,51 +2,53 @@
    本体は キー／種別／効果値／優先度 の4列だが、こちらはキーを「対象／種類」に割り、
    段階（initial / final）を足した6列になる */
 
-.emoklore.active-effect-config {
-  /* 6列ぶんを収めるので、本体の既定（560px）では狭い */
-  .em-effect-changes {
-    --em-effect-change-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)
-      minmax(0, 0.9fr) minmax(0, 0.6fr) auto;
-  }
+@layer applications {
+  .emoklore.active-effect-config {
+    /* 6列ぶんを収めるので、本体の既定（560px）では狭い */
+    .em-effect-changes {
+      --em-effect-change-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)
+        minmax(0, 0.9fr) minmax(0, 0.6fr) auto;
+    }
 
-  .em-effect-changes__head,
-  .em-effect-change {
-    display: grid;
-    grid-template-columns: var(--em-effect-change-columns);
-    align-items: center;
-    gap: var(--spacer-4);
-  }
+    .em-effect-changes__head,
+    .em-effect-change {
+      display: grid;
+      grid-template-columns: var(--em-effect-change-columns);
+      align-items: center;
+      gap: var(--spacer-4);
+    }
 
-  .em-effect-changes__head {
-    padding-bottom: var(--spacer-4);
-    font-size: var(--font-size-12);
-    font-weight: bold;
-  }
+    .em-effect-changes__head {
+      padding-bottom: var(--spacer-4);
+      font-size: var(--font-size-12);
+      font-weight: bold;
+    }
 
-  .em-effect-changes__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacer-4);
-    padding: 0;
-    list-style: none;
-  }
+    .em-effect-changes__body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacer-4);
+      padding: 0;
+      list-style: none;
+    }
 
-  /* 選択肢の文字が長い（〈専門知識〉など）ので、列を押し広げないよう中で省略させる。
-     grid item の既定は min-width: auto なので minmax(0, …) だけでは足りない */
-  .em-effect-change select,
-  .em-effect-change input {
-    min-width: 0;
-    width: 100%;
-  }
+    /* 選択肢の文字が長い（〈専門知識〉など）ので、列を押し広げないよう中で省略させる。
+       grid item の既定は min-width: auto なので minmax(0, …) だけでは足りない */
+    .em-effect-change select,
+    .em-effect-change input {
+      min-width: 0;
+      width: 100%;
+    }
 
-  /* 種類の選択と生入力は同じ場所に出し入れするので、片方だけが見えるよう重ねずに並べる。
-     hidden 属性で消えるほうは領域も持たない */
-  .em-effect-change__aspect {
-    display: grid;
-  }
+    /* 種類の選択と生入力は同じ場所に出し入れするので、片方だけが見えるよう重ねずに並べる。
+       hidden 属性で消えるほうは領域も持たない */
+    .em-effect-change__aspect {
+      display: grid;
+    }
 
-  .em-effect-change__controls {
-    display: flex;
-    justify-content: end;
+    .em-effect-change__controls {
+      display: flex;
+      justify-content: end;
+    }
   }
 }

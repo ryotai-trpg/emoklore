@@ -8,22 +8,52 @@ CSS・テンプレート・ダイアログの規約と、その背後にある�
 
 ## 層の責務
 
-`css/emoklore.css` は `@import` の目次で、並び順がそのままカスケードの順序になる。**目次には規則を書かない**。
+`css/emoklore.css` は目次で、`@layer` の宣言と `@import` だけを置く。**目次には規則を書かない**。
 
-| 層 | 持つもの | 持ってはいけないもの |
-|---|---|---|
-| `css/variables.css` | 値（カスタムプロパティ）だけ | セレクタごとの規則 |
-| `css/components/` | 部品の**内部**の構造 | 自分の外側の寸法・位置 |
-| `css/applications/` | 部品の**配置と外形寸法** | 部品の内部構造 |
-| `css/chat/` | シートの外に出るチャットカード | `.emoklore` スコープへの依存 |
+| 層 | レイヤ | 持つもの | 持ってはいけないもの |
+|---|---|---|---|
+| `css/variables.css` | `tokens` | 値（カスタムプロパティ）だけ | セレクタごとの規則 |
+| `css/base.css` | `base` | 本体のクラスに当てる下敷き | シート固有の配置 |
+| `css/components/` | `components` | 部品の**内部**の構造 | 自分の外側の寸法・位置 |
+| `css/applications/` | `applications` | 部品の**配置と外形寸法** | 部品の内部構造 |
+| `css/chat/` | `chat` | シートの外に出るチャットカード | `.emoklore` スコープへの依存 |
 
-**部品に位置決めを書かない**。`grid-row` / `grid-column` / 外側の margin / 幅は、置く側（`applications/`）から modifier セレクタで指定する。これがあるのでNPCシートやアイテムシートを足したときに同じ部品をそのまま使える。
+**部品に位置決めを書かない**。`grid-row` / `grid-column` / 外側の margin / 幅は、置く側（`applications/`）から指定する。これがあるのでNPCシートやアイテムシートを足したときに同じ部品をそのまま使える。
+
+この「配置は部品に勝つ」はレイヤ順が保証する。詳細度を上げて勝ちにいく必要はない。
+
+## カスケードレイヤ
+
+`css/emoklore.css` の先頭で順序を宣言し、各ファイルが自分のレイヤを自分で名乗る。
+
+```css
+/* css/emoklore.css */
+@layer tokens, base, components, applications, chat;
+```
+
+```css
+/* css/components/chip.css */
+@layer components {
+  .em-chip-list { ... }
+}
+```
+
+`system.json` の `styles` で `layer: "system"` を宣言してある。本体は `foundry2.css` の冒頭で `reset, variables, elements, blocks, applications, compatibility, layouts, system, modules, exceptions` を宣言していて、`system` はシステム用に空けてある。`applications` より後なので本体には勝ち、`modules` には負ける。本体側は `@import "..." layer(system)` の形で読み込む（`templates/views/layouts/main.hbs`）ため、ここで宣言した名前は `system.tokens` … という副レイヤになる。
+
+- **レイヤの宣言は各ファイルの中に書く。** `@import url(...) layer(...)` には寄せない。ファイルを開いた瞬間にどのレイヤか分かるほうがよく、バンドラの `@import` の扱いにも依存しない
+- **`@import` の並び順はカスケードに影響しない。** 順序を決めるのは目次の宣言のほう。ビルド後の `dist/emoklore.css` に宣言文そのものは残らないが、ミニファイアが同じレイヤの規則をまとめて宣言順に並べ替えてから落とすので、順序は保たれる
+- dev では `tools/vite-plugin-foundry-dev.ts` が全体を `@layer system { ... }` で包む。devと本番で解決結果は一致する
+- **レイヤ名を綴り間違えても Foundry は何も言わない。** 未宣言のレイヤは最後（`exceptions` の後）に積まれるので「今より強くなる」形で通ってしまう。DevToolsのStylesペインで `system.<名前>` として出ているかを目で見ること
 
 ### 変数を置くスコープ
 
 **テーマで変わる値は `.emoklore` に、変わらない値は `:root` に置く。** チャットカードは `.emoklore` の外に出るので、`.emoklore` に置いた変数はカード側から引けない。**引けない変数を書いても宣言が無効になるだけで、警告は何も出ない** — 角丸が0になって初めて気付くことになる。色はテーマ別ブロックが `.emoklore` を前提にしているのでそのまま、角丸のようにテーマと無関係な値は `:root` に置いて両方から引けるようにする。
 
-`system.json` の `styles` で `layer: "system"` を宣言する。本体は `foundry2.css` の冒頭で `reset, variables, elements, blocks, applications, compatibility, layouts, system, modules, exceptions` を宣言していて、`system` はシステム用に空けてある。`applications` より後なので本体には勝ち、`modules` には負ける。本体側は `@import "..." layer(system)` の形で読み込む（`templates/views/layouts/main.hbs`）ため、`css/emoklore.css` の中で `@layer` を書けば `system` の副レイヤになる。
+これはDOM上のどこに居るかで決まる話なので、セレクタの書き方（下記のスコープの規則）では解けない。
+
+::: tip テーマの2ブロックは触らない
+`css/variables.css` の `.theme-dark .emoklore:not(.theme-light), .emoklore.theme-dark` という形は場当たりではない。本体や dnd5e はレイヤを `general` / `specific` に分けて同じ問題を解いているが、**あれはLESSのmixinで値を2回展開できるから成立する**。素のCSSで真似るとライトの値を全部書き写すことになり、いまの2ブロックより悪くなる。
+:::
 
 ## 寸法の決め方
 
@@ -185,6 +215,30 @@ HP・MP・共鳴の3本のバーは、`.em-resources` が持つ行トラック�
 - 自前のクラスはすべて **`em-` 接頭辞 + BEM風**（`.em-meter`, `.em-meter__value`, `.em-progress--hp`）。`.value` や `.label` のような汎用名は他モジュールのCSSと衝突するので作らない
 - Foundry本体のクラス（`.window-content` `.tab` `.sheet-header` `.form-group` `.form-footer` `.flexrow` `.editor-container` `.hint` `.inline-control` `.draggable`）と、`formGroup` が生成する `span.label` はそのまま使う。**`em-` を付けてはいけない**
 - `data-*` 属性はJSのフック専用。CSSセレクタに使わない
+
+### セレクタのスコープ
+
+**自前の `em-` クラスを狙う規則はスコープで包まない。** 接頭辞が衝突を防ぐので `.emoklore` を重ねる必要がなく、重ねると詳細度が一段上がって「上書きするには何段必要か」を数える羽目になる。
+
+```css
+@layer components {
+  .em-chip-list { ... }   /* ← .emoklore で包まない */
+}
+```
+
+**`.emoklore` が要るのは本体のクラスや素の要素を狙うときだけ**で、それは `css/base.css` に集める。個々のシートに閉じた配置は `.emoklore.sheet.character` のように対象そのものを書く（これはラッパではない）。
+
+### クラスを置く粒度
+
+**CSSの規則もJSのフックも無いクラスは置かない。** 部品の内部の構造的な子は要素セレクタで当てる。
+
+```css
+.em-kai__block h3 { ... }   /* .em-kai__block-title を作らない */
+```
+
+フックとしてだけ生きているクラス（チャットカードの `CARD.root`、`chat-controls.ts` の二重挿入防止など）は残してよいが、**なぜ規則が無いのかをコメントに書く**。書いておかないと、次に読む人が「規則を消し忘れたのか、まだ書いていないのか」を判断できない。
+
+`npm run check:templates` は**CSS側を見ない**ので、これは自分で確認する。
 - **意味を持つ要素を使う**。対になった項目の並びは `dl` / `dt` / `dd`、リストは `ul` / `ol`、フォームの塊は `fieldset` / `legend`。`div` を並べてCSSで見た目だけ整えない
 - **レイアウトのためだけのラッパを増やさない**。グリッドの入れ子が要るように見えたら、まず `grid-template-areas` や `subgrid` で親のトラックに直接載せられないか検討する。`display: contents` も選択肢になる
 - `vite.config.ts` は lib mode で `cssFileName` が単一値なので、**CSSは1ファイルにしか出せない**。`styles` を複数エントリにするには `viteStaticCopy` 経由の別系統が要る
@@ -297,3 +351,15 @@ section.tab { grid-column: 2; grid-row: 3; overflow: auto; }
 ## 開発時の注意
 
 `vite.config.ts` は `emptyOutDir: false` なので、テンプレートを消したり改名したりすると `dist/` に前のファイルが残る。配布物を作る前に `rm -rf dist` する。
+
+## 検討して採らなかったもの
+
+CSS設計を見直したとき（2026-07-27）に一度検討し、理由があって採らなかったもの。同じ検討を繰り返さないために残す。
+
+| やらないこと | 理由 |
+|---|---|
+| `@scope (.emoklore)` | viteの build target（`safari16.4`）より新しい。`to (...)` のドーナツ穴が要る場面が無く、`em-` 接頭辞でスコープを外したいまは平坦化の利点も既に得ている。draw-steel は使っている |
+| `light-dark()` | 本体は `color-scheme` を4箇所でしか設定しておらず、テーマは `body.theme-dark` / `.themed.theme-dark` のクラス駆動。前提が無い |
+| テーマを `general` / `specific` のレイヤに分ける | 本体と dnd5e はこの形だが、**LESSのmixinで値を2回展開できるから成立する**。素のCSSで真似るとライトの値を全部書き写すことになり、いまの2ブロックより悪くなる |
+| `styles` を複数エントリにして `variables` / `elements` レイヤへ入れる（draw-steel方式） | viteの lib mode は `cssFileName` が単一値でCSSを1枚しか出せない。得るのは変数を本体の `variables` レイヤに沈められることだけで、困りごとに対応しない |
+| BEMをやめる / `data-*` をCSSセレクタに使う | 冗長さは重複の症状で、命名規則の問題ではない。部品を共有すれば長い名前自体が減る |

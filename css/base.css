@@ -1,0 +1,23 @@
+/* 本体のクラスに当てる下敷き。**`.emoklore` スコープが要るのはここだけ。**
+
+   自前の `em-` クラスは接頭辞で衝突を防げるのでスコープを持たないが、本体のクラス
+   （`.window-content` や `.tags`）は他のアプリケーションにも付いているので、
+   自分のシートの中に閉じ込める必要がある。その規則をこのファイルに集める。
+
+   個々のシート固有の配置は `css/applications/` が持つ。ここに置くのは
+   「emokloreのシート全般で成り立つもの」だけにする */
+
+@layer base {
+  /* .application と .emoklore はシートのルート要素そのものに同居しているので、
+     .emoklore .application ... と書くと子孫結合子で自分自身に届かない。
+     .emoklore の子孫として .window-content を直接指す */
+  .emoklore .window-content {
+    padding-top: 0;
+  }
+
+  /* 本体のタグは multi-select の右寄せ列に置く前提で justify-content: flex-end。
+     こちらは見出しの下に敷くので、行頭から並べる */
+  .emoklore .tags.input-element-tags {
+    justify-content: flex-start;
+  }
+}
