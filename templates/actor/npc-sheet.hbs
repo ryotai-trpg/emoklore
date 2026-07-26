@@ -12,21 +12,21 @@
   {{! 現在値は卓中に減っていくものなので、モードによらず入力にする（共鳴者のメータと同じ）。
       最大値は能力値からの派生なので、どちらのモードでも表示だけ — 変えたいなら能力値を変える }}
   <div class="em-npc__resources">
-    <label class="em-pair"
+    <label class="em-npc__resource"
       data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.hp.label"}}">
       {{! HP/MPのアイコンは共鳴者のメータと同じものを使う（fa-heart / fa-wand-magic-sparkles） }}
       <i class="fa-solid fa-heart em-npc__resource-icon" inert></i>
-      <span class="em-pair">
-        {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value classes="em-num"}}
+      <span class="em-npc__resource-edit">
+        {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
         <span>/</span>
         <span>{{system.resources.hp.max}}</span>
       </span>
     </label>
-    <label class="em-pair"
+    <label class="em-npc__resource"
       data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.mp.label"}}">
       <i class="fa-solid fa-wand-magic-sparkles em-npc__resource-icon" inert></i>
-      <span class="em-pair">
-        {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value classes="em-num"}}
+      <span class="em-npc__resource-edit">
+        {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
         <span>/</span>
         <span>{{system.resources.mp.max}}</span>
       </span>
@@ -36,7 +36,7 @@
 
 <section class="em-npc__characteristics">
   {{#each characteristics}}
-    <div class="em-pair">
+    <div class="em-npc__characteristic">
       {{! CONFIG が持つのは字形のクラスだけ。書体（fa-solid）は使う側が足す }}
       <i class="fa-solid {{icon}}" inert></i>
       <span class="em-npc__characteristic-label">{{label}}</span>
@@ -45,7 +45,7 @@
       {{else}}
         {{! min / max はスキーマから来る。type を渡さないと、段階が決まる数値は
             本体が range-picker にする（NumberField#_toInput） }}
-        {{formInput field value=value type="number" classes="em-num"}}
+        {{formInput field value=value type="number"}}
       {{/if}}
     </div>
   {{/each}}
@@ -61,7 +61,7 @@
         {{#if ../isPlay}}
           <span>{{localize "EMOKLORE.Format.level" level=level}}</span>
         {{else}}
-          {{formInput field value=level type="number" classes="em-num"}}
+          {{formInput field value=level type="number" classes="em-npc__skill-input"}}
         {{/if}}
         <span class="em-npc__skill-target">{{target}}</span>
       </li>

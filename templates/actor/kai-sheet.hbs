@@ -14,44 +14,44 @@
   {{! 現在値は卓中に減っていくものなので、モードによらず入力にする（共鳴者のメータと同じ）。
       組み立ての値である最大値だけを編集モードに残す。入力はスキーマから描くので、
       怪異のHP/MPが持つ min: 0 がそのまま効く }}
-  <label class="em-pair em-kai__stat">
+  <label class="em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.hp.label"}}</span>
-    <span class="em-pair">
-      {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value classes="em-num"}}
+    <span class="em-kai__stat-edit">
+      {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
       <span>/</span>
       {{#if isPlay}}
         <span>{{system.resources.hp.max}}</span>
       {{else}}
-        {{formInput systemFields.resources.fields.hp.fields.max value=system.resources.hp.max classes="em-num"}}
+        {{formInput systemFields.resources.fields.hp.fields.max value=system.resources.hp.max}}
       {{/if}}
     </span>
   </label>
-  <label class="em-pair em-kai__stat">
+  <label class="em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.mp.label"}}</span>
-    <span class="em-pair">
-      {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value classes="em-num"}}
+    <span class="em-kai__stat-edit">
+      {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
       <span>/</span>
       {{#if isPlay}}
         <span>{{system.resources.mp.max}}</span>
       {{else}}
-        {{formInput systemFields.resources.fields.mp.fields.max value=system.resources.mp.max classes="em-num"}}
+        {{formInput systemFields.resources.fields.mp.fields.max value=system.resources.mp.max}}
       {{/if}}
     </span>
   </label>
-  <label class="em-pair em-kai__stat">
+  <label class="em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.armor.label"}}</span>
     {{#if isPlay}}
       <span>{{system.resources.armor}}</span>
     {{else}}
-      <input class="em-num" type="number" name="system.resources.armor" value="{{system.resources.armor}}" min="0" />
+      <input type="number" name="system.resources.armor" value="{{system.resources.armor}}" min="0" />
     {{/if}}
   </label>
-  <label class="em-pair em-kai__stat">
+  <label class="em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.initiative.label"}}</span>
     {{#if isPlay}}
       <span>{{system.initiative}}</span>
     {{else}}
-      <input class="em-num" type="number" name="system.initiative" value="{{system.initiative}}" />
+      <input type="number" name="system.initiative" value="{{system.initiative}}" />
     {{/if}}
   </label>
 </section>
@@ -79,15 +79,15 @@
     </button>
   </header>
   <div class="em-kai__resonance">
-    <label class="em-pair">
+    <label class="em-kai__field">
       <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resonance.intensity.label"}}</span>
       {{#if isPlay}}
         <span>{{system.resonance.intensity}}</span>
       {{else}}
-        <input class="em-num" type="number" name="system.resonance.intensity" value="{{system.resonance.intensity}}" min="1" />
+        <input type="number" name="system.resonance.intensity" value="{{system.resonance.intensity}}" min="1" />
       {{/if}}
     </label>
-    <label class="em-pair">
+    <label class="em-kai__field">
       <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resonance.rise.label"}}</span>
       {{#if isPlay}}
         <span>{{system.resonance.rise}}</span>
@@ -152,19 +152,19 @@
           <input class="em-kai__attack-name-input" type="text" name="system.attacks.{{@index}}.name"
             value="{{name}}" placeholder="{{@root.attackFields.name.placeholder}}" />
           <div class="em-kai__attack-fields">
-            <label class="em-pair">{{@root.attackFields.diceCount.label}}
-              <input class="em-num" type="number" name="system.attacks.{{@index}}.diceCount" value="{{diceCount}}" min="0" /></label>
-            <label class="em-pair">{{@root.attackFields.target.label}}
-              <input class="em-num" type="number" name="system.attacks.{{@index}}.target" value="{{target}}" min="0" /></label>
-            <label class="em-pair">{{@root.attackFields.damage.label}}
+            <label>{{@root.attackFields.diceCount.label}}
+              <input type="number" name="system.attacks.{{@index}}.diceCount" value="{{diceCount}}" min="0" /></label>
+            <label>{{@root.attackFields.target.label}}
+              <input type="number" name="system.attacks.{{@index}}.target" value="{{target}}" min="0" /></label>
+            <label>{{@root.attackFields.damage.label}}
               <input type="text" name="system.attacks.{{@index}}.damage" value="{{damage}}"
                 placeholder="{{@root.attackFields.damage.placeholder}}" /></label>
-            <label class="em-pair">{{@root.attackFields.mpCost.label}}
-              <input class="em-num" type="number" name="system.attacks.{{@index}}.mpCost" value="{{mpCost}}" min="0" /></label>
-            <label class="em-pair">{{@root.attackFields.judgeless.label}}
+            <label>{{@root.attackFields.mpCost.label}}
+              <input type="number" name="system.attacks.{{@index}}.mpCost" value="{{mpCost}}" min="0" /></label>
+            <label>{{@root.attackFields.judgeless.label}}
               <input type="checkbox" name="system.attacks.{{@index}}.judgeless" {{checked judgeless}} /></label>
-            <label class="em-pair">{{@root.attackFields.fixedSuccess.label}}
-              <input class="em-num" type="number" name="system.attacks.{{@index}}.fixedSuccess" value="{{fixedSuccess}}" min="0" /></label>
+            <label>{{@root.attackFields.fixedSuccess.label}}
+              <input type="number" name="system.attacks.{{@index}}.fixedSuccess" value="{{fixedSuccess}}" min="0" /></label>
           </div>
           <a data-action="deleteAttack" data-tooltip="APPLICATION.ACTIONS.Delete">
             <i class="fa-solid fa-trash" inert></i>

@@ -1,0 +1,37 @@
+/* NPCシートと怪異シートが共有する配置。`module/applications/actor-sheet.ts`（両者の基底）と対。
+
+   **セレクタを並べる形にしてあるのは、マークアップを1要素1クラスに保つため。**
+   同じ3行を両シートに書き写すのは避けたいが、`em-pair` のような形を名前にしたクラスを
+   足して合成すると、要素が何であるかがクラス名から読めなくなる。共有する規則をここに置き、
+   使う側はBEMの名前だけを持つ。
+
+   ここに置けるのは **`applications/` の中で閉じているもの**に限る。層をまたぐ共有
+   （チャットカードとシートの両方で使うものなど）は `components/` の部品にする —
+   `applications/` のクラス名を `components/` から名指しすると依存が逆向きになる。 */
+
+@layer applications {
+  /* ラベルと値を1行に詰める。項目の詰め方を2シートで揃えるために共有する */
+  .em-npc__resource,
+  .em-npc__resource-edit,
+  .em-npc__characteristic,
+  .em-kai__stat,
+  .em-kai__stat-edit,
+  .em-kai__field,
+  .em-kai__attack-fields label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-4);
+  }
+
+  /* 桁の少ない数値入力。**幅を固定して中央に置く。** 縦に並んだときに数字の位置が揃い、
+     桁が変わっても行の幅が動かない。3rem は3桁ぶんで、remなのでフォントサイズ設定に追従する */
+  .em-npc__resource-edit input,
+  .em-npc__characteristic input,
+  .em-npc__skill-input,
+  .em-kai__stat input,
+  .em-kai__field input[type="number"],
+  .em-kai__attack-fields input[type="number"] {
+    width: 3rem;
+    text-align: center;
+  }
+}

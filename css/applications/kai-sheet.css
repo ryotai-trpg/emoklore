@@ -42,7 +42,8 @@
       padding: var(--spacer-8) 0;
     }
 
-    /* 並べ方は em-pair が持つ。ここは「ラベルを左端、値を右端へ」だけを足す */
+    /* 並べ方は applications/actor-sheet.css がNPCシートと共有している。
+       ここは「ラベルを左端、値を右端へ」だけを足す */
     .em-kai__stat {
       justify-content: space-between;
     }
