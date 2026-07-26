@@ -112,26 +112,19 @@
     }
   }
 
-  /* 経歴タブの入力フォーム。本体の form-group を縦積みに寄せる */
+  /* 経歴タブの入力フォーム。
+     ラベルと入力の縦積みは本体の `.form-group.stacked` に任せる（`biography.hbs` の
+     `formGroup` が `stacked=true` を渡す）。以前はここで本体の `.form-group` を
+     `flex-direction` / `align-items` / `gap` の3つで打ち消し、さらに `.form-group.stacked`
+     を `row` に戻していた — 打ち消しの打ち消しになっていた */
   .tab.biography {
     div.flexrow {
-      gap: 20px;
+      gap: var(--spacer-16);
     }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0px;
-    }
-
-    .form-group.stacked {
-      display: flex;
-      flex-direction: row;
-
-      .editor-container {
-        min-height: 150px;
-      }
+    /* 備考はリッチテキスト。本体の既定では潰れるので高さを与える */
+    .editor-container {
+      min-height: 150px;
     }
   }
 
