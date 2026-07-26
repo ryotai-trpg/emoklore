@@ -13,6 +13,30 @@
    ダークでもない環境では body にテーマクラスを付けないため（client/game.mjs の
    #configureTheme）、テーマ別ブロックだけに色を置くと変数が未定義になる */
 
+/* --- 角丸 ---
+   **テーマで変わらないので `:root` に置く。** チャットカードは `.emoklore` の外に出る
+   ので（`css/chat/` は `.emoklore` スコープに入れない決まり）、`.emoklore` に置くと
+   カード側から引けない。引けない変数を書いても `border-radius` が無効になるだけで
+   何の警告も出ないため、スコープのほうを合わせる。
+
+   本体には角丸の変数が1つも無いので、寄せる先は生値の分布しかない
+   （4px:34箇所 / 3px:26 / 2px:16 / 5px:14 / 6px:12 / 8px:7 / 10px:4）。 */
+:root {
+  /* バーの端。高さ10pxの `.em-progress` を丸め切る半径で、分布に寄せる値ではない */
+  --emoklore-progress-radius: 5px;
+
+  /* 行に埋める背の低いバー・段入力。丸めすぎると段の区切りが読めなくなる */
+  --emoklore-progress-radius-small: 2px;
+
+  /* 小さい枠。画像の枠・表の見出し行・タグ・サイドバーのトグルが共有する。
+     本体の最頻値に合わせる */
+  --emoklore-box-radius: 4px;
+
+  /* 沈んだ大きい面（立ち絵カード）。小さい枠と同じ半径にすると、面積に対して
+     角が立って見える。丸みは面の大きさに対して決まるので、枠とは別に持つ */
+  --emoklore-panel-radius: 8px;
+}
+
 .emoklore {
   /* Layout */
   --emoklore-sheet-sidebar-width: 250px;
@@ -20,11 +44,6 @@
   /* 一覧の行に埋め込むコントロール（バー・段入力・アイコン枠）の高さ。
      行の高さがこれで決まるので、バーだけ・段だけを変えると揃わなくなる */
   --emoklore-row-control-size: 1.25rem;
-
-  /* Border Radius */
-  --emoklore-progress-radius: 5px;
-  --emoklore-progress-radius-small: 2px;
-  --emoklore-card-radius: 10px;
 
   /* --- ブランド ---
      青がエモクロアの主アクセント。橙はガイアケアの色で、用途が決まるまでは

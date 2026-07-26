@@ -16,13 +16,14 @@
     {{/each}}
 
     {{else}}
+    {{! stacked はラベルを入力の上に積む本体の指定。自前のCSSで打ち消さずに済む }}
     <div class="flexrow">
       {{#each biographyPairedRows as |row|}}
-      {{formGroup row.field value=row.value}}
+      {{formGroup row.field value=row.value stacked=true}}
       {{/each}}
     </div>
     {{#each biographyRows as |row|}}
-    {{formGroup row.field value=row.value}}
+    {{formGroup row.field value=row.value stacked=true}}
     {{/each}}
     {{/if}}
   </div>

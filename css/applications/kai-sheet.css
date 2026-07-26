@@ -29,7 +29,7 @@
     width: 3rem;
     height: 3rem;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--emoklore-box-radius);
     object-fit: cover;
   }
 
@@ -94,7 +94,7 @@
   .em-kai__emotion {
     padding: 1px var(--spacer-8);
     border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border-radius: var(--emoklore-box-radius);
     background: var(--color-data-background);
   }
 
