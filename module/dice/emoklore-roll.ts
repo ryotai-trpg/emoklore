@@ -74,7 +74,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
   /** 成功数修正の表示。修正がなければ空文字 */
   get successModLabel(): string {
     if (this.successMod === 0) return "";
-    return _loc("EMOKLORE.successMod", { mod: formatSigned(this.successMod) });
+    return _loc("EMOKLORE.Format.successMod", { mod: formatSigned(this.successMod) });
   }
 
   /**

@@ -15,16 +15,31 @@ import {
   resolveResultName,
   SUCCESS_REQUIREMENTS,
 } from "../rules/success";
+import { joinCompact } from "./format";
 import { typedEntries } from "./object";
 
 /**
- * 技能名の頭に付ける印。基本技能は `＊`、エクストラ技能は `★`。
+ * 区分ごとの見せ方。基本技能は `＊`、エクストラ技能は `★` を頭に付ける。
+ *
+ * 印そのものをキーにせず、印を含んだフォーマットをキーにしている。記号だけを
+ * 翻訳できても、付ける位置は呼ぶ側が決めることになるため。
+ */
+const MARKED_LABEL_FORMATS = {
+  base: "EMOKLORE.Format.baseSkill",
+  extra: "EMOKLORE.Format.extraSkill",
+} as const;
+
+/**
+ * 印つきの表示名を組み立てる。
  *
  * 直に呼ばず `describeSkillLabel` を通すこと。印を付けるかどうかの判断まで含めて
  * 1箇所にまとめてある。
  */
-const skillMarker = (isBase: boolean, isExtra: boolean): string =>
-  isBase ? "＊" : isExtra ? "★" : "";
+const markLabel = (label: string, isBase: boolean, isExtra: boolean): string => {
+  if (isBase) return _loc(MARKED_LABEL_FORMATS.base, { name: label });
+  if (isExtra) return _loc(MARKED_LABEL_FORMATS.extra, { name: label });
+  return label;
+};
 
 /** どの技能を見せたいか。組込・基本は表から引き、カスタムは持っている値で名乗る */
 export type SkillDescriptor =
@@ -36,9 +51,7 @@ export type SkillDescriptor =
 export type SkillLabel = {
   /** 翻訳済みの表示名。印は含まない */
   label: string;
-  /** 区分の印。基本技能は `＊`、エクストラ技能は `★`、通常技能は空 */
-  marker: string;
-  /** 印つきの表示名。1本の文字列で出すところ（チャット・選択肢）はこちらを使う */
+  /** 印つきの表示名。表示に使うのは基本こちら */
   markedLabel: string;
 };
 
@@ -51,22 +64,19 @@ export type SkillLabel = {
  * `CONFIG.EMOKLORE` の label は i18nInit の performPreLocalization で翻訳済みなので、
  * ここでは参照するだけでよい。
  */
-export const describeSkillLabel = (ref: SkillDescriptor): SkillLabel => {
-  const { label, marker } = resolveLabelParts(ref);
+export const describeSkillLabel = (ref: SkillDescriptor): SkillLabel => resolveLabelParts(ref);
 
-  return { label, marker, markedLabel: `${marker}${label}` };
-};
-
-const resolveLabelParts = (ref: SkillDescriptor): { label: string; marker: string } => {
+const resolveLabelParts = (ref: SkillDescriptor): SkillLabel => {
   if (ref.kind === "custom") {
-    return { label: ref.label, marker: skillMarker(ref.isBase, ref.isExtra) };
+    return { label: ref.label, markedLabel: markLabel(ref.label, ref.isBase, ref.isExtra) };
   }
   if (ref.kind === "base") {
-    return { label: CONFIG.EMOKLORE.baseSkills[ref.key].label, marker: skillMarker(true, false) };
+    const { label } = CONFIG.EMOKLORE.baseSkills[ref.key];
+    return { label, markedLabel: markLabel(label, true, false) };
   }
 
   const { label, isExtra } = CONFIG.EMOKLORE.skills[ref.key];
-  return { label, marker: skillMarker(false, isExtra ?? false) };
+  return { label, markedLabel: markLabel(label, false, isExtra ?? false) };
 };
 
 /** 技能1行の見せ方。名前まわりに、判定に使う能力値の見せ方を足したもの */
@@ -113,12 +123,10 @@ const localizeCharacteristic = (key: CharacteristicKey): string =>
 
 /**
  * 参照能力値の並び。複数あるものは「身体／器用」のように連ねる。
- *
- * ルールブックは【身体 or 器用】と書くが、シートの列は狭いので区切りだけにしている。
- * 組込技能の `docs/data-model.md` の表も同じ「／」で並べている。
+ * 組込技能の `docs/data-model.md` の表も同じ区切りで並べている。
  */
 export const formatCharacteristicOptions = (options: Iterable<CharacteristicKey>): string =>
-  [...options].map(localizeCharacteristic).join("／");
+  joinCompact([...options].map(localizeCharacteristic));
 
 /** 技能グループの表示名。所属しないカスタム技能は「なし」 */
 export const formatSkillGroup = (group: SkillGroupKey | ""): string =>
@@ -224,12 +232,12 @@ export const toSkillRollShortcuts = (values: Iterable<string>): SkillRollShortcu
  * 古いデータは尻切れの表示になるだけで済む）。区切りは `formatCharacteristicOptions` と同じ。
  */
 export const formatSkillRefs = (values: Iterable<string>): string =>
-  [...values]
-    .flatMap((value) => {
+  joinCompact(
+    [...values].flatMap((value) => {
       const ref = toDescriptor(value);
       return ref ? [describeSkillLabel(ref).markedLabel] : [];
-    })
-    .join("／");
+    }),
+  );
 
 /**
  * 保存された「経路:キー」を、表に居ることを確かめたうえで参照に変える。

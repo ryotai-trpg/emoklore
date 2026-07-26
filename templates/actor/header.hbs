@@ -35,6 +35,8 @@
           data-action="roll"
           data-roll-type="resonance"
         ></button>
+        {{! ここだけ EMOKLORE.Format.level を使えない。値が入力欄なので、
+            フォーマット文字列で包めない }}
         <div class="em-meter__value">
           Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
         </div>

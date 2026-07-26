@@ -56,6 +56,7 @@ export const formatDamagePreview = (damageDie: DamageDie, attackPower: string): 
   const successes = _loc("EMOKLORE.Item.weapon.SuccessCount");
   const dice = damageDie ? `${successes}${damageDie.toUpperCase()}` : successes;
 
-  // 前後に空白を入れない。一覧の列で「＋」の前後が折り返し候補になり、式が途中で割れる
-  return attackPower ? `${dice}＋${attackPower}` : dice;
+  // 「＋」の前後に空白を入れない形は EMOKLORE.Format.damage が持つ。一覧の列で
+  // 空白が折り返し候補になり、式が途中で割れるため
+  return attackPower ? _loc("EMOKLORE.Format.damage", { dice, attackPower }) : dice;
 };

@@ -151,6 +151,11 @@ function isGamemaster(): boolean {
 
 /** 【身体】＋〈スピード〉のような基準の表示文字列 */
 function basisLabel(characteristic: CharacteristicKey, skill: SkillKey | ""): string {
-  const char = `【${characteristics[characteristic].label}】`;
-  return skill ? `${char}＋〈${skills[skill].label}〉` : char;
+  const name = characteristics[characteristic].label;
+  if (!skill) return _loc("EMOKLORE.Format.characteristicName", { name });
+
+  return _loc("EMOKLORE.Format.initiativeBasis", {
+    characteristic: name,
+    skill: skills[skill].label,
+  });
 }

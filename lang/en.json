@@ -76,9 +76,7 @@
   },
   "EMOKLORE": {
     "Common": {
-      "colon": ": ",
-      "none": "None",
-      "separator": " / "
+      "none": "None"
     },
     "Pack": {
       "howlingReactions": "Howling Reactions",
@@ -219,6 +217,22 @@
         "debate": "Debate",
         "cardiacArrest": "Cardiac Arrest (Dexterity)"
       }
+    },
+    "Format": {
+      "skillRoll": "{skillName} Roll",
+      "successMod": "Successes {mod}",
+      "skillName": "{name}",
+      "baseSkill": "*{name}",
+      "extraSkill": "★{name}",
+      "specialization": "{name}: {specialization}",
+      "characteristicName": "{name}",
+      "initiativeBasis": "{characteristic} + {skill}",
+      "level": "Lv.{level}",
+      "damage": "{dice} + {attackPower}",
+      "resonantEmotion": "{emotion} ({attribute})",
+      "emotionAttribute": "({attribute})",
+      "acquiredEmotion": "+{name}",
+      "separator": " / "
     },
     "Sheet": {
       "class": {
@@ -467,42 +481,42 @@
           "characteristics": {
             "physical": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.physical"
+                "label": "EMOKLORE.Config.characteristics.physical"
               }
             },
             "dexterity": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.dexterity"
+                "label": "EMOKLORE.Config.characteristics.dexterity"
               }
             },
             "mentality": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.mentality"
+                "label": "EMOKLORE.Config.characteristics.mentality"
               }
             },
             "sensitivity": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.sensitivity"
+                "label": "EMOKLORE.Config.characteristics.sensitivity"
               }
             },
             "intelligence": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.intelligence"
+                "label": "EMOKLORE.Config.characteristics.intelligence"
               }
             },
             "charisma": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.charisma"
+                "label": "EMOKLORE.Config.characteristics.charisma"
               }
             },
             "sociality": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.sociality"
+                "label": "EMOKLORE.Config.characteristics.sociality"
               }
             },
             "fortune": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.fortune"
+                "label": "EMOKLORE.Config.characteristics.fortune"
               }
             }
           },
@@ -647,9 +661,6 @@
         "Attacks": "Attacks"
       }
     },
-    "skillRoll": "{skillName} Roll",
-    "successMod": "Successes {mod}",
-    "resonantEmotion": "{emotion} ({attribute})",
     "Effect": {
       "Source": "Source",
       "Temporary": "Temporary",

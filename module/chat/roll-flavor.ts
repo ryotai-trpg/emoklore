@@ -21,14 +21,14 @@ export function formatSkillName({
   specialization,
 }: SkillRollContext): string {
   const { markedLabel } = describeSkillLabel({ kind: "custom", label, isBase, isExtra });
-  const suffix = specialization ? `${_loc("EMOKLORE.Common.colon")}${specialization}` : "";
+  if (!specialization) return markedLabel;
 
-  return `${markedLabel}${suffix}`;
+  return _loc("EMOKLORE.Format.specialization", { name: markedLabel, specialization });
 }
 
 /** チャットの見出し。判定の種類によらず「〈○○〉判定」の形にする */
 export const formatRollFlavor = (skillName: string): string =>
-  _loc("EMOKLORE.skillRoll", { skillName });
+  _loc("EMOKLORE.Format.skillRoll", { skillName });
 
 /**
  * 共鳴判定の判定名。

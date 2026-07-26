@@ -1,5 +1,6 @@
 import type { EmokloreActor } from "../documents/actor";
 import { SKILL_LEVEL_MAX, SKILL_LEVEL_MIN } from "../rules/limits";
+import { joinList } from "./format";
 import { typedEntries } from "./object";
 
 /**
@@ -274,13 +275,13 @@ export async function importFromCharSheet(
   // 取り込めなかったものは黙って捨てず知らせる（表記ゆれの発見に必要）
   if (unrecognizedEmotions.length > 0) {
     ui.notifications?.warn("EMOKLORE.Import.WarnUnknownEmotions", {
-      format: { labels: unrecognizedEmotions.join("、") },
+      format: { labels: joinList(unrecognizedEmotions) },
     });
   }
 
   if (unrecognizedSkills.length > 0) {
     ui.notifications?.warn("EMOKLORE.Import.WarnUnknownSkills", {
-      format: { labels: unrecognizedSkills.join("、") },
+      format: { labels: joinList(unrecognizedSkills) },
     });
   }
 }

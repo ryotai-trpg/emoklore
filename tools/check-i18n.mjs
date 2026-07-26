@@ -123,14 +123,22 @@ for (const file of sources) {
 // lang の値そのものがキーになっている場合、それも参照として数える。
 // FIELDS のラベルに `EMOKLORE.Config.characteristics.<能力値>` を置くと、
 // localizeSchema の `this.label ||= _loc(...)` が1回解決して能力値名になる。
-// 能力値名を2箇所に書かずに済む正しい書き方なので、参照として扱う
-const collectValueReferences = (node) => {
-  if (typeof node === "string") return KEY_SHAPE.test(node) ? [node] : [];
+// 能力値名を2箇所に書かずに済む正しい書き方なので、参照として扱う。
+//
+// **参照として数えるだけでなく、解決するかも見る。** キーを動かしたときに
+// 追従を忘れると、画面に生キーが出る（実際に一度やった）。
+const collectValueReferences = (node, path = "") => {
+  if (typeof node === "string") return KEY_SHAPE.test(node) ? [[path, node]] : [];
   if (node === null || typeof node !== "object") return [];
-  return Object.values(node).flatMap(collectValueReferences);
+  return Object.entries(node).flatMap(([key, value]) =>
+    collectValueReferences(value, path ? `${path}.${key}` : key),
+  );
 };
 
-for (const key of collectValueReferences(lang)) referenced.add(key);
+for (const [path, key] of collectValueReferences(lang)) {
+  referenced.add(key);
+  if (!defined.has(key)) undefinedRefs.push(`${LANG}: ${path} の値 ${key}`);
+}
 
 const unused = keys.filter((key) => {
   if (referenced.has(key)) return false;

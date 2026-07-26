@@ -5,6 +5,7 @@
 import { isResonantEmotionKey } from "../config/resonant-emotions";
 import { type OwnedEmotions, resolveEmotionMatch } from "../rules/emotion-match";
 import type { ResonanceMatch } from "../rules/resonance-roll";
+import { joinCompact } from "./format";
 
 /**
  * 感情キーから属性キーを引く。知らないキーは undefined。
@@ -24,7 +25,7 @@ export const formatEmotion = (emotion: string): string => {
   if (!isResonantEmotionKey(emotion)) return "";
 
   const { label, attribute } = CONFIG.EMOKLORE.resonantEmotions[emotion];
-  return _loc("EMOKLORE.resonantEmotion", {
+  return _loc("EMOKLORE.Format.resonantEmotion", {
     emotion: label,
     attribute: CONFIG.EMOKLORE.emotionAttributes[attribute].label,
   });
@@ -32,7 +33,4 @@ export const formatEmotion = (emotion: string): string => {
 
 /** 感情の一覧の表示。「怒り（情念）／恨み（情念）」。未知のキーは落とす */
 export const formatEmotions = (emotions: Iterable<string>): string =>
-  [...emotions]
-    .map(formatEmotion)
-    .filter((label) => label !== "")
-    .join(_loc("EMOKLORE.Common.separator"));
+  joinCompact([...emotions].map(formatEmotion).filter((label) => label !== ""));
