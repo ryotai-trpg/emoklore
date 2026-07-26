@@ -6,7 +6,7 @@
       {{#if this.notice}}
         <p class="em-meta em-damage-applied__notice">{{this.notice.text}}</p>
         {{#if this.notice.actorUuid}}
-          <button type="button" class="em-damage-applied__status" data-action="applyStatus"
+          <button type="button" data-action="applyStatus"
             data-status-id="{{this.notice.statusId}}" data-actor-uuid="{{this.notice.actorUuid}}">
             <i class="fa-solid fa-heart-pulse" inert></i>
             <span>{{this.notice.buttonLabel}}</span>

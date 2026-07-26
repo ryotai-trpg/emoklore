@@ -26,6 +26,7 @@ export class EmokloreHowlingSheet extends EmokloreItemSheet {
     header: EmokloreItemSheet.HEADER_PART,
     detail: {
       template: systemPath("templates/item/howling-detail.hbs"),
+      templates: ["templates/partials/field.hbs"].map(systemPath),
       scrollable: [""],
     },
   };

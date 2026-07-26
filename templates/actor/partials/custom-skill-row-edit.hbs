@@ -10,6 +10,8 @@
 
   @param skill カスタム技能の表示用データ（CustomSkillRow）
 --}}
+{{! `--custom` はCSSの規則を持たない。実機検証がカスタム技能の行を組込と
+    区別するための目印（tests/live/checks/custom-skill.mjs） }}
 <div
   class="em-skill-row em-skill-row--edit em-skill-row--custom"
   data-item-id="{{skill.id}}"
@@ -48,19 +50,7 @@
   {{/if}}
 
   <span class="em-skill-row__controls">
-    <a
-      class="em-skill-row__control"
-      data-action="viewDoc"
-      data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
-    >
-      <i class="fas fa-edit"></i>
-    </a>
-    <a
-      class="em-skill-row__control"
-      data-action="deleteDoc"
-      data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
-    >
-      <i class="fas fa-trash"></i>
-    </a>
+    {{! 編集モードでしか描かれない行なので、消すは常に出す }}
+    {{> "systems/emoklore/templates/partials/doc-controls.hbs" controlClass="em-skill-row__control" editable=true}}
   </span>
 </div>

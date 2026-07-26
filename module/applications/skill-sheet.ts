@@ -30,6 +30,7 @@ export class EmokloreSkillSheet extends EmokloreItemSheet {
     header: EmokloreItemSheet.HEADER_PART,
     detail: {
       template: systemPath("templates/item/skill-detail.hbs"),
+      templates: ["templates/partials/field.hbs"].map(systemPath),
       scrollable: [""],
     },
   };

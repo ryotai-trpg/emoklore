@@ -3,31 +3,16 @@
   {{#if isPlay}}
     {{! ラベルは LOCALIZATION_PREFIXES 経由で本体が翻訳済みにしている }}
     <div class="em-field-list">
-      <div class="em-field em-field--inline">
-        <label class="em-field__label">{{systemFields.category.label}}</label>
-        <span class="em-field__value">{{categoryLabel}}</span>
-      </div>
-      <div class="em-field">
-        <label class="em-field__label">{{systemFields.effect.label}}</label>
-        <span class="em-field__value">{{{effectHTML}}}</span>
-      </div>
+      {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.category.label display=categoryLabel inline=true}}
+      {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.effect.label display=effectHTML html=true}}
       {{! 回復条件は文と技能の2本立て。どちらも任意なので、書かれているぶんだけ出す }}
       {{#if system.recovery.note}}
-        <div class="em-field">
-          <label class="em-field__label">{{systemFields.recovery.fields.note.label}}</label>
-          <span class="em-field__value">{{system.recovery.note}}</span>
-        </div>
+        {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.recovery.fields.note.label display=system.recovery.note}}
       {{/if}}
       {{#if recoverySkillLabel}}
-        <div class="em-field em-field--inline">
-          <label class="em-field__label">{{systemFields.recovery.fields.skills.label}}</label>
-          <span class="em-field__value">{{recoverySkillLabel}}</span>
-        </div>
+        {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.recovery.fields.skills.label display=recoverySkillLabel inline=true}}
       {{/if}}
-      <div class="em-field">
-        <label class="em-field__label">{{systemFields.notes.label}}</label>
-        <span class="em-field__value">{{{notesHTML}}}</span>
-      </div>
+      {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.notes.label display=notesHTML html=true}}
     </div>
   {{else}}
     {{! choices にはi18nキーが入っているので、描画時に本体へ解決させる。

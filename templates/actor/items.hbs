@@ -2,7 +2,7 @@
 <section class="tab items {{tab.cssClass}}" data-group="primary" data-tab="items">
   <ol class="em-data-table">
     {{! 種別ごとに1項目。見出しと明細のolを li の中に収める（ol直下にolは置けない） }}
-    <li class="em-data-table__section" data-item-type="weapon">
+    <li data-item-type="weapon">
       <div class="em-data-table__head">
         <div class="em-data-table__name">{{localize "TYPES.Item.weapon"}}</div>
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.weapon.Damage"}}</div>
@@ -61,22 +61,7 @@
             {{! 開く・消すは組み立ての操作なので編集モードだけ。閲覧では行を右クリックする }}
             {{#unless @root.isPlay}}
             <div class="em-data-table__controls">
-              <a
-                class="em-data-table__control"
-                data-action="viewDoc"
-                data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
-              >
-                <i class="fas fa-edit"></i>
-              </a>
-              {{#if @root.editable}}
-                <a
-                  class="em-data-table__control"
-                  data-action="deleteDoc"
-                  data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
-                >
-                  <i class="fas fa-trash"></i>
-                </a>
-              {{/if}}
+              {{> "systems/emoklore/templates/partials/doc-controls.hbs" controlClass="em-data-table__control" editable=@root.editable}}
             </div>
             {{/unless}}
           </li>
@@ -84,7 +69,7 @@
       </ol>
     </li>
 
-    <li class="em-data-table__section" data-item-type="armor">
+    <li data-item-type="armor">
       <div class="em-data-table__head">
         <div class="em-data-table__name">{{localize "TYPES.Item.armor"}}</div>
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.armor.FIELDS.defense.label"}}</div>
@@ -132,22 +117,7 @@
             </div>
             {{#unless @root.isPlay}}
             <div class="em-data-table__controls">
-              <a
-                class="em-data-table__control"
-                data-action="viewDoc"
-                data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
-              >
-                <i class="fas fa-edit"></i>
-              </a>
-              {{#if @root.editable}}
-                <a
-                  class="em-data-table__control"
-                  data-action="deleteDoc"
-                  data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
-                >
-                  <i class="fas fa-trash"></i>
-                </a>
-              {{/if}}
+              {{> "systems/emoklore/templates/partials/doc-controls.hbs" controlClass="em-data-table__control" editable=@root.editable}}
             </div>
             {{/unless}}
           </li>

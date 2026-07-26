@@ -3,7 +3,7 @@ import type { ResonanceRequestState } from "../../data/messages/resonance-reques
 import { resolveActingActors } from "../../utils/targets";
 import {
   buildEmotionTags,
-  loadEmotionTagsPartial,
+  loadEmotionFieldPartials,
   pickEmotionsInto,
   readEmotions,
   removeEmotionFrom,
@@ -24,7 +24,7 @@ export async function promptResonanceRequest(
   preset: Partial<ResonanceRequestState> = {},
 ): Promise<ResonanceRequestState | null> {
   const emotions = preset.emotions ?? [];
-  await loadEmotionTagsPartial();
+  await loadEmotionFieldPartials();
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     intensity: preset.intensity ?? 5,
     rise: preset.rise ?? "1",

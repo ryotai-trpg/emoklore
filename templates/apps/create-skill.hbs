@@ -24,7 +24,7 @@
 {{! 複数選ぶと【身体 or 器用】のように判定時に選べるようになる }}
 <div class="form-group stacked">
   <label>{{localize "EMOKLORE.Item.skill.FIELDS.characteristicOptions.label"}}</label>
-  <div class="form-fields em-skill-create__characteristics">
+  <div class="form-fields">
     {{#each characteristics as |characteristic|}}
       <label>
         <input type="checkbox" name="characteristics" value="{{characteristic.value}}" {{checked characteristic.checked}}>

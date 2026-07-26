@@ -3,20 +3,11 @@
   {{#if isPlay}}
     {{! ラベルは LOCALIZATION_PREFIXES 経由で本体が翻訳済みにしている }}
     <div class="em-field-list">
-      <div class="em-field em-field--inline">
-        <label class="em-field__label">{{systemFields.defense.label}}</label>
-        <span class="em-field__value">{{system.defense}}</span>
-      </div>
+      {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.defense.label display=system.defense inline=true}}
       {{#if showCoverage}}
-        <div class="em-field em-field--inline">
-          <label class="em-field__label">{{systemFields.coverage.label}}</label>
-          <span class="em-field__value">{{system.coverage}}</span>
-        </div>
+        {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.coverage.label display=system.coverage inline=true}}
       {{/if}}
-      <div class="em-field">
-        <label class="em-field__label">{{systemFields.notes.label}}</label>
-        <span class="em-field__value">{{{notesHTML}}}</span>
-      </div>
+      {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.notes.label display=notesHTML html=true}}
     </div>
   {{else}}
     {{formGroup systemFields.defense value=system.defense}}
