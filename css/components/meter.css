@@ -30,8 +30,11 @@
     font-size: var(--font-size-16);
   }
 
+  /* 最大値は現在値より一段小さく。`small` は絶対キーワードで13px相当だが、
+     **ユーザーのフォントサイズ設定に追従しない**（本体は `configureUI` で `:root` の
+     font-size を変える）。`--font-size-13` は同じ13pxで、そちらは追従する */
   .em-meter__max {
-    font-size: small;
+    font-size: var(--font-size-13);
   }
 
   .em-meter .em-progress {
@@ -55,13 +58,18 @@
     /* 本体の button.icon は --button-size で箱を決める（.inline-control の
        既定は24px）。font-size だけ上げると字面が箱をはみ出してホバーの
        背景が欠けるので、箱のほうを --button-size で広げる。
-       見た目とホバーは本体のアイコンボタンに任せる */
+       見た目とホバーは本体のアイコンボタンに任せる。
+
+       **字面は箱から出す。** ここだけ `--font-size-24` に寄せてはいけない —
+       本体は `@media (max-width: 480px)` でフォントの段階を圧縮し
+       （`--font-size-24: 1.5rem → 1.25rem`）、`--button-size` の rem は圧縮しない。
+       トークン化すると狭いウィンドウで字面だけ縮んで箱と合わなくなる */
     .em-meter__action {
       grid-column: 1;
       grid-row: 1 / span 2;
       align-self: flex-start;
       --button-size: 2.25rem;
-      font-size: 1.5rem;
+      font-size: calc(var(--button-size) * 2 / 3);
     }
 
     /* MPの数値と同じ行・同じ下端に揃える */
