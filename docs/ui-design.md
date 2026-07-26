@@ -256,6 +256,16 @@ HP・MP・共鳴の3本のバーは、`.em-resources` が持つ行トラック�
 
 書いておかないと、次に読む人が「規則を消し忘れたのか、まだ書いていないのか」を判断できない。
 
+::: warning フックは `module/` だけではない
+**`tests/live/checks/` のセレクタもフック。** `.em-skill-row--custom` と `.em-emotion-picker__column` はCSSの規則を持たないが、実機検証が「カスタム技能の行だけを数える」「属性の列数を数える」ために引いている。`module/` と `templates/` だけを見て「使われていない」と判断すると、静的チェックは全部通ったうえで `verify:live` だけが落ちる。
+
+クラスを消す前に **`grep -rn "<クラス名>" module/ templates/ tests/`** を通すこと。
+:::
+
+**例外は、見分けのつかない兄弟を区別しているとき。** グリッドのセルがこれにあたる。`.em-effect-change__target` / `__type` / `__value` / `__phase` / `__priority` は規則を持たないが、6列に並ぶ `div` を見分ける手掛かりがこれしかない。列の位置だけが頼りの状態にすると、順序を入れ替えたときに何が起きたか読めなくなる。
+
+逆に、`<i class="em-chip__icon fa-solid fa-...">` の `em-chip__icon` のように**役割が中身から明らかなもの**は落とす。
+
 `npm run check:templates` は**CSS側を見ない**ので、これは自分で確認する。
 - **意味を持つ要素を使う**。対になった項目の並びは `dl` / `dt` / `dd`、リストは `ul` / `ol`、フォームの塊は `fieldset` / `legend`。`div` を並べてCSSで見た目だけ整えない
 - **レイアウトのためだけのラッパを増やさない**。グリッドの入れ子が要るように見えたら、まず `grid-template-areas` や `subgrid` で親のトラックに直接載せられないか検討する。`display: contents` も選択肢になる
@@ -266,7 +276,8 @@ HP・MP・共鳴の3本のバーは、`.em-resources` が持つ行トラック�
 <!-- Handlebarsの {{...}} をVueの補間として解釈させないため v-pre で囲む -->
 ::: v-pre
 
-- 引数を取る再利用部品は `templates/<種別>/partials/` に置き、先頭のコメントに `@param` を書く
+- 引数を取る再利用部品は `templates/<種別>/partials/` に置き、先頭のコメントに `@param` を書く。**文書の種別をまたいで使うものは `templates/partials/`** に置く（`field.hbs` は経歴タブとアイテムの詳細が、`doc-controls.hbs` は効果タブ・アイテムタブ・カスタム技能の行が共有する）
+- partialは**引数なしでも呼べる**。`{{#each}}` の中では現在のコンテキストがそのまま渡るので、行の形が揃っているならこれで足りる。1つずつ組み立てる側はハッシュ引数で渡す。`field.hbs` は両方の呼ばれ方をする
 - **入れ子のpartialもPARTSの `templates` に列挙する**。ApplicationV2 は再帰的に解決しないため、漏らすと初回描画は通って再描画で落ちる
 - TS側のパスは `systemPath()` を通す。hbs側の `{{> "systems/emoklore/..."}}` はHandlebarsからTSの定数が見えないのでフルパス直書きのまま
 - `{{lookup}}` を重ねてconfigを引くのはテンプレートでのデータ整形なので、`applications/` のコンテキスト整形側で解決する
