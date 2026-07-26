@@ -1,9 +1,18 @@
-import type { EmokloreActor } from "../../documents/actor";
 import type { CardActions } from "../../utils/chat-card";
 import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
+
+/**
+ * 状態を付与する対象のアクター。`documents/` を参照しないため構造で受ける
+ * （`data/character-like.ts` の `SkillItemLike` と同じ扱い）。
+ */
+type StatusTargetActor = {
+  name: string;
+  isOwner: boolean;
+  toggleStatusEffect: (statusId: string, options: { active: boolean }) => Promise<unknown>;
+};
 
 /** どのリソースの結果か。行の書式と境界の案内の出し分けに使う */
 export type ResourceKind = "hp" | "mp";
@@ -83,7 +92,7 @@ export class DamageAppliedModel extends ChatCardModel {
     const { statusId, actorUuid } = button.dataset;
     if (!statusId || !actorUuid) return;
 
-    const actor = (await foundry.utils.fromUuid(actorUuid)) as EmokloreActor | null;
+    const actor = (await foundry.utils.fromUuid(actorUuid)) as StatusTargetActor | null;
     if (!actor) {
       ui.notifications?.warn("EMOKLORE.ChatMessage.Common.ActorMissing", {
         localize: true,

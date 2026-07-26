@@ -1,9 +1,17 @@
-import type { EmokloreActor } from "../../documents/actor";
 import type { CardActions } from "../../utils/chat-card";
+import type { SkillRef } from "../character-like";
 import { type CardIdentity, ChatCardModel } from "./card-model";
 
 const { ArrayField, DocumentUUIDField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
+
+/**
+ * 判定を振らせる対象のアクター。`documents/` を参照しないため構造で受ける
+ * （`data/character-like.ts` の `SkillItemLike` と同じ扱い）。
+ */
+type RollingActor = {
+  rollSkill: (ref: SkillRef) => Promise<unknown>;
+};
 
 /** リマインダ1体ぶん。アクターを消したあとも読めるよう名前を焼き込む */
 export type SurvivalTarget = {
@@ -61,7 +69,7 @@ export class SurvivalReminderModel extends ChatCardModel {
     const { actorUuid } = button.dataset;
     if (!actorUuid) return;
 
-    const actor = (await foundry.utils.fromUuid(actorUuid)) as EmokloreActor | null;
+    const actor = (await foundry.utils.fromUuid(actorUuid)) as RollingActor | null;
     if (!actor) {
       ui.notifications?.warn("EMOKLORE.ChatMessage.Common.ActorMissing", {
         localize: true,
