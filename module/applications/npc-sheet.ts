@@ -4,7 +4,6 @@ import type { NpcDataModel } from "../data/npc";
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import { typedEntries } from "../utils/object";
-import { createDocumentData, resolveEmbeddedDocumentClass } from "../utils/sheet";
 import { describeSkill, describeSkillLabel, SHEET_CONTEXT } from "../utils/skill";
 import { formatDamagePreview, formatRangeLabel } from "../utils/weapon";
 import { EmokloreActorSheet } from "./actor-sheet";
@@ -30,9 +29,6 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
     position: { width: 520, height: 640 },
     actions: {
       ...super.DEFAULT_OPTIONS.actions,
-      viewDoc: this._viewDoc,
-      createDoc: this._createDoc,
-      deleteDoc: this._deleteDoc,
       toggleBaseSkill: this._toggleBaseSkill,
     },
   };
@@ -121,26 +117,6 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
       }));
 
     return context;
-  }
-
-  static async _viewDoc(this: EmokloreNpcSheet, _event: Event, target: HTMLElement) {
-    const id = target.closest<HTMLElement>("[data-item-id]")?.dataset.itemId;
-    if (id) this.actor.items.get(id)?.sheet?.render(true);
-  }
-
-  static async _deleteDoc(this: EmokloreNpcSheet, _event: Event, target: HTMLElement) {
-    const id = target.closest<HTMLElement>("[data-item-id]")?.dataset.itemId;
-    if (id) await this.actor.items.get(id)?.delete();
-  }
-
-  static async _createDoc(
-    this: EmokloreNpcSheet,
-    _event: Event,
-    target: HTMLElement & { dataset: DOMStringMap },
-  ) {
-    const docData = createDocumentData(target, this.actor);
-    const docCls = resolveEmbeddedDocumentClass(target.dataset.documentClass);
-    await docCls.create(docData, { parent: this.actor });
   }
 
   /**

@@ -172,6 +172,11 @@ export type CharacteristicsMap = Record<
 
 export type EmokloreActorSheetActions = {
   roll: (event: Event, target: HTMLElement) => Promise<unknown>;
+  // 行の埋め込みドキュメント（アイテム・効果）の開く・作る・消す。どのアクターシートも
+  // 同じ操作なので基底が持ち、マークアップに data-action がある種別だけで実際に発火する
+  viewDoc: (event: Event, target: HTMLElement) => Promise<void>;
+  createDoc: (event: Event, target: HTMLElement) => Promise<void>;
+  deleteDoc: (event: Event, target: HTMLElement) => Promise<void>;
   // mixin側のDEFAULT_OPTIONSから継承チェーン経由でマージされるので、各シートでの宣言は任意
   toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
 };

@@ -4,7 +4,11 @@ import { isSkillKey } from "../config/skills";
 import type { SkillRef } from "../data/character-like";
 import type { EmokloreActor } from "../documents/actor";
 import { getSetting } from "../settings";
-import { getEmbeddedDocument, resolveEmbeddedDocumentClass } from "../utils/sheet";
+import {
+  createDocumentData,
+  getEmbeddedDocument,
+  resolveEmbeddedDocumentClass,
+} from "../utils/sheet";
 import EmokloreDocumentSheetMixin from "./document-sheet-mixin";
 import { requestResonanceRoll, requestSkillRoll } from "./rolls";
 import type {
@@ -36,8 +40,36 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
     classes: ["actor"],
     actions: {
       roll: this.#onRoll,
+      viewDoc: this._viewDoc,
+      createDoc: this._createDoc,
+      deleteDoc: this._deleteDoc,
     },
   };
+
+  /**
+   * 行の埋め込みドキュメントを開く・作る・消す。
+   *
+   * **どのアクターシートでも同じ操作なので基底が持つ。** 行の解決は `utils/sheet.ts` の
+   * `getEmbeddedDocument` に任せる — アイテムと効果のどちらも引けるので、種別ごとに
+   * `data-item-id` を手で辿る必要がない（右クリックメニューも同じ関数を通っている）。
+   */
+  static async _viewDoc(this: EmokloreActorSheet, _event: Event, target: HTMLElement) {
+    getEmbeddedDocument(target, this.actor)?.sheet?.render(true);
+  }
+
+  static async _deleteDoc(this: EmokloreActorSheet, _event: Event, target: HTMLElement) {
+    await getEmbeddedDocument(target, this.actor)?.delete();
+  }
+
+  static async _createDoc(
+    this: EmokloreActorSheet,
+    _event: Event,
+    target: HTMLElement & { dataset: DOMStringMap },
+  ) {
+    const docData = createDocumentData(target, this.actor);
+    const docCls = resolveEmbeddedDocumentClass(target.dataset.documentClass);
+    await docCls.create(docData, { parent: this.actor });
+  }
 
   /**
    * 行の右クリックメニューを張る。
