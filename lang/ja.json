@@ -253,9 +253,7 @@
           "items": "アイテム",
           "effects": "効果"
         },
-        "fields": {
-          "specialization": "分野"
-        }
+        "specialization": "分野"
       },
       "npc": {
         "Skills": "技能",
@@ -522,31 +520,13 @@
           },
           "resources": {
             "hp": {
-              "label": "HP",
-              "value": {
-                "label": "現在"
-              },
-              "max": {
-                "label": "最大"
-              }
+              "label": "HP"
             },
             "mp": {
-              "label": "MP",
-              "value": {
-                "label": "現在"
-              },
-              "max": {
-                "label": "最大"
-              }
+              "label": "MP"
             },
             "resonance": {
-              "label": "共鳴",
-              "value": {
-                "label": "現在"
-              },
-              "max": {
-                "label": "最大"
-              }
+              "label": "共鳴"
             }
           },
           "biography": {
@@ -598,14 +578,10 @@
         "FIELDS": {
           "resources": {
             "hp": {
-              "value": {
-                "label": "HP"
-              }
+              "label": "HP"
             },
             "mp": {
-              "value": {
-                "label": "MP"
-              }
+              "label": "MP"
             },
             "armor": {
               "label": "装甲"

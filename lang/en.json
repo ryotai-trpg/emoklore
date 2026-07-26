@@ -253,9 +253,7 @@
           "items": "Items",
           "effects": "Effects"
         },
-        "fields": {
-          "specialization": "Specialization"
-        }
+        "specialization": "Specialization"
       },
       "npc": {
         "Skills": "Skills",
@@ -522,31 +520,13 @@
           },
           "resources": {
             "hp": {
-              "label": "HP",
-              "value": {
-                "label": "Current"
-              },
-              "max": {
-                "label": "Max"
-              }
+              "label": "HP"
             },
             "mp": {
-              "label": "MP",
-              "value": {
-                "label": "Current"
-              },
-              "max": {
-                "label": "Max"
-              }
+              "label": "MP"
             },
             "resonance": {
-              "label": "Resonance",
-              "value": {
-                "label": "Current"
-              },
-              "max": {
-                "label": "Max"
-              }
+              "label": "Resonance"
             }
           },
           "biography": {
@@ -598,14 +578,10 @@
         "FIELDS": {
           "resources": {
             "hp": {
-              "value": {
-                "label": "HP"
-              }
+              "label": "HP"
             },
             "mp": {
-              "value": {
-                "label": "MP"
-              }
+              "label": "MP"
             },
             "armor": {
               "label": "Armor"
