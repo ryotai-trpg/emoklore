@@ -17,13 +17,6 @@
     margin-bottom: var(--spacer-12);
   }
 
-  .em-acquired__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacer-8);
-  }
-
   .em-acquired__title {
     margin: 0;
     font-size: var(--font-size-14);

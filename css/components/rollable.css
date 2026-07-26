@@ -1,0 +1,17 @@
+/* 押すと判定が飛ぶ名前。NPCの技能・武器と、怪異の攻撃が使う。
+
+   `docs/ui-design.md` の「クリックできるものは、ホバーで必ず反応させる」を1箇所にまとめたもの。
+   カーソルの形だけでは弱いので、ホバーで文字を光らせる。
+
+   **共鳴者シートの技能行はこれを使わない。** あちらは行全体を当たり判定にして地の色で示す
+   （`components/skill-row.css`）。一覧の密度が違うので、示し方も変えてある。 */
+
+@layer components {
+  .em-rollable {
+    cursor: pointer;
+  }
+
+  .em-rollable:hover {
+    text-shadow: 0 0 8px var(--color-shadow-primary);
+  }
+}

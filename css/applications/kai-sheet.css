@@ -42,22 +42,9 @@
       padding: var(--spacer-8) 0;
     }
 
+    /* 並べ方は em-pair が持つ。ここは「ラベルを左端、値を右端へ」だけを足す */
     .em-kai__stat {
-      display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: var(--spacer-4);
-    }
-
-    .em-kai__stat-edit {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--spacer-4);
-    }
-
-    .em-kai__stat input {
-      width: 3rem;
-      text-align: center;
     }
 
     .em-kai__block {
@@ -70,11 +57,8 @@
       font-size: var(--font-size-14);
     }
 
+    /* 並べ方は em-section-head が持つ。下の間隔だけ足す */
     .em-kai__block-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--spacer-8);
       margin-bottom: var(--spacer-4);
     }
 
@@ -99,17 +83,6 @@
       gap: var(--spacer-16);
     }
 
-    .em-kai__field {
-      display: flex;
-      align-items: center;
-      gap: var(--spacer-4);
-    }
-
-    .em-kai__field input[type="number"] {
-      width: 3rem;
-      text-align: center;
-    }
-
     .em-kai__attack-list {
       list-style: none;
       margin: 0;
@@ -127,13 +100,9 @@
       padding: var(--spacer-4) 0;
     }
 
+    /* 押せることの示し方は em-rollable が持つ。ここは太さだけ */
     .em-kai__attack-name {
-      cursor: pointer;
       font-weight: bold;
-    }
-
-    .em-kai__attack-name:hover {
-      text-shadow: 0 0 8px var(--color-shadow-primary);
     }
 
     .em-kai__attack-damage {
@@ -145,17 +114,6 @@
       flex-wrap: wrap;
       gap: var(--spacer-8);
       flex: 1 1 100%;
-    }
-
-    .em-kai__attack-fields label {
-      display: flex;
-      align-items: center;
-      gap: var(--spacer-4);
-    }
-
-    .em-kai__attack-fields input[type="number"] {
-      width: 3rem;
-      text-align: center;
     }
 
     .em-kai__attack-name-input {

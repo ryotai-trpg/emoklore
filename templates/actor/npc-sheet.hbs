@@ -12,22 +12,22 @@
   {{! 現在値は卓中に減っていくものなので、モードによらず入力にする（共鳴者のメータと同じ）。
       最大値は能力値からの派生なので、どちらのモードでも表示だけ — 変えたいなら能力値を変える }}
   <div class="em-npc__resources">
-    <label class="em-npc__resource"
+    <label class="em-pair"
       data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.hp.label"}}">
       {{! HP/MPのアイコンは共鳴者のメータと同じものを使う（fa-heart / fa-wand-magic-sparkles） }}
       <i class="fa-solid fa-heart em-npc__resource-icon" inert></i>
-      <span class="em-npc__resource-edit">
-        {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
-        <span class="em-npc__resource-sep">/</span>
+      <span class="em-pair">
+        {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value classes="em-num"}}
+        <span>/</span>
         <span>{{system.resources.hp.max}}</span>
       </span>
     </label>
-    <label class="em-npc__resource"
+    <label class="em-pair"
       data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.mp.label"}}">
       <i class="fa-solid fa-wand-magic-sparkles em-npc__resource-icon" inert></i>
-      <span class="em-npc__resource-edit">
-        {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
-        <span class="em-npc__resource-sep">/</span>
+      <span class="em-pair">
+        {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value classes="em-num"}}
+        <span>/</span>
         <span>{{system.resources.mp.max}}</span>
       </span>
     </label>
@@ -36,7 +36,7 @@
 
 <section class="em-npc__characteristics">
   {{#each characteristics}}
-    <div class="em-npc__characteristic">
+    <div class="em-pair">
       {{! CONFIG が持つのは字形のクラスだけ。書体（fa-solid）は使う側が足す }}
       <i class="fa-solid {{icon}}" inert></i>
       <span class="em-npc__characteristic-label">{{label}}</span>
@@ -45,7 +45,7 @@
       {{else}}
         {{! min / max はスキーマから来る。type を渡さないと、段階が決まる数値は
             本体が range-picker にする（NumberField#_toInput） }}
-        {{formInput field value=value type="number"}}
+        {{formInput field value=value type="number" classes="em-num"}}
       {{/if}}
     </div>
   {{/each}}
@@ -56,12 +56,12 @@
   <ul class="em-npc__skill-list">
     {{#each skills}}
       <li class="em-npc__skill">
-        <a class="em-npc__skill-name" data-action="roll" data-roll-type="{{rollType}}" data-skill="{{key}}">{{markedLabel}}</a>
+        <a class="em-rollable em-npc__skill-name" data-action="roll" data-roll-type="{{rollType}}" data-skill="{{key}}">{{markedLabel}}</a>
         <i class="fa-solid {{characteristicIcon}}" inert></i>
         {{#if ../isPlay}}
-          <span class="em-npc__skill-level">{{localize "EMOKLORE.Format.level" level=level}}</span>
+          <span>{{localize "EMOKLORE.Format.level" level=level}}</span>
         {{else}}
-          {{formInput field value=level type="number" classes="em-npc__skill-input"}}
+          {{formInput field value=level type="number" classes="em-num"}}
         {{/if}}
         <span class="em-npc__skill-target">{{target}}</span>
       </li>
@@ -103,7 +103,7 @@
             data-tooltip="EMOKLORE.Sheet.npc.ShowBaseSkill"
             {{checked shown}}
           />
-          <a class="em-npc__skill-name" data-action="roll" data-roll-type="{{rollType}}" data-skill="{{key}}">{{markedLabel}}</a>
+          <a class="em-rollable em-npc__skill-name" data-action="roll" data-roll-type="{{rollType}}" data-skill="{{key}}">{{markedLabel}}</a>
           <i class="fa-solid {{characteristicIcon}}" inert></i>
           <span class="em-npc__skill-target">{{target}}</span>
         </li>
@@ -119,9 +119,9 @@
     <ul class="em-npc__skill-list">
       {{#each customSkills}}
         <li class="em-npc__skill" data-item-id="{{id}}">
-          <a class="em-npc__skill-name" data-action="roll" data-roll-type="custom-skill" data-item-id="{{id}}">{{markedLabel}}</a>
+          <a class="em-rollable em-npc__skill-name" data-action="roll" data-roll-type="custom-skill" data-item-id="{{id}}">{{markedLabel}}</a>
           {{#if ../isPlay}}
-            <span class="em-npc__skill-level">{{localize "EMOKLORE.Format.level" level=level}}</span>
+            <span>{{localize "EMOKLORE.Format.level" level=level}}</span>
           {{/if}}
           <span class="em-npc__skill-target">{{target}}</span>
         </li>
@@ -131,7 +131,7 @@
 {{/if}}
 
 <section class="em-npc__weapons">
-  <header class="em-npc__section-head">
+  <header class="em-section-head">
     <h3>{{localize "EMOKLORE.Sheet.npc.Weapons"}}</h3>
     {{#unless isPlay}}
       <button type="button" data-action="createDoc" data-document-class="Item" data-type="weapon">
@@ -143,9 +143,9 @@
     {{! data-document-class は行の右クリックメニューが引くための目印（actor-sheet.ts） }}
     {{#each weapons}}
       <li class="em-npc__weapon" data-item-id="{{id}}" data-document-class="Item">
-        <img class="em-npc__weapon-image" src="{{img}}" height="24" width="24" alt="" />
-        <a class="em-npc__weapon-name" data-action="roll" data-roll-type="weapon" data-item-id="{{id}}">{{name}}</a>
-        <span class="em-npc__weapon-meta">{{rangeLabel}} / {{damagePreview}}</span>
+        <img src="{{img}}" height="24" width="24" alt="" />
+        <a class="em-rollable em-npc__weapon-name" data-action="roll" data-roll-type="weapon" data-item-id="{{id}}">{{name}}</a>
+        <span class="em-meta">{{rangeLabel}} / {{damagePreview}}</span>
         {{#unless ../isPlay}}
           <a data-action="viewDoc" data-tooltip="APPLICATION.ACTIONS.Edit"><i class="fa-solid fa-pen-to-square" inert></i></a>
           <a data-action="deleteDoc" data-tooltip="APPLICATION.ACTIONS.Delete"><i class="fa-solid fa-trash" inert></i></a>

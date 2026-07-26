@@ -1,0 +1,18 @@
+/* ラベルと値を1行に詰めて並べる。NPC・怪異シートの各項目（HP/MP・能力値・共鳴の強度・
+   攻撃の各欄）が共有する。
+
+   **間隔を揃えるために共有している。** かつては `em-npc__resource` / `em-npc__resource-edit` /
+   `em-npc__characteristic` / `em-kai__stat-edit` / `em-kai__field` / `em-kai__attack-fields label`
+   の**6つの別名**に同じ3行が散っていた。片方だけ間隔を変えると、同じ「ラベルと値」なのに
+   シートごとに詰め方が違う、という形で崩れる。
+
+   `inline-flex` と書き分けていた箇所があったが、いずれもflexアイテムの中に居るので
+   display は flex に blockify される（差は出ない）。 */
+
+@layer components {
+  .em-pair {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-4);
+  }
+}

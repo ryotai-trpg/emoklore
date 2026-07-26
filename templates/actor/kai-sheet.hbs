@@ -5,7 +5,7 @@
   {{#if isPlay}}
     <h1 class="em-kai__name">{{document.name}}</h1>
   {{else}}
-    <input class="em-kai__name-input" type="text" name="name" value="{{document.name}}"
+    <input type="text" name="name" value="{{document.name}}"
       placeholder="{{localize "DOCUMENT.FIELDS.name.label"}}" />
   {{/if}}
 </header>
@@ -14,44 +14,44 @@
   {{! 現在値は卓中に減っていくものなので、モードによらず入力にする（共鳴者のメータと同じ）。
       組み立ての値である最大値だけを編集モードに残す。入力はスキーマから描くので、
       怪異のHP/MPが持つ min: 0 がそのまま効く }}
-  <label class="em-kai__stat">
+  <label class="em-pair em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.hp.label"}}</span>
-    <span class="em-kai__stat-edit">
-      {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
+    <span class="em-pair">
+      {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value classes="em-num"}}
       <span>/</span>
       {{#if isPlay}}
         <span>{{system.resources.hp.max}}</span>
       {{else}}
-        {{formInput systemFields.resources.fields.hp.fields.max value=system.resources.hp.max}}
+        {{formInput systemFields.resources.fields.hp.fields.max value=system.resources.hp.max classes="em-num"}}
       {{/if}}
     </span>
   </label>
-  <label class="em-kai__stat">
+  <label class="em-pair em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.mp.label"}}</span>
-    <span class="em-kai__stat-edit">
-      {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
+    <span class="em-pair">
+      {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value classes="em-num"}}
       <span>/</span>
       {{#if isPlay}}
         <span>{{system.resources.mp.max}}</span>
       {{else}}
-        {{formInput systemFields.resources.fields.mp.fields.max value=system.resources.mp.max}}
+        {{formInput systemFields.resources.fields.mp.fields.max value=system.resources.mp.max classes="em-num"}}
       {{/if}}
     </span>
   </label>
-  <label class="em-kai__stat">
+  <label class="em-pair em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.armor.label"}}</span>
     {{#if isPlay}}
       <span>{{system.resources.armor}}</span>
     {{else}}
-      <input type="number" name="system.resources.armor" value="{{system.resources.armor}}" min="0" />
+      <input class="em-num" type="number" name="system.resources.armor" value="{{system.resources.armor}}" min="0" />
     {{/if}}
   </label>
-  <label class="em-kai__stat">
+  <label class="em-pair em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.initiative.label"}}</span>
     {{#if isPlay}}
       <span>{{system.initiative}}</span>
     {{else}}
-      <input type="number" name="system.initiative" value="{{system.initiative}}" />
+      <input class="em-num" type="number" name="system.initiative" value="{{system.initiative}}" />
     {{/if}}
   </label>
 </section>
@@ -71,23 +71,23 @@
 </section>
 
 <section class="em-kai__block">
-  <header class="em-kai__block-head">
+  <header class="em-section-head em-kai__block-head">
     <h3>{{localize "EMOKLORE.Actor.kai.Resonance"}}</h3>
-    <button type="button" class="em-kai__resonance-request" data-action="requestResonance">
+    <button type="button" data-action="requestResonance">
       <i class="fa-solid fa-tower-broadcast" inert></i>
       <span>{{localize "EMOKLORE.Actor.kai.RequestResonance"}}</span>
     </button>
   </header>
   <div class="em-kai__resonance">
-    <label class="em-kai__field">
+    <label class="em-pair">
       <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resonance.intensity.label"}}</span>
       {{#if isPlay}}
         <span>{{system.resonance.intensity}}</span>
       {{else}}
-        <input type="number" name="system.resonance.intensity" value="{{system.resonance.intensity}}" min="1" />
+        <input class="em-num" type="number" name="system.resonance.intensity" value="{{system.resonance.intensity}}" min="1" />
       {{/if}}
     </label>
-    <label class="em-kai__field">
+    <label class="em-pair">
       <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resonance.rise.label"}}</span>
       {{#if isPlay}}
         <span>{{system.resonance.rise}}</span>
@@ -100,7 +100,7 @@
       閲覧では紐づいているときだけリンクを出す }}
   {{#if isPlay}}
     {{#if resonanceTableLink}}
-      <div class="em-kai__resonance-table">
+      <div>
         <span>{{localize "EMOKLORE.Actor.kai.ResonanceTable"}}</span>
         {{{resonanceTableLink}}}
       </div>
@@ -113,14 +113,14 @@
 <section class="em-kai__block">
   <h3>{{localize "EMOKLORE.Actor.kai.Mutation"}}</h3>
   {{#if isPlay}}
-    <div class="em-kai__mutation">{{{mutationHTML}}}</div>
+    <div>{{{mutationHTML}}}</div>
   {{else}}
     <textarea class="em-kai__mutation-input" name="system.mutation" rows="3">{{system.mutation}}</textarea>
   {{/if}}
 </section>
 
 <section class="em-kai__block">
-  <header class="em-kai__block-head">
+  <header class="em-section-head em-kai__block-head">
     <h3>{{localize "EMOKLORE.Actor.kai.Attacks"}}</h3>
     {{#unless isPlay}}
       <button type="button" data-action="addAttack">
@@ -132,12 +132,12 @@
     {{#each system.attacks}}
       <li class="em-kai__attack" data-attack-index="{{@index}}">
         {{#if ../isPlay}}
-          <a class="em-kai__attack-name" data-action="rollAttack">
+          <a class="em-rollable em-kai__attack-name" data-action="rollAttack">
             {{#if name}}{{name}}{{else}}{{localize "EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"}}{{/if}}
           </a>
           {{! ラベルはスキーマから引く（attackFields）。攻撃の性質なので、
               チャットカードと同じところを見る }}
-          <span class="em-kai__attack-judge">
+          <span>
             {{#if judgeless}}
               {{@root.attackFields.judgeless.label}} {{fixedSuccess}}
             {{else}}
@@ -145,28 +145,28 @@
             {{/if}}
           </span>
           {{#if damage}}<span class="em-kai__attack-damage">{{damage}}</span>{{/if}}
-          {{#if mpCost}}<span class="em-kai__attack-mp">{{@root.attackFields.mpCost.label}}{{mpCost}}</span>{{/if}}
+          {{#if mpCost}}<span>{{@root.attackFields.mpCost.label}}{{mpCost}}</span>{{/if}}
         {{else}}
           {{! ラベルとプレースホルダはスキーマから引く（コンテキストの attackFields）。
               name 属性だけは添字が要るのでここで組み立てる }}
           <input class="em-kai__attack-name-input" type="text" name="system.attacks.{{@index}}.name"
             value="{{name}}" placeholder="{{@root.attackFields.name.placeholder}}" />
           <div class="em-kai__attack-fields">
-            <label>{{@root.attackFields.diceCount.label}}
-              <input type="number" name="system.attacks.{{@index}}.diceCount" value="{{diceCount}}" min="0" /></label>
-            <label>{{@root.attackFields.target.label}}
-              <input type="number" name="system.attacks.{{@index}}.target" value="{{target}}" min="0" /></label>
-            <label>{{@root.attackFields.damage.label}}
+            <label class="em-pair">{{@root.attackFields.diceCount.label}}
+              <input class="em-num" type="number" name="system.attacks.{{@index}}.diceCount" value="{{diceCount}}" min="0" /></label>
+            <label class="em-pair">{{@root.attackFields.target.label}}
+              <input class="em-num" type="number" name="system.attacks.{{@index}}.target" value="{{target}}" min="0" /></label>
+            <label class="em-pair">{{@root.attackFields.damage.label}}
               <input type="text" name="system.attacks.{{@index}}.damage" value="{{damage}}"
                 placeholder="{{@root.attackFields.damage.placeholder}}" /></label>
-            <label>{{@root.attackFields.mpCost.label}}
-              <input type="number" name="system.attacks.{{@index}}.mpCost" value="{{mpCost}}" min="0" /></label>
-            <label class="em-kai__attack-flag">{{@root.attackFields.judgeless.label}}
+            <label class="em-pair">{{@root.attackFields.mpCost.label}}
+              <input class="em-num" type="number" name="system.attacks.{{@index}}.mpCost" value="{{mpCost}}" min="0" /></label>
+            <label class="em-pair">{{@root.attackFields.judgeless.label}}
               <input type="checkbox" name="system.attacks.{{@index}}.judgeless" {{checked judgeless}} /></label>
-            <label>{{@root.attackFields.fixedSuccess.label}}
-              <input type="number" name="system.attacks.{{@index}}.fixedSuccess" value="{{fixedSuccess}}" min="0" /></label>
+            <label class="em-pair">{{@root.attackFields.fixedSuccess.label}}
+              <input class="em-num" type="number" name="system.attacks.{{@index}}.fixedSuccess" value="{{fixedSuccess}}" min="0" /></label>
           </div>
-          <a class="em-kai__attack-delete" data-action="deleteAttack" data-tooltip="APPLICATION.ACTIONS.Delete">
+          <a data-action="deleteAttack" data-tooltip="APPLICATION.ACTIONS.Delete">
             <i class="fa-solid fa-trash" inert></i>
           </a>
         {{/if}}

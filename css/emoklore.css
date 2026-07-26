@@ -34,6 +34,9 @@
 @import url("./components/utilities.css");
 @import url("./components/avatar.css");
 @import url("./components/button.css");
+@import url("./components/pair.css");
+@import url("./components/rollable.css");
+@import url("./components/section-head.css");
 @import url("./components/card.css");
 @import url("./components/tag.css");
 @import url("./components/terms.css");

@@ -6,7 +6,7 @@
   {{! 1件も無いときは、選び直せる人にだけ空の枠を見せる（入口がここにあると分かる） }}
   {{#if (or editable acquiredEmotionRows.length)}}
     <section class="em-acquired">
-      <header class="em-acquired__head">
+      <header class="em-section-head">
         <h3 class="em-acquired__title">{{localize "EMOKLORE.EmotionPicker.AcquiredSection"}}</h3>
         {{#if editable}}
           <button type="button" class="em-button em-button--inline" data-action="pickAcquiredEmotions">
