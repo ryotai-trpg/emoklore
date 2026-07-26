@@ -1,73 +1,75 @@
 /* アイテムシート共通のレイアウト。templates/item/header.hbs と、
    種別ごとの詳細（.em-item-detail）を使うシートで成立する */
 
-/* リサイズの下限。**内容から導ける値ではない。**
-   実測では280pxまで詰めても文字は折り返さず、横にも溢れない（能力値や項目の並びが
-   `auto-fill` で段数を変えるだけ）。共鳴者シートと違って「これ以上詰めると壊れる幅」が
-   無いので、ここは「これ以上小さいと読めない」という使い勝手の値になる。 */
-.emoklore.sheet.item:not(.minimized, .minimizing, .maximizing) {
-  min-width: 320px;
-  min-height: 320px;
-}
-
-.emoklore.sheet.item {
-  /* 画像と名前を横に並べ、中央で揃える。
-     名前の列は minmax(0, 1fr)。grid item の既定は min-width: auto なので、
-     これがないと長い名前が列を押し広げて画像を枠外へ追い出す */
-  .em-item-header {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: var(--spacer-8);
-    padding: var(--spacer-8) 0;
-    container-type: inline-size;
+@layer applications {
+  /* リサイズの下限。**内容から導ける値ではない。**
+     実測では280pxまで詰めても文字は折り返さず、横にも溢れない（能力値や項目の並びが
+     `auto-fill` で段数を変えるだけ）。共鳴者シートと違って「これ以上詰めると壊れる幅」が
+     無いので、ここは「これ以上小さいと読めない」という使い勝手の値になる。 */
+  .emoklore.sheet.item:not(.minimized, .minimizing, .maximizing) {
+    min-width: 320px;
+    min-height: 320px;
   }
 
-  /* 中身が変わらない枠なので寸法を固定する。rem にしてユーザーの
-     フォントサイズ設定に追従させる */
-  .em-item-header__image {
-    width: 3rem;
-    height: 3rem;
-    border: none;
-    border-radius: var(--emoklore-box-radius);
-    object-fit: cover;
-  }
-
-  /* 画像は押すとファイルピッカーが開く。閲覧専用のときは本体が .disabled を付ける */
-  .em-item-header__image:not(.disabled) {
-    cursor: pointer;
-
-    &:hover {
-      outline: 1px solid var(--color-border-highlight);
+  .emoklore.sheet.item {
+    /* 画像と名前を横に並べ、中央で揃える。
+       名前の列は minmax(0, 1fr)。grid item の既定は min-width: auto なので、
+       これがないと長い名前が列を押し広げて画像を枠外へ追い出す */
+    .em-item-header {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: var(--spacer-8);
+      padding: var(--spacer-8) 0;
+      container-type: inline-size;
     }
-  }
 
-  /* 文字サイズは容器に追従させ、それでも収まらないときに切り詰める */
-  .em-item-header__name {
-    min-width: 0;
-    font-size: clamp(1rem, 8cqi, var(--font-size-24));
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    input {
-      width: 100%;
-      height: initial;
+    /* 中身が変わらない枠なので寸法を固定する。rem にしてユーザーの
+       フォントサイズ設定に追従させる */
+    .em-item-header__image {
+      width: 3rem;
+      height: 3rem;
+      border: none;
+      border-radius: var(--emoklore-box-radius);
+      object-fit: cover;
     }
-  }
 
-  /* 種別ごとの詳細。並ぶ項目は違うが、器の余白と折り返しは共通 */
-  .em-item-detail {
-    padding: var(--spacer-8) 0;
+    /* 画像は押すとファイルピッカーが開く。閲覧専用のときは本体が .disabled を付ける */
+    .em-item-header__image:not(.disabled) {
+      cursor: pointer;
 
-    /* 備考は長さが読めないので、折り返して器の中に収める */
-    .em-field__value {
+      &:hover {
+        outline: 1px solid var(--color-border-highlight);
+      }
+    }
+
+    /* 文字サイズは容器に追従させ、それでも収まらないときに切り詰める */
+    .em-item-header__name {
       min-width: 0;
-      overflow-wrap: anywhere;
+      font-size: clamp(1rem, 8cqi, var(--font-size-24));
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      input {
+        width: 100%;
+        height: initial;
+      }
     }
 
-    .form-group.stacked .editor-container {
-      min-height: 8rem;
+    /* 種別ごとの詳細。並ぶ項目は違うが、器の余白と折り返しは共通 */
+    .em-item-detail {
+      padding: var(--spacer-8) 0;
+
+      /* 備考は長さが読めないので、折り返して器の中に収める */
+      .em-field__value {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .form-group.stacked .editor-container {
+        min-height: 8rem;
+      }
     }
   }
 }

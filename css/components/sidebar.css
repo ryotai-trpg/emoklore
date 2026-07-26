@@ -7,7 +7,7 @@
    .window-content の overflow: hidden に任せる。こうするとトグルを
    サイドバーの外に出しても切られない */
 
-.emoklore {
+@layer components {
   .em-sidebar {
     position: relative;
     width: var(--emoklore-sheet-sidebar-width);
@@ -57,28 +57,28 @@
     font-size: var(--font-size-12);
     transition: transform 300ms ease;
   }
-}
 
-/* 畳んだ状態。ルート要素に付くクラスで切り替える（character-sheet.ts の
-   _applySidebarState）。再描画を挟まないので、押した瞬間に反応する。
+  /* 畳んだ状態。ルート要素に付くクラスで切り替える（character-sheet.ts の
+     _applySidebarState）。再描画を挟まないので、押した瞬間に反応する。
 
-   幅も余白も0にするので、タブ側はシートいっぱいに広がる。
-   トグルは絶対配置なので幅の外に居続ける */
-.emoklore.em-sidebar-collapsed {
-  .em-sidebar {
-    width: 0;
-    margin-inline-end: 0;
-  }
+     幅も余白も0にするので、タブ側はシートいっぱいに広がる。
+     トグルは絶対配置なので幅の外に居続ける */
+  .em-sidebar-collapsed {
+    .em-sidebar {
+      width: 0;
+      margin-inline-end: 0;
+    }
 
-  /* 自分の幅だけでは .window-content の内側の縁で止まり、シート端の余白の
-     ぶんが帯として残る。その余白も足して完全に外へ送り出す */
-  .em-sidebar__scroll {
-    transform: translateX(calc(-100% - var(--spacer-16)));
-  }
+    /* 自分の幅だけでは .window-content の内側の縁で止まり、シート端の余白の
+       ぶんが帯として残る。その余白も足して完全に外へ送り出す */
+    .em-sidebar__scroll {
+      transform: translateX(calc(-100% - var(--spacer-16)));
+    }
 
-  /* サイドバーに追従して余白の中まで下がる。ここまで来ると、
-     ボタンがちょうどシート端の余白を埋める */
-  .em-sidebar__toggle {
-    transform: translateX(calc(-1 * var(--spacer-16)));
+    /* サイドバーに追従して余白の中まで下がる。ここまで来ると、
+       ボタンがちょうどシート端の余白を埋める */
+    .em-sidebar__toggle {
+      transform: translateX(calc(-1 * var(--spacer-16)));
+    }
   }
 }

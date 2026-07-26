@@ -1,42 +1,44 @@
 /* 怪異の攻撃カード。templates/chat/kai-attack-card.hbs と対。
    武器カードと同じ骨格で、判定とダメージを1枚に並べる */
 
-.em-kai-attack-card {
-  .em-kai-attack-card__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--spacer-4) var(--spacer-8);
-    margin-bottom: var(--spacer-4);
-  }
+@layer chat {
+  .em-kai-attack-card {
+    .em-kai-attack-card__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--spacer-4) var(--spacer-8);
+      margin-bottom: var(--spacer-4);
+    }
 
-  .em-kai-attack-card__name {
-    font-weight: bold;
-  }
+    .em-kai-attack-card__name {
+      font-weight: bold;
+    }
 
-  .em-kai-attack-card__meta {
-    color: var(--color-text-subtle);
-    font-size: var(--font-size-12);
-  }
+    .em-kai-attack-card__meta {
+      color: var(--color-text-subtle);
+      font-size: var(--font-size-12);
+    }
 
-  .em-kai-attack-card__sep {
-    opacity: 0.5;
-  }
+    .em-kai-attack-card__sep {
+      opacity: 0.5;
+    }
 
-  .em-kai-attack-card__roll {
-    margin-top: var(--spacer-4);
-  }
+    .em-kai-attack-card__roll {
+      margin-top: var(--spacer-4);
+    }
 
-  .em-kai-attack-card__roll-label {
-    margin: 0 0 var(--spacer-2);
-    font-size: var(--font-size-12);
-    color: var(--color-text-subtle);
-  }
+    .em-kai-attack-card__roll-label {
+      margin: 0 0 var(--spacer-2);
+      font-size: var(--font-size-12);
+      color: var(--color-text-subtle);
+    }
 
-  .em-kai-attack-card__buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacer-4);
-    margin-top: var(--spacer-8);
+    .em-kai-attack-card__buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacer-4);
+      margin-top: var(--spacer-8);
+    }
   }
 }

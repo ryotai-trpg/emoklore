@@ -3,7 +3,7 @@
    ベンダー疑似要素は継承もまとめ書きもできないので、-webkit- と -moz- を
    それぞれ並べる必要がある。旧Edge専用の ::-ms-fill は削除済み */
 
-.emoklore {
+@layer components {
   /* 外側の余白は持たない。margin は「自分をどこに置くか」なので、置く側の
      責務になる（docs/ui-design.md の層の責務）。ここに 2px があったせいで、
      meter は自前の margin で上書き、skill-row は 0 で打ち消し、stat-row だけ

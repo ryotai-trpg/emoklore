@@ -1,22 +1,24 @@
 /* ココフォリアJSONの取り込みダイアログ */
 
-/* 取り込みダイアログはシートとは別のウィンドウなので、シートのブロックの中に
-   入れてはいけない。ルート要素が .emoklore.charsheet-import-dialog になる。
+@layer applications {
+  /* 取り込みダイアログはシートとは別のウィンドウなので、シートのブロックの中に
+     入れてはいけない。ルート要素が .emoklore.charsheet-import-dialog になる。
 
-   間隔・ラベル配置・ボタン配置は classes の standard-form で本体に任せている。
-   ここに残すのは本体が持っていない textarea の見た目だけ */
-.emoklore.charsheet-import-dialog {
-  /* パーツのルート要素（テンプレート側の無名div）。ApplicationV2 の
-     「1パーツ1ルート要素」を満たすためだけに居るので、レイアウト上は透明にして
-     中身を standard-form の flex の直接の子として並ばせる */
-  > div {
-    display: contents;
-  }
+     間隔・ラベル配置・ボタン配置は classes の standard-form で本体に任せている。
+     ここに残すのは本体が持っていない textarea の見た目だけ */
+  .emoklore.charsheet-import-dialog {
+    /* パーツのルート要素（テンプレート側の無名div）。ApplicationV2 の
+       「1パーツ1ルート要素」を満たすためだけに居るので、レイアウト上は透明にして
+       中身を standard-form の flex の直接の子として並ばせる */
+    > div {
+      display: contents;
+    }
 
-  textarea {
-    width: 100%;
-    font-family: monospace;
-    font-size: var(--font-size-12);
-    resize: vertical;
+    textarea {
+      width: 100%;
+      font-family: monospace;
+      font-size: var(--font-size-12);
+      resize: vertical;
+    }
   }
 }

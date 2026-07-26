@@ -1,6 +1,6 @@
 /* 立ち絵と能力値をまとめるカード */
 
-.emoklore {
+@layer components {
   .em-card {
     background: var(--emoklore-surface-sunken);
     display: flex;

@@ -1,10 +1,33 @@
-/* emoklore のスタイルの目次。ここには @import だけを置き、規則は書かない。
-   並び順がそのままカスケードの順序になる（変数 → 部品 → アプリケーション → チャット）。
-   viteが @import を解決して dist/emoklore.css の1枚に展開する */
+/* emoklore のスタイルの目次。ここには @layer の宣言と @import だけを置き、規則は書かない。
+   viteが @import を解決して dist/emoklore.css の1枚に展開する。
 
+   **カスケードの順序を決めるのは下の宣言であって、@import の並び順ではない。**
+   各ファイルが自分のレイヤを自分で名乗るので（`@layer components { ... }`）、
+   ここの並びを入れ替えても勝ち負けは変わらない。目次としての読みやすさで並べてよい。
+
+   ビルド後の `dist/emoklore.css` にこの宣言文そのものは残らないが、順序は保たれる。
+   ミニファイアが同じレイヤの規則を1つのブロックにまとめ、**宣言順に並べ替えたうえで**
+   冗長になった宣言文を落とすため。@import を宣言と逆順にして出力を確かめてある。
+
+   `system.json` が `layer: "system"` を宣言していて、本体は
+   `@import "..." layer(system)` の形で読む（templates/views/layouts/main.hbs）ため、
+   ここで宣言した名前は `system.tokens` … という副レイヤになる。
+   本体のレイヤ順（reset, variables, elements, blocks, applications, compatibility,
+   layouts, system, modules, exceptions）で system は applications より後なので、
+   詳細度を上げなくても本体には勝つ。
+
+   **レイヤ名を綴り間違えても Foundry は何も言わない。** 未宣言のレイヤは最後
+   （exceptions の後）に積まれるので「今より強くなる」形で通ってしまう。
+   DevToolsのStylesペインで `system.<名前>` として出ているかを目で見ること */
+@layer tokens, base, components, applications, chat;
+
+/* 値だけ。セレクタごとの規則は持たない */
 @import url("./variables.css");
 
-/* Components — .emoklore の下で成立する部品 */
+/* 本体のクラスに当てる下敷き。.emoklore スコープが要るのはここだけ */
+@import url("./base.css");
+
+/* Components — 部品の内部構造。自前の em- クラスなのでスコープを持たない */
 @import url("./components/progress.css");
 @import url("./components/segments.css");
 @import url("./components/meter.css");
@@ -13,15 +36,13 @@
 @import url("./components/sidebar.css");
 @import url("./components/emotion-list.css");
 @import url("./components/stat-row.css");
-/* 目標値は技能の行とチップが共有するので、両方より先に置く */
 @import url("./components/target.css");
 @import url("./components/skill-row.css");
 @import url("./components/chip.css");
 @import url("./components/field-list.css");
 @import url("./components/data-table.css");
 
-/* Applications — module/applications/ と対で、部品の配置と寸法を持つ */
-@import url("./applications/document-sheet.css");
+/* Applications — module/applications/ と対で、部品の配置と外形寸法を持つ */
 @import url("./applications/character-sheet.css");
 @import url("./applications/npc-sheet.css");
 @import url("./applications/kai-sheet.css");

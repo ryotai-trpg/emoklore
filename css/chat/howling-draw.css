@@ -1,52 +1,54 @@
 /* 共鳴表から引いたハウリング反応のカード。
    シートの外に出るので .emoklore スコープに入れない */
 
-.em-howling-draw {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacer-4);
-}
+@layer chat {
+  .em-howling-draw {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacer-4);
+  }
 
-.em-howling-draw__head {
-  display: flex;
-  align-items: center;
-  gap: var(--spacer-8);
-}
+  .em-howling-draw__head {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-8);
+  }
 
-.em-howling-draw__image {
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  border: none;
-  object-fit: cover;
-}
+  .em-howling-draw__image {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border: none;
+    object-fit: cover;
+  }
 
-.em-howling-draw__title {
-  display: flex;
-  align-items: baseline;
-  gap: var(--spacer-4);
-  min-width: 0;
-}
+  .em-howling-draw__title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacer-4);
+    min-width: 0;
+  }
 
-.em-howling-draw__name {
-  font-weight: bold;
-}
+  .em-howling-draw__name {
+    font-weight: bold;
+  }
 
-/* 分類は表示だけの値なので、名前より弱く添える */
-.em-howling-draw__category {
-  font-size: var(--font-size-12);
-  opacity: 0.8;
-}
+  /* 分類は表示だけの値なので、名前より弱く添える */
+  .em-howling-draw__category {
+    font-size: var(--font-size-12);
+    opacity: 0.8;
+  }
 
-.em-howling-draw__description {
-  margin: 0;
-}
+  .em-howling-draw__description {
+    margin: 0;
+  }
 
-.em-howling-draw__description :is(p, ul, ol):last-child {
-  margin-bottom: 0;
-}
+  .em-howling-draw__description :is(p, ul, ol):last-child {
+    margin-bottom: 0;
+  }
 
-.em-howling-draw__recovery {
-  margin: 0;
-  font-size: var(--font-size-12);
+  .em-howling-draw__recovery {
+    margin: 0;
+    font-size: var(--font-size-12);
+  }
 }

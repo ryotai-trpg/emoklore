@@ -4,7 +4,7 @@
    行を grid にしてあるのは、置く側が grid-template-rows: subgrid で
    親のトラックに載せ替えられるようにするため。単体でも2行として成立する */
 
-.emoklore {
+@layer components {
   .em-meter {
     display: grid;
     grid-template-rows: auto auto;

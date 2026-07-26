@@ -1,31 +1,33 @@
 /* 生存判定リマインダはシートの外に出るため、.emoklore スコープに入れない。
    自前のクラスはすべて em- 接頭辞なので、本体や他モジュールとは衝突しない */
 
-.em-survival-reminder__prompt {
-  margin: 0 0 var(--spacer-4);
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-12);
-}
+@layer chat {
+  .em-survival-reminder__prompt {
+    margin: 0 0 var(--spacer-4);
+    color: var(--color-text-subtle);
+    font-size: var(--font-size-12);
+  }
 
-.em-survival-reminder__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+  .em-survival-reminder__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 
-/* 名前と判定ボタンを1行に並べ、ボタンは右へ寄せる */
-.em-survival-reminder__item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacer-8);
-}
+  /* 名前と判定ボタンを1行に並べ、ボタンは右へ寄せる */
+  .em-survival-reminder__item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-8);
+  }
 
-.em-survival-reminder__name {
-  flex: 1;
-  min-width: 0;
-}
+  .em-survival-reminder__name {
+    flex: 1;
+    min-width: 0;
+  }
 
-.em-survival-reminder__roll {
-  flex: 0 0 auto;
-  width: auto;
+  .em-survival-reminder__roll {
+    flex: 0 0 auto;
+    width: auto;
+  }
 }
