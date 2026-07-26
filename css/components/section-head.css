@@ -1,0 +1,13 @@
+/* 見出しと、その右端に置く操作を1行にする。区分の頭に使う。
+
+   `em-acquired__head` / `em-npc__section-head` / `em-kai__block-head` の3コピーがあった。
+   外側の余白は置く側が持つ（怪異のブロックだけ下に間隔を足している）。 */
+
+@layer components {
+  .em-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-8);
+  }
+}

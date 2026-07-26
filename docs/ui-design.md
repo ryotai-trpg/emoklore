@@ -218,7 +218,20 @@ HP・MP・共鳴の3本のバーは、`.em-resources` が持つ行トラック�
 
 ### 共有する部品を作る基準
 
-`css/components/` にある `em-button` / `em-avatar` / `em-tag` / `em-terms` / `em-meta` は、複数の場所に書き写されていたものを1つにまとめた部品になる。合成して使う。
+`css/components/` にある共有部品は、複数の場所に書き写されていたものを1つにまとめたもの。合成して使う。
+
+| 部品 | 役割 |
+|---|---|
+| `em-button`（`--inline` / `--wrap`） | 本体の `--button-size` による高さの固定を外し、中身なりに縮むボタン |
+| `em-avatar`（`--em-avatar-size`） | 画像の枠。枠線を消して角を丸め、切り抜く |
+| `em-pair` | ラベルと値を1行に詰めて並べる |
+| `em-section-head` | 見出しと、その右端に置く操作を1行にする |
+| `em-rollable` | 押すと判定が飛ぶ名前。ホバーで文字を光らせる |
+| `em-tag` | 値を1つ囲って見せる札 |
+| `em-terms` | `dl` の対の並び |
+| `em-meta` | 主役の隣に置く控えめな補足 |
+| `em-num` | 桁の少ない数値入力。幅を固定して中央に置く |
+| `em-truncate` は**作っていない**（下記） | |
 
 ```hbs
 <button class="em-button em-button--inline em-chip">
