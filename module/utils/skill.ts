@@ -6,7 +6,7 @@
 
 import { type BaseSkillKey, baseSkills, isBaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
-import { type SkillCategory, skillCategories } from "../config/skill-categories";
+import { isSkillCategory, skillCategories } from "../config/skill-categories";
 import type { SkillGroupKey } from "../config/skill-groups";
 import { isSkillKey, type SkillKey, skills } from "../config/skills";
 import {
@@ -172,13 +172,17 @@ export const describeSkill = (
 };
 
 /**
- * カスタム技能の区分の表示名。
+ * カスタム技能の区分の表示名。表に無い区分は空文字。
  *
  * `skillCategories` が持つのは labelKey（i18nキー）だけ。スキーマの choices と
  * 共有しているので preLocalize の対象にしておらず、翻訳は引く側で行う。
+ *
+ * **保存データを絞らずに引くと落ちる。** `choices` は入力を絞るだけで保存済みの値は
+ * 直さないので、キーを改名したあとのデータには表に無い区分が入りうる。絞らずに引くと
+ * `undefined.labelKey` で TypeError になる（`localizeHowlingCategory` と同じ扱い）。
  */
-export const localizeSkillCategory = (category: SkillCategory): string =>
-  _loc(skillCategories[category].labelKey);
+export const localizeSkillCategory = (category: string): string =>
+  isSkillCategory(category) ? _loc(skillCategories[category].labelKey) : "";
 
 /** 能力値の表示名。CONFIG.EMOKLORE の label は i18nInit で翻訳済み */
 const localizeCharacteristic = (key: CharacteristicKey): string =>

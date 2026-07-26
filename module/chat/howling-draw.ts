@@ -73,7 +73,8 @@ export const renderHowlingDrawCard = async (state: HowlingDrawState): Promise<st
   foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     reactionName: state.reactionName,
     reactionImg: state.reactionImg,
-    categoryLabel: state.category ? localizeHowlingCategory(state.category) : "",
+    // text結果の空文字も、表に無い分類も、localizeHowlingCategory が空文字に倒す
+    categoryLabel: localizeHowlingCategory(state.category),
     descriptionHTML: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       state.description,
     ),

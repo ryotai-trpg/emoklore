@@ -5,7 +5,11 @@
  * `chat/howling-draw.ts`、誰に適用するかは `applications/howling.ts` の担当。
  */
 
-import { type HowlingCategory, howlingCategories } from "../config/howling-categories";
+import {
+  type HowlingCategory,
+  howlingCategories,
+  isHowlingCategory,
+} from "../config/howling-categories";
 import type { KaiDataModel } from "../data/kai";
 import { type SkillRollShortcut, toSkillRollShortcuts } from "./skill";
 
@@ -27,14 +31,20 @@ export type TableResult = {
 };
 
 /**
- * 分類の表示名。
+ * 分類の表示名。表に無い分類は空文字。
  *
  * `howlingCategories` が持つのは labelKey（i18nキー）だけ。スキーマの choices と
  * 共有しているので preLocalize の対象にしておらず、翻訳は引く側で行う
  * （`localizeSkillCategory` と同じ）。
+ *
+ * **保存データを絞らずに引くと落ちる。** `choices` は入力を絞るだけで保存済みの値は
+ * 直さないので、手書きのpackや他所のコンペンディウム、キーを改名したあとのデータには
+ * 表に無い分類が入りうる。絞らずに引くと `undefined.labelKey` で TypeError になる。
+ * 表に無いものを落とすのは `formatSkillRefs` と同じ扱いで、分類は表示にしか使わない
+ * （`config/howling-categories.ts`）ため、空欄になるだけで済む。
  */
-export const localizeHowlingCategory = (category: HowlingCategory): string =>
-  _loc(howlingCategories[category].labelKey);
+export const localizeHowlingCategory = (category: string): string =>
+  isHowlingCategory(category) ? _loc(howlingCategories[category].labelKey) : "";
 
 /**
  * 怪異に紐づいた共鳴表を引く。
