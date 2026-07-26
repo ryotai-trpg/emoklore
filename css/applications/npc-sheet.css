@@ -133,6 +133,17 @@
     padding: 1px 0;
   }
 
+  /* 基本技能の行（編集モードだけ）は、頭に「閲覧に出すか」のチェックが増え、
+     レベルの列を持たない（常にLv.1で編集する項目が無い）。どちらの行も目標値が
+     最後のトラックに落ちるので、通常技能と縦のラインが揃う */
+  .em-npc__skill--base {
+    grid-template-columns: auto minmax(0, 1fr) auto 2rem;
+  }
+
+  .em-npc__skill-shown {
+    margin: 0;
+  }
+
   .em-npc__skill-name,
   .em-npc__weapon-name {
     cursor: pointer;
