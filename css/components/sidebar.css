@@ -53,7 +53,7 @@
     /* 本体のボタンが持つ padding を残すと、border-box でも
        padding + border より細くならず幅が合わない */
     padding: 0;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 var(--emoklore-box-radius) var(--emoklore-box-radius) 0;
     font-size: var(--font-size-12);
     transition: transform 300ms ease;
   }

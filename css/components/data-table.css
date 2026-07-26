@@ -28,7 +28,7 @@
     padding: 0;
     background: var(--emoklore-surface-sunken);
     font-weight: bold;
-    border-radius: 3px;
+    border-radius: var(--emoklore-box-radius);
   }
 
   .em-data-table__head > * {

@@ -5,11 +5,11 @@
     background: var(--emoklore-surface-sunken);
     display: flex;
     flex-direction: column;
-    border-radius: var(--emoklore-card-radius);
+    border-radius: var(--emoklore-panel-radius);
   }
 
   .em-card__image {
-    border-top-left-radius: var(--emoklore-card-radius);
-    border-top-right-radius: var(--emoklore-card-radius);
+    border-top-left-radius: var(--emoklore-panel-radius);
+    border-top-right-radius: var(--emoklore-panel-radius);
   }
 }

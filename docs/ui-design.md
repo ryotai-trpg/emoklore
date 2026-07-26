@@ -19,6 +19,10 @@ CSS・テンプレート・ダイアログの規約と、その背後にある�
 
 **部品に位置決めを書かない**。`grid-row` / `grid-column` / 外側の margin / 幅は、置く側（`applications/`）から modifier セレクタで指定する。これがあるのでNPCシートやアイテムシートを足したときに同じ部品をそのまま使える。
 
+### 変数を置くスコープ
+
+**テーマで変わる値は `.emoklore` に、変わらない値は `:root` に置く。** チャットカードは `.emoklore` の外に出るので、`.emoklore` に置いた変数はカード側から引けない。**引けない変数を書いても宣言が無効になるだけで、警告は何も出ない** — 角丸が0になって初めて気付くことになる。色はテーマ別ブロックが `.emoklore` を前提にしているのでそのまま、角丸のようにテーマと無関係な値は `:root` に置いて両方から引けるようにする。
+
 `system.json` の `styles` で `layer: "system"` を宣言する。本体は `foundry2.css` の冒頭で `reset, variables, elements, blocks, applications, compatibility, layouts, system, modules, exceptions` を宣言していて、`system` はシステム用に空けてある。`applications` より後なので本体には勝ち、`modules` には負ける。本体側は `@import "..." layer(system)` の形で読み込む（`templates/views/layouts/main.hbs`）ため、`css/emoklore.css` の中で `@layer` を書けば `system` の副レイヤになる。
 
 ## 寸法の決め方
