@@ -118,6 +118,41 @@ HP・MP・共鳴の3本のバーは、`.em-resources` が持つ行トラック�
 
 なお個別テーマは**構築時に解決される**（`_initializeApplicationOptions`）。設定を変えても既存のシートインスタンスには反映されないので、確認するときはシートを開き直す。
 
+## プレイモードと編集モード
+
+シートには2本の軸が渡っている。**混同すると「卓中に押し間違えるボタン」か「権限が無いのに押せるボタン」のどちらかができる。**
+
+| コンテキスト | 何を表すか | 出どころ |
+|---|---|---|
+| `isPlay` | いまどちらのモードか | `applications/document-sheet-mixin.ts` |
+| `editable` | このユーザーが書き換えてよいか | 本体の `DocumentSheetV2._prepareContext` |
+
+**線は「卓中の操作か、組み立ての操作か」で引く。**
+
+- **卓中の操作は両モードに出し、`editable` だけで絞る** — 現在HP/MPの入力、装備のチェック、効果の有効/無効、ハウリング反応を外すゴミ箱、判定のトリガ
+- **組み立ての操作は編集モードだけに出す** — 追加（＋）・削除・シートを開く鉛筆・並び替えのドラッグ・能力値や技能レベルの入力・最大値の入力
+
+**現在値と最大値は別の軸に置く。** 現在HPは卓中に減るので閲覧モードで触れないと使えず、最大HPは組み立ての値なので卓中に触る理由が無い。共鳴者・NPC・怪異の3シートともこの形に揃えてある。
+
+<!-- Handlebarsの {{...}} をVueの補間として解釈させないため v-pre で囲む -->
+::: v-pre
+`isEditMode` はコンテキストに積んでいないので、テンプレートでは `{{#unless isPlay}}` と書く。`{{#each}}` の中からは `@root.` を明示する。
+:::
+
+### 隠した操作は右クリックに残す
+
+**行のアイコンを閲覧モードで隠すのは誤爆を防ぐためで、操作そのものを封じるためではない。** 隠したぶんは行の右クリックメニューに置き、そちらは**モードで絞らず権限だけで絞る**（dnd5e・draw-steel・ryuutama も同じ割り切り）。
+
+メニューは `EmokloreActorSheet` が1本だけ張っている。足すときの作法は次のとおり。
+
+- **`ApplicationV2#_createContextMenu()` を通す。** `jQuery: false` と `get...ContextOptions` フック（モジュールが項目を足せる口）が付いてくる。`ContextMenu.create()` は ApplicationV2 に対して例外を投げる
+- **登録は `_onFirstRender` で1回だけ。** コンストラクタが container に直接リスナを張るので、`_onRender` で作るとリスナが積み上がる
+- **`fixed: true` を渡す。** タブは `overflow: auto` なので、注入方式だとメニューが切られる
+- 項目の綴りは **`label` / `visible` / `onClick(event, target)`**（`name` / `condition` / `callback` は非推奨）。`label` は本体が `_loc` を通すのでキーをそのまま渡す。`visible` は開くたびに評価される
+- 行には `data-document-class` と `data-item-id` / `data-effect-id` を持たせる。`utils/sheet.ts` の `getEmbeddedDocument` がこれで引く
+
+**本体は、座標を持たない合成イベントに対して、見えていないターゲットのメニューを開かない**（`_setFixedPosition` の `checkVisibility`）。テストから右クリックを再現するときは、タブを開いたうえで `clientX` / `clientY` を渡す。
+
 ## 操作できることを示す
 
 **クリックできるものは、ホバーで必ず反応させる**。カーソル形状だけでは弱い。

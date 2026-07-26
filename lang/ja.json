@@ -258,7 +258,12 @@
         "Skills": "技能",
         "BaseSkills": "基本技能",
         "CustomSkills": "カスタム技能",
-        "Weapons": "武器"
+        "Weapons": "武器",
+        "ShowBaseSkill": "プレイ画面に出す"
+      },
+      "rowMenu": {
+        "Open": "開く",
+        "Delete": "削除"
       }
     },
     "Item": {
@@ -572,6 +577,14 @@
             "root": {
               "label": "ルーツ"
             }
+          }
+        }
+      },
+      "npc": {
+        "FIELDS": {
+          "shownBaseSkills": {
+            "label": "プレイ画面に出す基本技能",
+            "hint": "チェックした基本技能だけがプレイ画面に並びます。すべて外すと欄ごと出ません。"
           }
         }
       },
