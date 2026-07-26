@@ -12,17 +12,17 @@
  */
 
 export interface HowlingCategoryConfig {
-  label: string;
+  labelKey: string;
 }
 
 const definitions = {
-  reflex: { label: "EMOKLORE.Item.howling.Category.reflex" },
-  denial: { label: "EMOKLORE.Item.howling.Category.denial" },
-  agitation: { label: "EMOKLORE.Item.howling.Category.agitation" },
-  rejection: { label: "EMOKLORE.Item.howling.Category.rejection" },
-  attunement: { label: "EMOKLORE.Item.howling.Category.attunement" },
-  acceptance: { label: "EMOKLORE.Item.howling.Category.acceptance" },
-  unclassified: { label: "EMOKLORE.Item.howling.Category.unclassified" },
+  reflex: { labelKey: "EMOKLORE.Item.howling.Category.reflex" },
+  denial: { labelKey: "EMOKLORE.Item.howling.Category.denial" },
+  agitation: { labelKey: "EMOKLORE.Item.howling.Category.agitation" },
+  rejection: { labelKey: "EMOKLORE.Item.howling.Category.rejection" },
+  attunement: { labelKey: "EMOKLORE.Item.howling.Category.attunement" },
+  acceptance: { labelKey: "EMOKLORE.Item.howling.Category.acceptance" },
+  unclassified: { labelKey: "EMOKLORE.Item.howling.Category.unclassified" },
 } satisfies Record<string, HowlingCategoryConfig>;
 
 export type HowlingCategory = keyof typeof definitions;
@@ -41,5 +41,5 @@ export const isHowlingCategory = (value: string): value is HowlingCategory => va
  * スキーマ定義の時点で翻訳に触らない）
  */
 export const howlingCategoryChoices: Record<string, string> = Object.fromEntries(
-  Object.entries(definitions).map(([key, { label }]) => [key, label]),
+  Object.entries(definitions).map(([key, { labelKey }]) => [key, labelKey]),
 );

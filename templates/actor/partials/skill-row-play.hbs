@@ -6,9 +6,11 @@
 --}}
 <div class="em-skill-row" data-skill="{{key}}">
   <a class="em-skill-row__name" data-action="roll" data-roll-type="skill" data-skill="{{key}}">
-    {{skill.label}}{{#if skill.specialization}}{{localize "EMOKLORE.Common.colon"}}{{skill.specialization}}{{/if}}
+    {{#if skill.specialization}}
+      {{localize "EMOKLORE.Format.specialization" name=skill.label specialization=skill.specialization}}
+    {{else}}{{skill.label}}{{/if}}
   </a>
-  <span class="em-skill-row__level">Lv.{{skill.level}}</span>
+  <span class="em-skill-row__level">{{localize "EMOKLORE.Format.level" level=skill.level}}</span>
   <progress class="em-progress em-progress--sm" value="{{skill.level}}" max="3"></progress>
   <span class="em-skill-row__target">{{skill.target}}</span>
   <i class="em-skill-row__stat fa-solid {{skill.characteristicIcon}}"></i>

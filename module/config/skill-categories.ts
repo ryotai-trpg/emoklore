@@ -13,13 +13,13 @@
  */
 
 export interface SkillCategoryConfig {
-  label: string;
+  labelKey: string;
 }
 
 const definitions = {
-  base: { label: "EMOKLORE.Item.skill.Category.base" },
-  normal: { label: "EMOKLORE.Item.skill.Category.normal" },
-  extra: { label: "EMOKLORE.Item.skill.Category.extra" },
+  base: { labelKey: "EMOKLORE.Item.skill.Category.base" },
+  normal: { labelKey: "EMOKLORE.Item.skill.Category.normal" },
+  extra: { labelKey: "EMOKLORE.Item.skill.Category.extra" },
 } satisfies Record<string, SkillCategoryConfig>;
 
 export type SkillCategory = keyof typeof definitions;
@@ -41,5 +41,5 @@ export const isSkillCategory = (value: string): value is SkillCategory => value 
  * スキーマ定義の時点で翻訳に触らない）
  */
 export const skillCategoryChoices: Record<string, string> = Object.fromEntries(
-  Object.entries(definitions).map(([key, { label }]) => [key, label]),
+  Object.entries(definitions).map(([key, { labelKey }]) => [key, labelKey]),
 );

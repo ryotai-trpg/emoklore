@@ -43,7 +43,7 @@ describe("getEmotionRows", () => {
     expect(rows.root).toEqual({ label: "", attribute: "" });
   });
 
-  // 言語キーを組み立てる形にすると、尻切れのキー（`EMOKLORE.emotionAttributes.`）が
+  // 言語キーを組み立てる形にすると、尻切れのキー（`EMOKLORE.Config.emotionAttributes.`）が
   // そのままシートに表示される
   it("既知でない感情が保存されていても言語キーを漏らさない", () => {
     const rows = rowsFor({ surface: "unknownEmotion", hidden: "", root: undefined });

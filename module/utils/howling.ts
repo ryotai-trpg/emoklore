@@ -29,11 +29,12 @@ export type TableResult = {
 /**
  * 分類の表示名。
  *
- * `howlingCategories` の label はi18nキーのまま（スキーマの choices と共有しているので
- * preLocalize の対象にしていない）。翻訳は引く側で行う（`localizeSkillCategory` と同じ）。
+ * `howlingCategories` が持つのは labelKey（i18nキー）だけ。スキーマの choices と
+ * 共有しているので preLocalize の対象にしておらず、翻訳は引く側で行う
+ * （`localizeSkillCategory` と同じ）。
  */
 export const localizeHowlingCategory = (category: HowlingCategory): string =>
-  _loc(howlingCategories[category].label);
+  _loc(howlingCategories[category].labelKey);
 
 /**
  * 怪異に紐づいた共鳴表を引く。

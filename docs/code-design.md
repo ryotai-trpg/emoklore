@@ -39,7 +39,7 @@ TypeScriptの型と、モジュールの分け方に関する規約はここが�
 
 ```ts
 const definitions = {
-  investigation: { label: "EMOKLORE.Actor.skillGroup.investigation" },
+  investigation: { label: "EMOKLORE.Config.skillGroups.investigation" },
   // ...
 } satisfies Record<string, SkillGroupsConfig>;
 
@@ -130,7 +130,21 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 - **`Emoklore*` を付けるのは、本体クラスを継承して本体の同名概念を置き換えるものだけ**。`EmokloreActor` `EmokloreRoll` `EmokloreCharacterSheet` がそれで、本体に `Actor` `Roll` `ActorSheet` があるから区別が要る。`CharacterDataModel` や `CharSheetImportDialog` のように本体に同名の概念が無いものには付けない
 - **`rules/` の動詞は3つに絞る**。`calculate*` は数式（`calculateMaxHp`）、`resolve*` は入力から一意に決まる導出（`resolveSkillRoll`）、`build*` は複合物の組み立て（`buildDamageFormula`）
 
-`lang/*.json` のキーは名前空間をPascalCaseで切り、その下は camelCase にする（`EMOKLORE.Sheet.character.tab`）。**ドットを含むキーを1本の文字列で書かない** — 本体は読めるが、木として辿れなくなる。configのテーブルに対応する名前空間は、テーブル名と同じ複数形にする（`Actor.skillGroups`）。
+### `lang/*.json` のキー
+
+名前空間はPascalCaseで切り、その下は camelCase にする（`EMOKLORE.Sheet.character.tab`）。**ドットを含むキーを1本の文字列で書かない** — 本体は読めるが、木として辿れなくなる。**`EMOKLORE` の直下に裸のリーフを置かない**（名前空間と同じ列に文字列が並ぶと、どちらなのかが読めない）。
+
+名前空間の切り方は3つに分かれる。
+
+| 名前空間 | 中身 | 例 |
+|---|---|---|
+| `EMOKLORE.Config.*` | `module/config/` の表のうち、**層をまたいで使われるもの**。名前は変数名と同じ複数形にする | `Config.skillGroups` `Config.resonantEmotions` |
+| `EMOKLORE.<Document>.<種別>.FIELDS.*` | `LOCALIZATION_PREFIXES` が指す先。**プレフィクスと1対1**にする | `EMOKLORE.Item.weapon.FIELDS` |
+| それ以外 | 画面・カード・ダイアログごとの文字列 | `EMOKLORE.ApplyDamage` `EMOKLORE.EmotionPicker` |
+
+**`FIELDS` を持つ名前空間に、横断的な表を混ぜない。** かつて `EMOKLORE.Actor` が `character` / `kai`（プレフィクス）と `characteristics` / `skills`（表）の両方を抱えていて、同じ名前空間が2つの意味を持っていた。表がその種別でしか使われないなら下に置いてよい（`Item.skill.Category` はカスタム技能アイテム専用）。
+
+**装飾込みのフォーマット文字列は `EMOKLORE.Format.*` にまとめる。** 記号だけを翻訳のキーにすると、その記号を使う側が組み立てを持つことになり、言語ごとに語順や約物を変えられない。
 
 ## アサーション（`as`）の使いどころ
 
@@ -163,7 +177,8 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 
 - **繰り返すフィールドは関数に寄せる**。修正値の組（`bonus` / `success` / `target`）は4箇所に出てくるので `modifierField()` にまとめてある。対応する型 `ModifierSet` と1対1で向き合う場所を1つにするため
 - **`prepareDerivedData` は配線だけにする**。計算は `rules/` の関数を呼ぶ。派生値であることが分かるよう、`declare` の側にもコメントを残す
-- **`choices` の値には翻訳済み文字列ではなくi18nキーを入れる**。テンプレートが `formInput` に `localize=true` を渡していれば描画時に本体が解決する。ここで `game.i18n` を呼ぶと、スキーマ定義が i18nInit より先に走ったときに壊れる
+- **`choices` の値には翻訳済み文字列ではなくi18nキーを入れる**。テンプレートが `formInput` に `localize=true` を渡していれば描画時に本体が解決する。ここで翻訳を引くと、スキーマ定義が i18nInit より先に走ったときに壊れる
+- **表示名のプロパティは `label` と `labelKey` で呼び分ける**。`module/config/index.ts` の `preLocalize` に登録した表は `label` を持ち、i18nInit で翻訳済みの文字列に差し替わる。登録しない表（`choices` と共有するため差し替えられないもの）は `labelKey` を持ち、読む側が翻訳する。**同じ名前で意味が変わらないようにするのが要点**で、間違えて素で使うとプロパティが無いのでコンパイルエラーになる
 - **`label` はスキーマ定義時に設定しない**。本体の `localizeSchema` は `this.label ||= ...` なので、定義時に入れた値が `lang/ja.json` の `FIELDS` の指定に勝ってしまう
 - **新しい種別は `system.json` の `documentTypes` にも宣言する**。`CONFIG.*.dataModels` に登録しただけでは作成できず、警告も出ない。宣言しない種別を登録すると、到達できないのに `system` の型だけが増えて嘘になる
 

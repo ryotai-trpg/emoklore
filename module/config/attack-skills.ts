@@ -6,7 +6,7 @@ export type DamageDie = "d3" | "d6" | null;
 
 export interface AttackSkillConfig {
   /** i18nキー。技能・基本技能どちらのラベルを指すかは base で決まる */
-  label: string;
+  labelKey: string;
   /** 基本技能なら true。判定を引くとき system.baseSkills 側を見る必要がある */
   base: boolean;
   rangeType: RangeType;
@@ -23,31 +23,31 @@ export interface AttackSkillConfig {
  */
 const definitions = {
   fight: {
-    label: "EMOKLORE.Actor.baseSkills.fight",
+    labelKey: "EMOKLORE.Config.baseSkills.fight",
     base: true,
     rangeType: "melee",
     damageDie: "d3",
   },
   martialArt: {
-    label: "EMOKLORE.Actor.skills.martialArt",
+    labelKey: "EMOKLORE.Config.skills.martialArt",
     base: false,
     rangeType: "melee",
     damageDie: "d3",
   },
   secretTechnique: {
-    label: "EMOKLORE.Actor.skills.secretTechnique",
+    labelKey: "EMOKLORE.Config.skills.secretTechnique",
     base: false,
     rangeType: "melee",
     damageDie: "d6",
   },
   throw: {
-    label: "EMOKLORE.Actor.baseSkills.throw",
+    labelKey: "EMOKLORE.Config.baseSkills.throw",
     base: true,
     rangeType: "ranged",
     damageDie: null,
   },
   rangedAttack: {
-    label: "EMOKLORE.Actor.skills.rangedAttack",
+    labelKey: "EMOKLORE.Config.skills.rangedAttack",
     base: false,
     rangeType: "ranged",
     damageDie: null,
@@ -76,5 +76,5 @@ export const attackSkills: Record<AttackSkillKey, AttackSkillConfig> = definitio
  * （能力値の characteristicOptions と同じ扱い。module/data/character.ts を参照）
  */
 export const attackSkillChoices: Record<string, string> = Object.fromEntries(
-  Object.entries(attackSkills).map(([key, { label }]) => [key, label]),
+  Object.entries(attackSkills).map(([key, { labelKey }]) => [key, labelKey]),
 );

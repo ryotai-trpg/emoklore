@@ -92,16 +92,22 @@ const buildTargetGroups = (customSkills: Option[]): OptionGroup[] => {
       options: toOptions("skillGroups", skillGroups),
     },
     {
-      // ★ はエクストラ技能の印。シートやチャットの表記と揃える
+      // 印はシートやチャットと同じ describeSkillLabel が付ける
       label: _loc("EMOKLORE.Effect.TargetGroup.skills"),
-      options: toOptions("skills", skills, (key, label) =>
-        skills[key].isExtra ? `★${label}` : label,
+      options: toOptions(
+        "skills",
+        skills,
+        (key) => describeSkillLabel({ kind: "skill", key }).markedLabel,
       ),
     },
     {
-      // ＊ は基本技能の印。技能グループと綴りが同じキーがあるので、印で見分けが付く
+      // ＊ が付くので、技能グループと綴りが同じキーがあっても見分けが付く
       label: _loc("EMOKLORE.Effect.TargetGroup.baseSkills"),
-      options: toOptions("baseSkills", baseSkills, (_key, label) => `＊${label}`),
+      options: toOptions(
+        "baseSkills",
+        baseSkills,
+        (key) => describeSkillLabel({ kind: "base", key }).markedLabel,
+      ),
     },
     // 持っていなければ optgroup ごと出さない
     ...(customSkills.length > 0

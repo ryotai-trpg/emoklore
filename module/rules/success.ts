@@ -78,7 +78,7 @@ export function meetsRequirement(successCount: number, required: number): boolea
 }
 
 /**
- * 成功数から結果名を決める。`EMOKLORE.result.*` の言語キーに対応する。
+ * 成功数から結果名を決める。`EMOKLORE.Result.*` の言語キーに対応する。
  */
 export function resolveResultName(successCount: number): ResultName {
   if (successCount < 0) return "fumble";

@@ -76,13 +76,163 @@
   },
   "EMOKLORE": {
     "Common": {
-      "colon": "：",
-      "none": "なし",
-      "separator": "／"
+      "none": "なし"
     },
     "Pack": {
       "howlingReactions": "ハウリング反応",
       "resonanceTables": "共鳴表"
+    },
+    "Config": {
+      "characteristics": {
+        "physical": "身体",
+        "dexterity": "器用",
+        "mentality": "精神",
+        "sensitivity": "五感",
+        "intelligence": "知力",
+        "charisma": "魅力",
+        "sociality": "社会",
+        "fortune": "運勢"
+      },
+      "skillGroups": {
+        "investigation": "調査系",
+        "perception": "知覚系",
+        "negotiations": "交渉系",
+        "knowledge": "情報系",
+        "athletic": "運動系",
+        "survival": "生存系",
+        "unique": "特殊"
+      },
+      "baseSkills": {
+        "investigation": "調査",
+        "perception": "知覚",
+        "negotiations": "交渉",
+        "knowledge": "知識",
+        "news": "ニュース",
+        "athletic": "運動",
+        "fight": "格闘",
+        "throw": "投擲",
+        "survival": "生存",
+        "self": "自我",
+        "treatment": "手当て",
+        "handiwork": "細工",
+        "luck": "幸運"
+      },
+      "skills": {
+        "search": "検索",
+        "insight": "洞察",
+        "mapping": "マッピング",
+        "instinct": "直感",
+        "appraisal": "鑑定",
+        "keenObservation": "観察眼",
+        "listen": "聞き耳",
+        "taste": "毒見",
+        "threatDetection": "危機察知",
+        "spiritualSense": "霊感",
+        "etiquette": "社交術",
+        "debate": "ディベート",
+        "charm": "魅了",
+        "psychology": "心理",
+        "specializedKnowledge": "専門知識",
+        "insider": "事情通",
+        "industryKnowledge": "業界",
+        "speed": "スピード",
+        "strength": "ストレングス",
+        "acrobatics": "アクロバット",
+        "dive": "ダイブ",
+        "martialArt": "武術",
+        "secretTechnique": "奥義",
+        "rangedAttack": "射撃",
+        "endurance": "耐久",
+        "grit": "根性",
+        "medicine": "医術",
+        "resurrection": "蘇生",
+        "technique": "技巧",
+        "art": "芸術",
+        "pilot": "操縦",
+        "cipher": "暗号",
+        "computer": "電脳",
+        "stealth": "隠匿",
+        "strongLuck": "強運"
+      },
+      "emotionAttributes": {
+        "desire": "欲望",
+        "passion": "情念",
+        "ideal": "理想",
+        "relationship": "関係",
+        "wound": "傷"
+      },
+      "resonantEmotions": {
+        "selfAssertion": "自己顕示",
+        "possession": "所有",
+        "instinct": "本能",
+        "destruction": "破壊",
+        "superiority": "優越感",
+        "sloth": "怠惰",
+        "escape": "逃避",
+        "curiosity": "好奇心",
+        "thrill": "スリル",
+        "joy": "喜び",
+        "anger": "怒り",
+        "sorrow": "哀しみ",
+        "happiness": "幸福",
+        "anxiety": "不安",
+        "disgust": "嫌悪",
+        "fear": "恐怖",
+        "jealousy": "嫉妬",
+        "grudge": "恨み",
+        "justice": "正義",
+        "worship": "崇拝",
+        "goodAndEvil": "善悪",
+        "hope": "希望",
+        "aspiration": "向上",
+        "reason": "理性",
+        "victory": "勝利",
+        "order": "秩序",
+        "admiration": "憧憬",
+        "selflessness": "無我",
+        "friendship": "友情",
+        "love": "愛",
+        "romance": "恋",
+        "dependence": "依存",
+        "respect": "尊敬",
+        "contempt": "軽蔑",
+        "protection": "庇護",
+        "domination": "支配",
+        "service": "奉仕",
+        "indulgence": "甘え",
+        "regret": "後悔",
+        "loneliness": "孤独",
+        "resignation": "諦観",
+        "despair": "絶望",
+        "denial": "否定",
+        "doubt": "疑念",
+        "guilt": "罪悪感",
+        "madness": "狂気",
+        "inferiorityComplex": "劣等感"
+      },
+      "initiativePresets": {
+        "combat": "戦闘・逃走",
+        "underwater": "水中戦闘",
+        "search": "捜索",
+        "debate": "議論",
+        "cardiacArrest": "心肺停止（器用）"
+      }
+    },
+    "Format": {
+      "skillRoll": "〈{skillName}〉判定",
+      "successMod": "成功数{mod}",
+      "skillName": "〈{name}〉",
+      "baseSkill": "＊{name}",
+      "extraSkill": "★{name}",
+      "specialization": "{name}：{specialization}",
+      "characteristicName": "【{name}】",
+      "initiativeBasis": "【{characteristic}】＋〈{skill}〉",
+      "level": "Lv.{level}",
+      "damage": "{dice}＋{attackPower}",
+      "resonantEmotion": "{emotion}（{attribute}）",
+      "emotionAttribute": "（{attribute}）",
+      "acquiredEmotion": "＋{name}",
+      "separator": "／"
     },
     "Sheet": {
       "class": {
@@ -103,9 +253,7 @@
           "items": "アイテム",
           "effects": "効果"
         },
-        "fields": {
-          "specialization": "分野"
-        }
+        "specialization": "分野"
       },
       "npc": {
         "Skills": "技能",
@@ -290,13 +438,6 @@
       }
     },
     "Combat": {
-      "presets": {
-        "combat": "戦闘・逃走",
-        "underwater": "水中戦闘",
-        "search": "捜索",
-        "debate": "議論",
-        "cardiacArrest": "心肺停止（器用）"
-      },
       "FIELDS": {
         "characteristic": {
           "label": "能力値"
@@ -332,134 +473,60 @@
       "ArmorPiece": "{name}（防御力 {defense}）",
       "ArmorPieceWithCoverage": "{name}（防御力 {defense}／{coverage}）"
     },
-    "emotionAttributes": {
-      "desire": "欲望",
-      "passion": "情念",
-      "ideal": "理想",
-      "relationship": "関係",
-      "wound": "傷"
-    },
-    "resonantEmotions": {
-      "selfAssertion": "自己顕示",
-      "possession": "所有",
-      "instinct": "本能",
-      "destruction": "破壊",
-      "superiority": "優越感",
-      "sloth": "怠惰",
-      "escape": "逃避",
-      "curiosity": "好奇心",
-      "thrill": "スリル",
-      "joy": "喜び",
-      "anger": "怒り",
-      "sorrow": "哀しみ",
-      "happiness": "幸福",
-      "anxiety": "不安",
-      "disgust": "嫌悪",
-      "fear": "恐怖",
-      "jealousy": "嫉妬",
-      "grudge": "恨み",
-      "justice": "正義",
-      "worship": "崇拝",
-      "goodAndEvil": "善悪",
-      "hope": "希望",
-      "aspiration": "向上",
-      "reason": "理性",
-      "victory": "勝利",
-      "order": "秩序",
-      "admiration": "憧憬",
-      "selflessness": "無我",
-      "friendship": "友情",
-      "love": "愛",
-      "romance": "恋",
-      "dependence": "依存",
-      "respect": "尊敬",
-      "contempt": "軽蔑",
-      "protection": "庇護",
-      "domination": "支配",
-      "service": "奉仕",
-      "indulgence": "甘え",
-      "regret": "後悔",
-      "loneliness": "孤独",
-      "resignation": "諦観",
-      "despair": "絶望",
-      "denial": "否定",
-      "doubt": "疑念",
-      "guilt": "罪悪感",
-      "madness": "狂気",
-      "inferiorityComplex": "劣等感"
-    },
     "Actor": {
       "character": {
         "FIELDS": {
           "characteristics": {
             "physical": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.physical"
+                "label": "EMOKLORE.Config.characteristics.physical"
               }
             },
             "dexterity": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.dexterity"
+                "label": "EMOKLORE.Config.characteristics.dexterity"
               }
             },
             "mentality": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.mentality"
+                "label": "EMOKLORE.Config.characteristics.mentality"
               }
             },
             "sensitivity": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.sensitivity"
+                "label": "EMOKLORE.Config.characteristics.sensitivity"
               }
             },
             "intelligence": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.intelligence"
+                "label": "EMOKLORE.Config.characteristics.intelligence"
               }
             },
             "charisma": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.charisma"
+                "label": "EMOKLORE.Config.characteristics.charisma"
               }
             },
             "sociality": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.sociality"
+                "label": "EMOKLORE.Config.characteristics.sociality"
               }
             },
             "fortune": {
               "value": {
-                "label": "EMOKLORE.Actor.characteristics.fortune"
+                "label": "EMOKLORE.Config.characteristics.fortune"
               }
             }
           },
           "resources": {
             "hp": {
-              "label": "HP",
-              "value": {
-                "label": "現在"
-              },
-              "max": {
-                "label": "最大"
-              }
+              "label": "HP"
             },
             "mp": {
-              "label": "MP",
-              "value": {
-                "label": "現在"
-              },
-              "max": {
-                "label": "最大"
-              }
+              "label": "MP"
             },
             "resonance": {
-              "label": "共鳴",
-              "value": {
-                "label": "現在"
-              },
-              "max": {
-                "label": "最大"
-              }
+              "label": "共鳴"
             }
           },
           "biography": {
@@ -507,89 +574,14 @@
           }
         }
       },
-      "characteristics": {
-        "physical": "身体",
-        "dexterity": "器用",
-        "mentality": "精神",
-        "sensitivity": "五感",
-        "intelligence": "知力",
-        "charisma": "魅力",
-        "sociality": "社会",
-        "fortune": "運勢"
-      },
-      "skillGroups": {
-        "investigation": "調査系",
-        "perception": "知覚系",
-        "negotiations": "交渉系",
-        "knowledge": "情報系",
-        "athletic": "運動系",
-        "survival": "生存系",
-        "unique": "特殊"
-      },
-      "baseSkills": {
-        "investigation": "調査",
-        "perception": "知覚",
-        "negotiations": "交渉",
-        "knowledge": "知識",
-        "news": "ニュース",
-        "athletic": "運動",
-        "fight": "格闘",
-        "throw": "投擲",
-        "survival": "生存",
-        "self": "自我",
-        "treatment": "手当て",
-        "handiwork": "細工",
-        "luck": "幸運"
-      },
-      "skills": {
-        "search": "検索",
-        "insight": "洞察",
-        "mapping": "マッピング",
-        "instinct": "直感",
-        "appraisal": "鑑定",
-        "keenObservation": "観察眼",
-        "listen": "聞き耳",
-        "taste": "毒見",
-        "threatDetection": "危機察知",
-        "spiritualSense": "霊感",
-        "etiquette": "社交術",
-        "debate": "ディベート",
-        "charm": "魅了",
-        "psychology": "心理",
-        "specializedKnowledge": "専門知識",
-        "insider": "事情通",
-        "industryKnowledge": "業界",
-        "speed": "スピード",
-        "strength": "ストレングス",
-        "acrobatics": "アクロバット",
-        "dive": "ダイブ",
-        "martialArt": "武術",
-        "secretTechnique": "奥義",
-        "rangedAttack": "射撃",
-        "endurance": "耐久",
-        "grit": "根性",
-        "medicine": "医術",
-        "resurrection": "蘇生",
-        "technique": "技巧",
-        "art": "芸術",
-        "pilot": "操縦",
-        "cipher": "暗号",
-        "computer": "電脳",
-        "stealth": "隠匿",
-        "strongLuck": "強運"
-      },
       "kai": {
         "FIELDS": {
           "resources": {
             "hp": {
-              "value": {
-                "label": "HP"
-              }
+              "label": "HP"
             },
             "mp": {
-              "value": {
-                "label": "MP"
-              }
+              "label": "MP"
             },
             "armor": {
               "label": "装甲"
@@ -645,9 +637,6 @@
         "Attacks": "攻撃"
       }
     },
-    "skillRoll": "〈{skillName}〉判定",
-    "successMod": "成功数{mod}",
-    "resonantEmotion": "{emotion}（{attribute}）",
     "Effect": {
       "Source": "ソース",
       "Temporary": "一時的効果",
@@ -733,6 +722,15 @@
       "Met": "{requirement} 達成",
       "Missed": "{requirement} 未達"
     },
+    "Result": {
+      "fumble": "ファンブル",
+      "failure": "失敗",
+      "single": "シングル成功",
+      "double": "ダブル成功",
+      "triple": "トリプル成功",
+      "miracle": "ミラクル成功",
+      "catastrophe": "カタストロフ"
+    },
     "EmotionPicker": {
       "Title": "共鳴感情",
       "Open": "感情を選ぶ",
@@ -767,15 +765,6 @@
       "Applied": "{name} に「{reaction}」を適用しました",
       "Section": "ハウリング",
       "Recover": "回復判定"
-    },
-    "result": {
-      "fumble": "ファンブル",
-      "failure": "失敗",
-      "single": "シングル成功",
-      "double": "ダブル成功",
-      "triple": "トリプル成功",
-      "miracle": "ミラクル成功",
-      "catastrophe": "カタストロフ"
     },
     "Skill": {
       "Name": "技能名",

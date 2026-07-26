@@ -16,28 +16,28 @@ export interface InitiativePresetConfig {
 
 const definitions = {
   combat: {
-    label: "EMOKLORE.Combat.presets.combat",
+    label: "EMOKLORE.Config.initiativePresets.combat",
     characteristic: "physical",
     skill: "speed",
   },
   underwater: {
-    label: "EMOKLORE.Combat.presets.underwater",
+    label: "EMOKLORE.Config.initiativePresets.underwater",
     characteristic: "physical",
     skill: "dive",
   },
   search: {
-    label: "EMOKLORE.Combat.presets.search",
+    label: "EMOKLORE.Config.initiativePresets.search",
     characteristic: "sensitivity",
     skill: "keenObservation",
   },
   debate: {
-    label: "EMOKLORE.Combat.presets.debate",
+    label: "EMOKLORE.Config.initiativePresets.debate",
     characteristic: "intelligence",
     skill: "debate",
   },
   // 【心肺停止】が出たときの新規ラウンド進行。イニシアチブは【器用】のみ
   cardiacArrest: {
-    label: "EMOKLORE.Combat.presets.cardiacArrest",
+    label: "EMOKLORE.Config.initiativePresets.cardiacArrest",
     characteristic: "dexterity",
     skill: null,
   },

@@ -7,195 +7,195 @@ export interface ResonantEmotionConfig {
 
 const definitions = {
   selfAssertion: {
-    label: "EMOKLORE.resonantEmotions.selfAssertion",
+    label: "EMOKLORE.Config.resonantEmotions.selfAssertion",
     attribute: "desire",
   },
   possession: {
-    label: "EMOKLORE.resonantEmotions.possession",
+    label: "EMOKLORE.Config.resonantEmotions.possession",
     attribute: "desire",
   },
   instinct: {
-    label: "EMOKLORE.resonantEmotions.instinct",
+    label: "EMOKLORE.Config.resonantEmotions.instinct",
     attribute: "desire",
   },
   destruction: {
-    label: "EMOKLORE.resonantEmotions.destruction",
+    label: "EMOKLORE.Config.resonantEmotions.destruction",
     attribute: "desire",
   },
   superiority: {
-    label: "EMOKLORE.resonantEmotions.superiority",
+    label: "EMOKLORE.Config.resonantEmotions.superiority",
     attribute: "desire",
   },
   sloth: {
-    label: "EMOKLORE.resonantEmotions.sloth",
+    label: "EMOKLORE.Config.resonantEmotions.sloth",
     attribute: "desire",
   },
   escape: {
-    label: "EMOKLORE.resonantEmotions.escape",
+    label: "EMOKLORE.Config.resonantEmotions.escape",
     attribute: "desire",
   },
   curiosity: {
-    label: "EMOKLORE.resonantEmotions.curiosity",
+    label: "EMOKLORE.Config.resonantEmotions.curiosity",
     attribute: "desire",
   },
   thrill: {
-    label: "EMOKLORE.resonantEmotions.thrill",
+    label: "EMOKLORE.Config.resonantEmotions.thrill",
     attribute: "desire",
   },
 
   joy: {
-    label: "EMOKLORE.resonantEmotions.joy",
+    label: "EMOKLORE.Config.resonantEmotions.joy",
     attribute: "passion",
   },
   anger: {
-    label: "EMOKLORE.resonantEmotions.anger",
+    label: "EMOKLORE.Config.resonantEmotions.anger",
     attribute: "passion",
   },
   sorrow: {
-    label: "EMOKLORE.resonantEmotions.sorrow",
+    label: "EMOKLORE.Config.resonantEmotions.sorrow",
     attribute: "passion",
   },
   happiness: {
-    label: "EMOKLORE.resonantEmotions.happiness",
+    label: "EMOKLORE.Config.resonantEmotions.happiness",
     attribute: "passion",
   },
   anxiety: {
-    label: "EMOKLORE.resonantEmotions.anxiety",
+    label: "EMOKLORE.Config.resonantEmotions.anxiety",
     attribute: "passion",
   },
   disgust: {
-    label: "EMOKLORE.resonantEmotions.disgust",
+    label: "EMOKLORE.Config.resonantEmotions.disgust",
     attribute: "passion",
   },
   fear: {
-    label: "EMOKLORE.resonantEmotions.fear",
+    label: "EMOKLORE.Config.resonantEmotions.fear",
     attribute: "passion",
   },
   jealousy: {
-    label: "EMOKLORE.resonantEmotions.jealousy",
+    label: "EMOKLORE.Config.resonantEmotions.jealousy",
     attribute: "passion",
   },
   grudge: {
-    label: "EMOKLORE.resonantEmotions.grudge",
+    label: "EMOKLORE.Config.resonantEmotions.grudge",
     attribute: "passion",
   },
 
   justice: {
-    label: "EMOKLORE.resonantEmotions.justice",
+    label: "EMOKLORE.Config.resonantEmotions.justice",
     attribute: "ideal",
   },
   worship: {
-    label: "EMOKLORE.resonantEmotions.worship",
+    label: "EMOKLORE.Config.resonantEmotions.worship",
     attribute: "ideal",
   },
   goodAndEvil: {
-    label: "EMOKLORE.resonantEmotions.goodAndEvil",
+    label: "EMOKLORE.Config.resonantEmotions.goodAndEvil",
     attribute: "ideal",
   },
   hope: {
-    label: "EMOKLORE.resonantEmotions.hope",
+    label: "EMOKLORE.Config.resonantEmotions.hope",
     attribute: "ideal",
   },
   aspiration: {
-    label: "EMOKLORE.resonantEmotions.aspiration",
+    label: "EMOKLORE.Config.resonantEmotions.aspiration",
     attribute: "ideal",
   },
   reason: {
-    label: "EMOKLORE.resonantEmotions.reason",
+    label: "EMOKLORE.Config.resonantEmotions.reason",
     attribute: "ideal",
   },
   victory: {
-    label: "EMOKLORE.resonantEmotions.victory",
+    label: "EMOKLORE.Config.resonantEmotions.victory",
     attribute: "ideal",
   },
   order: {
-    label: "EMOKLORE.resonantEmotions.order",
+    label: "EMOKLORE.Config.resonantEmotions.order",
     attribute: "ideal",
   },
   admiration: {
-    label: "EMOKLORE.resonantEmotions.admiration",
+    label: "EMOKLORE.Config.resonantEmotions.admiration",
     attribute: "ideal",
   },
   selflessness: {
-    label: "EMOKLORE.resonantEmotions.selflessness",
+    label: "EMOKLORE.Config.resonantEmotions.selflessness",
     attribute: "ideal",
   },
 
   friendship: {
-    label: "EMOKLORE.resonantEmotions.friendship",
+    label: "EMOKLORE.Config.resonantEmotions.friendship",
     attribute: "relationship",
   },
   love: {
-    label: "EMOKLORE.resonantEmotions.love",
+    label: "EMOKLORE.Config.resonantEmotions.love",
     attribute: "relationship",
   },
   romance: {
-    label: "EMOKLORE.resonantEmotions.romance",
+    label: "EMOKLORE.Config.resonantEmotions.romance",
     attribute: "relationship",
   },
   dependence: {
-    label: "EMOKLORE.resonantEmotions.dependence",
+    label: "EMOKLORE.Config.resonantEmotions.dependence",
     attribute: "relationship",
   },
   respect: {
-    label: "EMOKLORE.resonantEmotions.respect",
+    label: "EMOKLORE.Config.resonantEmotions.respect",
     attribute: "relationship",
   },
   contempt: {
-    label: "EMOKLORE.resonantEmotions.contempt",
+    label: "EMOKLORE.Config.resonantEmotions.contempt",
     attribute: "relationship",
   },
   protection: {
-    label: "EMOKLORE.resonantEmotions.protection",
+    label: "EMOKLORE.Config.resonantEmotions.protection",
     attribute: "relationship",
   },
   domination: {
-    label: "EMOKLORE.resonantEmotions.domination",
+    label: "EMOKLORE.Config.resonantEmotions.domination",
     attribute: "relationship",
   },
   service: {
-    label: "EMOKLORE.resonantEmotions.service",
+    label: "EMOKLORE.Config.resonantEmotions.service",
     attribute: "relationship",
   },
   indulgence: {
-    label: "EMOKLORE.resonantEmotions.indulgence",
+    label: "EMOKLORE.Config.resonantEmotions.indulgence",
     attribute: "relationship",
   },
 
   regret: {
-    label: "EMOKLORE.resonantEmotions.regret",
+    label: "EMOKLORE.Config.resonantEmotions.regret",
     attribute: "wound",
   },
   loneliness: {
-    label: "EMOKLORE.resonantEmotions.loneliness",
+    label: "EMOKLORE.Config.resonantEmotions.loneliness",
     attribute: "wound",
   },
   resignation: {
-    label: "EMOKLORE.resonantEmotions.resignation",
+    label: "EMOKLORE.Config.resonantEmotions.resignation",
     attribute: "wound",
   },
   despair: {
-    label: "EMOKLORE.resonantEmotions.despair",
+    label: "EMOKLORE.Config.resonantEmotions.despair",
     attribute: "wound",
   },
   denial: {
-    label: "EMOKLORE.resonantEmotions.denial",
+    label: "EMOKLORE.Config.resonantEmotions.denial",
     attribute: "wound",
   },
   doubt: {
-    label: "EMOKLORE.resonantEmotions.doubt",
+    label: "EMOKLORE.Config.resonantEmotions.doubt",
     attribute: "wound",
   },
   guilt: {
-    label: "EMOKLORE.resonantEmotions.guilt",
+    label: "EMOKLORE.Config.resonantEmotions.guilt",
     attribute: "wound",
   },
   madness: {
-    label: "EMOKLORE.resonantEmotions.madness",
+    label: "EMOKLORE.Config.resonantEmotions.madness",
     attribute: "wound",
   },
   inferiorityComplex: {
-    label: "EMOKLORE.resonantEmotions.inferiorityComplex",
+    label: "EMOKLORE.Config.resonantEmotions.inferiorityComplex",
     attribute: "wound",
   },
 } satisfies Record<string, ResonantEmotionConfig>;

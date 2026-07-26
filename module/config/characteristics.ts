@@ -5,35 +5,35 @@ export interface CharacteristicConfig {
 
 const definitions = {
   physical: {
-    label: "EMOKLORE.Actor.characteristics.physical",
+    label: "EMOKLORE.Config.characteristics.physical",
     fa: "fa-person-running",
   },
   dexterity: {
-    label: "EMOKLORE.Actor.characteristics.dexterity",
+    label: "EMOKLORE.Config.characteristics.dexterity",
     fa: "fa-hand-sparkles",
   },
   mentality: {
-    label: "EMOKLORE.Actor.characteristics.mentality",
+    label: "EMOKLORE.Config.characteristics.mentality",
     fa: "fa-face-meh-blank",
   },
   sensitivity: {
-    label: "EMOKLORE.Actor.characteristics.sensitivity",
+    label: "EMOKLORE.Config.characteristics.sensitivity",
     fa: "fa-ear-listen",
   },
   intelligence: {
-    label: "EMOKLORE.Actor.characteristics.intelligence",
+    label: "EMOKLORE.Config.characteristics.intelligence",
     fa: "fa-book-open",
   },
   charisma: {
-    label: "EMOKLORE.Actor.characteristics.charisma",
+    label: "EMOKLORE.Config.characteristics.charisma",
     fa: "fa-face-kiss-wink-heart",
   },
   sociality: {
-    label: "EMOKLORE.Actor.characteristics.sociality",
+    label: "EMOKLORE.Config.characteristics.sociality",
     fa: "fa-id-card",
   },
   fortune: {
-    label: "EMOKLORE.Actor.characteristics.fortune",
+    label: "EMOKLORE.Config.characteristics.fortune",
     fa: "fa-dice-six",
   },
 } satisfies Record<string, CharacteristicConfig>;

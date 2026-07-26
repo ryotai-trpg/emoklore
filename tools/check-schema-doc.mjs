@@ -36,11 +36,14 @@ const DOCS = ["docs/data-model.md", "docs/active-effect.md"];
 // 同じキーが複数のテーブルに出る（investigation は基本技能と技能グループの両方、
 // fight は基本技能と攻撃技能の両方）。どのテーブルとして書かれていてもよいので、
 // キーに対して許容ラベルの集合を持つ
+// preLocalize の対象になる表は `label`（i18nInit で翻訳済みの文字列に差し替わる）、
+// 対象外の表は `labelKey`（i18nキーのまま）を持つ。ここは Foundry を起動しないので、
+// どちらもi18nキーの文字列として読める
 const labelsByKey = new Map();
 const missingLabels = [];
 for (const { table, name } of TABLES) {
   for (const [key, config] of Object.entries(table)) {
-    const label = localize(config.label);
+    const label = localize(config.label ?? config.labelKey);
     if (label === undefined) {
       missingLabels.push(`${name}.${key} → ${config.label}`);
       continue;
