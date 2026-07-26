@@ -177,7 +177,8 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 
 - **繰り返すフィールドは関数に寄せる**。修正値の組（`bonus` / `success` / `target`）は4箇所に出てくるので `modifierField()` にまとめてある。対応する型 `ModifierSet` と1対1で向き合う場所を1つにするため
 - **`prepareDerivedData` は配線だけにする**。計算は `rules/` の関数を呼ぶ。派生値であることが分かるよう、`declare` の側にもコメントを残す
-- **`choices` の値には翻訳済み文字列ではなくi18nキーを入れる**。テンプレートが `formInput` に `localize=true` を渡していれば描画時に本体が解決する。ここで `game.i18n` を呼ぶと、スキーマ定義が i18nInit より先に走ったときに壊れる
+- **`choices` の値には翻訳済み文字列ではなくi18nキーを入れる**。テンプレートが `formInput` に `localize=true` を渡していれば描画時に本体が解決する。ここで翻訳を引くと、スキーマ定義が i18nInit より先に走ったときに壊れる
+- **表示名のプロパティは `label` と `labelKey` で呼び分ける**。`module/config/index.ts` の `preLocalize` に登録した表は `label` を持ち、i18nInit で翻訳済みの文字列に差し替わる。登録しない表（`choices` と共有するため差し替えられないもの）は `labelKey` を持ち、読む側が翻訳する。**同じ名前で意味が変わらないようにするのが要点**で、間違えて素で使うとプロパティが無いのでコンパイルエラーになる
 - **`label` はスキーマ定義時に設定しない**。本体の `localizeSchema` は `this.label ||= ...` なので、定義時に入れた値が `lang/ja.json` の `FIELDS` の指定に勝ってしまう
 - **新しい種別は `system.json` の `documentTypes` にも宣言する**。`CONFIG.*.dataModels` に登録しただけでは作成できず、警告も出ない。宣言しない種別を登録すると、到達できないのに `system` の型だけが増えて嘘になる
 

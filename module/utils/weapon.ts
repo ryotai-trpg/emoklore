@@ -32,10 +32,11 @@ export const localizeRangeType = (rangeType: RangeType): string =>
 /**
  * 参照技能の表示名。
  *
- * attackSkills の label は preLocalize の対象外（スキーマの choices と共有しているため）
- * なので、翻訳は引く側で行う。
+ * attackSkills が持つのは labelKey（i18nキー）だけ。スキーマの choices と共有している
+ * ので preLocalize の対象外で、翻訳は引く側で行う。
  */
-export const localizeAttackSkill = (skill: string): string => _loc(resolveAttackSkill(skill).label);
+export const localizeAttackSkill = (skill: string): string =>
+  _loc(resolveAttackSkill(skill).labelKey);
 
 /**
  * 武器の射程の表示。

@@ -111,11 +111,11 @@ export const describeSkill = (
 /**
  * カスタム技能の区分の表示名。
  *
- * `skillCategories` の label はi18nキーのまま（スキーマの choices と共有しているので
- * preLocalize の対象にしていない）。翻訳は引く側で行う。
+ * `skillCategories` が持つのは labelKey（i18nキー）だけ。スキーマの choices と
+ * 共有しているので preLocalize の対象にしておらず、翻訳は引く側で行う。
  */
 export const localizeSkillCategory = (category: SkillCategory): string =>
-  _loc(skillCategories[category].label);
+  _loc(skillCategories[category].labelKey);
 
 /** 能力値の表示名。CONFIG.EMOKLORE の label は i18nInit で翻訳済み */
 const localizeCharacteristic = (key: CharacteristicKey): string =>
