@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildLabelIndex,
   parseEmotions,
+  parseKana,
   parseSkills,
   validateCharSheetJSON,
 } from "./charsheet-importer";
@@ -35,6 +36,27 @@ describe("buildLabelIndex", () => {
 
   it("空の定義は空の索引になる", () => {
     expect(buildLabelIndex({})).toEqual({});
+  });
+});
+
+describe("parseKana", () => {
+  it("メモ欄のふりがなの行を拾う", () => {
+    const memo = "ふりがな:くが　あかり\n共鳴感情・表: 怒り(情念)";
+
+    expect(parseKana(memo)).toBe("くが　あかり");
+  });
+
+  it("全角コロンでも拾う", () => {
+    expect(parseKana("ふりがな：てすと")).toBe("てすと");
+  });
+
+  it("記載が無ければ空文字", () => {
+    expect(parseKana("共鳴感情・表: 怒り")).toBe("");
+  });
+
+  // 空の「ふりがな:」だけが入っていることがある。空白しか無ければ拾わない
+  it("値が空白だけなら空文字", () => {
+    expect(parseKana("ふりがな:   \n次の行")).toBe("");
   });
 });
 

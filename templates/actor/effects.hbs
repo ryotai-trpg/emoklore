@@ -1,5 +1,35 @@
 {{! Effects Tab }}
 <section class="tab effects {{tab.cssClass}}" data-group="primary" data-tab="effects">
+  {{! 追加取得した共鳴感情。共振や怪異の付与で後から増えるもので、3枠と違って件数に
+      上限が無い。ヘッダに置くとヘッダの高さがこれで決まってしまうので、「後から受けた
+      もの」を並べるこのタブが持つ。編集モードでなくても、権限があれば選び直せる }}
+  {{! 1件も無いときは、選び直せる人にだけ空の枠を見せる（入口がここにあると分かる） }}
+  {{#if (or editable acquiredEmotionRows.length)}}
+    <section class="em-acquired">
+      <header class="em-acquired__head">
+        <h3 class="em-acquired__title">{{localize "EMOKLORE.EmotionPicker.AcquiredSection"}}</h3>
+        {{#if editable}}
+          <button type="button" class="em-acquired__pick" data-action="pickAcquiredEmotions">
+            <i class="fa-solid fa-heart-circle-plus" inert></i>
+            <span>{{localize "EMOKLORE.EmotionPicker.OpenAcquired"}}</span>
+          </button>
+        {{/if}}
+      </header>
+      {{#if acquiredEmotionRows.length}}
+        <ul class="em-acquired__list">
+          {{#each acquiredEmotionRows}}
+            <li class="em-acquired__item">
+              {{this.label}}
+              {{#if this.attribute}}<span class="em-acquired__attribute">{{localize "EMOKLORE.Format.emotionAttribute" attribute=this.attribute}}</span>{{/if}}
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <p class="hint">{{localize "EMOKLORE.EmotionPicker.NoAcquired"}}</p>
+      {{/if}}
+    </section>
+  {{/if}}
+
   <ol class="em-data-table">
     {{! ハウリング反応はアイテムそのものを並べる。反応が持つ効果は下の区分から除いてあり、
         「いま何を受けているか」を1件1行で見せる。受けていなければ区分ごと出さない }}

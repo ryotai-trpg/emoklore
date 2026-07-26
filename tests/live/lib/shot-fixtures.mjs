@@ -85,6 +85,7 @@ export const createShotFixtures = (page) =>
         type: "character",
         flags,
         system: {
+          kana: "くが あかり",
           characteristics: {
             physical: { value: 4 },
             dexterity: { value: 3 },

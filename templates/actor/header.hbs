@@ -1,14 +1,23 @@
-{{! Sheet Header }}
+{{! Sheet Header
+
+    ふりがな・HP・共鳴感情の3つが同じ高さから始まる。ヘッダの上端を1本の線として
+    読ませるための並びで、位置決めは applications/character-sheet.css が持つ }}
 <header class="sheet-header em-sheet-header">
-  {{! 閲覧は切り詰めるので、全文はツールチップで見せる }}
-  {{#if isPlay}}
-  <div class="em-sheet-header__name" data-tooltip="{{source.name}}">{{source.name}}</div>
-  {{else}}
-  <div class="em-sheet-header__name">
-    {{formInput fields.name value=source.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
-    aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
+  <div class="em-sheet-header__identity">
+    {{! 閲覧は切り詰めるので、全文はツールチップで見せる }}
+    {{#if isPlay}}
+    <div class="em-sheet-header__kana">{{system.kana}}</div>
+    <div class="em-sheet-header__name" data-tooltip="{{source.name}}">{{source.name}}</div>
+    {{else}}
+    <div class="em-sheet-header__kana">
+      {{formInput systemFields.kana value=system.kana}}
+    </div>
+    <div class="em-sheet-header__name">
+      {{formInput fields.name value=source.name placeholder=(localize "DOCUMENT.FIELDS.name.label")
+      aria=(object label=(localize "DOCUMENT.FIELDS.name.label"))}}
+    </div>
+    {{/if}}
   </div>
-  {{/if}}
 
   {{#if isPlay}}
   <div class="em-resources">
@@ -40,8 +49,7 @@
         <div class="em-meter__value">
           Lv.{{formInput systemFields.resources.fields.resonance.fields.value value=system.resources.resonance.value}}
         </div>
-        {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows
-      acquired=acquiredEmotionRows}}
+        {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows}}
       </div>
       {{! 塗りは素の --emoklore-accent。HP/MPと違い共鳴には固有の意味色を持たせない }}
       <progress
@@ -55,16 +63,10 @@
   {{else}}
   {{! 編集は3つのselectではなくピッカーで行う。ここは現在値の表示と入口だけを持つ }}
   <div class="em-emotion-list">
-    {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows
-      acquired=acquiredEmotionRows}}
+    {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows}}
     <button type="button" class="em-emotion-list__pick" data-action="pickEmotions">
       <i class="fa-solid fa-heart" inert></i>
       <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
-    </button>
-    {{! 追加取得は3枠と別の操作。枚数が決まらないので複数選択モードで開く }}
-    <button type="button" class="em-emotion-list__pick" data-action="pickAcquiredEmotions">
-      <i class="fa-solid fa-heart-circle-plus" inert></i>
-      <span>{{localize "EMOKLORE.EmotionPicker.OpenAcquired"}}</span>
     </button>
   </div>
   {{/if}}

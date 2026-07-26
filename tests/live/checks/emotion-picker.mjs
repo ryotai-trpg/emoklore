@@ -184,7 +184,7 @@ export async function run({ page, check }) {
     ),
   );
 
-  await check("追加取得は3枠と別に選べて、行にも出る", () =>
+  await check("追加取得は3枠と別に選べて、効果タブに出る（ヘッダには出ない）", () =>
     assertInPage(
       page,
       async (tag) => {
@@ -212,26 +212,32 @@ export async function run({ page, check }) {
         });
         await window.__waitFor(() => !findPicker(), { label: "ピッカーが閉じる" });
 
-        // 3枠は触られていない。行には ＋ 付きで並ぶ
+        // 3枠は触られていない
         const slotsKept = ["surface", "hidden", "root"].every(
           (key) => actor.system.emotions[key] === slotsBefore[key],
         );
-        const shown = await window.__waitFor(() => sheet.element.textContent.includes("＋嫉妬"), {
-          soft: true,
-          timeout: 1000,
-          label: "追加取得の行",
-        });
+
+        // 追加取得は効果タブが持つ。件数に上限が無く、ヘッダに置くと
+        // ヘッダの高さがそれで決まってしまうため（#83）
+        const shown = await window.__waitFor(
+          () => sheet.element.querySelector(".em-acquired__list")?.textContent.includes("嫉妬"),
+          { soft: true, timeout: 1000, label: "効果タブの追加取得" },
+        );
+        // ヘッダの感情は3枠だけ。移したはずのものが両方に出ていないことまで見る
+        const notInHeader = !sheet.element
+          .querySelector(".em-sheet-header")
+          .textContent.includes("嫉妬");
 
         // 感情マッチングを見る後続のチェックが素の3枠を前提にしているので戻す
         await actor.update({ "system.emotions.acquired": [] });
         await window.__setMode(sheet, "play");
 
-        const ok = noSlots && slotsKept && Boolean(shown);
+        const ok = noSlots && slotsKept && Boolean(shown) && notInHeader;
         return {
           ok,
           detail: ok
-            ? "枠なしで嫉妬を追加取得、行に ＋嫉妬 が出た"
-            : `枠なし=${noSlots} 3枠そのまま=${slotsKept} 行の表示=${Boolean(shown)}`,
+            ? "枠なしで嫉妬を追加取得、効果タブに出てヘッダには出ない"
+            : `枠なし=${noSlots} 3枠そのまま=${slotsKept} 効果タブ=${Boolean(shown)} ヘッダに無い=${notInHeader}`,
         };
       },
       TAG,

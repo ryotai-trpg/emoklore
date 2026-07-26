@@ -8,7 +8,8 @@
     gap: var(--spacer-4);
   }
 
-  button.em-emotion-list__pick {
+  button.em-emotion-list__pick,
+  button.em-acquired__pick {
     display: inline-flex;
     align-items: center;
     gap: var(--spacer-4);
@@ -19,6 +20,48 @@
     height: auto;
     min-height: 0;
     line-height: 1.4;
+  }
+
+  /* 効果タブの「追加取得した共鳴感情」。3枠と違って件数に上限が無いので、
+     折り返して並べる（ヘッダの3行とは別の見せ方になる） */
+  .em-acquired {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacer-4);
+    margin-bottom: var(--spacer-12);
+  }
+
+  .em-acquired__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-8);
+  }
+
+  .em-acquired__title {
+    margin: 0;
+    font-size: var(--font-size-14);
+  }
+
+  .em-acquired__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .em-acquired__item {
+    padding: 1px var(--spacer-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--emoklore-box-radius);
+    background: var(--color-data-background);
+  }
+
+  .em-acquired__attribute {
+    font-size: 0.8em;
+    color: var(--color-text-subtle);
   }
 }
 
