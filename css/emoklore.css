@@ -34,7 +34,6 @@
 @import url("./components/utilities.css");
 @import url("./components/avatar.css");
 @import url("./components/button.css");
-@import url("./components/pair.css");
 @import url("./components/rollable.css");
 @import url("./components/section-head.css");
 @import url("./components/card.css");
@@ -51,6 +50,7 @@
 @import url("./components/data-table.css");
 
 /* Applications — module/applications/ と対で、部品の配置と外形寸法を持つ */
+@import url("./applications/actor-sheet.css");
 @import url("./applications/character-sheet.css");
 @import url("./applications/npc-sheet.css");
 @import url("./applications/kai-sheet.css");
