@@ -132,15 +132,17 @@
           <a class="em-kai__attack-name" data-action="rollAttack">
             {{#if name}}{{name}}{{else}}{{localize "EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"}}{{/if}}
           </a>
+          {{! ラベルはスキーマから引く（attackFields）。攻撃の性質なので、
+              チャットカードと同じところを見る }}
           <span class="em-kai__attack-judge">
             {{#if judgeless}}
-              {{localize "EMOKLORE.ChatMessage.kaiAttack.Judgeless"}} {{fixedSuccess}}
+              {{@root.attackFields.judgeless.label}} {{fixedSuccess}}
             {{else}}
               {{diceCount}}DM≦{{target}}
             {{/if}}
           </span>
           {{#if damage}}<span class="em-kai__attack-damage">{{damage}}</span>{{/if}}
-          {{#if mpCost}}<span class="em-kai__attack-mp">{{localize "EMOKLORE.ChatMessage.kaiAttack.MpCost"}}{{mpCost}}</span>{{/if}}
+          {{#if mpCost}}<span class="em-kai__attack-mp">{{@root.attackFields.mpCost.label}}{{mpCost}}</span>{{/if}}
         {{else}}
           {{! ラベルとプレースホルダはスキーマから引く（コンテキストの attackFields）。
               name 属性だけは添字が要るのでここで組み立てる }}
