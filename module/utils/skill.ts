@@ -212,7 +212,7 @@ export type StoredSkillRef = {
 };
 
 /** 選択肢の value は「経路:キー」。selectの値は1本の文字列にしかならないので繋ぐ */
-export const SKILL_REF_SEPARATOR = ":";
+const SKILL_REF_SEPARATOR = ":";
 
 /**
  * 技能をひとつ選ばせるときの選択肢。通常技能と基本技能の2グループに分ける。

@@ -69,7 +69,7 @@ export const buildHowlingDrawState = async (
 };
 
 /** 引いた結果カードのHTMLを組み立てる */
-export const renderHowlingDrawCard = async (state: HowlingDrawState): Promise<string> =>
+const renderHowlingDrawCard = async (state: HowlingDrawState): Promise<string> =>
   foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     reactionName: state.reactionName,
     reactionImg: state.reactionImg,

@@ -25,7 +25,7 @@ export type RequestedSkillRow = RequestedSkill & { label: string };
  * キーはキーそのものを出す。黙って行を落とすと、DLの指定が消えたのか元から
  * 無かったのかが卓から見て分からなくなる。
  */
-export const describeRequestedSkill = ({ kind, key }: RequestedSkill): RequestedSkillRow => {
+const describeRequestedSkill = ({ kind, key }: RequestedSkill): RequestedSkillRow => {
   if (kind === "base" && isBaseSkillKey(key)) {
     return { kind, key, label: describeSkillLabel({ kind, key }).markedLabel };
   }
@@ -38,7 +38,7 @@ export const describeRequestedSkill = ({ kind, key }: RequestedSkill): Requested
 };
 
 /** 判定要求カードのHTMLを組み立てる */
-export const renderSkillRequestCard = (state: SkillRequestState): Promise<string> =>
+const renderSkillRequestCard = (state: SkillRequestState): Promise<string> =>
   foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     skills: state.skills.map(describeRequestedSkill),
     requirement: formatRequirement(state.requiredSuccess),

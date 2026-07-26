@@ -19,7 +19,7 @@ const TEMPLATE = systemPath("templates/chat/resonance-outcome.hbs");
  * ハウリングを引くボタンは、怪異に共鳴表が紐づいているときだけ出す。押しても何も
  * 起きないボタンを並べるより、DLに「表を用意していない」と気付かせるほうがよい。
  */
-export const renderResonanceOutcomeCard = async (state: ResonanceOutcomeState): Promise<string> => {
+const renderResonanceOutcomeCard = async (state: ResonanceOutcomeState): Promise<string> => {
   const canDraw = state.howling && Boolean(await resolveResonanceTable(state.kaiUuid));
 
   return foundry.applications.handlebars.renderTemplate(TEMPLATE, {

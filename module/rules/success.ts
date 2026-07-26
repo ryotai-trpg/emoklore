@@ -1,8 +1,8 @@
 /** 出目がこれ以下ならクリティカル。目標値によらず成功し、さらに成功数がもう1つ増える */
-export const CRITICAL_FACE = 1;
+const CRITICAL_FACE = 1;
 
 /** 出目がこれ以上ならファンブル。目標値によらず失敗し、成功数が1つ減る */
-export const FUMBLE_FACE = 10;
+const FUMBLE_FACE = 10;
 
 /** 出目1個の判定結果 */
 export type FaceOutcome = "critical" | "success" | "failure" | "fumble";
