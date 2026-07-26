@@ -1,10 +1,10 @@
 {{! Weapon Card }}
 <div class="em-weapon-card">
   <header class="em-weapon-card__head">
-    <img class="em-weapon-card__image" src="{{weaponImg}}" height="36" width="36" alt="" />
+    <img class="em-avatar em-weapon-card__image" src="{{weaponImg}}" height="36" width="36" alt="" />
     <div class="em-weapon-card__title">
       <div class="em-weapon-card__name">{{weaponName}}</div>
-      <div class="em-weapon-card__meta">
+      <div class="em-meta em-weapon-card__meta">
         {{rangeLabel}}
         <span class="em-weapon-card__sep">/</span>
         {{skillLabel}}
@@ -19,14 +19,14 @@
   {{! ロールは本体の描画をそのまま埋める。content に要素があるので二重には描かれない }}
   {{#if attackHTML}}
     <section class="em-weapon-card__roll">
-      <h4 class="em-weapon-card__roll-label">{{localize "EMOKLORE.ChatMessage.weapon.Attack"}}</h4>
+      <h4 class="em-meta em-weapon-card__roll-label">{{localize "EMOKLORE.ChatMessage.weapon.Attack"}}</h4>
       {{{attackHTML}}}
     </section>
   {{/if}}
 
   {{#if damageHTML}}
     <section class="em-weapon-card__roll">
-      <h4 class="em-weapon-card__roll-label">{{localize "EMOKLORE.ChatMessage.weapon.Damage"}}</h4>
+      <h4 class="em-meta em-weapon-card__roll-label">{{localize "EMOKLORE.ChatMessage.weapon.Damage"}}</h4>
       {{{damageHTML}}}
     </section>
   {{/if}}

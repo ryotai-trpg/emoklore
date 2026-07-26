@@ -1,0 +1,31 @@
+/* 中身なりに縮むボタン。
+
+   **地・枠・角丸・ホバーは本体の `--button-*` が持っているので塗り直さない。**
+   ここが持つのは寸法だけになる。本体の `button` は `--button-size` で高さが固まるので、
+   一覧の行やチャットカードに埋めると背が高すぎる。それを外して中身なりに縮める。
+
+   この6行はかつて chip / emotion-list / emotion-picker / kai-sheet / skill-request の
+   5ファイルに書き写されていて、コメントの文面まで複製されたうえで既にずれ始めていた。 */
+
+@layer components {
+  .em-button {
+    margin: 0;
+    padding: var(--spacer-4) var(--spacer-8);
+    width: auto;
+    height: auto;
+    min-height: 0;
+    line-height: 1.4;
+  }
+
+  /* アイコンと文字を横に並べるもの */
+  .em-button--inline {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-4);
+  }
+
+  /* 英語だと名前が伸びるので、折り返しを許して枠を破らせない */
+  .em-button--wrap {
+    white-space: normal;
+  }
+}

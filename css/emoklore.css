@@ -32,7 +32,12 @@
 @import url("./components/segments.css");
 @import url("./components/meter.css");
 @import url("./components/utilities.css");
+@import url("./components/avatar.css");
+@import url("./components/button.css");
 @import url("./components/card.css");
+@import url("./components/tag.css");
+@import url("./components/terms.css");
+@import url("./components/meta.css");
 @import url("./components/sidebar.css");
 @import url("./components/emotion-list.css");
 @import url("./components/stat-row.css");
@@ -55,8 +60,10 @@
 /* Chat — シートの外に出るチャットカード */
 @import url("./chat/dice-roll.css");
 @import url("./chat/weapon-card.css");
+@import url("./chat/damage-applied.css");
 @import url("./chat/kai-attack-card.css");
 @import url("./chat/survival-reminder.css");
 @import url("./chat/skill-request.css");
 @import url("./chat/resonance-request.css");
+@import url("./chat/resonance-outcome.css");
 @import url("./chat/howling-draw.css");

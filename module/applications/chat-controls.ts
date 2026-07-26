@@ -9,7 +9,10 @@
 
 import { requestResonanceCheck, requestSkillCheck } from "./requests";
 
-/** 差すボタン。目印のクラスで二重を防ぐ（要素は使い回されたまま親だけが移る） */
+/**
+ * 差すボタン。目印のクラスで二重を防ぐ（要素は使い回されたまま親だけが移る）。
+ * `cls` は**掴むためだけのクラスで、CSSの規則は持たない**。見た目は本体のボタンに任せる
+ */
 const BUTTONS = [
   {
     cls: "em-request-skill",

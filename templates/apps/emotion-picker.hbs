@@ -9,7 +9,7 @@
     <div class="em-emotion-picker__slot">
       <button
         type="button"
-        class="em-emotion-picker__slot-target"
+        class="em-button em-button--inline em-emotion-picker__slot-target"
         data-action="selectSlot"
         data-slot="{{this.key}}"
         aria-pressed="{{this.active}}"
@@ -48,7 +48,7 @@
         <li>
           <button
             type="button"
-            class="em-emotion-picker__emotion"
+            class="em-button em-button--wrap em-emotion-picker__emotion"
             data-action="pickEmotion"
             data-emotion="{{this.key}}"
             aria-pressed="{{this.selected}}"

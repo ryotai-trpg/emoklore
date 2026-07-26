@@ -1,7 +1,7 @@
 {{! Human NPC sheet — 単一ルートが要る（HandlebarsApplicationMixin のパート制約） }}
 <div class="em-npc">
 <header class="em-npc__header">
-  <img class="em-npc__avatar" src="{{document.img}}" data-edit="img" alt="" />
+  <img class="em-avatar em-npc__avatar" src="{{document.img}}" data-edit="img" alt="" />
   {{#if isPlay}}
     <h1 class="em-npc__name">{{document.name}}</h1>
   {{else}}
@@ -79,7 +79,7 @@
       {{#each baseSkills}}
         <button
           type="button"
-          class="em-chip"
+          class="em-button em-button--inline em-button--wrap em-chip"
           data-action="roll"
           data-roll-type="{{rollType}}"
           data-skill="{{key}}"

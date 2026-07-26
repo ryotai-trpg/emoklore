@@ -24,16 +24,6 @@
       container-type: inline-size;
     }
 
-    /* 中身が変わらない枠なので寸法を固定する。rem にしてユーザーの
-       フォントサイズ設定に追従させる */
-    .em-item-header__image {
-      width: 3rem;
-      height: 3rem;
-      border: none;
-      border-radius: var(--emoklore-box-radius);
-      object-fit: cover;
-    }
-
     /* 画像は押すとファイルピッカーが開く。閲覧専用のときは本体が .disabled を付ける */
     .em-item-header__image:not(.disabled) {
       cursor: pointer;

@@ -64,7 +64,7 @@
   {{! 編集は3つのselectではなくピッカーで行う。ここは現在値の表示と入口だけを持つ }}
   <div class="em-emotion-list">
     {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows}}
-    <button type="button" class="em-emotion-list__pick" data-action="pickEmotions">
+    <button type="button" class="em-button em-button--inline" data-action="pickEmotions">
       <i class="fa-solid fa-heart" inert></i>
       <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
     </button>

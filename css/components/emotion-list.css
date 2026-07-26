@@ -8,20 +8,6 @@
     gap: var(--spacer-4);
   }
 
-  button.em-emotion-list__pick,
-  button.em-acquired__pick {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacer-4);
-    margin: 0;
-    padding: var(--spacer-4) var(--spacer-8);
-    width: auto;
-    /* 本体の button は --button-size で高さが固まる。中身なりに縮める */
-    height: auto;
-    min-height: 0;
-    line-height: 1.4;
-  }
-
   /* 効果タブの「追加取得した共鳴感情」。3枠と違って件数に上限が無いので、
      折り返して並べる（ヘッダの3行とは別の見せ方になる） */
   .em-acquired {
@@ -50,13 +36,6 @@
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-
-  .em-acquired__item {
-    padding: 1px var(--spacer-8);
-    border: 1px solid var(--color-border);
-    border-radius: var(--emoklore-box-radius);
-    background: var(--color-data-background);
   }
 
   /* ヘッダの3行と同じ「感情の属性」なので、同じトークンを引く */

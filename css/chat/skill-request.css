@@ -21,35 +21,6 @@
     gap: var(--spacer-4);
   }
 
-  button.em-skill-request__skill {
-    margin: 0;
-    padding: var(--spacer-4) var(--spacer-8);
-    width: auto;
-    /* 本体の button は --button-size で高さが固まる。中身なりに縮める */
-    height: auto;
-    min-height: 0;
-    line-height: 1.4;
-    /* 英語だと技能名が伸びる。折り返しを許してカードを破らせない */
-    white-space: normal;
-  }
-
-  /* 条件は「必要成功数: ダブル成功以上」の対なので定義リストで表す */
-  .em-skill-request__terms {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 0 var(--spacer-8);
-    margin: 0;
-    font-size: var(--font-size-12);
-  }
-
-  .em-skill-request__terms dt {
-    font-weight: bold;
-  }
-
-  .em-skill-request__terms dd {
-    margin: 0;
-  }
-
   .em-skill-request__note {
     margin: 0;
     font-size: var(--font-size-12);

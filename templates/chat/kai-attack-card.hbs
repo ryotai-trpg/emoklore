@@ -4,7 +4,7 @@
     <div class="em-kai-attack-card__name">{{attackName}}</div>
     {{! 「判定なし」と「消費MP」は攻撃の性質なのでスキーマのラベルを引く（attackLabels）。
         判定なしのときも成功数は固定値として出るので、両方を / 区切りで並べる }}
-    <div class="em-kai-attack-card__meta">
+    <div class="em-meta">
       {{#if judgeless}}
         {{attackLabels.judgeless}}
         <span class="em-kai-attack-card__sep">/</span>
@@ -22,7 +22,7 @@
   {{! ロールは本体の描画をそのまま埋める。content に要素があるので二重には描かれない }}
   {{#if judgmentHTML}}
     <section class="em-kai-attack-card__roll">
-      <h4 class="em-kai-attack-card__roll-label">
+      <h4 class="em-meta em-kai-attack-card__roll-label">
         {{localize "EMOKLORE.ChatMessage.kaiAttack.Judgment"}}
       </h4>
       {{{judgmentHTML}}}
@@ -31,7 +31,7 @@
 
   {{#if damageHTML}}
     <section class="em-kai-attack-card__roll">
-      <h4 class="em-kai-attack-card__roll-label">
+      <h4 class="em-meta em-kai-attack-card__roll-label">
         {{localize "EMOKLORE.ChatMessage.kaiAttack.Damage"}}
       </h4>
       {{{damageHTML}}}

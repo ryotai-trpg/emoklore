@@ -4,8 +4,6 @@
 @layer chat {
   .em-survival-reminder__prompt {
     margin: 0 0 var(--spacer-4);
-    color: var(--color-text-subtle);
-    font-size: var(--font-size-12);
   }
 
   .em-survival-reminder__list {

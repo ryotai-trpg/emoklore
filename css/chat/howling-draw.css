@@ -15,11 +15,9 @@
   }
 
   .em-howling-draw__image {
+    /* 武器カードのサムネイルと同じ大きさ。並んで出ることがあるので揃える */
+    --em-avatar-size: 2.25rem;
     flex: 0 0 auto;
-    width: 36px;
-    height: 36px;
-    border: none;
-    object-fit: cover;
   }
 
   .em-howling-draw__title {

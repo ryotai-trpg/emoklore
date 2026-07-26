@@ -4,7 +4,7 @@
     <li>
       <span>{{this.line}}</span>
       {{#if this.notice}}
-        <p class="em-damage-applied__notice">{{this.notice.text}}</p>
+        <p class="em-meta em-damage-applied__notice">{{this.notice.text}}</p>
         {{#if this.notice.actorUuid}}
           <button type="button" class="em-damage-applied__status" data-action="applyStatus"
             data-status-id="{{this.notice.statusId}}" data-actor-uuid="{{this.notice.actorUuid}}">

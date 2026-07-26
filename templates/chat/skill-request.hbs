@@ -10,7 +10,7 @@
     {{#each skills}}
       <button
         type="button"
-        class="em-skill-request__skill"
+        class="em-button em-button--wrap"
         data-action="rollRequested"
         data-kind="{{this.kind}}"
         data-key="{{this.key}}"
@@ -18,7 +18,7 @@
     {{/each}}
   </div>
 
-  <dl class="em-skill-request__terms">
+  <dl class="em-terms">
     {{#if requirement}}
       <dt>{{localize "EMOKLORE.RollOptions.Requirement"}}</dt>
       <dd>{{requirement}}</dd>

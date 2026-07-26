@@ -1,8 +1,7 @@
 /* 小さなボタンを折り返して並べる。基本技能の判定トリガに使う。
 
-   見た目は本体のボタン（サイドバーの「キャラクター作成」など）に任せる。
-   地・枠・角丸・ホバーはすべて本体の --button-* が持っているので、
-   ここで持つのは並べ方と、1行ぶんに詰めるための寸法だけにする */
+   寸法は em-button（+ --inline / --wrap）が持つので、ここは並べ方と、
+   チップに固有の文字の寄せ方だけを持つ */
 
 @layer components {
   .em-chip-list {
@@ -14,19 +13,7 @@
     padding: var(--spacer-8);
   }
 
-  button.em-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacer-4);
-    margin: 0;
-    padding: var(--spacer-4) var(--spacer-8);
-    width: auto;
-    /* 本体の button は --button-size で高さが固まる。中身なりに縮めたいので外す */
-    height: auto;
-    min-height: 0;
-    line-height: 1.4;
-    /* 英語だと名前が伸びるので、折り返しを許して枠を破らせない */
-    white-space: normal;
+  .em-chip {
     text-align: left;
   }
 

@@ -1,0 +1,16 @@
+/* ダメージ適用の結果カード。templates/chat/damage-applied.hbs と対。
+   シートの外に出るので .emoklore スコープに入れない */
+
+@layer chat {
+  /* 対象1体につき1行の一覧なので ul で組み、箇条書きの記号と既定の字下げだけ落とす */
+  .em-damage-applied {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* 境界の案内。HPの行の下へぶら下げる（控えめさは em-meta が持つ） */
+  .em-damage-applied__notice {
+    margin: var(--spacer-2) 0 var(--spacer-4);
+  }
+}
