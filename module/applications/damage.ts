@@ -26,7 +26,7 @@ export async function applyDamageAndReport(
 ): Promise<void> {
   const applied = await applyDamageToTargets(targets, amount, { reduction, armor });
   if (!applied) {
-    ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoGM", { localize: true });
+    ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoDealer", { localize: true });
     return;
   }
 

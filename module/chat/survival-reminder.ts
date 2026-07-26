@@ -7,7 +7,9 @@
 
 import { systemPath } from "../constants";
 import type { SurvivalReminderState, SurvivalTarget } from "../data/messages/survival-reminder";
+import { describeSkillLabel } from "../utils/skill";
 import { createCardMessage } from "./message";
+import { formatRollFlavor } from "./roll-flavor";
 
 const TEMPLATE = systemPath("templates/chat/survival-reminder.hbs");
 
@@ -21,6 +23,14 @@ export async function createSurvivalReminderMessage(
   return createCardMessage({
     type: "survivalReminder",
     system,
-    content: await foundry.applications.handlebars.renderTemplate(TEMPLATE, { targets }),
+    content: await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
+      targets,
+      // ボタンの文字を訳文に持たせない。基本技能の印（＊）を落とした「〈生存〉判定」に
+      // なりやすく、同じカードの本文（〈＊生存〉）と食い違う。技能名の見せ方は
+      // describeSkillLabel が1箇所で決める
+      rollLabel: formatRollFlavor(
+        describeSkillLabel({ kind: "base", key: "survival" }).markedLabel,
+      ),
+    }),
   });
 }

@@ -12,14 +12,14 @@
   {{#if isGM}}
     <div class="em-initiative-basis__row">
       <select class="em-initiative-basis__preset" data-em="preset"
-        aria-label="{{localize "EMOKLORE.Combat.bar.preset"}}">
-        <option value="" {{#if customSelected}}selected{{/if}}>{{localize "EMOKLORE.Combat.bar.custom"}}</option>
+        aria-label="{{localize "EMOKLORE.Combat.Bar.Preset"}}">
+        <option value="" {{#if customSelected}}selected{{/if}}>{{localize "EMOKLORE.Combat.Bar.Custom"}}</option>
         {{#each presets}}
           <option value="{{this.key}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
         {{/each}}
       </select>
       <button type="button" class="em-initiative-basis__recompute" data-em="recompute">
-        {{localize "EMOKLORE.Combat.bar.recomputeAll"}}
+        {{localize "EMOKLORE.Combat.Bar.RecomputeAll"}}
       </button>
     </div>
     <div class="em-initiative-basis__row">
@@ -31,7 +31,7 @@
       </select>
       <select class="em-initiative-basis__select" data-em="skill"
         aria-label="{{localize "EMOKLORE.Combat.FIELDS.skill.label"}}">
-        <option value="" {{#if noSkill}}selected{{/if}}>{{localize "EMOKLORE.Combat.bar.noSkill"}}</option>
+        <option value="" {{#if noSkill}}selected{{/if}}>{{localize "EMOKLORE.Combat.Bar.NoSkill"}}</option>
         {{#each skills}}
           <option value="{{this.key}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
         {{/each}}
@@ -39,7 +39,7 @@
     </div>
   {{else}}
     <div class="em-initiative-basis__label">
-      <span class="em-initiative-basis__title">{{localize "EMOKLORE.Combat.bar.title"}}</span>
+      <span class="em-initiative-basis__title">{{localize "EMOKLORE.Combat.Bar.Title"}}</span>
       <span>{{basisLabel}}</span>
     </div>
   {{/if}}

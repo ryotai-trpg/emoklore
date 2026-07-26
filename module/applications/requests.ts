@@ -116,7 +116,7 @@ async function rollResonanceFor(
   const successCount = roll.successCount;
   const changed = await raiseResonance(actor, request, successCount);
   if (!changed) {
-    ui.notifications?.warn("EMOKLORE.ChatMessage.resonanceRequest.NoGM", { localize: true });
+    ui.notifications?.warn("EMOKLORE.ChatMessage.resonanceRequest.NoDealer", { localize: true });
     return;
   }
 

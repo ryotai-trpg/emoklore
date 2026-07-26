@@ -89,7 +89,7 @@ export default (base: ApplicationV2Constructor) => {
       toggleMode.type = "button";
       toggleMode.classList.add("header-control", "icon", "fa-solid", "fa-user-lock");
       toggleMode.dataset.action = "toggleMode";
-      toggleMode.dataset.tooltip = "EMOKLORE.Sheet.toggleMode";
+      toggleMode.dataset.tooltip = "EMOKLORE.Sheet.ToggleMode";
       this.window.controls.after(toggleMode);
 
       return frame;
