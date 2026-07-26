@@ -51,5 +51,17 @@ export const ORIGIN = `http://localhost:${PORT}`;
 /** 検証用に作るものの印。後片付けでこれを頼りに消す */
 export const TAG = "__verify";
 
+/**
+ * スクリーンショット採取用に作るものの印（`npm run shots:live`）。
+ *
+ * **名前ではなくフラグで印を付ける。** 採取の目的は書体と幅の判断なので、
+ * `__verify_` のような接頭辞が名前に混ざると、いちばん見たいもの（キャラクター名の
+ * 伸縮、技能名の折り返し、印の並び）が歪む。
+ *
+ * 検証（`TAG`）と印を分けてあるのは、どちらかが途中で落ちて残骸が出たとき、
+ * もう片方を巻き込まないため。
+ */
+export const SHOT_FLAG = { scope: "emoklore", key: "shotFixture" };
+
 /** 取り込みの検証でアクター名がこれに変わる。後片付けで拾うために名前を共有する */
 export const IMPORTED_NAME = "パラム無し";

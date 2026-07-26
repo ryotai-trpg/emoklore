@@ -36,6 +36,7 @@
     "check:manifest-urls": "node tools/check-manifest-urls.mjs",
     "link:foundry": "node tools/create-symlinks.mjs",
     "typecheck": "node tools/typecheck.mjs",
-    "verify:live": "node tests/live/run.mjs"
+    "verify:live": "node tests/live/run.mjs",
+    "shots:live": "node tests/live/shots.mjs"
   }
 }
