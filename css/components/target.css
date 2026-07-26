@@ -1,0 +1,18 @@
+/* 判定の目標値。技能の行にも基本技能のチップにも同じ形で入る。
+
+   置き場所を1つにしてあるのは、行とチップで枠・角丸・詰め方を手で一致させないため。
+   どちらかを変えたときにもう片方が黙って置き去りになるのを、共有で防ぐ。
+
+   外側の余白は持たない（置く側の責務）。行では列の間隔として、チップでは
+   flex の gap として、置く側がそれぞれ決める */
+
+.emoklore {
+  .em-target {
+    border: 1px solid;
+    border-radius: var(--emoklore-progress-radius-small);
+    padding: 0 var(--spacer-4);
+    text-align: center;
+    /* 桁が変わっても数字の位置がずれないようにする */
+    font-variant-numeric: tabular-nums;
+  }
+}

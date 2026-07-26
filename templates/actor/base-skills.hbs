@@ -9,8 +9,8 @@
     data-roll-type="base-skill"
     data-skill="{{baseSkill.key}}"
   >
-    {{baseSkill.label}}
-    <span class="em-chip__target">{{baseSkill.target}}</span>
+    <span class="em-chip__name">{{baseSkill.markedLabel}}</span>
+    <span class="em-target">{{baseSkill.target}}</span>
     <i class="em-chip__icon fa-solid {{baseSkill.characteristicIcon}}"></i>
   </button>
   {{/each}}
@@ -25,8 +25,8 @@
     data-roll-type="custom-skill"
     data-item-id="{{baseSkill.id}}"
   >
-    {{baseSkill.markedLabel}}
-    <span class="em-chip__target">{{baseSkill.target}}</span>
+    <span class="em-chip__name">{{baseSkill.markedLabel}}</span>
+    <span class="em-target">{{baseSkill.target}}</span>
     <i class="em-chip__icon fa-solid {{baseSkill.characteristicIcon}}"></i>
   </button>
   {{/each}}

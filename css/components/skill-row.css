@@ -60,14 +60,10 @@
     min-width: 0;
   }
 
-  /* Lvから右は、列間の基本（4px）に足して要素ごとに間隔を持たせる */
-  .em-skill-row__target {
-    border: 1px solid;
-    border-radius: var(--emoklore-progress-radius-small);
-    padding: 0 var(--spacer-4);
+  /* Lvから右は、列間の基本（4px）に足して要素ごとに間隔を持たせる。
+     目標値の見た目そのものは components/target.css が持つ（チップと共有） */
+  .em-skill-row .em-target {
     margin-inline-start: var(--spacer-4);
-    text-align: center;
-    font-variant-numeric: tabular-nums;
   }
 
   .em-skill-row__stat {
