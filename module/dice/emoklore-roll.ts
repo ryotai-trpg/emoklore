@@ -68,7 +68,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
 
   /** 判定結果の表示。チャットカードの見出しに出る「成功」「ダブル」など */
   get resultLabel(): string {
-    return _loc(`EMOKLORE.result.${this.resultName}`);
+    return _loc(`EMOKLORE.Result.${this.resultName}`);
   }
 
   /** 成功数修正の表示。修正がなければ空文字 */
@@ -89,7 +89,7 @@ export class EmokloreRoll extends foundry.dice.Roll {
     if (this.requiredSuccess <= 0) return "";
 
     const requirement = _loc("EMOKLORE.RollOptions.AtLeast", {
-      result: _loc(`EMOKLORE.result.${resolveResultName(this.requiredSuccess)}`),
+      result: _loc(`EMOKLORE.Result.${resolveResultName(this.requiredSuccess)}`),
     });
     const key = meetsRequirement(this.successCount, this.requiredSuccess)
       ? "EMOKLORE.RollOptions.Met"

@@ -4,19 +4,19 @@ export interface EmotionAttributeConfig {
 
 const definitions = {
   desire: {
-    label: "EMOKLORE.emotionAttributes.desire",
+    label: "EMOKLORE.Config.emotionAttributes.desire",
   },
   passion: {
-    label: "EMOKLORE.emotionAttributes.passion",
+    label: "EMOKLORE.Config.emotionAttributes.passion",
   },
   ideal: {
-    label: "EMOKLORE.emotionAttributes.ideal",
+    label: "EMOKLORE.Config.emotionAttributes.ideal",
   },
   relationship: {
-    label: "EMOKLORE.emotionAttributes.relationship",
+    label: "EMOKLORE.Config.emotionAttributes.relationship",
   },
   wound: {
-    label: "EMOKLORE.emotionAttributes.wound",
+    label: "EMOKLORE.Config.emotionAttributes.wound",
   },
 } satisfies Record<string, EmotionAttributeConfig>;
 

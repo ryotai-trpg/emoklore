@@ -270,7 +270,7 @@ export const baseSkillOf = (key: string): string | null => {
  */
 export const formatSuccessRequirement = (result: ResultName): string =>
   _loc("EMOKLORE.RollOptions.AtLeast", {
-    result: _loc(`EMOKLORE.result.${result}`),
+    result: _loc(`EMOKLORE.Result.${result}`),
   });
 
 /** 要求された成功数の表示。「ダブル成功以上」。指定なしは空文字 */

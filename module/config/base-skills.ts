@@ -9,67 +9,67 @@ export interface BaseSkillConfig {
 
 const definitions = {
   investigation: {
-    label: "EMOKLORE.Actor.baseSkills.investigation",
+    label: "EMOKLORE.Config.baseSkills.investigation",
     characteristic: "dexterity",
     group: "investigation",
   },
   perception: {
-    label: "EMOKLORE.Actor.baseSkills.perception",
+    label: "EMOKLORE.Config.baseSkills.perception",
     characteristic: "sensitivity",
     group: "perception",
   },
   negotiations: {
-    label: "EMOKLORE.Actor.baseSkills.negotiations",
+    label: "EMOKLORE.Config.baseSkills.negotiations",
     characteristic: "charisma",
     group: "negotiations",
   },
   knowledge: {
-    label: "EMOKLORE.Actor.baseSkills.knowledge",
+    label: "EMOKLORE.Config.baseSkills.knowledge",
     characteristic: "intelligence",
     group: "knowledge",
   },
   news: {
-    label: "EMOKLORE.Actor.baseSkills.news",
+    label: "EMOKLORE.Config.baseSkills.news",
     characteristic: "sociality",
     group: "knowledge",
   },
   athletic: {
-    label: "EMOKLORE.Actor.baseSkills.athletic",
+    label: "EMOKLORE.Config.baseSkills.athletic",
     characteristic: "physical",
     group: "athletic",
   },
   fight: {
-    label: "EMOKLORE.Actor.baseSkills.fight",
+    label: "EMOKLORE.Config.baseSkills.fight",
     characteristic: "physical",
     group: "athletic",
   },
   throw: {
-    label: "EMOKLORE.Actor.baseSkills.throw",
+    label: "EMOKLORE.Config.baseSkills.throw",
     characteristic: "dexterity",
     group: "athletic",
   },
   survival: {
-    label: "EMOKLORE.Actor.baseSkills.survival",
+    label: "EMOKLORE.Config.baseSkills.survival",
     characteristic: "physical",
     group: "survival",
   },
   self: {
-    label: "EMOKLORE.Actor.baseSkills.self",
+    label: "EMOKLORE.Config.baseSkills.self",
     characteristic: "mentality",
     group: "survival",
   },
   treatment: {
-    label: "EMOKLORE.Actor.baseSkills.treatment",
+    label: "EMOKLORE.Config.baseSkills.treatment",
     characteristic: "intelligence",
     group: "survival",
   },
   handiwork: {
-    label: "EMOKLORE.Actor.baseSkills.handiwork",
+    label: "EMOKLORE.Config.baseSkills.handiwork",
     characteristic: "dexterity",
     group: "unique",
   },
   luck: {
-    label: "EMOKLORE.Actor.baseSkills.luck",
+    label: "EMOKLORE.Config.baseSkills.luck",
     characteristic: "fortune",
     group: "unique",
   },

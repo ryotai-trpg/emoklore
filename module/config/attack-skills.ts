@@ -23,31 +23,31 @@ export interface AttackSkillConfig {
  */
 const definitions = {
   fight: {
-    label: "EMOKLORE.Actor.baseSkills.fight",
+    label: "EMOKLORE.Config.baseSkills.fight",
     base: true,
     rangeType: "melee",
     damageDie: "d3",
   },
   martialArt: {
-    label: "EMOKLORE.Actor.skills.martialArt",
+    label: "EMOKLORE.Config.skills.martialArt",
     base: false,
     rangeType: "melee",
     damageDie: "d3",
   },
   secretTechnique: {
-    label: "EMOKLORE.Actor.skills.secretTechnique",
+    label: "EMOKLORE.Config.skills.secretTechnique",
     base: false,
     rangeType: "melee",
     damageDie: "d6",
   },
   throw: {
-    label: "EMOKLORE.Actor.baseSkills.throw",
+    label: "EMOKLORE.Config.baseSkills.throw",
     base: true,
     rangeType: "ranged",
     damageDie: null,
   },
   rangedAttack: {
-    label: "EMOKLORE.Actor.skills.rangedAttack",
+    label: "EMOKLORE.Config.skills.rangedAttack",
     base: false,
     rangeType: "ranged",
     damageDie: null,

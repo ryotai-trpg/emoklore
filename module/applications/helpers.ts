@@ -106,7 +106,7 @@ export const buildEmotionColumns = (
  *
  * どちらの label も i18nInit の performPreLocalization で翻訳済みなので、ここでは
  * 参照するだけでよい。言語キーをここで組み立てると、感情が未選択のときに尻切れのキー
- * （`EMOKLORE.emotionAttributes.`）がそのままシートに出る。キーを作らないので、
+ * （`EMOKLORE.Config.emotionAttributes.`）がそのままシートに出る。キーを作らないので、
  * 未選択・未知の感情はどちらも空文字になる。
  *
  * 翻訳を呼ばない純粋関数なので、そのまま単体テストできる。

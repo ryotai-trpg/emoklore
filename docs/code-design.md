@@ -39,7 +39,7 @@ TypeScriptの型と、モジュールの分け方に関する規約はここが�
 
 ```ts
 const definitions = {
-  investigation: { label: "EMOKLORE.Actor.skillGroup.investigation" },
+  investigation: { label: "EMOKLORE.Config.skillGroups.investigation" },
   // ...
 } satisfies Record<string, SkillGroupsConfig>;
 
@@ -130,7 +130,21 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 - **`Emoklore*` を付けるのは、本体クラスを継承して本体の同名概念を置き換えるものだけ**。`EmokloreActor` `EmokloreRoll` `EmokloreCharacterSheet` がそれで、本体に `Actor` `Roll` `ActorSheet` があるから区別が要る。`CharacterDataModel` や `CharSheetImportDialog` のように本体に同名の概念が無いものには付けない
 - **`rules/` の動詞は3つに絞る**。`calculate*` は数式（`calculateMaxHp`）、`resolve*` は入力から一意に決まる導出（`resolveSkillRoll`）、`build*` は複合物の組み立て（`buildDamageFormula`）
 
-`lang/*.json` のキーは名前空間をPascalCaseで切り、その下は camelCase にする（`EMOKLORE.Sheet.character.tab`）。**ドットを含むキーを1本の文字列で書かない** — 本体は読めるが、木として辿れなくなる。configのテーブルに対応する名前空間は、テーブル名と同じ複数形にする（`Actor.skillGroups`）。
+### `lang/*.json` のキー
+
+名前空間はPascalCaseで切り、その下は camelCase にする（`EMOKLORE.Sheet.character.tab`）。**ドットを含むキーを1本の文字列で書かない** — 本体は読めるが、木として辿れなくなる。**`EMOKLORE` の直下に裸のリーフを置かない**（名前空間と同じ列に文字列が並ぶと、どちらなのかが読めない）。
+
+名前空間の切り方は3つに分かれる。
+
+| 名前空間 | 中身 | 例 |
+|---|---|---|
+| `EMOKLORE.Config.*` | `module/config/` の表のうち、**層をまたいで使われるもの**。名前は変数名と同じ複数形にする | `Config.skillGroups` `Config.resonantEmotions` |
+| `EMOKLORE.<Document>.<種別>.FIELDS.*` | `LOCALIZATION_PREFIXES` が指す先。**プレフィクスと1対1**にする | `EMOKLORE.Item.weapon.FIELDS` |
+| それ以外 | 画面・カード・ダイアログごとの文字列 | `EMOKLORE.ApplyDamage` `EMOKLORE.EmotionPicker` |
+
+**`FIELDS` を持つ名前空間に、横断的な表を混ぜない。** かつて `EMOKLORE.Actor` が `character` / `kai`（プレフィクス）と `characteristics` / `skills`（表）の両方を抱えていて、同じ名前空間が2つの意味を持っていた。表がその種別でしか使われないなら下に置いてよい（`Item.skill.Category` はカスタム技能アイテム専用）。
+
+**装飾込みのフォーマット文字列は `EMOKLORE.Format.*` にまとめる。** 記号だけを翻訳のキーにすると、その記号を使う側が組み立てを持つことになり、言語ごとに語順や約物を変えられない。
 
 ## アサーション（`as`）の使いどころ
 

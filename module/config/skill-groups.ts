@@ -4,25 +4,25 @@ export interface SkillGroupConfig {
 
 const definitions = {
   investigation: {
-    label: "EMOKLORE.Actor.skillGroups.investigation",
+    label: "EMOKLORE.Config.skillGroups.investigation",
   },
   perception: {
-    label: "EMOKLORE.Actor.skillGroups.perception",
+    label: "EMOKLORE.Config.skillGroups.perception",
   },
   negotiations: {
-    label: "EMOKLORE.Actor.skillGroups.negotiations",
+    label: "EMOKLORE.Config.skillGroups.negotiations",
   },
   knowledge: {
-    label: "EMOKLORE.Actor.skillGroups.knowledge",
+    label: "EMOKLORE.Config.skillGroups.knowledge",
   },
   athletic: {
-    label: "EMOKLORE.Actor.skillGroups.athletic",
+    label: "EMOKLORE.Config.skillGroups.athletic",
   },
   survival: {
-    label: "EMOKLORE.Actor.skillGroups.survival",
+    label: "EMOKLORE.Config.skillGroups.survival",
   },
   unique: {
-    label: "EMOKLORE.Actor.skillGroups.unique",
+    label: "EMOKLORE.Config.skillGroups.unique",
   },
 } satisfies Record<string, SkillGroupConfig>;
 

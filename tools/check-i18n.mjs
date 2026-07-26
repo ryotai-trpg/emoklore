@@ -57,7 +57,7 @@ const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 /**
  * ソースからキーらしき文字列を拾う。
  *
- * 静的なものはそのまま、テンプレートリテラルの `` `EMOKLORE.result.${name}` `` は
+ * 静的なものはそのまま、テンプレートリテラルの `` `EMOKLORE.Result.${name}` `` は
  * 埋め込み部分を1区画のワイルドカードにしたパターンとして扱う。動的キーを手書きの
  * allowlistで除外せずに済み、書き換えれば自動で追従する。
  *
@@ -113,7 +113,7 @@ for (const file of sources) {
   for (const [text, pattern] of patterns) {
     referencedPatterns.push(pattern);
     // 動的キーは1つに定まらないが、1件も当たらないなら綴りが違う。
-    // `EMOKLORE.result.${name}` の result を打ち間違えるとここで落ちる
+    // `EMOKLORE.Result.${name}` の result を打ち間違えるとここで落ちる
     if (!keys.some((key) => pattern.test(key))) {
       undefinedRefs.push(`${file}: ${text}（動的キー、該当するキーが無い）`);
     }
@@ -121,7 +121,7 @@ for (const file of sources) {
 }
 
 // lang の値そのものがキーになっている場合、それも参照として数える。
-// FIELDS のラベルに `EMOKLORE.Actor.characteristics.<能力値>` を置くと、
+// FIELDS のラベルに `EMOKLORE.Config.characteristics.<能力値>` を置くと、
 // localizeSchema の `this.label ||= _loc(...)` が1回解決して能力値名になる。
 // 能力値名を2箇所に書かずに済む正しい書き方なので、参照として扱う
 const collectValueReferences = (node) => {

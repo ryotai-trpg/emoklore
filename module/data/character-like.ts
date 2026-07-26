@@ -306,7 +306,7 @@ export class CharacterLikeDataModel extends EmokloreSystemDataModel {
                         choices: Object.fromEntries(
                           characteristicOptions.map((key) => [
                             key,
-                            `EMOKLORE.Actor.characteristics.${key}`,
+                            `EMOKLORE.Config.characteristics.${key}`,
                           ]),
                         ),
                       }
