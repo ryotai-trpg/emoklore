@@ -30,29 +30,69 @@ const MARKED_LABEL_FORMATS = {
 } as const;
 
 /**
+ * 名前が置かれる文脈。**印を付けるかどうかはここで変わる。**
+ *
+ * `standalone`（既定）は名前だけが出る場所 — チャットの見出し、カード、効果の適用先、
+ * 選択肢。区分を名前でしか示せないので、ルールブックと同じ `＊` / `★` を両方付ける。
+ *
+ * `grouped` はシート。基本技能はチップ列に、一般技能は行に分かれて置かれるので、
+ * **置き場所そのものが区分を伝えている**。`＊` は全件に付く冗長な印になるので落とす。
+ * `★` は一般技能の中でエクストラを区別するため、こちらでも付ける。
+ */
+export type LabelContext = "standalone" | "grouped";
+
+/** シートが名前を組み立てるときの文脈。呼ぶ側で綴らずこれを使う */
+export const SHEET_CONTEXT: LabelContext = "grouped";
+
+/**
  * 印つきの表示名を組み立てる。
  *
  * 直に呼ばず `describeSkillLabel` を通すこと。印を付けるかどうかの判断まで含めて
  * 1箇所にまとめてある。
  */
-const markLabel = (label: string, isBase: boolean, isExtra: boolean): string => {
-  if (isBase) return _loc(MARKED_LABEL_FORMATS.base, { name: label });
+const markLabel = (
+  label: string,
+  isBase: boolean,
+  isExtra: boolean,
+  context: LabelContext,
+): string => {
+  if (isBase) {
+    return context === "grouped" ? label : _loc(MARKED_LABEL_FORMATS.base, { name: label });
+  }
   if (isExtra) return _loc(MARKED_LABEL_FORMATS.extra, { name: label });
   return label;
 };
 
-/** どの技能を見せたいか。組込・基本は表から引き、カスタムは持っている値で名乗る */
+/**
+ * どの技能を見せたいか。組込・基本は表から引き、カスタムは持っている値で名乗る。
+ *
+ * 分野（特化）はアクター側の値なので、表から引ける組込技能でも渡してもらう。
+ * 基本技能は分野を持たない（`data/character-like.ts` の `baseSkills`）。
+ */
 export type SkillDescriptor =
-  | { kind: "skill"; key: SkillKey }
+  | { kind: "skill"; key: SkillKey; specialization?: string | undefined }
   | { kind: "base"; key: BaseSkillKey }
-  | { kind: "custom"; label: string; isBase: boolean; isExtra: boolean };
+  | {
+      kind: "custom";
+      label: string;
+      isBase: boolean;
+      isExtra: boolean;
+      specialization?: string | undefined;
+    };
 
-/** 技能の名前まわり */
+/**
+ * 技能の名前まわり。3つの形を持つのは、場所によって足せるものが違うため。
+ *
+ * 編集モードは分野が入力欄なので名前に含められず、閲覧モードは「専門知識：民俗学」まで
+ * 出したい。**どれを使うかはテンプレートが選ぶが、組み立て方はここが決める。**
+ */
 export type SkillLabel = {
-  /** 翻訳済みの表示名。印は含まない */
+  /** 翻訳済みの表示名。印も分野も含まない */
   label: string;
-  /** 印つきの表示名。表示に使うのは基本こちら */
+  /** 印つきの表示名。分野は含まない。編集モードの行はこれを使う */
   markedLabel: string;
+  /** 印と分野まで込みの表示名。閲覧で名乗るのはこれ */
+  displayLabel: string;
 };
 
 /**
@@ -64,19 +104,41 @@ export type SkillLabel = {
  * `CONFIG.EMOKLORE` の label は i18nInit の performPreLocalization で翻訳済みなので、
  * ここでは参照するだけでよい。
  */
-export const describeSkillLabel = (ref: SkillDescriptor): SkillLabel => resolveLabelParts(ref);
+export const describeSkillLabel = (
+  ref: SkillDescriptor,
+  context: LabelContext = "standalone",
+): SkillLabel => {
+  const { label, markedLabel } = resolveLabelParts(ref, context);
+  const specialization = ref.kind === "base" ? undefined : ref.specialization;
 
-const resolveLabelParts = (ref: SkillDescriptor): SkillLabel => {
+  return {
+    label,
+    markedLabel,
+    // 印は名前に付き、分野はその後ろに続く（「★技能：専門」）。分野まで含めてから
+    // 印を付けると、分野のほうが区分に掛かって見える
+    displayLabel: specialization
+      ? _loc("EMOKLORE.Format.specialization", { name: markedLabel, specialization })
+      : markedLabel,
+  };
+};
+
+const resolveLabelParts = (
+  ref: SkillDescriptor,
+  context: LabelContext,
+): Omit<SkillLabel, "displayLabel"> => {
   if (ref.kind === "custom") {
-    return { label: ref.label, markedLabel: markLabel(ref.label, ref.isBase, ref.isExtra) };
+    return {
+      label: ref.label,
+      markedLabel: markLabel(ref.label, ref.isBase, ref.isExtra, context),
+    };
   }
   if (ref.kind === "base") {
     const { label } = CONFIG.EMOKLORE.baseSkills[ref.key];
-    return { label, markedLabel: markLabel(label, true, false) };
+    return { label, markedLabel: markLabel(label, true, false, context) };
   }
 
   const { label, isExtra } = CONFIG.EMOKLORE.skills[ref.key];
-  return { label, markedLabel: markLabel(label, false, isExtra ?? false) };
+  return { label, markedLabel: markLabel(label, false, isExtra ?? false, context) };
 };
 
 /** 技能1行の見せ方。名前まわりに、判定に使う能力値の見せ方を足したもの */
@@ -97,11 +159,12 @@ export type SkillDisplay = SkillLabel & {
 export const describeSkill = (
   ref: SkillDescriptor,
   characteristic: CharacteristicKey,
+  context: LabelContext = "standalone",
 ): SkillDisplay => {
   const { label: characteristicLabel, fa } = CONFIG.EMOKLORE.characteristics[characteristic];
 
   return {
-    ...describeSkillLabel(ref),
+    ...describeSkillLabel(ref, context),
     characteristic,
     characteristicLabel,
     characteristicIcon: fa,

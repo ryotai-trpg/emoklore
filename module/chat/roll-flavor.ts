@@ -9,9 +9,9 @@ import type { SkillRollContext } from "../data/character-like";
 import { describeSkillLabel } from "../utils/skill";
 
 /**
- * チャットの見出しに出す判定名を組み立てる。「＊格闘」「★技能：専門」など。
+ * チャットの見出しに出す判定名を組み立てる。「★技能：専門」など。
  *
- * 印の付け方は `describeSkillLabel` が決める。判定の文脈は組込・基本・カスタムの
+ * 印と分野の組み立ては `describeSkillLabel` が決める。判定の文脈は組込・基本・カスタムの
  * どれでも同じ形（表示名と区分）に均されているので、カスタムとして渡す。
  */
 export function formatSkillName({
@@ -20,10 +20,8 @@ export function formatSkillName({
   isExtra,
   specialization,
 }: SkillRollContext): string {
-  const { markedLabel } = describeSkillLabel({ kind: "custom", label, isBase, isExtra });
-  if (!specialization) return markedLabel;
-
-  return _loc("EMOKLORE.Format.specialization", { name: markedLabel, specialization });
+  return describeSkillLabel({ kind: "custom", label, isBase, isExtra, specialization })
+    .displayLabel;
 }
 
 /** チャットの見出し。判定の種類によらず「〈○○〉判定」の形にする */
