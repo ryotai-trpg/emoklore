@@ -1,7 +1,7 @@
 // 最小のChrome DevTools Protocolドライバ（依存なし。Node 22+ の標準WebSocketを使う）。
 //
 // モジュールとしても、CLIとしても使える。
-//   node tools/cdp.mjs nav <url> | eval <式> | shot <ファイル> | kill
+//   node tests/live/lib/cdp.mjs nav <url> | eval <式> | shot <ファイル> | kill
 //
 // 環境変数:
 //   CHROME_BIN … Chromeの実行ファイル。未指定なら既知のパスを順に探す
@@ -133,9 +133,39 @@ export async function openPage({ port = CDP_PORT } = {}) {
       return r.result.value;
     },
 
-    async shot(path) {
-      const r = await send("Page.captureScreenshot", { format: "png" });
-      writeFileSync(path, Buffer.from(r.data, "base64"));
+    /**
+     * 表示領域の大きさを変える。
+     *
+     * ウィンドウの大きさ（`--window-size`）ではなく**ページの表示領域**を直接指す。
+     * 枠のぶんだけ実際の表示領域は小さくなるので、高さが要る撮影ではこちらで決める。
+     * `null` を渡すと元に戻る。
+     */
+    async viewport(size) {
+      if (!size) return send("Emulation.clearDeviceMetricsOverride");
+      const { width, height, scale = 1 } = size;
+      return send("Emulation.setDeviceMetricsOverride", {
+        width,
+        height,
+        deviceScaleFactor: scale,
+        mobile: false,
+      });
+    },
+
+    /**
+     * PNGを書き出す。`clip` を渡すとその矩形だけを切り出す。
+     *
+     * `clip` は CSS ピクセルのビューポート座標（`getBoundingClientRect` がそのまま使える。
+     * Foundryの画面は body がスクロールしないので、文書座標と一致する）。`scale` を上げると
+     * 出力の解像度が上がり、文字の詰まりを読めるようになる。
+     */
+    async shot(path, { clip } = {}) {
+      const r = await send("Page.captureScreenshot", {
+        format: "png",
+        ...(clip ? { clip: { scale: 1, ...clip } } : {}),
+      });
+      const buffer = Buffer.from(r.data, "base64");
+      writeFileSync(path, buffer);
+      return buffer.byteLength;
     },
 
     close,
@@ -176,7 +206,9 @@ if (import.meta.filename === process.argv[1]) {
       await page.shot(arg ?? "shot.png");
       console.log("OK shot", arg);
     } else {
-      console.error("使い方: node tools/cdp.mjs nav <url> | eval <式> | shot <ファイル> | kill");
+      console.error(
+        "使い方: node tests/live/lib/cdp.mjs nav <url> | eval <式> | shot <ファイル> | kill",
+      );
       process.exitCode = 1;
     }
     page.close();
