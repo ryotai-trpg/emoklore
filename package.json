@@ -30,6 +30,7 @@
     "prepare": "lefthook install",
     "check:biome-version": "node tools/check-biome-version.mjs",
     "check:lang": "node tools/check-lang.mjs",
+    "check:i18n": "node tools/check-i18n.mjs",
     "check:templates": "node tools/check-templates.mjs",
     "check:schema-doc": "node tools/check-schema-doc.mjs",
     "check:manifest-urls": "node tools/check-manifest-urls.mjs",

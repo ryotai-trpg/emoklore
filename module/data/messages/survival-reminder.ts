@@ -66,7 +66,7 @@ export class SurvivalReminderModel extends ChatCardModel {
 
     const actor = (await foundry.utils.fromUuid(actorUuid)) as EmokloreActor | null;
     if (!actor) {
-      ui.notifications?.warn("EMOKLORE.ChatMessage.survivalReminder.ActorMissing", {
+      ui.notifications?.warn("EMOKLORE.ChatMessage.Common.ActorMissing", {
         localize: true,
       });
       return;

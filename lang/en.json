@@ -19,7 +19,7 @@
     "EMOKLORE": {
       "DeveloperMode": {
         "Name": "Developer Mode",
-        "Hint": "test"
+        "Hint": "Logs the template context to the console on every sheet render, and opens the actor sheet configured below on startup. For development."
       },
       "DeveloperActorId": {
         "Name": "Actor ID to Open on Startup",
@@ -69,6 +69,10 @@
       "colon": ": ",
       "none": "None",
       "separator": " / "
+    },
+    "Pack": {
+      "howlingReactions": "Howling Reactions",
+      "resonanceTables": "Resonance Tables"
     },
     "Sheet": {
       "class": {
@@ -215,6 +219,9 @@
       }
     },
     "ChatMessage": {
+      "Common": {
+        "ActorMissing": "The target character could not be found."
+      },
       "weapon": {
         "Attack": "Attack",
         "Damage": "Damage",
@@ -239,13 +246,11 @@
         "ApplyStatus": "Apply [{status}]",
         "StatusApplied": "Applied [{status}] to {name}.",
         "NoPermission": "You lack permission to apply a status to this character.",
-        "ActorMissing": "The target character could not be found.",
         "ActionFailed": "The action failed."
       },
       "survivalReminder": {
         "Prompt": "End of round. Characters in Cardiac Arrest roll *Survival (Endurance or Grit may substitute). On failure, Dead.",
         "Roll": "Roll Survival",
-        "ActorMissing": "The target character could not be found.",
         "ActionFailed": "The action failed."
       },
       "kaiAttack": {
@@ -617,12 +622,12 @@
         "AttackDice": "Dice",
         "AttackTarget": "Target",
         "AttackDamage": "Damage Formula",
-        "FixedSuccess": "Fixed Successes",
-        "NoResonanceTarget": "Target a resonant to request a resonance roll."
+        "FixedSuccess": "Fixed Successes"
       }
     },
     "skillRoll": "{skillName} Roll",
     "successMod": "Successes {mod}",
+    "resonantEmotion": "{emotion} ({attribute})",
     "Effect": {
       "Source": "Source",
       "Temporary": "Temporary",
@@ -743,7 +748,6 @@
       "Section": "Howling",
       "Recover": "Recovery Check"
     },
-    "resonantEmotion": "{emotion} ({attribute})",
     "result": {
       "fumble": "Fumble",
       "failure": "Failure",
@@ -755,14 +759,13 @@
     },
     "Skill": {
       "Name": "Skill Name",
-      "CreateTitle": "Create Skill",
-      "CreateButton": "Create Skill",
+      "Create": "Create Skill",
       "NoLevel": "—",
       "NamePlaceholder": "e.g. Ninjutsu"
     }
   },
   "USER": {
-    "RoleAssistant": "Assitant Dealer",
+    "RoleAssistant": "Assistant Dealer",
     "RoleGamemaster": "Dealer"
   }
 }
