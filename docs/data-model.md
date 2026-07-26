@@ -234,7 +234,7 @@ Actorは3種別あり、`EmokloreActor#system` はそれらのunion。共鳴者�
 
 `hp.value` / `mp.value` は `max` を超えないよう毎回丸める。
 
-導出値のうち `resources.hp.max` / `resources.mp.max` / `initiative` / `armor` は**スキーマにフィールドがあり、保存だけしない**（`persisted: false`）。かつて `initiative` はスキーマに無く `declare` だけで足していたが、それだと効果を当てたとき本体が値の型を推測する経路に落ち、効果値のRoll評価も整数の検証も効かなかった。
+導出値のうち `resources.hp.max` / `resources.mp.max` / `initiative` / `armor` は**スキーマにフィールドがあり、保存だけしない**（`persisted: false`）。スキーマから外して `declare` だけで足すと、効果を当てたとき本体が値の型を推測する経路に落ち、効果値のRoll評価も整数の検証も効かなくなる。
 
 `skills.<k>.target` と `baseSkills.<k>.target` はいまもスキーマに無く `declare` だけ。効果を当てること自体はできるが、上の3つと違って検証を伴わない。
 
@@ -262,9 +262,9 @@ NPCだけが持つフィールドなので、`LOCALIZATION_PREFIXES` に `EMOKLO
 | `resources.mp` | SchemaField | value 0 / max 0 | MP。同上 |
 | `resources.armor` | NumberField | 0 | 装甲。受けるダメージを平坦に軽減する（`applyDamage` が自前で引く） |
 | `initiative` | NumberField | 0 | 固定イニシアチブ値。`getRollData` 展開で `@initiative` に解決し、既定の【身体】＋〈スピード〉基準で並ぶ |
-| `emotions` | SetField(StringField) | `[]` | 共鳴感情（複数）。値は感情キー。#74 の感情ピッカーで編集UIを置き換える |
+| `emotions` | SetField(StringField) | `[]` | 共鳴感情（複数）。値は感情キー。編集は怪異シートの感情ピッカーが行う |
 | `resonance.intensity` | NumberField | 5 | 共鳴判定の強度（判定値）のプリセット |
-| `resonance.rise` | StringField | `"1"` | 上昇値。ダイス式も受ける（`Roll.validate` で検証）。適用は #75 |
+| `resonance.rise` | StringField | `"1"` | 上昇値。ダイス式も受ける（`Roll.validate` で検証）。ここは値を持つだけで、適用は共鳴判定の結果側が行う |
 | `resonanceTable` | DocumentUUIDField | `null` | 使う共鳴表（RollTable）への参照。ハウリングが起きたら結果カードのボタンがここを引く |
 | `mutation` | HTMLField | `""` | 憑依時の変異などの自由記述。`system.json` の `htmlFields` に宣言 |
 | `attacks` | ArrayField(SchemaField) | `[]` | 攻撃・固有技能のリスト（下記） |
@@ -451,7 +451,7 @@ DLからの共鳴判定・憑依判定の要求。判定要求カードと同じ
 | `forcedMatch` | StringField | `""` | 一致度のGM強制。空なら感情から自動で決める |
 | `possessionMode` | BooleanField | `false` | 憑依判定モード。成否によらず+1、ハウリングなし |
 | `targets` | ArrayField(SchemaField) | `[]` | 対象の `actorUuid` / `name`。**表示だけ**で、押せる相手は絞らない |
-| `kaiUuid` | DocumentUUIDField | `null` | 判定の出どころの怪異。どの共鳴表を引くかを #79 がここから辿る |
+| `kaiUuid` | DocumentUUIDField | `null` | 判定の出どころの怪異。どの共鳴表を引くかをここから辿る |
 
 ## ChatMessage `resonanceOutcome`
 

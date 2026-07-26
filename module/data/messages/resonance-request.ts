@@ -83,7 +83,7 @@ const defineResonanceRequestSchema = () => ({
     }),
   ),
 
-  // 判定の出どころの怪異。ハウリングでどの共鳴表を引くかを #79 がここから辿る
+  // 判定の出どころの怪異。ハウリングでどの共鳴表を引くかをここから辿る
   kaiUuid: new DocumentUUIDField({ type: "Actor", nullable: true, initial: null }),
 });
 

@@ -74,11 +74,11 @@ export const skillGroups: Record<SkillGroupKey, SkillGroupsConfig> = definitions
 export const isSkillKey = (value: string): value is SkillKey => value in skills;
 ```
 
-`as SkillKey` と名乗るだけでは、綴り間違いが型を素通りして、その先で `CONFIG` を引いた結果を分割代入したところで `TypeError` になる。実際に `getSkillRollContext` がその形だった。検証は文字列が入ってくる場所で1回だけ行い、そこから先は型が保証する。
+`as SkillKey` と名乗るだけでは、綴り間違いが型を素通りして、その先で `CONFIG` を引いた結果を分割代入したところで `TypeError` になる。検証は文字列が入ってくる場所で1回だけ行い、そこから先は型が保証する。
 
 **`declare` で名乗った型は保存データが裏切りうる。** `WeaponDataModel#skill` は `AttackSkillKey` と宣言してあるが、実体は `StringField` なので、手書きのデータや `CONFIG` を触るモジュール、フックからの差し替えで別の値が入りうる。スキーマの `choices` は入力を絞るだけで、保存済みの値を遡って直しはしない。
 
-**組み合わせが有り得ない状態を型で作れないようにする。** かつて技能判定は `(skill: string, { base: boolean })` の組で渡しており、「`base: true` に通常技能のキー」という存在しない組み合わせが書けてしまった。判別可能unionにすれば、種別とキーが必ず対応する。
+**組み合わせが有り得ない状態を型で作れないようにする。** 技能判定を `(skill: string, { base: boolean })` の組で渡すと、「`base: true` に通常技能のキー」という存在しない組み合わせが型のうえで書けてしまう。判別可能unionにすれば、種別とキーが必ず対応する。
 
 ```ts
 export type SkillRef =
@@ -144,7 +144,7 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 | `EMOKLORE.<Document>.<種別>.FIELDS.*` | `LOCALIZATION_PREFIXES` が指す先。**プレフィクスと1対1**にする | `EMOKLORE.Item.weapon.FIELDS` |
 | それ以外 | 画面・カード・ダイアログごとの文字列 | `EMOKLORE.ApplyDamage` `EMOKLORE.EmotionPicker` |
 
-**`FIELDS` を持つ名前空間に、横断的な表を混ぜない。** かつて `EMOKLORE.Actor` が `character` / `kai`（プレフィクス）と `characteristics` / `skills`（表）の両方を抱えていて、同じ名前空間が2つの意味を持っていた。表がその種別でしか使われないなら下に置いてよい（`Item.skill.Category` はカスタム技能アイテム専用）。
+**`FIELDS` を持つ名前空間に、横断的な表を混ぜない。** `EMOKLORE.Actor` が `character` / `kai`（プレフィクス）と `characteristics` / `skills`（表）の両方を抱えると、同じ名前空間が2つの意味を持つことになる。表がその種別でしか使われないなら下に置いてよい（`Item.skill.Category` はカスタム技能アイテム専用）。
 
 **装飾込みのフォーマット文字列は `EMOKLORE.Format.*` にまとめる。** 記号だけを翻訳のキーにすると、その記号を使う側が組み立てを持つことになり、言語ごとに語順や約物を変えられない。
 
@@ -173,7 +173,7 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 
 ## DataModelのスキーマ
 
-**スキーマ定義と `declare` の二重管理は避けられない。** 本体のフィールドクラス（`common/data/fields.mjs`）はジェネリックではなく、`@template` を持つのは `ArrayField` だけ。つまり `SchemaField` の中身からデータの型を導く道が本体側に無い。かつて型引数でスキーマの型を持ち回す形になっていたが、クラス本体で使われておらず何も制約していなかった。**効かない型引数は、無いより悪い**。
+**スキーマ定義と `declare` の二重管理は避けられない。** 本体のフィールドクラス（`common/data/fields.mjs`）はジェネリックではなく、`@template` を持つのは `ArrayField` だけ。つまり `SchemaField` の中身からデータの型を導く道が本体側に無い。型引数でスキーマの型を持ち回しても、クラス本体で使われなければ何も制約しない。**効かない型引数は、無いより悪い**。
 
 二重管理が前提になるので、ずれにくくする側で工夫する。
 
