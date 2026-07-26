@@ -43,8 +43,9 @@
         {{> "systems/emoklore/templates/actor/partials/emotion-rows.hbs" rows=emotionRows
       acquired=acquiredEmotionRows}}
       </div>
+      {{! 塗りは素の --emoklore-accent。HP/MPと違い共鳴には固有の意味色を持たせない }}
       <progress
-        class="em-progress em-progress--resonance"
+        class="em-progress"
         id="character-resonance"
         value="{{ system.resources.resonance.value }}"
         max="{{ system.resources.resonance.max }}"
