@@ -34,7 +34,7 @@
     {{! ハウリング反応はアイテムそのものを並べる。反応が持つ効果は下の区分から除いてあり、
         「いま何を受けているか」を1件1行で見せる。受けていなければ区分ごと出さない }}
     {{#if howlings.length}}
-      <li class="em-data-table__section" data-effect-type="howling">
+      <li data-effect-type="howling">
         <div class="em-data-table__head">
           <div class="em-data-table__name">{{localize "EMOKLORE.Howling.Section"}}</div>
           <div class="em-data-table__cell">{{localize "EMOKLORE.Item.howling.FIELDS.category.label"}}</div>
@@ -97,7 +97,7 @@
 
     {{#each effects as |section sid|}}
       {{! 区分ごとに1項目。見出しと明細のolを li の中に収める（ol直下にolは置けない） }}
-      <li class="em-data-table__section" data-effect-type="{{section.type}}">
+      <li data-effect-type="{{section.type}}">
         <div class="em-data-table__head">
           <div class="em-data-table__name">{{section.label}}</div>
           <div class="em-data-table__cell">{{localize "EMOKLORE.Effect.Source"}}</div>
@@ -155,22 +155,7 @@
                 {{/if}}
                 {{! 開く・消すは組み立ての操作。閲覧では行を右クリックする }}
                 {{#unless @root.isPlay}}
-                  <a
-                    class="em-data-table__control"
-                    data-action="viewDoc"
-                    data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
-                  >
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  {{#if @root.editable}}
-                    <a
-                      class="em-data-table__control"
-                      data-action="deleteDoc"
-                      data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
-                    >
-                      <i class="fas fa-trash"></i>
-                    </a>
-                  {{/if}}
+                  {{> "systems/emoklore/templates/partials/doc-controls.hbs" controlClass="em-data-table__control" editable=@root.editable}}
                 {{/unless}}
               </div>
             </li>

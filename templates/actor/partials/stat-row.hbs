@@ -14,7 +14,7 @@
 </div>
 {{else}}
 {{! 編集も閲覧と同じ4列に載せる。値の入力だけがバーから段に変わる }}
-<div class="em-stat-row em-stat-row--edit" data-characteristic="{{key}}">
+<div class="em-stat-row" data-characteristic="{{key}}">
   <i class="fa-solid {{stat.icon}} em-stat-row__icon"></i>
   <label for="{{key}}">{{stat.field.fields.value.label}}</label>
   <span class="em-stat-row__value">{{stat.value}}</span>

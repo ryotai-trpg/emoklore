@@ -1,0 +1,20 @@
+{{!--
+  ダイアログで共鳴感情を選ばせる入力。共鳴判定（PL側）とDLの要求作成が共有する。
+
+  感情はシートと同じピッカーで選ぶ。保存するキーは hidden が持ち、ボタンは表示だけ。
+  感情は数も長さも決まらないので、本体のタグと同じ形で折り返して見せる。
+
+  @param emotions hidden に詰める感情キー（区切りは emotion-field.ts の SEPARATOR）
+  @param tags     表示するタグの並び（buildEmotionTags の戻り値）
+--}}
+<div class="form-group stacked">
+  <label>{{localize "EMOKLORE.EmotionPicker.Title"}}</label>
+  <div class="em-emotion-field">
+    <input type="hidden" name="emotions" value="{{emotions}}">
+    {{> "systems/emoklore/templates/apps/partials/emotion-tags.hbs" tags=tags}}
+    <button type="button" data-action="pickEmotions">
+      <i class="fa-solid fa-heart" inert></i>
+      <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
+    </button>
+  </div>
+</div>

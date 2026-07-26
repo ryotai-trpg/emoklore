@@ -14,6 +14,7 @@ import { formatEmotion } from "../../utils/emotion";
 import { EmotionPicker } from "../emotion-picker";
 
 const TAGS_TEMPLATE = systemPath("templates/apps/partials/emotion-tags.hbs");
+const FIELD_TEMPLATE = systemPath("templates/apps/partials/emotion-field.hbs");
 
 /** hidden に詰めるときの区切り。感情キーは識別子なのでカンマとは衝突しない */
 const SEPARATOR = ",";
@@ -22,14 +23,15 @@ const SEPARATOR = ",";
 const FIELD = ".em-emotion-field";
 
 /**
- * タグのpartialをHandlebarsに登録する。**ダイアログを開く前に必ず通すこと。**
+ * 感情入力のpartialをHandlebarsに登録する。**ダイアログを開く前に必ず通すこと。**
  *
  * 本体が自動で読むのは ApplicationV2 の `PARTS.templates` だけで、`DialogV2.prompt` の
  * content は自前の `renderTemplate` を通るため、`{{> ...}}` の解決先が登録されていない。
+ * **入れ子のpartialも再帰的には解決されない**ので、外側（field）と内側（tags）を両方並べる。
  * `getTemplate` はキャッシュするので、毎回呼んでも読み込みは1回で済む。
  */
-export const loadEmotionTagsPartial = (): Promise<unknown[]> =>
-  foundry.applications.handlebars.loadTemplates([TAGS_TEMPLATE]);
+export const loadEmotionFieldPartials = (): Promise<unknown[]> =>
+  foundry.applications.handlebars.loadTemplates([FIELD_TEMPLATE, TAGS_TEMPLATE]);
 
 /** hidden の値から感情キーを取り出す。保存値・前回の選択なので型述語を通す */
 export const readEmotions = (form: HTMLFormElement): string[] =>

@@ -15,7 +15,7 @@
         aria-pressed="{{this.active}}"
       >
         <span class="em-emotion-picker__slot-label">{{this.label}}</span>
-        <span class="em-emotion-picker__slot-value">{{this.value}}</span>
+        <span>{{this.value}}</span>
       </button>
       {{#if this.filled}}
       <button
@@ -41,6 +41,8 @@
 
   <div class="em-emotion-picker__columns">
     {{#each columns}}
+    {{! `__column` はCSSの規則を持たない。実機検証が列数を数えるための目印
+        （tests/live/checks/emotion-picker.mjs） }}
     <section class="em-emotion-picker__column">
       <h3 class="em-emotion-picker__attribute">{{this.label}}</h3>
       <ul class="em-emotion-picker__emotions">

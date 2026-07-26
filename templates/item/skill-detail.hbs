@@ -3,28 +3,13 @@
   {{#if isPlay}}
     {{! ラベルは LOCALIZATION_PREFIXES 経由で本体が翻訳済みにしている }}
     <div class="em-field-list">
-      <div class="em-field em-field--inline">
-        <label class="em-field__label">{{systemFields.category.label}}</label>
-        <span class="em-field__value">{{categoryLabel}}</span>
-      </div>
-      <div class="em-field em-field--inline">
-        <label class="em-field__label">{{systemFields.characteristicOptions.label}}</label>
-        <span class="em-field__value">{{characteristicLabel}}</span>
-      </div>
-      <div class="em-field em-field--inline">
-        <label class="em-field__label">{{systemFields.group.label}}</label>
-        <span class="em-field__value">{{groupLabel}}</span>
-      </div>
+      {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.category.label display=categoryLabel inline=true}}
+      {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.characteristicOptions.label display=characteristicLabel inline=true}}
+      {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.group.label display=groupLabel inline=true}}
       {{#if showLevel}}
-        <div class="em-field em-field--inline">
-          <label class="em-field__label">{{systemFields.level.label}}</label>
-          <span class="em-field__value">{{localize "EMOKLORE.Format.level" level=system.level}}</span>
-        </div>
+        {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.level.label display=(localize "EMOKLORE.Format.level" level=system.level) inline=true}}
       {{/if}}
-      <div class="em-field">
-        <label class="em-field__label">{{systemFields.notes.label}}</label>
-        <span class="em-field__value">{{{notesHTML}}}</span>
-      </div>
+      {{> "systems/emoklore/templates/partials/field.hbs" label=systemFields.notes.label display=notesHTML html=true}}
     </div>
   {{else}}
     {{! choices にはi18nキーが入っているので、描画時に本体へ解決させる。

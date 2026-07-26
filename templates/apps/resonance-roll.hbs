@@ -6,19 +6,7 @@
     {{#if intensity}}value="{{intensity}}"{{/if}} autofocus>
 </div>
 
-{{! 感情はシートと同じピッカーで選ぶ。保存するキーは hidden が持ち、ボタンは表示だけ }}
-<div class="form-group stacked">
-  <label>{{localize "EMOKLORE.EmotionPicker.Title"}}</label>
-  {{! 感情は数も長さも決まらないので、本体のタグと同じ形で折り返して見せる }}
-  <div class="em-emotion-field">
-    <input type="hidden" name="emotions" value="{{emotions}}">
-    {{> "systems/emoklore/templates/apps/partials/emotion-tags.hbs" tags=emotionTags}}
-    <button type="button" data-action="pickEmotions">
-      <i class="fa-solid fa-heart" inert></i>
-      <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
-    </button>
-  </div>
-</div>
+{{> "systems/emoklore/templates/apps/partials/emotion-field.hbs" emotions=emotions tags=emotionTags}}
 
 <div class="form-group stacked">
   <label>{{localize "EMOKLORE.Resonance.Match"}}</label>

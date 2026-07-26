@@ -1,0 +1,25 @@
+{{!--
+  埋め込みドキュメントを開く・消すの対。効果タブ・アイテムタブ・カスタム技能の行が共有する。
+
+  クラスを引数で受けるのは、置かれる先で寸法が違うため（表のセルは文字なりの大きさ、
+  技能の行は `--emoklore-row-control-size` の正方形）。見た目は置く側の責務。
+
+  @param controlClass 各コントロールに付けるクラス
+  @param editable     消すを出すか。権限で消せないときは開くだけにする
+--}}
+<a
+  class="{{controlClass}}"
+  data-action="viewDoc"
+  data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
+>
+  <i class="fas fa-edit"></i>
+</a>
+{{#if editable}}
+  <a
+    class="{{controlClass}}"
+    data-action="deleteDoc"
+    data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
+  >
+    <i class="fas fa-trash"></i>
+  </a>
+{{/if}}

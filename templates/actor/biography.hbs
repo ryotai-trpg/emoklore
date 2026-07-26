@@ -8,11 +8,11 @@
     {{#if isPlay}}
     <div class="flexrow">
       {{#each biographyPairedRows as |row|}}
-      {{> "systems/emoklore/templates/actor/partials/field.hbs" row=row}}
+      {{> "systems/emoklore/templates/partials/field.hbs"}}
       {{/each}}
     </div>
     {{#each biographyRows as |row|}}
-    {{> "systems/emoklore/templates/actor/partials/field.hbs" row=row}}
+    {{> "systems/emoklore/templates/partials/field.hbs"}}
     {{/each}}
 
     {{else}}

@@ -5,7 +5,7 @@ import { normalizeIntensity, type ResonanceMatch } from "../../rules/resonance-r
 import { matchEmotion } from "../../utils/emotion";
 import {
   buildEmotionTags,
-  loadEmotionTagsPartial,
+  loadEmotionFieldPartials,
   pickEmotionsInto,
   readEmotions,
   removeEmotionFrom,
@@ -39,7 +39,7 @@ export async function promptResonanceRoll({
   owned: OwnedEmotions;
   emotions?: readonly string[];
 }): Promise<ResonanceRollInput | null> {
-  await loadEmotionTagsPartial();
+  await loadEmotionFieldPartials();
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     intensity,
     emotions: emotions.join(","),

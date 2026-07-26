@@ -26,6 +26,7 @@ export class EmokloreWeaponSheet extends EmokloreItemSheet {
     header: EmokloreItemSheet.HEADER_PART,
     detail: {
       template: systemPath("templates/item/weapon-detail.hbs"),
+      templates: ["templates/partials/field.hbs"].map(systemPath),
       scrollable: [""],
     },
   };

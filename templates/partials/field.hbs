@@ -1,0 +1,18 @@
+{{!--
+  ラベルと値の1項目（閲覧）。経歴タブと、アイテムの詳細（武器・防具・技能・ハウリング）が
+  共有する。**ここを触ると両方が動く。**
+
+  `{{#each}}` の中からは引数なしで呼べる（現在のコンテキストがそのまま渡る）。
+  1つずつ組み立てる側は、下の名前をハッシュ引数で渡す。
+
+  @param label   項目名
+  @param display 表示する値
+  @param inline  真ならラベルと値を横に並べる（短い値向け）
+  @param html    真なら display をHTMLとして描く
+--}}
+<div class="em-field{{#if inline}} em-field--inline{{/if}}">
+  <label class="em-field__label">{{label}}</label>
+  <span class="em-field__value">
+    {{~#if html}}{{{display}}}{{else}}{{display}}{{/if~}}
+  </span>
+</div>

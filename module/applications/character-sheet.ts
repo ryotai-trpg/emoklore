@@ -107,20 +107,23 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         "templates/actor/partials/custom-skill-row-play.hbs",
         "templates/actor/partials/custom-skill-row-edit.hbs",
         "templates/actor/partials/segments.hbs",
+        "templates/partials/doc-controls.hbs",
       ].map(systemPath),
       scrollable: [""],
     },
     biography: {
       template: systemPath("templates/actor/biography.hbs"),
-      templates: ["templates/actor/partials/field.hbs"].map(systemPath),
+      templates: ["templates/partials/field.hbs"].map(systemPath),
       scrollable: [""],
     },
     items: {
       template: systemPath("templates/actor/items.hbs"),
+      templates: ["templates/partials/doc-controls.hbs"].map(systemPath),
       scrollable: [""],
     },
     effects: {
       template: systemPath("templates/actor/effects.hbs"),
+      templates: ["templates/partials/doc-controls.hbs"].map(systemPath),
       scrollable: [""],
     },
   };

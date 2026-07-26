@@ -61,7 +61,7 @@ export async function run({ page, check }) {
         ok,
         detail: ok
           ? `${labels.join(" / ")} 条件つき 未解決キーなし`
-          : `type=${message.type} ${labels.join(" / ")} 条件=${card.querySelector(".em-skill-request__terms").textContent.replace(/\s+/g, " ").trim()} 生キー: ${leaked.join(", ")}`,
+          : `type=${message.type} ${labels.join(" / ")} 条件=${card.querySelector(".em-terms").textContent.replace(/\s+/g, " ").trim()} 生キー: ${leaked.join(", ")}`,
       };
     }),
   );
