@@ -20,14 +20,14 @@
   .em-meter__icon {
     display: flex;
     align-items: flex-end;
-    font-size: 1.1em;
+    font-size: var(--font-size-16);
   }
 
   .em-meter__value input[type="number"] {
     padding: var(--spacer-4);
     height: 1.3em;
     width: 2em;
-    font-size: 1.1em;
+    font-size: var(--font-size-16);
   }
 
   .em-meter__max {
@@ -104,8 +104,10 @@
       white-space: nowrap;
     }
 
+    /* 幅は --emoklore-emotion-attribute-width がこの文字サイズから出している。
+       片方だけ変えると属性が切れるので、変えるなら両方を見ること */
     dd {
-      font-size: 0.8em;
+      font-size: var(--emoklore-emotion-attribute-font);
     }
   }
 }
