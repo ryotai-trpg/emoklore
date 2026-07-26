@@ -408,9 +408,7 @@
       "kaiAttack": {
         "Judgment": "Judgment",
         "Damage": "Damage",
-        "Judgeless": "No roll · successes",
         "SuccessCount": "Successes",
-        "MpCost": "MP cost",
         "UnnamedAttack": "Attack"
       },
       "skillRequest": {

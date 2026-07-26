@@ -2,16 +2,18 @@
 <div class="em-kai-attack-card">
   <header class="em-kai-attack-card__head">
     <div class="em-kai-attack-card__name">{{attackName}}</div>
+    {{! 「判定なし」と「消費MP」は攻撃の性質なのでスキーマのラベルを引く（attackLabels）。
+        判定なしのときも成功数は固定値として出るので、両方を / 区切りで並べる }}
     <div class="em-kai-attack-card__meta">
       {{#if judgeless}}
-        {{localize "EMOKLORE.ChatMessage.kaiAttack.Judgeless"}}
+        {{attackLabels.judgeless}}
         <span class="em-kai-attack-card__sep">/</span>
       {{/if}}
       {{localize "EMOKLORE.ChatMessage.kaiAttack.SuccessCount"}}
       {{successCount}}
       {{#if mpCost}}
         <span class="em-kai-attack-card__sep">/</span>
-        {{localize "EMOKLORE.ChatMessage.kaiAttack.MpCost"}}
+        {{attackLabels.mpCost}}
         {{mpCost}}
       {{/if}}
     </div>

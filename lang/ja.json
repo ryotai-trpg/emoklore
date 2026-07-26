@@ -408,9 +408,7 @@
       "kaiAttack": {
         "Judgment": "判定",
         "Damage": "ダメージ",
-        "Judgeless": "判定なし・成功数",
         "SuccessCount": "成功数",
-        "MpCost": "消費MP",
         "UnnamedAttack": "攻撃"
       },
       "skillRequest": {
