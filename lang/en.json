@@ -258,7 +258,12 @@
         "Skills": "Skills",
         "BaseSkills": "Base Skills",
         "CustomSkills": "Custom Skills",
-        "Weapons": "Weapons"
+        "Weapons": "Weapons",
+        "ShowBaseSkill": "Show in play mode"
+      },
+      "rowMenu": {
+        "Open": "Open",
+        "Delete": "Delete"
       }
     },
     "Item": {
@@ -572,6 +577,14 @@
             "root": {
               "label": "Root"
             }
+          }
+        }
+      },
+      "npc": {
+        "FIELDS": {
+          "shownBaseSkills": {
+            "label": "Base skills shown in play mode",
+            "hint": "Only the checked base skills are listed in play mode. Clear them all and the section is hidden."
           }
         }
       },

@@ -177,6 +177,29 @@ export type EmokloreActorSheetActions = {
 };
 
 /**
+ * 行の右クリックメニューの項目。
+ *
+ * 本体の ContextMenuEntry のうち実際に使うものだけ。**綴りは v14 のもの**で、
+ * `name` / `condition` / `callback` は非推奨（`ux/context-menu.mjs`）。`label` は
+ * 本体が `_loc` を通すのでキーをそのまま入れる。
+ */
+export interface RowContextEntry {
+  label: string;
+  icon: string;
+  /** メニューを開くたびに評価される */
+  visible?: () => boolean;
+  onClick: (event: PointerEvent, target: HTMLElement) => void;
+}
+
+/**
+ * 並び替えの対象になる ActiveEffect。
+ *
+ * `parent` / `sort` はスキーマとClientDocumentMixin由来で、本体JSDocの型に出てこない。
+ * 使う分だけ交差型で足す（`utils/effects.ts` の SheetActiveEffect と同じ扱い）。
+ */
+export type SheetEffect = ActiveEffect & { parent: unknown; sort: number };
+
+/**
  * ウィンドウ枠の操作メニュー（⋮）の項目。
  *
  * 本体の ApplicationHeaderControlsEntry のうち、実際に使うメンバーだけを並べている。
@@ -373,8 +396,10 @@ export type NpcSkillRow = SkillDisplay & {
   rollType: string;
   level: number;
   target: number;
-  /** 編集モードの入力に渡す。基本技能はレベルを編集できないので空 */
-  name: string;
+  /** レベル入力のスキーマフィールド。基本技能はレベルを編集できないので持たない */
+  field?: foundry.data.fields.DataField | undefined;
+  /** 閲覧モードに並べるか。基本技能だけが持つ（`shownBaseSkills`） */
+  shown?: boolean;
 };
 
 /**
@@ -388,9 +413,11 @@ export type NpcSheetContext = SheetContextBase<EmokloreActor, NpcDataModel> & {
     label: string;
     icon: string;
     value: number;
-    name: string;
+    /** 入力のスキーマフィールド。min / max はここから来る（SkillRow#field と同じ扱い） */
+    field: foundry.data.fields.DataField | undefined;
   }>;
   skills: NpcSkillRow[];
+  /** 閲覧モードでは `shownBaseSkills` に選ばれたものだけ。編集モードは13件すべて */
   baseSkills: NpcSkillRow[];
   /** カスタム技能は判定に要る分だけ。能力値は列に出さないので SkillLabel で足りる */
   customSkills: Array<SkillLabel & { id: string; level: number; target: number }>;

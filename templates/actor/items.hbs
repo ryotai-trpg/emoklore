@@ -8,6 +8,9 @@
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.weapon.Damage"}}</div>
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.weapon.FIELDS.range.label"}}</div>
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.weapon.FIELDS.equipped.label"}}</div>
+        {{! 作成は編集モードだけ。閲覧では controls 列そのものを出さないので、見出しと
+            明細がどちらも4列になって装備の列がぴたりと揃う }}
+        {{#unless isPlay}}
         <div class="em-data-table__controls">
           {{#if editable}}
             <a
@@ -21,6 +24,7 @@
             </a>
           {{/if}}
         </div>
+        {{/unless}}
       </div>
 
       {{! 値の編集は武器シートが持つ。同じ name の入力を2箇所に描くと
@@ -54,6 +58,8 @@
                 {{#unless @root.editable}}disabled{{/unless}}
               />
             </div>
+            {{! 開く・消すは組み立ての操作なので編集モードだけ。閲覧では行を右クリックする }}
+            {{#unless @root.isPlay}}
             <div class="em-data-table__controls">
               <a
                 class="em-data-table__control"
@@ -72,6 +78,7 @@
                 </a>
               {{/if}}
             </div>
+            {{/unless}}
           </li>
         {{/each}}
       </ol>
@@ -83,6 +90,7 @@
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.armor.FIELDS.defense.label"}}</div>
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.armor.FIELDS.coverage.label"}}</div>
         <div class="em-data-table__cell">{{localize "EMOKLORE.Item.armor.FIELDS.equipped.label"}}</div>
+        {{#unless isPlay}}
         <div class="em-data-table__controls">
           {{#if editable}}
             <a
@@ -96,6 +104,7 @@
             </a>
           {{/if}}
         </div>
+        {{/unless}}
       </div>
 
       <ol class="em-data-table__body">
@@ -121,6 +130,7 @@
                 {{#unless @root.editable}}disabled{{/unless}}
               />
             </div>
+            {{#unless @root.isPlay}}
             <div class="em-data-table__controls">
               <a
                 class="em-data-table__control"
@@ -139,6 +149,7 @@
                 </a>
               {{/if}}
             </div>
+            {{/unless}}
           </li>
         {{/each}}
       </ol>

@@ -242,6 +242,16 @@ Actorは3種別あり、`EmokloreActor#system` はそれらのunion。共鳴者�
 
 人間NPC。`CharacterLikeDataModel` を継承し、`character` から共鳴値・共鳴感情・経歴を除いたもの。能力値・技能・基本技能・カスタム技能・技能グループ・`resources.hp/mp`・`mod`・導出値（`initiative` を含む）は共鳴者と同じなので、上の `Actor character` の各節を参照。判定の計算（`getSkillRollContext` / `derived-values`）も共鳴者と1つの実装を共有する。
 
+足しているのは1つだけ。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `shownBaseSkills` | SetField(StringField) | `[]` | 閲覧モードに並べる基本技能のキー。空なら基本技能の欄そのものを出さない |
+
+**基本技能は13件すべてがレベル1固定**なので、通常技能の「未修得（Lv.0）は隠す」に当たる基準が無い。どれを見せるかはシナリオがそのNPCに何を求めるかで決まるため、アクターごとの選択として持つ。共鳴者と共有する `baseSkills` には足していない — 共鳴者は13件すべてをチップ列に出すのが正しく、選ぶ理由が無い。
+
+NPCだけが持つフィールドなので、`LOCALIZATION_PREFIXES` に `EMOKLORE.Actor.npc` を足して自分の名前空間に置く（共有分は `EMOKLORE.Actor.character` のまま。本体は各プレフィクスの `FIELDS` を前から順に重ねる）。
+
 ## Actor `kai`
 
 怪異。能力値の標準ブロックを持たない別形状で、`CharacterLikeDataModel` は継承しない。攻撃の判定は能力値から派生させず、ダイス数と判定値を直接持つ。

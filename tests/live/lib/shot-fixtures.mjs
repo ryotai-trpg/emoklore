@@ -197,6 +197,9 @@ export const createShotFixtures = (page) =>
         "system.skills.search.level": 2,
         "system.skills.debate.level": 1,
         "system.skills.insider.level": 3,
+        // 基本技能は選んだものだけが閲覧モードに並ぶ。何も選ばないと欄ごと消えて
+        // チップの見た目が撮れないので、聞き込みで使いそうな3つを選んでおく
+        "system.shownBaseSkills": ["negotiations", "knowledge", "news"],
       });
 
       // --- 怪異 ---------------------------------------------------------

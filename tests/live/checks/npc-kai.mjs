@@ -241,6 +241,93 @@ export async function run({ page, check }) {
     ),
   );
 
+  await check("npc・kaiのHP/MPを閲覧モードで直接減らせる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const results = [];
+        for (const type of ["npc", "kai"]) {
+          const sheet = game.actors.getName(`${tag}_${type}`).sheet;
+          if (!sheet.rendered) await sheet.render(true);
+          await window.__setMode(sheet, "play");
+
+          // 卓中に減っていく値なので、閲覧モードでも入力でなければならない
+          const inputs = ["hp", "mp"].map((key) =>
+            sheet.element.querySelector(`input[name="system.resources.${key}.value"]`),
+          );
+          if (inputs.some((input) => !input)) {
+            return { ok: false, detail: `${type}: 閲覧モードに現在値の入力が無い` };
+          }
+          results.push(`${type}=${inputs.map((input) => input.value).join("/")}`);
+        }
+        return { ok: true, detail: results.join(" ") };
+      },
+      TAG,
+    ),
+  );
+
+  await check("kaiの最大値は編集モードだけで入力できる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const sheet = game.actors.getName(`${tag}_kai`).sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        const maxInput = () =>
+          !!sheet.element.querySelector('input[name="system.resources.hp.max"]');
+
+        await window.__setMode(sheet, "play");
+        const play = maxInput();
+        await window.__setMode(sheet, "edit");
+        const edit = maxInput();
+        await window.__setMode(sheet, "play");
+
+        return { ok: !play && edit, detail: `最大値の入力 閲覧=${play} 編集=${edit}` };
+      },
+      TAG,
+    ),
+  );
+
+  await check("npcの基本技能は選んだものだけが閲覧モードに出る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_npc`);
+        const sheet = actor.sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        const before = [...actor.system.shownBaseSkills];
+
+        try {
+          // 何も選ばれていなければ、基本技能の見出しごと出ない
+          await actor.update({ "system.shownBaseSkills": [] });
+          await window.__setMode(sheet, "play");
+          const empty = sheet.element.querySelectorAll("[data-roll-type=base-skill]").length;
+
+          // 編集モードは選ぶ場所なので、選択によらず13件すべてを出す
+          await window.__setMode(sheet, "edit");
+          const boxes = sheet.element.querySelectorAll('[data-action="toggleBaseSkill"]').length;
+
+          // 1つ選ぶと、その1つだけがチップで並ぶ
+          await actor.update({ "system.shownBaseSkills": ["negotiations"] });
+          await window.__setMode(sheet, "play");
+          const chips = sheet.element.querySelectorAll(
+            ".em-chip[data-roll-type=base-skill]",
+          ).length;
+
+          const all = Object.keys(CONFIG.EMOKLORE.baseSkills).length;
+          const ok = empty === 0 && boxes === all && chips === 1;
+          return {
+            ok,
+            detail: `未選択${empty}件 ／ 編集のチェック${boxes}/${all} ／ 1件選択→${chips}件`,
+          };
+        } finally {
+          await actor.update({ "system.shownBaseSkills": before });
+          await window.__setMode(sheet, "play");
+        }
+      },
+      TAG,
+    ),
+  );
+
   await check("npcのHP/MPが共鳴者と同じアイコンで出る", () =>
     assertInPage(
       page,

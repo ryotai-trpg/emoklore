@@ -11,29 +11,32 @@
 </header>
 
 <section class="em-kai__stats">
+  {{! 現在値は卓中に減っていくものなので、モードによらず入力にする（共鳴者のメータと同じ）。
+      組み立ての値である最大値だけを編集モードに残す。入力はスキーマから描くので、
+      怪異のHP/MPが持つ min: 0 がそのまま効く }}
   <label class="em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.hp.label"}}</span>
-    {{#if isPlay}}
-      <span>{{system.resources.hp.value}} / {{system.resources.hp.max}}</span>
-    {{else}}
-      <span class="em-kai__stat-edit">
-        <input type="number" name="system.resources.hp.value" value="{{system.resources.hp.value}}" />
-        <span>/</span>
-        <input type="number" name="system.resources.hp.max" value="{{system.resources.hp.max}}" />
-      </span>
-    {{/if}}
+    <span class="em-kai__stat-edit">
+      {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
+      <span>/</span>
+      {{#if isPlay}}
+        <span>{{system.resources.hp.max}}</span>
+      {{else}}
+        {{formInput systemFields.resources.fields.hp.fields.max value=system.resources.hp.max}}
+      {{/if}}
+    </span>
   </label>
   <label class="em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.mp.label"}}</span>
-    {{#if isPlay}}
-      <span>{{system.resources.mp.value}} / {{system.resources.mp.max}}</span>
-    {{else}}
-      <span class="em-kai__stat-edit">
-        <input type="number" name="system.resources.mp.value" value="{{system.resources.mp.value}}" />
-        <span>/</span>
-        <input type="number" name="system.resources.mp.max" value="{{system.resources.mp.max}}" />
-      </span>
-    {{/if}}
+    <span class="em-kai__stat-edit">
+      {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
+      <span>/</span>
+      {{#if isPlay}}
+        <span>{{system.resources.mp.max}}</span>
+      {{else}}
+        {{formInput systemFields.resources.fields.mp.fields.max value=system.resources.mp.max}}
+      {{/if}}
+    </span>
   </label>
   <label class="em-kai__stat">
     <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.armor.label"}}</span>

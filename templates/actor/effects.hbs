@@ -67,15 +67,19 @@
                 {{#if howling.recoveryNote}}<span>{{howling.recoveryNote}}</span>{{/if}}
               </div>
               <div class="em-data-table__controls">
-                <a
-                  class="em-data-table__control"
-                  data-action="viewDoc"
-                  data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
-                >
-                  <i class="fas fa-edit"></i>
-                </a>
+                {{#unless @root.isPlay}}
+                  <a
+                    class="em-data-table__control"
+                    data-action="viewDoc"
+                    data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                {{/unless}}
                 {{#if @root.editable}}
-                  {{! 回復＝反応そのものを消すこと。付いている効果もまとめて外れる }}
+                  {{! 回復＝反応そのものを消すこと。付いている効果もまとめて外れる。
+                      **これは卓中の操作なので閲覧モードでも残す** — 隣の技能ショートカットで
+                      回復判定を振り、成立したらその場で外す、という一連の動きになる }}
                   <a
                     class="em-data-table__control"
                     data-action="deleteDoc"
@@ -98,7 +102,10 @@
           <div class="em-data-table__name">{{section.label}}</div>
           <div class="em-data-table__cell">{{localize "EMOKLORE.Effect.Source"}}</div>
           <div class="em-data-table__cell">{{localize "EFFECT.TABS.duration"}}</div>
+          {{! 見出しの controls 列は常に置く。明細が閲覧モードでも有効/無効のトグルを
+              持つので、ここを消すと見出しだけ1列少なくなって列がずれる }}
           <div class="em-data-table__controls">
+            {{#if (and @root.editable (not @root.isPlay))}}
             <a
               class="em-data-table__control"
               data-action="createDoc"
@@ -117,6 +124,7 @@
             >
               <i class="fas fa-plus"></i>
             </a>
+            {{/if}}
           </div>
         </div>
 
@@ -135,6 +143,7 @@
               <div class="em-data-table__cell">{{effect.sourceName}}</div>
               <div class="em-data-table__cell">{{effect.duration.label}}</div>
               <div class="em-data-table__controls">
+                {{! 有効/無効は卓中の操作（状態異常のON/OFF）なので閲覧モードでも出す }}
                 {{#if @root.editable}}
                   <a
                     class="em-data-table__control"
@@ -144,22 +153,25 @@
                     <i class="fas {{#if effect.disabled}}fa-check{{else}}fa-times{{/if}}"></i>
                   </a>
                 {{/if}}
-                <a
-                  class="em-data-table__control"
-                  data-action="viewDoc"
-                  data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
-                >
-                  <i class="fas fa-edit"></i>
-                </a>
-                {{#if @root.editable}}
+                {{! 開く・消すは組み立ての操作。閲覧では行を右クリックする }}
+                {{#unless @root.isPlay}}
                   <a
                     class="em-data-table__control"
-                    data-action="deleteDoc"
-                    data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
+                    data-action="viewDoc"
+                    data-tooltip='{{localize "DOCUMENT.Update" type=""}}'
                   >
-                    <i class="fas fa-trash"></i>
+                    <i class="fas fa-edit"></i>
                   </a>
-                {{/if}}
+                  {{#if @root.editable}}
+                    <a
+                      class="em-data-table__control"
+                      data-action="deleteDoc"
+                      data-tooltip='{{localize "DOCUMENT.Delete" type=""}}'
+                    >
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  {{/if}}
+                {{/unless}}
               </div>
             </li>
           {{/each}}

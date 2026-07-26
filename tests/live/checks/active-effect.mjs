@@ -527,10 +527,15 @@ export async function run({ page, check }) {
       page,
       async (tag) => {
         const a = game.actors.getName(`${tag}_char`);
+        // 作成は組み立ての操作なので編集モードにしか出ない
+        await window.__setMode(a.sheet, "edit");
         const el = a.sheet.element.querySelector(
           "[data-effect-type=temporary] [data-action=createDoc][data-document-class=ActiveEffect]",
         );
-        if (!el) return { ok: false, detail: "一時的効果の作成ボタンが無い" };
+        if (!el) {
+          await window.__setMode(a.sheet, "play");
+          return { ok: false, detail: "一時的効果の作成ボタンが無い" };
+        }
 
         const before = a.effects.size;
         el.click();
@@ -548,6 +553,7 @@ export async function run({ page, check }) {
           : `value=${value} units=${units} isTemporary=${effect?.isTemporary}`;
 
         await effect?.delete();
+        await window.__setMode(a.sheet, "play");
         return { ok, detail };
       },
       TAG,

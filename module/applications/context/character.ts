@@ -42,15 +42,22 @@ import type {
 /** このシートは type: "character" にしか登録しないので、アクターは共鳴者に絞れる */
 type CharacterActor = EmokloreActor & { system: CharacterDataModel };
 
+/** `sort` はスキーマ由来で本体JSDocの型に出ないため、並べ替えの場面だけ足す */
+type SortableItem = EmokloreItem & { sort: number };
+
 /**
- * 所持アイテムを種別で絞る。
+ * 所持アイテムを種別で絞り、`sort` の順に並べる。
  *
  * 絞り込みは本体の `itemTypes` に任せる（埋め込みコレクション側でメモ化されている）。
  * 本体は `Record<string, Item[]>` で型付けており実装クラスまでは絞られないので、
  * ここで1回だけ絞る。呼び出し側はさらに型述語を通して `system` を確定させる。
+ *
+ * **並べ直しは必須。** 本体の `documentsByType` は保存順（＝作成順）で返し `sort` を見ない
+ * （`common/abstract/embedded-collection.mjs`）ので、ここを通さないとドラッグの並び替えが
+ * `sort` を書くだけで表示に出ない。
  */
 const itemsOfType = (actor: CharacterActor, type: string): EmokloreItem[] =>
-  (actor.itemTypes[type] ?? []) as EmokloreItem[];
+  ((actor.itemTypes[type] ?? []) as SortableItem[]).toSorted((a, b) => a.sort - b.sort);
 
 /**
  * 能力値の表示用データ。
