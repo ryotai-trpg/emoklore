@@ -4,7 +4,7 @@ import "../css/emoklore.css";
 import { api } from "./api";
 import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
 import { EmokloreArmorSheet } from "./applications/armor-sheet";
-import * as applications from "./applications/character-sheet";
+import { EmokloreCharacterSheet } from "./applications/character-sheet";
 import { injectChatControls } from "./applications/chat-controls";
 import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyHowling, drawHowling } from "./applications/howling";
@@ -23,6 +23,7 @@ import {
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
 import { statusEffects } from "./config/status-effects";
+import { SYSTEM_ID } from "./constants";
 import { CharacterDataModel } from "./data/character";
 import { CombatDataModel } from "./data/combat";
 import {
@@ -51,6 +52,35 @@ import { registerQueries } from "./documents/queries";
 import { getSetting, registerSystemSettings } from "./settings";
 import { performPreLocalization } from "./utils/localization";
 import { typedEntries } from "./utils/object";
+
+type RegisterSheetArgs = Parameters<
+  typeof foundry.applications.apps.DocumentSheetConfig.registerSheet
+>;
+
+/**
+ * シートを1種類登録する。
+ *
+ * 本体は第3引数に `typeof ApplicationV2` を要求するが、`HandlebarsApplicationMixin` を
+ * 通したサブクラスはコンストラクタ型のジェネリクスが開いたままで代入互換にならない。
+ * 8種類ぶん同じキャストを並べずに済むよう、名乗り直しをここ1箇所に閉じる。
+ *
+ * 実行時に本体が見るのは `sheetClass.name` と、`DocumentSheetV2` のサブクラスかどうか
+ * だけなので（`client/applications/apps/document-sheet-config.mjs`）、受けるのは構造で足りる。
+ *
+ * `scope` と `makeDefault` は全種で同じ値になるため引数に出さない。
+ */
+const registerSheet = (
+  documentClass: RegisterSheetArgs[0],
+  sheetClass: { name: string; prototype: unknown },
+  options: { label: string; types?: string[] },
+) => {
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(
+    documentClass,
+    SYSTEM_ID,
+    sheetClass as RegisterSheetArgs[2],
+    { makeDefault: true, ...options },
+  );
+};
 
 Hooks.once("init", () => {
   console.log("Emo-klore TRPG | Initializing...");
@@ -166,105 +196,40 @@ Hooks.once("init", () => {
     },
   };
 
-  const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
+  registerSheet(Actor, EmokloreCharacterSheet, {
+    types: ["character"],
+    label: "EMOKLORE.Sheet.class.character",
+  });
+  registerSheet(Actor, EmokloreNpcSheet, {
+    types: ["npc"],
+    label: "EMOKLORE.Sheet.class.npc",
+  });
+  registerSheet(Actor, EmokloreKaiSheet, {
+    types: ["kai"],
+    label: "EMOKLORE.Sheet.class.kai",
+  });
 
-  // ApplicationV2 のコンストラクタ型はジェネリクスが開いたままなので、
-  // 具体化したサブクラスは代入互換にならない。登録先が期待する型として明示する
-  DocumentSheetConfig.registerSheet(
-    Actor,
-    "emoklore",
-    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
-    applications.EmokloreCharacterSheet as unknown as typeof foundry.applications.api.ApplicationV2,
-    {
-      types: ["character"],
-      makeDefault: true,
-      label: "EMOKLORE.Sheet.class.character",
-    },
-  );
-
-  DocumentSheetConfig.registerSheet(
-    Actor,
-    "emoklore",
-    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
-    EmokloreNpcSheet as unknown as typeof foundry.applications.api.ApplicationV2,
-    {
-      types: ["npc"],
-      makeDefault: true,
-      label: "EMOKLORE.Sheet.class.npc",
-    },
-  );
-
-  DocumentSheetConfig.registerSheet(
-    Actor,
-    "emoklore",
-    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
-    EmokloreKaiSheet as unknown as typeof foundry.applications.api.ApplicationV2,
-    {
-      types: ["kai"],
-      makeDefault: true,
-      label: "EMOKLORE.Sheet.class.kai",
-    },
-  );
-
-  DocumentSheetConfig.registerSheet(
-    Item,
-    "emoklore",
-    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
-    EmokloreWeaponSheet as unknown as typeof foundry.applications.api.ApplicationV2,
-    {
-      types: ["weapon"],
-      makeDefault: true,
-      label: "EMOKLORE.Sheet.class.weapon",
-    },
-  );
-
-  DocumentSheetConfig.registerSheet(
-    Item,
-    "emoklore",
-    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
-    EmokloreArmorSheet as unknown as typeof foundry.applications.api.ApplicationV2,
-    {
-      types: ["armor"],
-      makeDefault: true,
-      label: "EMOKLORE.Sheet.class.armor",
-    },
-  );
-
-  DocumentSheetConfig.registerSheet(
-    Item,
-    "emoklore",
-    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
-    EmokloreSkillSheet as unknown as typeof foundry.applications.api.ApplicationV2,
-    {
-      types: ["skill"],
-      makeDefault: true,
-      label: "EMOKLORE.Sheet.class.skill",
-    },
-  );
-
-  DocumentSheetConfig.registerSheet(
-    Item,
-    "emoklore",
-    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
-    EmokloreHowlingSheet as unknown as typeof foundry.applications.api.ApplicationV2,
-    {
-      types: ["howling"],
-      makeDefault: true,
-      label: "EMOKLORE.Sheet.class.howling",
-    },
-  );
+  registerSheet(Item, EmokloreWeaponSheet, {
+    types: ["weapon"],
+    label: "EMOKLORE.Sheet.class.weapon",
+  });
+  registerSheet(Item, EmokloreArmorSheet, {
+    types: ["armor"],
+    label: "EMOKLORE.Sheet.class.armor",
+  });
+  registerSheet(Item, EmokloreSkillSheet, {
+    types: ["skill"],
+    label: "EMOKLORE.Sheet.class.skill",
+  });
+  registerSheet(Item, EmokloreHowlingSheet, {
+    types: ["howling"],
+    label: "EMOKLORE.Sheet.class.howling",
+  });
 
   // 効果の設定シート。属性キーを手打ちさせないための差し替えで、種別は base 一択
-  DocumentSheetConfig.registerSheet(
-    ActiveEffect,
-    "emoklore",
-    // biome-ignore lint: 本体のコンストラクタ型がジェネリクス開放のため素の as では通らない
-    EmokloreActiveEffectConfig as unknown as typeof foundry.applications.api.ApplicationV2,
-    {
-      makeDefault: true,
-      label: "EMOKLORE.Sheet.class.activeEffect",
-    },
-  );
+  registerSheet(ActiveEffect, EmokloreActiveEffectConfig, {
+    label: "EMOKLORE.Sheet.class.activeEffect",
+  });
 });
 // チャットカードのボタンを繋ぐ。本体のチャットログは自前のアクション表しか見ないので、
 // システム側のボタンはメッセージが描かれるたびに自分で拾う必要がある
