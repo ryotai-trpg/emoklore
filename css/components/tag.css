@@ -1,0 +1,13 @@
+/* 値を1つ囲って見せる札。共鳴感情の表示に使う。
+
+   押せるものではないので本体のボタンには寄せない（押せる見た目にすると嘘になる）。
+   地・枠は本体のデータ表示用の変数を引く */
+
+@layer components {
+  .em-tag {
+    padding: 1px var(--spacer-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--emoklore-box-radius);
+    background: var(--color-data-background);
+  }
+}

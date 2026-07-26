@@ -1,0 +1,19 @@
+/* 画像の枠。アクターの立ち絵、アイテムのアイコン、カードのサムネイルが共有する。
+
+   中身が変わらない枠なので寸法を固定してよい（`docs/ui-design.md` の「固定pxは
+   中身が変わらないものにだけ許す」）。ただし **rem で持つ** ので、ユーザーの
+   フォントサイズ設定には追従する。
+
+   大きさは置く側が `--em-avatar-size` で決める。枠そのものの決まりごと（枠線を消す・
+   角を丸める・切り抜き方）は場所によらず同じなので、ここが持つ。 */
+
+@layer components {
+  .em-avatar {
+    width: var(--em-avatar-size, 3rem);
+    height: var(--em-avatar-size, 3rem);
+    /* 本体は img に枠を付けるので消す */
+    border: none;
+    border-radius: var(--emoklore-box-radius);
+    object-fit: cover;
+  }
+}

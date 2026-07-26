@@ -1,7 +1,7 @@
 {{! Kai (怪異) sheet — 単一ルートが要る（HandlebarsApplicationMixin のパート制約） }}
 <div class="em-kai">
 <header class="em-kai__header">
-  <img class="em-kai__avatar" src="{{document.img}}" data-edit="img" alt="" />
+  <img class="em-avatar" src="{{document.img}}" data-edit="img" alt="" />
   {{#if isPlay}}
     <h1 class="em-kai__name">{{document.name}}</h1>
   {{else}}
@@ -59,11 +59,11 @@
 <section class="em-kai__block">
   <h3>{{localize "EMOKLORE.Actor.kai.Emotions"}}</h3>
   <div class="em-kai__emotions">
-    {{#each selectedEmotions}}<span class="em-kai__emotion">{{label}}</span>{{/each}}
+    {{#each selectedEmotions}}<span class="em-tag">{{label}}</span>{{/each}}
   </div>
   {{#unless isPlay}}
     {{! 編集はピッカーで行う。ここは入口だけを持つ }}
-    <button type="button" class="em-kai__emotion-pick" data-action="pickEmotions">
+    <button type="button" class="em-button em-button--inline em-kai__emotion-pick" data-action="pickEmotions">
       <i class="fa-solid fa-heart" inert></i>
       <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
     </button>

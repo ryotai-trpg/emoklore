@@ -1,0 +1,24 @@
+/* 「必要成功数: ダブル成功以上」のような対の並び。dl / dt / dd で組む。
+
+   ラベルの列は auto、値の列は minmax(0, 1fr)。grid item の既定は min-width: auto
+   なので、これがないと長い値が枠を破る。
+
+   行の間は詰める（`gap: 0 …`）。対が縦に続くときは1つの塊として読ませたい */
+
+@layer components {
+  .em-terms {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0 var(--spacer-8);
+    margin: 0;
+    font-size: var(--font-size-12);
+  }
+
+  .em-terms dt {
+    font-weight: bold;
+  }
+
+  .em-terms dd {
+    margin: 0;
+  }
+}

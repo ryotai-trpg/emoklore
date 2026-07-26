@@ -4,7 +4,7 @@
   {{#each baseSkills as |baseSkill|}}
   <button
     type="button"
-    class="em-chip"
+    class="em-button em-button--inline em-button--wrap em-chip"
     data-action="roll"
     data-roll-type="base-skill"
     data-skill="{{baseSkill.key}}"
@@ -20,7 +20,7 @@
   {{#each customBaseSkills as |baseSkill|}}
   <button
     type="button"
-    class="em-chip"
+    class="em-button em-button--inline em-button--wrap em-chip"
     data-action="roll"
     data-roll-type="custom-skill"
     data-item-id="{{baseSkill.id}}"

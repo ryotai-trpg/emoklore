@@ -27,17 +27,11 @@
       gap: var(--spacer-4);
     }
 
-    button.em-emotion-picker__slot-target {
-      display: inline-flex;
+    /* 寸法は em-button--inline が持つ。ラベルと感情名を並べるので、揃えは
+       中央ではなくベースライン。間隔も一段広く取る */
+    .em-emotion-picker__slot-target {
       align-items: baseline;
       gap: var(--spacer-8);
-      margin: 0;
-      padding: var(--spacer-4) var(--spacer-8);
-      width: auto;
-      /* 本体の button は --button-size で高さが固まる。中身なりに縮める */
-      height: auto;
-      min-height: 0;
-      line-height: 1.4;
     }
 
     .em-emotion-picker__slot-label {
@@ -74,19 +68,15 @@
       list-style: none;
     }
 
-    button.em-emotion-picker__emotion {
-      margin: 0;
+    /* 寸法は em-button--wrap が持つ。列いっぱいに広げ、47個を詰めるので
+       左右の余白は詰める */
+    .em-emotion-picker__emotion {
       padding: var(--spacer-4);
       width: 100%;
-      height: auto;
-      min-height: 0;
-      line-height: 1.4;
-      /* 英語だと感情名が伸びる。折り返しを許して列を破らせない */
-      white-space: normal;
     }
 
     /* 選ばれている感情。押し込まれて見えるだけにして、色は増やさない */
-    button.em-emotion-picker__emotion[aria-pressed="true"] {
+    .em-emotion-picker__emotion[aria-pressed="true"] {
       background: var(--emoklore-surface-sunken);
       font-weight: bold;
     }
