@@ -73,13 +73,23 @@
   }
 
   /* 感情3行。親の行に載せると2行目（HPバーの行）が文字の高さまで広がって
-     HPの数値とバーが離れてしまうので、ここは独立した均等3行にする */
+     HPの数値とバーが離れてしまうので、ここは独立した3行にする。
+
+     **列も行も固定にする。** 感情名は47種の閉じた表から来るので最大の幅が分かって
+     おり（いちばん長いのが「自己顕示（欲望）」＝全角7文字）、可変長のテキストでは
+     ない。固定にすると、
+       - 3枠が未選択でも場所が残るので、共鳴バーの長さが選択の有無で変わらない
+       - 1行目の上端が親の1行目の上端＝HPの見出しの上端にそのまま揃う
+     align-content: start がないと3行が余白に散り、この上端が動く */
   .em-meter__emotions {
     grid-column: 2;
     grid-row: 1 / span 3;
     display: grid;
-    grid-template-columns: auto auto;
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: var(--emoklore-emotion-name-width) var(
+        --emoklore-emotion-attribute-width
+      );
+    grid-auto-rows: var(--emoklore-emotion-row-height);
+    align-content: start;
     align-items: center;
     justify-content: start;
     column-gap: var(--spacer-4);
@@ -89,6 +99,9 @@
     dd {
       margin: 0;
       min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     dd {
