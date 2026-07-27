@@ -8,7 +8,7 @@
 
 import { updateWeaponCard } from "../chat/weapon-card";
 import { resolveSkillRef } from "../data/character-like";
-import { resolveCardButtons } from "../data/messages/attack-card";
+import { type AttackRolls, resolveCardButtons } from "../data/messages/attack-card";
 import type { WeaponCardModel, WeaponCardState } from "../data/messages/weapon-card";
 import type { EmokloreActor } from "../documents/actor";
 import { buildDamageFormula, resolveStrengthBonus } from "../rules/weapon-damage";
@@ -45,7 +45,8 @@ export async function rollAttack(this: WeaponCardModel): Promise<void> {
   }
 
   const { roll } = await actor.buildSkillRoll(ref);
-  await applyRoll(this, [roll], { successCount: roll.successCount });
+  const rolls = { attackRoll: roll, damageRoll: undefined };
+  await applyRoll(this, rolls, { successCount: roll.successCount });
 
   Hooks.callAll("emoklore.rollAttack", this.message, roll);
 }
@@ -73,8 +74,7 @@ export async function rollDamage(this: WeaponCardModel): Promise<void> {
   const roll = new foundry.dice.Roll(buildDamageFormula(config));
   await roll.evaluate();
 
-  const attackRoll = this.attackRoll;
-  const rolls = attackRoll ? [attackRoll, roll] : [roll];
+  const rolls = { attackRoll: this.attackRoll, damageRoll: roll };
   await applyRoll(this, rolls, { damageTotal: roll.total ?? 0 });
 
   Hooks.callAll("emoklore.rollDamage", this.message, roll);
@@ -111,10 +111,10 @@ export async function applyDamageWithReduction(this: WeaponCardModel): Promise<v
   await applyDamageAndReport(targets, amount, { reduction: input.reduction, armor: input.armor });
 }
 
-/** ロールと状態をカードに書き戻す。描き直しとダイス音は chat/weapon-card.ts が持つ */
+/** ロールと状態をカードに書き戻す。描き直しとダイス音は chat/ 側が持つ */
 async function applyRoll(
   card: WeaponCardModel,
-  rolls: foundry.dice.Roll[],
+  rolls: AttackRolls,
   changes: Partial<WeaponCardState>,
 ): Promise<void> {
   const system = { ...card.toObject(), ...changes } as WeaponCardState;

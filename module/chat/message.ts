@@ -1,11 +1,15 @@
 /**
- * ChatMessage を作る唯一の口。
+ * ChatMessage を作る・育てる唯一の口。
  *
  * カードごとに違うのは種別・状態・中身のHTMLだけで、残り（ポップアウトの許可など）は
  * 共通なので、`ChatMessage.create` の呼び出しをここ1箇所に集める。公開範囲のような
  * 「全カードに一様に効く決まり」を足す場所も、必然的にここになる。
+ *
+ * 育つカード（武器・怪異の攻撃）の書き戻しも同じ理由でここに置く。押すたびに
+ * `content` を組み直すのはカードごとの仕事だが、更新の当て方とダイス音は共通になる。
  */
 
+import type { CardMessage } from "../data/messages/attack-card";
 import type { CardType } from "../data/messages/card-model";
 import type { EmokloreRoll } from "../dice/emoklore-roll";
 import type { EmokloreActor } from "../documents/actor";
@@ -78,6 +82,25 @@ export async function createCardMessage<S>(
   options: PostOptions = {},
 ): Promise<ChatMessage | undefined> {
   return postMessage(buildCardMessageData(data), options);
+}
+
+/**
+ * 振った結果をカードに書き戻す。
+ *
+ * `content` を毎回組み直すのは、ボタンの出し分けと結果の表示が状態と一緒に変わるため。
+ * 組み立てはカードごとに違うので、呼ぶ側が済ませたものを受ける。
+ *
+ * 作成時と違って更新では `sound` が鳴らないので、ダイス音はここで明示的に鳴らす。
+ */
+export async function updateCardMessage<S>(
+  message: CardMessage,
+  { content, rolls, system }: { content: string; rolls: foundry.dice.Roll[]; system: S },
+): Promise<void> {
+  await message.update({ content, rolls, system });
+
+  // モジュールが CONFIG.sounds を空にしている場合があるので、あるときだけ鳴らす
+  const sound = CONFIG.sounds.dice;
+  if (sound) foundry.audio.AudioHelper.play({ src: sound }, true);
 }
 
 export type RollMessageData = {
