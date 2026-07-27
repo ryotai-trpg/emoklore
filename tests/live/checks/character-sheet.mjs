@@ -69,6 +69,41 @@ export async function run({ page, check }) {
     ),
   );
 
+  await check("モード切替ボタンが切り替え先を表示する", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const sheet = game.actors.getName(`${tag}_char`).sheet;
+        if (!sheet.rendered) await sheet.render(true);
+
+        // ボタンは「押したら切り替わる先」を出す。閲覧中は編集へ（ペン）、編集中は閲覧へ（鍵）。
+        // ボタンの反映は `_onRender` で走り、`__setMode` が待つ本文の入れ替え
+        // （`_replaceHTML`）より一歩あと。切り替え直後に読むと古い顔を掴みうるので、
+        // 期待の顔になるまで待ってから記録する
+        const face = () => {
+          const button = window.__modeToggle(sheet);
+          const icon = ["fa-user-lock", "fa-user-pen"].filter((c) => button.classList.contains(c));
+          return `${icon.join("+") || "アイコンなし"} ${button.dataset.tooltip}`;
+        };
+        const switchAndRead = async (mode, wanted) => {
+          await window.__setMode(sheet, mode);
+          await window.__waitFor(() => face() === wanted, { soft: true, label: `${mode}の表示` });
+          return face();
+        };
+
+        const play = await switchAndRead("play", "fa-user-pen EMOKLORE.Sheet.EditMode");
+        const edit = await switchAndRead("edit", "fa-user-lock EMOKLORE.Sheet.PlayMode");
+        await window.__setMode(sheet, "play");
+
+        const ok =
+          play === "fa-user-pen EMOKLORE.Sheet.EditMode" &&
+          edit === "fa-user-lock EMOKLORE.Sheet.PlayMode";
+        return { ok, detail: `閲覧中: ${play} ／ 編集中: ${edit}` };
+      },
+      TAG,
+    ),
+  );
+
   await check("最小幅まで縮めても組込の技能名が折り返さない", () =>
     assertInPage(
       page,
