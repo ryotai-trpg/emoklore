@@ -42,7 +42,7 @@ export type KaiAttackRolls = {
 };
 
 /** 怪異の攻撃カードのHTMLを組み立てる */
-export async function renderKaiAttackCard(
+async function renderKaiAttackCard(
   state: KaiAttackCardState,
   { judgmentRoll, damageRoll }: KaiAttackRolls,
 ): Promise<string> {

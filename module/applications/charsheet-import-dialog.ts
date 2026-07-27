@@ -2,7 +2,7 @@ import type { ApplicationRenderContext } from "@client/applications/_types.mjs";
 import type { HandlebarsRenderOptions } from "@client/applications/api/handlebars-application.mjs";
 import { systemPath } from "../constants";
 import type { EmokloreActor } from "../documents/actor";
-import { importFromCharSheet, validateCharSheetJSON } from "../utils/charsheet-importer";
+import { validateCharSheetJSON } from "../utils/charsheet-importer";
 import type { ApplicationV2Statics } from "./types";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -89,7 +89,7 @@ export class CharSheetImportDialog extends (HandlebarsApplicationMixin(
 
     // 取り込む
     try {
-      await importFromCharSheet(this.actor, validation.data);
+      await this.actor.importFromCharSheet(validation.data);
       this.close();
     } catch (error) {
       console.error("emoklore | キャラクターの取り込みに失敗しました", error);

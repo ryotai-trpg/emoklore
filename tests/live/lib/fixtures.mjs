@@ -50,6 +50,15 @@ export const createFixtures = (page) =>
     });
     made.push(npc.name);
     await npc.update({ "system.skills.search.level": 2 });
+    // 武器を1本。NPCシートの武器行は、開く・消すを共鳴者シートと同じ基底の
+    // ハンドラで処理する。行の解決が効いていることを見るために要る
+    await npc.createEmbeddedDocuments("Item", [
+      {
+        name: `${tag}_鉄パイプ`,
+        type: "weapon",
+        system: { skill: "martialArt", attackPower: "2" },
+      },
+    ]);
 
     // 怪異: 固定初速・装甲・共鳴感情・共鳴プリセット・攻撃（自由ダメージ式のD4と判定なし）
     const kai = await Actor.implementation.create({

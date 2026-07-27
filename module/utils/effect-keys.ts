@@ -14,7 +14,7 @@ export const MODIFIER_ASPECTS = ["bonus", "target", "success"] as const;
 export type ModifierAspect = (typeof MODIFIER_ASPECTS)[number];
 
 /** 修正を持つ表。全体修正だけはどの表にも属さない */
-export const MODIFIER_COLLECTIONS = [
+const MODIFIER_COLLECTIONS = [
   "characteristics",
   "skillGroups",
   "skills",

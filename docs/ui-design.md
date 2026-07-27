@@ -318,6 +318,7 @@ BEMを土台に、層をまたぐ共有だけ合成を許す形になる。[CUBE
 - partialは**引数なしでも呼べる**。`{{#each}}` の中では現在のコンテキストがそのまま渡るので、行の形が揃っているならこれで足りる。1つずつ組み立てる側はハッシュ引数で渡す。`field.hbs` は両方の呼ばれ方をする
 - **入れ子のpartialもPARTSの `templates` に列挙する**。ApplicationV2 は再帰的に解決しないため、漏らすと初回描画は通って再描画で落ちる
 - TS側のパスは `systemPath()` を通す。hbs側の `{{> "systems/emoklore/..."}}` はHandlebarsからTSの定数が見えないのでフルパス直書きのまま
+- **パスは文字列リテラルで書く。組み立てない。** `npm run check:templates` の孤児検査は `module/**/*.ts` の `"templates/….hbs"` を正規表現で拾うので、`` systemPath(`templates/item/${type}-detail.hbs`) `` のように種別名から組み立てると、そのテンプレートが「どこからも参照されていない」と報告される。**アイテムシート4種の `PARTS` を種別名1つにまとめないのはこれが理由**で、減る記述より孤児検査のほうが価値がある
 - `{{lookup}}` を重ねてconfigを引くのはテンプレートでのデータ整形なので、`applications/` のコンテキスト整形側で解決する
 - `{{#each}}` の中から親のコンテキストは**見えない**（Handlebarsは親スコープへフォールバックしない）。`@root` か `../` を明示する
 - **1つのパーツはルート要素を1つだけ返す**。兄弟を並べると `Template part "..." must render a single HTML element.` で描画が落ちる。囲むためだけの要素が必要になったら、`display: contents` を当てて親のレイアウトに影響させないか、パーツ自体を分ける

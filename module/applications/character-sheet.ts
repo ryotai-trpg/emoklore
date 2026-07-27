@@ -3,11 +3,7 @@ import { systemPath } from "../constants";
 import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import { getSetting, setSetting } from "../settings";
-import {
-  createDocumentData,
-  getEmbeddedDocument,
-  resolveEmbeddedDocumentClass,
-} from "../utils/sheet";
+import { getEmbeddedDocument, resolveEmbeddedDocumentClass } from "../utils/sheet";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import {
@@ -60,9 +56,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
     actions: {
       ...super.DEFAULT_OPTIONS.actions,
-      viewDoc: this._viewDoc,
-      createDoc: this._createDoc,
-      deleteDoc: this._deleteDoc,
       toggleEffect: this._toggleEffect,
       toggleEquipped: this._toggleEquipped,
       importCharacter: this._importCharacter,
@@ -188,24 +181,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
 
     if (partId in context.tabs) context.tab = context.tabs[partId] as unknown;
     return context;
-  }
-
-  static async _viewDoc(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
-    getEmbeddedDocument(target, this.actor)?.sheet?.render(true);
-  }
-
-  static async _deleteDoc(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
-    await getEmbeddedDocument(target, this.actor)?.delete();
-  }
-
-  static async _createDoc(
-    this: EmokloreCharacterSheet,
-    _event: Event,
-    target: HTMLElement & { dataset: DOMStringMap },
-  ) {
-    const docData = createDocumentData(target, this.actor);
-    const docCls = resolveEmbeddedDocumentClass(target.dataset.documentClass);
-    await docCls.create(docData, { parent: this.actor });
   }
 
   static async _toggleEffect(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {

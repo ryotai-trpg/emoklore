@@ -33,7 +33,7 @@ const formatForcedMatch = (forcedMatch: string): string =>
   isResonanceMatch(forcedMatch) ? _loc(MATCH_LABELS[forcedMatch]) : "";
 
 /** 共鳴判定の要求カードのHTMLを組み立てる */
-export const renderResonanceRequestCard = (state: ResonanceRequestState): Promise<string> =>
+const renderResonanceRequestCard = (state: ResonanceRequestState): Promise<string> =>
   foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     intensity: state.intensity,
     // 憑依判定は上昇値の指定を受けない（成否によらず+1）ので、そもそも出さない

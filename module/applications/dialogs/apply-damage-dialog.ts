@@ -3,8 +3,7 @@ import { systemPath } from "../../constants";
 import { resolveSkillRef, type SkillRef } from "../../data/character-like";
 import type { EmokloreActor } from "../../documents/actor";
 import { normalizeReduction } from "../../rules/weapon-damage";
-import { typedEntries } from "../../utils/object";
-import { describeSkillLabel, parseSkillRefValue, toSkillRefValue } from "../../utils/skill";
+import { buildSkillRefGroups, parseSkillRefValue } from "../../utils/skill";
 
 export type DamageReductionInput = {
   reduction: number;
@@ -14,7 +13,13 @@ export type DamageReductionInput = {
 
 const TEMPLATE = systemPath("templates/apps/apply-damage.hbs");
 
-/** 防御判定の既定。ルールブックの防御の例示が〈耐久〉 */
+/**
+ * 防御判定の既定。ルールブックの防御の例示が〈耐久〉。
+ *
+ * 候補は通常技能と基本技能の全件を出す（`buildSkillRefGroups`）。ルールブックの防御は
+ * 「〈耐久〉などの技能」で、どれを認めるかはDL裁量なので、こちらで絞るとルールの発明になる。
+ * カスタム技能は対象アクターの所持アイテム依存なので、必要になったら足す。
+ */
 const DEFAULT_DEFENSE_SKILL = "skill:endurance";
 
 /**
@@ -45,7 +50,7 @@ export async function promptDamageReduction({
       successCount: successCount ?? "?",
     }),
     canRollDefense: !!defender,
-    defenseSkillGroups: listDefenseSkillGroups(),
+    defenseSkillGroups: buildSkillRefGroups(DEFAULT_DEFENSE_SKILL),
     armorPieces,
     hasArmorChoices: armorPieces.length > 0,
   });
@@ -73,39 +78,6 @@ export async function promptDamageReduction({
   } as Parameters<typeof foundry.applications.api.DialogV2.prompt>[0]);
 
   return (result as DamageReductionInput | null) ?? null;
-}
-
-type DefenseSkillOption = { value: string; label: string; selected: boolean };
-type DefenseSkillGroup = { label: string; options: DefenseSkillOption[] };
-
-/**
- * 防御判定に使う技能の選択肢。
- *
- * ルールブックの防御は「〈耐久〉などの技能」で、どの技能を認めるかはDL裁量。
- * こちらで候補を絞るとルールの発明になるので、通常技能とベース技能を全部出す。
- * カスタム技能は対象アクターの所持アイテム依存なので、必要になったら足す。
- */
-function listDefenseSkillGroups(): DefenseSkillGroup[] {
-  const skills = typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => {
-    const value = toSkillRefValue({ kind: "skill", key });
-    return {
-      value,
-      label: describeSkillLabel({ kind: "skill", key }).markedLabel,
-      selected: value === DEFAULT_DEFENSE_SKILL,
-    };
-  });
-  const baseSkills = typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key]) => ({
-    value: toSkillRefValue({ kind: "base", key }),
-    label: describeSkillLabel({ kind: "base", key }).markedLabel,
-    selected: false,
-  }));
-
-  // 見出しはカスタム技能の区分名を借りている。判定要求のダイアログとは別の言い回しなので、
-  // 揃えるかどうかは文言の整理（Issue #59）で決める
-  return [
-    { label: _loc("EMOKLORE.Item.skill.Category.normal"), options: skills },
-    { label: _loc("EMOKLORE.Item.skill.Category.base"), options: baseSkills },
-  ];
 }
 
 /** 防御判定を振ってチャットに流し、成功数を軽減値の入力へ書き込む */

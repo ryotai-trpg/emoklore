@@ -6,7 +6,7 @@
 
 import { type BaseSkillKey, baseSkills, isBaseSkillKey } from "../config/base-skills";
 import type { CharacteristicKey } from "../config/characteristics";
-import { type SkillCategory, skillCategories } from "../config/skill-categories";
+import { isSkillCategory, skillCategories } from "../config/skill-categories";
 import type { SkillGroupKey } from "../config/skill-groups";
 import { isSkillKey, type SkillKey, skills } from "../config/skills";
 import {
@@ -172,13 +172,17 @@ export const describeSkill = (
 };
 
 /**
- * カスタム技能の区分の表示名。
+ * カスタム技能の区分の表示名。表に無い区分は空文字。
  *
  * `skillCategories` が持つのは labelKey（i18nキー）だけ。スキーマの choices と
  * 共有しているので preLocalize の対象にしておらず、翻訳は引く側で行う。
+ *
+ * **保存データを絞らずに引くと落ちる。** `choices` は入力を絞るだけで保存済みの値は
+ * 直さないので、キーを改名したあとのデータには表に無い区分が入りうる。絞らずに引くと
+ * `undefined.labelKey` で TypeError になる（`localizeHowlingCategory` と同じ扱い）。
  */
-export const localizeSkillCategory = (category: SkillCategory): string =>
-  _loc(skillCategories[category].labelKey);
+export const localizeSkillCategory = (category: string): string =>
+  isSkillCategory(category) ? _loc(skillCategories[category].labelKey) : "";
 
 /** 能力値の表示名。CONFIG.EMOKLORE の label は i18nInit で翻訳済み */
 const localizeCharacteristic = (key: CharacteristicKey): string =>
@@ -208,33 +212,43 @@ export type StoredSkillRef = {
 };
 
 /** 選択肢の value は「経路:キー」。selectの値は1本の文字列にしかならないので繋ぐ */
-export const SKILL_REF_SEPARATOR = ":";
+const SKILL_REF_SEPARATOR = ":";
+
+/** 技能をひとつ選ばせる select の選択肢1件 */
+export type SkillRefOption = { value: string; label: string; selected: boolean };
+
+/** optgroup 1つぶん。通常技能と基本技能の2グループに分ける */
+export type SkillRefGroup = { label: string; skills: SkillRefOption[] };
 
 /**
  * 技能をひとつ選ばせるときの選択肢。通常技能と基本技能の2グループに分ける。
  *
  * 印（★ / ＊）を付けてシートの表記と揃える。47感情のような一望の必要は無いので、
  * 専用のピッカーは作らず optgroup 付きの素の select で足りる。
+ *
+ * @param selected 初期選択にする「経路:キー」。複数選択の select では渡さない
  */
-export const buildSkillRefGroups = (): Array<{
-  label: string;
-  skills: Array<{ value: string; label: string }>;
-}> => [
-  {
-    label: _loc("EMOKLORE.SkillRequest.NormalSkills"),
-    skills: typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => ({
-      value: toSkillRefValue({ kind: "skill", key }),
-      label: describeSkillLabel({ kind: "skill", key }).markedLabel,
-    })),
-  },
-  {
-    label: _loc("EMOKLORE.SkillRequest.BaseSkills"),
-    skills: typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key]) => ({
-      value: toSkillRefValue({ kind: "base", key }),
-      label: describeSkillLabel({ kind: "base", key }).markedLabel,
-    })),
-  },
-];
+export const buildSkillRefGroups = (selected?: string): SkillRefGroup[] => {
+  const toOption = (
+    ref: { kind: "skill"; key: SkillKey } | { kind: "base"; key: BaseSkillKey },
+  ) => {
+    const value = toSkillRefValue(ref);
+    return { value, label: describeSkillLabel(ref).markedLabel, selected: value === selected };
+  };
+
+  return [
+    {
+      label: _loc("EMOKLORE.SkillRequest.NormalSkills"),
+      skills: typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => toOption({ kind: "skill", key })),
+    },
+    {
+      label: _loc("EMOKLORE.SkillRequest.BaseSkills"),
+      skills: typedEntries(CONFIG.EMOKLORE.baseSkills).map(([key]) =>
+        toOption({ kind: "base", key }),
+      ),
+    },
+  ];
+};
 
 /** 「経路:キー」を分解する。value は自分で組んだものなので、経路は base 以外を skill に倒す */
 export const parseSkillRefValue = (value: string): StoredSkillRef => {

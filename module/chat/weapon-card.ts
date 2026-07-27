@@ -23,7 +23,7 @@ const TEMPLATE = systemPath("templates/chat/weapon-card.hbs");
  * 状態をモデルからではなく引数で受けるのは、更新の直前に「これから保存する状態」で
  * 描く必要があるため。カードを最初に作る時点ではモデルがまだ存在しないという事情もある。
  */
-export async function renderWeaponCard(
+async function renderWeaponCard(
   state: WeaponCardState,
   rolls: foundry.dice.Roll[],
 ): Promise<string> {

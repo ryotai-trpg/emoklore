@@ -1,5 +1,5 @@
 /** 技能レベルごとの取得コスト。レベル0は取得していない扱いでコストなし */
-export const SKILL_POINT_COSTS: Record<number, number> = {
+const SKILL_POINT_COSTS: Record<number, number> = {
   1: 1,
   2: 5,
   3: 15,

@@ -2,7 +2,7 @@
 export const HP_BASE = 10;
 
 /** 共鳴値の下限。判定でダイス数になるので0以下にはならない */
-export const RESONANCE_MIN = 1;
+const RESONANCE_MIN = 1;
 
 /** 目標値が能力値の半分（切り上げ）になる基本技能。〈手当〉だけが該当する */
 const HALVED_TARGET_BASE_SKILL = "treatment";

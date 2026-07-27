@@ -21,7 +21,7 @@
       <select name="defenseSkill" id="defense-skill">
         {{#each defenseSkillGroups as |group|}}
           <optgroup label="{{group.label}}">
-            {{#each group.options as |option|}}
+            {{#each group.skills as |option|}}
               <option value="{{option.value}}" {{#if option.selected}}selected{{/if}}>{{option.label}}</option>
             {{/each}}
           </optgroup>

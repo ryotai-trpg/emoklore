@@ -14,20 +14,22 @@ TypeScriptの型と、モジュールの分け方に関する規約はここが�
 | `rules/` | `config/`（型のみ） |
 | `dice/` | `rules/` |
 | `data/` | `config/` `rules/` `utils/` |
-| `chat/` | `config/` `rules/` `data/` `utils/`。`documents/` は型のみ |
+| `chat/` | `config/` `rules/` `data/` `utils/`。`dice/` `documents/` は型のみ |
 | `documents/` | `config/` `data/` `rules/` `dice/` `chat/` `utils/` |
 | `applications/` | 上のすべて |
 | `utils/` | `config/` `rules/`。`data/` `documents/` は型のみ |
 
 - **`rules/` は何にも依存しない**。Foundry APIもi18nもUIも触らない。だから `vitest` の `environment: "node"` でそのまま動く。逆に言えば、テストしたいロジックはこの層に切り出す
 - **`constants.ts` と `settings.ts` はどの層から読んでもよい**。表に行を作っていないのは、層ではなく横断する道具だから。ただし `rules/` だけは例外で、**設定を読ませない** — 読んだ瞬間に純粋関数でなくなる。自動化を切るかどうかの判断は呼び出し側（[アーキテクチャ](/architecture)「自動化の程度」の表）に置く
-- **`import type` は依存の矢印を消さない**。型だけのimportはビルド後に消えるので、importグラフ上は逆依存が見えなくなる。`utils/charsheet-importer.ts` が `EmokloreActor` を型で借りたまま `actor.update()` を呼んでいるのがこれで、型だけ借りているように見えて実際は上の層を動かしている。**型だけ借りているのか、動かしているのかは分けて考えること**
+- **`import type` は依存の矢印を消さない**。型だけのimportはビルド後に消えるので、importグラフ上は逆依存が見えなくなる。**型だけ借りているのか、動かしているのかは分けて考えること** — `utils/sheet.ts` が `EmokloreActor` を型で借りるのは、所持アイテムと効果を引くだけで動かさないので借用。`actor.update()` を呼び始めたらそれは上の層を動かしているので、置き場所は `utils/` ではなく `documents/` になる（保管所の取り込みが `EmokloreActor#importFromCharSheet` にあるのはこのため）
 
 現状の例外は1つで、[アーキテクチャ](/architecture) の「既知の構造的課題」に記録してある。`config/index.ts` が事前ローカライズの登録のために `utils/` をimportしている。
 
 **`data/` の行に `documents/` を足してはいけない。** 表は既に `documents/` → `data/` を許しているので、足すと表そのものが2層間の相互依存を許可することになり、順序を決めるための表が順序を失う。チャットカードのボタンハンドラは判定やダメージ適用を駆動するためこの矢印を欲しがるが、**そこは表ではなくハンドラの置き場所で解く** — ハンドラは `applications/` に置き、`ACTIONS` へ外から登録する。
 
 **`chat/` から `data/` は値でも引いてよい。** カードの状態の型（`WeaponCardState` など）とボタンの出し分け（`resolveCardButtons`）はスキーマと同じ場所に置いてあり、`chat/` はそれを読む側になる。逆向き（`data/` → `chat/`）は無い。
+
+**`chat/` から `dice/` は型だけ。** 判定結果を流す `createRollMessage` が `EmokloreRoll` を引数の型に持つ。Rollを作って評価するのは `documents/` 側で、`chat/` は受け取って `ChatMessage` に載せるだけなので、値では引かない。
 
 **ダイアログを開くかどうかは `applications/` が決める。** `documents/` のメソッドは検証済みの値を必須引数で受け、ダイアログを知らない。入力を集めてから呼ぶ入口は `applications/rolls.ts` にある。dnd5e は `Actor5e#rollSkill(config, dialog, message)` のようにDocument側がダイアログの可否まで持つが、それは**あちらのダイアログがRollクラスの静的メンバー（`BasicRoll.build`）で、パイプライン全体がRollの関心にある**ためで、こちらの事情とは違う。
 

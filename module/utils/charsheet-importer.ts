@@ -1,6 +1,4 @@
-import type { EmokloreActor } from "../documents/actor";
 import { SKILL_LEVEL_MAX, SKILL_LEVEL_MIN } from "../rules/limits";
-import { joinList } from "./format";
 import { typedEntries } from "./object";
 
 /**
@@ -11,7 +9,7 @@ import { typedEntries } from "./object";
  * 実際には無いことがある**。必須として宣言すると、取り込み側が確かめないまま回し、
  * 壊れたJSONを貼ったときに例外になる。型の側で任意にしておけば、確かめないと通らない。
  */
-interface CharSheetJSON {
+export interface CharSheetJSON {
   kind: "character";
   data: {
     name?: string;
@@ -196,12 +194,26 @@ function splitSpecialization(raw: string): [name: string, specialization?: strin
 }
 
 /**
- * 保管所のJSONからアクターへ取り込む
+ * 取り込みの中身。**適用はしない。**
+ *
+ * `Actor#update` に渡す形まで組み立てて返し、書き込みと通知は
+ * `EmokloreActor#importFromCharSheet` が行う。読み取りと書き込みを分けてあるので、
+ * この層は `documents/` を知らずに済む。
  */
-export async function importFromCharSheet(
-  actor: EmokloreActor,
-  jsonData: CharSheetJSON,
-): Promise<void> {
+export type CharSheetImport = {
+  /** `Actor#update` にそのまま渡せる更新データ */
+  updateData: Record<string, unknown>;
+  /** 取り込み元の名前。空なら名前を変えない */
+  name: string;
+  /** 索引に無くて取り込めなかったもの。黙って捨てず知らせるために返す */
+  unrecognizedEmotions: string[];
+  unrecognizedSkills: string[];
+};
+
+/**
+ * 保管所のJSONを、アクターに書き込める形へ組み立てる。
+ */
+export function buildCharSheetImport(jsonData: CharSheetJSON): CharSheetImport {
   if (jsonData.kind !== "character") {
     throw new Error("Invalid JSON: kind must be 'character'");
   }
@@ -288,25 +300,12 @@ export async function importFromCharSheet(
     updateData["flags.emoklore.externalUrl"] = data.externalUrl;
   }
 
-  // まとめてアクターへ反映する
-  await actor.update(updateData);
-
-  ui.notifications?.info("EMOKLORE.Import.Success", {
-    format: { name: data.name || actor.name },
-  });
-
-  // 取り込めなかったものは黙って捨てず知らせる（表記ゆれの発見に必要）
-  if (unrecognizedEmotions.length > 0) {
-    ui.notifications?.warn("EMOKLORE.Import.WarnUnknownEmotions", {
-      format: { labels: joinList(unrecognizedEmotions) },
-    });
-  }
-
-  if (unrecognizedSkills.length > 0) {
-    ui.notifications?.warn("EMOKLORE.Import.WarnUnknownSkills", {
-      format: { labels: joinList(unrecognizedSkills) },
-    });
-  }
+  return {
+    updateData,
+    name: data.name ?? "",
+    unrecognizedEmotions,
+    unrecognizedSkills,
+  };
 }
 
 /**
