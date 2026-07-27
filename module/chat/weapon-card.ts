@@ -6,12 +6,8 @@
  */
 
 import { systemPath } from "../constants";
-import {
-  resolveCardButtons,
-  type WeaponCardMessage,
-  type WeaponCardSource,
-  type WeaponCardState,
-} from "../data/messages/weapon-card";
+import { type CardMessage, resolveCardButtons } from "../data/messages/attack-card";
+import type { WeaponCardSource, WeaponCardState } from "../data/messages/weapon-card";
 import { localizeAttackSkill } from "../utils/weapon";
 import { buildCardMessageData } from "./message";
 
@@ -64,7 +60,7 @@ export async function buildWeaponCardMessageData(
  * 作成時と違って更新では `sound` が鳴らないので、ダイス音はここで明示的に鳴らす。
  */
 export async function updateWeaponCard(
-  message: WeaponCardMessage,
+  message: CardMessage,
   system: WeaponCardState,
   rolls: foundry.dice.Roll[],
 ): Promise<void> {

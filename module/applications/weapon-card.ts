@@ -8,11 +8,8 @@
 
 import { updateWeaponCard } from "../chat/weapon-card";
 import { resolveSkillRef } from "../data/character-like";
-import {
-  resolveCardButtons,
-  type WeaponCardModel,
-  type WeaponCardState,
-} from "../data/messages/weapon-card";
+import { resolveCardButtons } from "../data/messages/attack-card";
+import type { WeaponCardModel, WeaponCardState } from "../data/messages/weapon-card";
 import type { EmokloreActor } from "../documents/actor";
 import { buildDamageFormula, resolveStrengthBonus } from "../rules/weapon-damage";
 import { resolveAttackSkill } from "../utils/weapon";
