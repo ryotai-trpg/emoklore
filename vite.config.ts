@@ -25,6 +25,7 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
+    // build:packs が vite build より先に dist/packs を書くので、ここで空にすると消える
     emptyOutDir: false,
     sourcemap: true,
     // Vite 8 のバンドラは rolldown で、変換は esbuild ではなく oxc が行う。

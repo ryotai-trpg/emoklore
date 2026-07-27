@@ -22,6 +22,7 @@ TypeScriptの型と、モジュールの分け方に関する規約はここが�
 - **`rules/` は何にも依存しない**。Foundry APIもi18nもUIも触らない。だから `vitest` の `environment: "node"` でそのまま動く。逆に言えば、テストしたいロジックはこの層に切り出す
 - **`constants.ts` と `settings.ts` はどの層から読んでもよい**。表に行を作っていないのは、層ではなく横断する道具だから。ただし `rules/` だけは例外で、**設定を読ませない** — 読んだ瞬間に純粋関数でなくなる。自動化を切るかどうかの判断は呼び出し側（[アーキテクチャ](/architecture)「自動化の程度」の表）に置く
 - **`import type` は依存の矢印を消さない**。型だけのimportはビルド後に消えるので、importグラフ上は逆依存が見えなくなる。**型だけ借りているのか、動かしているのかは分けて考えること** — `utils/sheet.ts` が `EmokloreActor` を型で借りるのは、所持アイテムと効果を引くだけで動かさないので借用。`actor.update()` を呼び始めたらそれは上の層を動かしているので、置き場所は `utils/` ではなく `documents/` になる（保管所の取り込みが `EmokloreActor#importFromCharSheet` にあるのはこのため）
+- **importの循環はlintが落とす**（`noImportCycles`）。表は方向を決めるもので、循環しないことは機械が守る
 
 現状の例外は1つで、[アーキテクチャ](/architecture) の「既知の構造的課題」に記録してある。`config/index.ts` が事前ローカライズの登録のために `utils/` をimportしている。
 
@@ -213,21 +214,27 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 - **`any` は lint で禁止**（`noExplicitAny`）。本体の型が足りないときは `any` で潰さず交差型で補う。抑制してよいのは交差型でも表現できないとき（mixin のコンストラクタ制約がそれ）だけで、必ず理由コメントを付ける
 - **`exactOptionalPropertyTypes` が有効**。任意プロパティに明示的な `undefined` を入れうる場合は `foo?: T | undefined` と書く
 - **`verbatimModuleSyntax` が有効**。型だけのimportは `import type` と書く
+- **Biomeの `noFloatingPromises` が有効**。待たないと決めたPromiseは `void` を前置して、await漏れと区別する
 
 以下は**入れなかったものと、その理由**。同じ検討を繰り返さないために残す。フラグを増やすときは、**推測ではなくフラグごとにエラー数を実測してから決めること**。
 
 | 見送ったもの | 実測 | 理由 |
 |---|---|---|
-| `noPropertyAccessFromIndexSignature` | 28件 | ほぼ全部 `dataset.rollType` → `dataset['rollType']`。DOMのdatasetに対して読みにくくなるだけ |
-| `lib: ES2025` / `ESNext` | 1件 | 攻撃カードの `parent` のキャストが comparability を失う（`data/messages/attack-card.ts` の `this.parent as CardMessage`）。ES2024までは0件なので、そちらに固定している。二重キャストは禁止しているので、直すなら型述語か構造の側 |
+| `noPropertyAccessFromIndexSignature` | 56件 | ほぼ全部 `dataset.rollType` → `dataset['rollType']`。DOMのdatasetに対して読みにくくなるだけ |
+| `lib: ES2025` / `ESNext` | 4件 | `DataModel` を挟む比較・キャストが comparability を失う（`data/messages/attack-card.ts` の `this.parent as CardMessage`、`applications/actor-sheet.ts` の `effect.parent === this.actor`）。ES2024までは0件なので、そちらに固定している。二重キャストは禁止しているので、直すなら型述語か構造の側 |
 | `checkJs` + `tools/` `tests/` を `include` | 99件 | ページに注入するグローバル（`__waitFor` など）とコールバックの暗黙 `any` が大半で、型を付けるには注入側の宣言が要る。1件ずつ当たった結果、実行時に壊れるものは無い。**件数は当たるべき対象の量であって、中身の証拠ではない** |
-| `types: ["node"]` の分離 | — | ブラウザ向けコードにNodeのグローバルが載るが、ルートの `vite.config.ts` が同じ `include` にあるため tsconfig を分ける必要がある |
+| `types: ["node"]` の分離 | — | ブラウザ向けコードにNodeのグローバルが載るが、ルートの `vite.config.ts` が同じ `include` にあるため tsconfig を分ける必要がある。module/ にNodeグローバルの参照は実測0件 |
+| `skipLibCheck: false` | 0件 | 今は依存のd.tsも全部通るが、依存更新でd.tsのバグを踏むと無関係なPRが止まる。auditを `high` で留めるのと同じ判断で `true` のまま |
 | Biome `preset: all` | 700件超 | `useNamingConvention` 116 / `noMagicNumbers` 51 / `noConsole` 36 / `noTernary` 26 と、大半がノイズ |
-| Biome `noUnnecessaryConditions` | — | `actor-sheet` の `switch` を unreachable と誤検出する。Biomeは型情報を持たないため `dataset.rollType` を推論できない。**実機で3経路とも通ることを確認済み** |
-| Biome `useAwait` | 7件 | 本体API契約上 `async` が必須のハンドラを咎める |
-| Biome `useImportExtensions` | 90件 | bundlerの解決方式と噛み合わない |
+| Biome `noUnnecessaryConditions` | 7件 | 6件は誤検出。`a?.b ?? c` の短絡で生じる `undefined` を「非nullish保証」と判定し、`RegExp.exec` のnullやprivateフィールドへの代入も追えない。残る1件（`active-effect-config.ts` のキャストが `undefined` を落とす）はキャストの側を直す話 |
+| Biome `useAwait` | 16件 | 本体API契約上 `async` が必須のハンドラを咎める |
+| Biome `useImportExtensions` | 470件 | bundlerの解決方式と噛み合わない |
+| Biome `noMisleadingReturnType` | 3件 | 全部が本体API契約の戻り値型（`_preUpdate` など、実装より広いunionを本体が要求するもの）。`useAwait` と同型のノイズ |
+| Biome `useNullishCoalescing` | 3件 | 3件とも `name` や `img` の空文字を既定値へ倒す意図的な論理和で、`??` に直すと挙動が変わる |
+| Biome `noBaseToString` | 2件 | 型の無い `tools/` `tests/live/` のスクリプトでの推測ベースの検出のみ |
+| Biome `useExhaustiveSwitchCases` | 0件 | `useDefaultSwitchClause` が全switchにdefaultを求めるため実質発火しない。設定だけ増える |
 
-Biomeは型情報を持たないので、型に関する検査はすべて `tsc` 側にある。組み込みルールに無いものは**GritQLプラグインで書けることがある**（二重キャストの禁止がそれ）。「Biomeでは無理」と決める前にプラグインを検討すること。
+Biomeの型推論は部分的で（`?.` の短絡や `RegExp.exec` のnullを追えない）、型に関する検査の正は `tsc` 側にある。有効にしている型情報系ルール（`noFloatingPromises` など）は、`tsc` が見ない `tools/` `tests/live/` のJSにも届く保険と捉える。組み込みルールに無いものは**GritQLプラグインで書けることがある**（二重キャストの禁止がそれ）。「Biomeでは無理」と決める前にプラグインを検討すること。
 
 ## コメント
 

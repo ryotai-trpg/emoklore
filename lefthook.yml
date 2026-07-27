@@ -39,6 +39,16 @@ pre-commit:
         - "system.json"
       run: npm run check:i18n
 
+    # スキーマ表とconfigのテーブル・翻訳の突き合わせ。どれか片側だけ動かせば壊れるので、
+    # check-schema-doc.mjs が読むファイルを全部引き金にする。全体を見るチェック
+    - name: schema-doc
+      glob:
+        - "module/config/*.ts"
+        - "docs/data-model.md"
+        - "docs/active-effect.md"
+        - "lang/ja.json"
+      run: npm run check:schema-doc
+
     # Biomeのバージョンは3箇所に散っており、揃っていないとCIとローカルで違うBiomeが走る。
     # Dependabotが上げてくるのは package.json だけなので、そのPRの時点で気付けるようにする
     - name: biome-version

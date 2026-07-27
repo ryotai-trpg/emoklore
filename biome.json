@@ -17,7 +17,15 @@
       "preset": "recommended",
       "suspicious": {
         "noExplicitAny": "error",
+        "noImportCycles": "error",
         "noShadow": "error"
+      },
+      "nursery": {
+        "noFloatingPromises": "error",
+        "noImpliedEval": "error",
+        "noMisusedPromises": "error",
+        "noUnsafePlusOperands": "error",
+        "useAwaitThenable": "error"
       },
       "complexity": {
         "noThisInStatic": "off"
