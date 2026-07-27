@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildKaiAttackSpec, substituteSuccess } from "./kai-attack";
+import { buildKaiAttackSpec, canRollKaiDamage, substituteSuccess } from "./kai-attack";
 
 describe("buildKaiAttackSpec", () => {
   it("ダイス数と判定値をそのまま RollSpec に組む", () => {
@@ -32,5 +32,35 @@ describe("substituteSuccess", () => {
 
   it("複数の @success をすべて差し替える", () => {
     expect(substituteSuccess("@successd6+@success", 4)).toBe("4d6+4");
+  });
+});
+
+describe("canRollKaiDamage", () => {
+  const judged = { judgeless: false, damageFormula: "@successd4+3" };
+  const judgeless = { judgeless: true, damageFormula: "1d6" };
+
+  it("判定ありは命中していれば振れる", () => {
+    expect(canRollKaiDamage({ ...judged, successCount: 1 })).toBe(true);
+    expect(canRollKaiDamage({ ...judged, successCount: 3 })).toBe(true);
+  });
+
+  it("判定ありで成功数0以下なら振れない", () => {
+    expect(canRollKaiDamage({ ...judged, successCount: 0 })).toBe(false);
+    expect(canRollKaiDamage({ ...judged, successCount: -1 })).toBe(false);
+  });
+
+  it("判定をまだ振っていなければ振れない", () => {
+    expect(canRollKaiDamage({ ...judged, successCount: null })).toBe(false);
+  });
+
+  // 判定なしには「外れる」概念が無い。固定成功数0の攻撃を命中の条件で塞ぐと、
+  // ボタンが1つも出ないカードになる
+  it("判定なしは固定成功数0でも振れる", () => {
+    expect(canRollKaiDamage({ ...judgeless, successCount: 0 })).toBe(true);
+  });
+
+  it("ダメージ式が空なら振れない", () => {
+    expect(canRollKaiDamage({ judgeless: false, damageFormula: "", successCount: 3 })).toBe(false);
+    expect(canRollKaiDamage({ judgeless: true, damageFormula: "", successCount: 3 })).toBe(false);
   });
 });

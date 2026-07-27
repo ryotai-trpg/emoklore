@@ -1,5 +1,12 @@
+import { canRollKaiDamage } from "../../rules/kai-attack";
 import type { CardActions } from "../../utils/chat-card";
-import { AttackCardModel, type AttackProgress } from "./attack-card";
+import { diceFormulaValidator } from "../kai";
+import {
+  AttackCardModel,
+  type AttackProgress,
+  type CardButtons,
+  resolveCardButtons,
+} from "./attack-card";
 import type { CardIdentity } from "./card-model";
 
 const { BooleanField, DocumentUUIDField, NumberField, StringField } = foundry.data.fields;
@@ -10,6 +17,9 @@ export type KaiAttackCardState = AttackProgress & {
   actorUuid: string | null;
   mpCost: number;
   judgeless: boolean;
+  diceCount: number;
+  target: number;
+  damageFormula: string;
 };
 
 const defineKaiAttackCardSchema = () => {
@@ -19,6 +29,18 @@ const defineKaiAttackCardSchema = () => {
     actorUuid: new DocumentUUIDField({ type: "Actor", nullable: true, initial: null }),
     mpCost: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
     judgeless: new BooleanField({ required: true, initial: false }),
+
+    // 判定とダメージはカードのボタンから振るので、使用時点の攻撃の内容を焼き込む。
+    // 怪異を消したり攻撃欄を編集したあとでも、そのカードは出したときの内容で振れる
+    diceCount: new NumberField({ required: true, integer: true, min: 0, initial: 1 }),
+    target: new NumberField({ required: true, integer: true, min: 0, initial: 7 }),
+    damageFormula: new StringField({
+      required: true,
+      blank: true,
+      initial: "",
+      validate: diceFormulaValidator,
+      validationError: "is not a valid dice formula",
+    }),
   };
 };
 
@@ -36,6 +58,9 @@ export class KaiAttackCardModel extends AttackCardModel {
   declare actorUuid: string | null;
   declare mpCost: number;
   declare judgeless: boolean;
+  declare diceCount: number;
+  declare target: number;
+  declare damageFormula: string;
 
   static override CARD: CardIdentity = {
     root: ".em-kai-attack-card",
@@ -52,5 +77,10 @@ export class KaiAttackCardModel extends AttackCardModel {
   /** 判定なしの攻撃は判定を振らないので、`message.rolls` の先頭がダメージになる */
   protected override get hasAttackRoll(): boolean {
     return !this.judgeless;
+  }
+
+  /** ダメージを振れる条件が武器と違う。判定なしと空のダメージ式のぶん */
+  override get buttons(): CardButtons {
+    return resolveCardButtons(this, canRollKaiDamage(this));
   }
 }

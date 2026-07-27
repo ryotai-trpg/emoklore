@@ -38,7 +38,7 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
     position: { width: 500, height: 680 },
     actions: {
       ...super.DEFAULT_OPTIONS.actions,
-      rollAttack: this._rollAttack,
+      useAttack: this._useAttack,
       addAttack: this._addAttack,
       deleteAttack: this._deleteAttack,
       requestResonance: this._requestResonance,
@@ -87,10 +87,10 @@ export class EmokloreKaiSheet extends EmokloreActorSheet {
     return Number.isInteger(index) ? index : null;
   }
 
-  static async _rollAttack(this: EmokloreKaiSheet, _event: Event, target: HTMLElement) {
+  static async _useAttack(this: EmokloreKaiSheet, _event: Event, target: HTMLElement) {
     const index = EmokloreKaiSheet.#attackIndex(target);
     if (index === null) return;
-    await this.actor.rollKaiAttack(index);
+    await this.actor.useKaiAttack(index);
   }
 
   static async _addAttack(this: EmokloreKaiSheet) {

@@ -132,7 +132,7 @@
     {{#each system.attacks}}
       <li class="em-kai__attack" data-attack-index="{{@index}}">
         {{#if ../isPlay}}
-          <a class="em-rollable em-kai__attack-name" data-action="rollAttack">
+          <a class="em-rollable em-kai__attack-name" data-action="useAttack">
             {{#if name}}{{name}}{{else}}{{localize "EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"}}{{/if}}
           </a>
           {{! ラベルはスキーマから引く（attackFields）。攻撃の性質なので、

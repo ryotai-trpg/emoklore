@@ -1,4 +1,5 @@
 import type { RollSpec } from "./types";
+import { canRollDamage } from "./weapon-damage";
 
 /**
  * 怪異の攻撃判定の内容を決める。
@@ -34,4 +35,31 @@ export function buildKaiAttackSpec({
  */
 export function substituteSuccess(formula: string, successCount: number): string {
   return formula.replace(/@success/gi, String(successCount));
+}
+
+/**
+ * 怪異の攻撃で、ダメージを振れる段まで進んでいるか。
+ *
+ * 武器と違って事情が2つ増える。
+ *
+ * 1つは**ダメージ式が空の攻撃**。怪異の `attacks` は固有技能も兼ねる器なので、判定だけで
+ * ダメージを持たないものが普通にある。
+ *
+ * もう1つは**判定なしの攻撃**で、こちらには「外れる」概念が無い。固定成功数は0も取れて
+ * （スキーマの `min` が0）、`@success` を含まない固定ダメージ式と組み合わせられるため、
+ * 命中の条件（成功数1以上）に掛けるとボタンが1つも出ないカードになる。
+ */
+export function canRollKaiDamage({
+  judgeless,
+  successCount,
+  damageFormula,
+}: {
+  judgeless: boolean;
+  successCount: number | null;
+  damageFormula: string;
+}): boolean {
+  if (damageFormula === "") return false;
+  if (judgeless) return true;
+
+  return successCount !== null && canRollDamage(successCount);
 }

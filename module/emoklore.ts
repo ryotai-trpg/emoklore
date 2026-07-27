@@ -10,6 +10,7 @@ import { injectChatControls } from "./applications/chat-controls";
 import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyHowling, drawHowling } from "./applications/howling";
 import { EmokloreHowlingSheet } from "./applications/howling-sheet";
+import { rollKaiAttack, rollKaiDamage } from "./applications/kai-attack-card";
 import { EmokloreKaiSheet } from "./applications/kai-sheet";
 import { EmokloreNpcSheet } from "./applications/npc-sheet";
 import { rollRequested, rollRequestedResonance } from "./applications/requests";
@@ -148,6 +149,8 @@ Hooks.once("init", () => {
   WeaponCardModel.ACTIONS.applyDamage = applyDamage;
   WeaponCardModel.ACTIONS.applyDamageWithReduction = applyDamageWithReduction;
 
+  KaiAttackCardModel.ACTIONS.rollAttack = rollKaiAttack;
+  KaiAttackCardModel.ACTIONS.rollDamage = rollKaiDamage;
   KaiAttackCardModel.ACTIONS.applyDamage = applyDamage;
   KaiAttackCardModel.ACTIONS.applyDamageWithReduction = applyDamageWithReduction;
 
