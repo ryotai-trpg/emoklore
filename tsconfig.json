@@ -4,8 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
-    "rootDir": "./",
-    "outDir": "dist",
     "noEmit": true,
 
     "strict": true,
