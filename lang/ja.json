@@ -244,7 +244,8 @@
         "kai": "怪異シート",
         "howling": "ハウリング反応シート"
       },
-      "ToggleMode": "プレイ・編集モード切替",
+      "PlayMode": "プレイモード",
+      "EditMode": "編集モード",
       "character": {
         "tab": {
           "biography": "プロフィール",

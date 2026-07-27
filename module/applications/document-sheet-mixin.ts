@@ -1,3 +1,4 @@
+import type { ApplicationRenderContext } from "@client/applications/_types.mjs";
 import { getSetting } from "../settings";
 import type {
   ApplicationV2Statics,
@@ -81,18 +82,34 @@ export default (base: ApplicationV2Constructor) => {
       }
     }
 
-    override async _renderFrame(options: EmokloreRenderOptions): Promise<HTMLElement> {
-      const frame = await super._renderFrame(options);
+    override async _onRender(
+      context: ApplicationRenderContext,
+      options: EmokloreRenderOptions,
+    ): Promise<void> {
+      await super._onRender(context, options);
+      this.#renderModeToggle();
+    }
 
-      // 閲覧/編集を切り替えるボタンを、本体のウィンドウ操作列の後ろに足す
-      const toggleMode = document.createElement("button");
-      toggleMode.type = "button";
-      toggleMode.classList.add("header-control", "icon", "fa-solid", "fa-user-lock");
-      toggleMode.dataset.action = "toggleMode";
-      toggleMode.dataset.tooltip = "EMOKLORE.Sheet.ToggleMode";
-      this.window.controls.after(toggleMode);
-
-      return frame;
+    /**
+     * 閲覧/編集を切り替えるボタン。初回は本体のウィンドウ操作列の後ろに足し、
+     * 以降のrenderでは「押したら切り替わる先」のアイコンと文言を反映する
+     */
+    #renderModeToggle(): void {
+      let button = this.window.header.querySelector<HTMLButtonElement>(
+        "[data-action='toggleMode']",
+      );
+      if (!button) {
+        button = document.createElement("button");
+        button.type = "button";
+        button.classList.add("header-control", "icon", "fa-solid");
+        button.dataset.action = "toggleMode";
+        this.window.controls.after(button);
+      }
+      const key = this.isEditMode ? "EMOKLORE.Sheet.PlayMode" : "EMOKLORE.Sheet.EditMode";
+      button.classList.toggle("fa-user-lock", this.isEditMode);
+      button.classList.toggle("fa-user-pen", this.isPlayMode);
+      button.dataset.tooltip = key;
+      button.ariaLabel = _loc(key);
     }
 
     static readonly MODES = Object.freeze({
