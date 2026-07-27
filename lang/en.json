@@ -1,7 +1,7 @@
 {
   "TYPES": {
     "Actor": {
-      "character": "Character",
+      "character": "Resonator",
       "npc": "NPC",
       "kai": "Apparition"
     },
@@ -76,7 +76,7 @@
   },
   "EMOKLORE": {
     "Common": {
-      "none": "None"
+      "None": "None"
     },
     "Pack": {
       "howlingReactions": "Howling Reactions",
@@ -235,7 +235,7 @@
     },
     "Sheet": {
       "class": {
-        "character": "Character Sheet",
+        "character": "Resonator Sheet",
         "weapon": "Weapon Sheet",
         "armor": "Armor Sheet",
         "activeEffect": "Effect Sheet",
@@ -244,7 +244,7 @@
         "kai": "Apparition Sheet",
         "howling": "Howling Reaction Sheet"
       },
-      "toggleMode": "Toggle Play/Edit mode",
+      "ToggleMode": "Toggle Play/Edit mode",
       "character": {
         "tab": {
           "biography": "Biography",
@@ -252,7 +252,7 @@
           "items": "Items",
           "effects": "Effects"
         },
-        "specialization": "Specialization"
+        "Specialization": "Specialization"
       },
       "npc": {
         "Skills": "Skills",
@@ -390,7 +390,7 @@
         "Apply": "Apply Damage",
         "ApplyWithReduction": "Apply with Reduction",
         "NoTarget": "No target. Target a token first.",
-        "NoGM": "A connected GM is required to apply damage to characters you do not own.",
+        "NoDealer": "A connected Dealer is required to apply damage to characters you do not own.",
         "Applied": "{name} HP: {before} → {after}",
         "AppliedWithReduction": "{name} HP: {before} → {after} (reduced by {reduction})",
         "AppliedWithArmor": "{name} HP: {before} → {after} (armor {armor})",
@@ -406,8 +406,7 @@
         "NoPermission": "You lack permission to apply a status to this character."
       },
       "survivalReminder": {
-        "Prompt": "End of round. Characters in Cardiac Arrest roll *Survival (Endurance or Grit may substitute). On failure, Dead.",
-        "Roll": "Roll Survival"
+        "Prompt": "End of round. Characters in Cardiac Arrest roll *Survival (Endurance or Grit may substitute). On failure, Dead."
       },
       "kaiAttack": {
         "Judgment": "Judgment",
@@ -426,7 +425,7 @@
         "Targets": "Targets",
         "Roll": "Roll Resonance",
         "NoActor": "No character to roll with. Select a token or assign a character.",
-        "NoGM": "You lack permission to raise resonance. A connected GM is required."
+        "NoDealer": "You lack permission to raise resonance. A connected Dealer is required."
       },
       "resonanceOutcome": {
         "Raised": "{name} ∞Resonance Lv.{before} → Lv.{after} (+{rise})",
@@ -448,12 +447,12 @@
           "label": "Skill"
         }
       },
-      "bar": {
-        "title": "Initiative",
-        "preset": "Preset",
-        "custom": "Custom",
-        "noSkill": "No skill",
-        "recomputeAll": "Recompute all"
+      "Bar": {
+        "Title": "Initiative",
+        "Preset": "Preset",
+        "Custom": "Custom",
+        "NoSkill": "No skill",
+        "RecomputeAll": "Recompute all"
       }
     },
     "ApplyDamage": {
@@ -699,14 +698,14 @@
       "PasteJSON": "Paste JSON Data",
       "JSONPlaceholder": "Paste the JSON data from the character sheet here...",
       "Hint": "Paste the JSON data exported from https://emoklore.charasheet.jp",
-      "Success": "Imported data for {name}",
-      "WarnUnknownEmotions": "Resonant emotion(s) \"{labels}\" were not recognized and have been skipped",
-      "WarnUnknownSkills": "Skill(s) \"{labels}\" were not recognized and have been skipped",
-      "ErrorEmptyInput": "Please enter JSON data",
-      "ErrorInvalidJSON": "Invalid JSON data",
-      "ErrorInvalidKind": "Not a character data",
-      "ErrorMissingData": "Data not found",
-      "ErrorImportFailed": "Import failed"
+      "Success": "Imported data for {name}.",
+      "WarnUnknownEmotions": "Resonant emotion(s) \"{labels}\" were not recognized and have been skipped.",
+      "WarnUnknownSkills": "Skill(s) \"{labels}\" were not recognized and have been skipped.",
+      "ErrorEmptyInput": "Please enter JSON data.",
+      "ErrorInvalidJSON": "Invalid JSON data.",
+      "ErrorInvalidKind": "Not a character data.",
+      "ErrorMissingData": "Data not found.",
+      "ErrorImportFailed": "Import failed."
     },
     "SkillRequest": {
       "Title": "Request a Check",
@@ -750,7 +749,7 @@
       "Open": "Choose Emotions",
       "OpenAcquired": "Choose Acquired",
       "AcquiredSection": "Acquired resonant emotions",
-      "NoAcquired": "None yet",
+      "NoAcquired": "None yet.",
       "Unselected": "Not Selected",
       "Clear": "Remove",
       "Confirm": "Confirm",
@@ -759,7 +758,7 @@
       "HintMany": "Click an emotion to select it. Click again to remove it."
     },
     "Resonance": {
-      "Name": "♾️Resonance",
+      "Name": "∞Resonance",
       "Intensity": "Intensity",
       "Rise": "Increase",
       "Match": "Match",

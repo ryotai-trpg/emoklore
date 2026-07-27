@@ -172,6 +172,13 @@ export async function run({ page, check }) {
           );
           if (!button) return { ok: false, detail: "描画されたカードにボタンが無い" };
 
+          // ボタンの文字は describeSkillLabel が組み立てる。訳文に直書きすると基本技能の
+          // 印（＊）が落ちて、同じカードの本文（〈＊生存〉）と食い違う
+          const label = button.textContent.trim();
+          if (!label.includes("＊")) {
+            return { ok: false, detail: `ボタンの技能名に印が無い: ${label}` };
+          }
+
           const rollsBefore = game.messages.contents.length;
           button.click();
           const rolled = await window.__waitFor(
@@ -179,9 +186,9 @@ export async function run({ page, check }) {
               game.messages.contents.length > rollsBefore && game.messages.contents.at(-1).isRoll,
             { soft: true, label: "生存判定の実行" },
           );
-          if (!rolled) return { ok: false, detail: "ボタンを押しても〈生存〉判定が飛ばない" };
+          if (!rolled) return { ok: false, detail: "ボタンを押しても〈＊生存〉判定が飛ばない" };
 
-          return { ok: true, detail: "リマインダ→ボタンで〈生存〉判定が飛んだ" };
+          return { ok: true, detail: `リマインダ→「${label}」で判定が飛んだ` };
         } finally {
           await combat.delete();
           await char.delete();

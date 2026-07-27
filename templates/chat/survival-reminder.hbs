@@ -9,7 +9,8 @@
           <button type="button" class="em-survival-reminder__roll" data-action="rollSurvival"
             data-actor-uuid="{{this.actorUuid}}">
             <i class="fa-solid fa-heart-pulse" inert></i>
-            <span>{{localize "EMOKLORE.ChatMessage.survivalReminder.Roll"}}</span>
+            {{! 「〈＊生存〉判定」。印は describeSkillLabel が付けるのでキーを直接引かない }}
+            <span>{{@root.rollLabel}}</span>
           </button>
         {{/if}}
       </li>

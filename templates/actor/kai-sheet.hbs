@@ -15,7 +15,7 @@
       組み立ての値である最大値だけを編集モードに残す。入力はスキーマから描くので、
       怪異のHP/MPが持つ min: 0 がそのまま効く }}
   <label class="em-kai__stat">
-    <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.hp.label"}}</span>
+    <span>{{systemFields.resources.fields.hp.label}}</span>
     <span class="em-kai__stat-edit">
       {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
       <span>/</span>
@@ -27,7 +27,7 @@
     </span>
   </label>
   <label class="em-kai__stat">
-    <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.mp.label"}}</span>
+    <span>{{systemFields.resources.fields.mp.label}}</span>
     <span class="em-kai__stat-edit">
       {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
       <span>/</span>
@@ -39,7 +39,7 @@
     </span>
   </label>
   <label class="em-kai__stat">
-    <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resources.armor.label"}}</span>
+    <span>{{systemFields.resources.fields.armor.label}}</span>
     {{#if isPlay}}
       <span>{{system.resources.armor}}</span>
     {{else}}
@@ -47,7 +47,7 @@
     {{/if}}
   </label>
   <label class="em-kai__stat">
-    <span>{{localize "EMOKLORE.Actor.kai.FIELDS.initiative.label"}}</span>
+    <span>{{systemFields.initiative.label}}</span>
     {{#if isPlay}}
       <span>{{system.initiative}}</span>
     {{else}}
@@ -80,7 +80,7 @@
   </header>
   <div class="em-kai__resonance">
     <label class="em-kai__field">
-      <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resonance.intensity.label"}}</span>
+      <span>{{systemFields.resonance.fields.intensity.label}}</span>
       {{#if isPlay}}
         <span>{{system.resonance.intensity}}</span>
       {{else}}
@@ -88,7 +88,7 @@
       {{/if}}
     </label>
     <label class="em-kai__field">
-      <span>{{localize "EMOKLORE.Actor.kai.FIELDS.resonance.rise.label"}}</span>
+      <span>{{systemFields.resonance.fields.rise.label}}</span>
       {{#if isPlay}}
         <span>{{system.resonance.rise}}</span>
       {{else}}

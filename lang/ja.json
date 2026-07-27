@@ -1,7 +1,7 @@
 {
   "TYPES": {
     "Actor": {
-      "character": "キャラクター",
+      "character": "共鳴者",
       "npc": "NPC",
       "kai": "怪異"
     },
@@ -76,7 +76,7 @@
   },
   "EMOKLORE": {
     "Common": {
-      "none": "なし"
+      "None": "なし"
     },
     "Pack": {
       "howlingReactions": "ハウリング反応",
@@ -235,7 +235,7 @@
     },
     "Sheet": {
       "class": {
-        "character": "キャラクターシート",
+        "character": "共鳴者シート",
         "weapon": "武器シート",
         "armor": "防具シート",
         "activeEffect": "効果シート",
@@ -244,7 +244,7 @@
         "kai": "怪異シート",
         "howling": "ハウリング反応シート"
       },
-      "toggleMode": "プレイ・編集モード切替",
+      "ToggleMode": "プレイ・編集モード切替",
       "character": {
         "tab": {
           "biography": "プロフィール",
@@ -252,7 +252,7 @@
           "items": "アイテム",
           "effects": "効果"
         },
-        "specialization": "分野"
+        "Specialization": "分野"
       },
       "npc": {
         "Skills": "技能",
@@ -390,7 +390,7 @@
         "Apply": "ダメージを適用",
         "ApplyWithReduction": "軽減して適用",
         "NoTarget": "ターゲットがいません。対象のトークンをターゲットしてください。",
-        "NoGM": "権限のないキャラクターに適用するにはGMの接続が必要です。",
+        "NoDealer": "権限のないキャラクターに適用するにはディーラーの接続が必要です。",
         "Applied": "{name} HP: {before} → {after}",
         "AppliedWithReduction": "{name} HP: {before} → {after}（軽減 {reduction}）",
         "AppliedWithArmor": "{name} HP: {before} → {after}（防具 {armor}）",
@@ -406,8 +406,7 @@
         "NoPermission": "このキャラクターに状態を付与する権限がありません。"
       },
       "survivalReminder": {
-        "Prompt": "ラウンド終了。【心肺停止】のキャラクターは〈＊生存〉判定（〈耐久〉〈根性〉で代用可）。失敗で【死亡】。",
-        "Roll": "〈生存〉判定"
+        "Prompt": "ラウンド終了。【心肺停止】のキャラクターは〈＊生存〉判定（〈耐久〉〈根性〉で代用可）。失敗で【死亡】。"
       },
       "kaiAttack": {
         "Judgment": "判定",
@@ -417,23 +416,23 @@
       },
       "skillRequest": {
         "Title": "判定の要求",
-        "NoActor": "振るアクターが決まりません。トークンを選ぶか、担当キャラクターを設定してください",
-        "NotCharacterLike": "この種別は技能判定を持ちません"
+        "NoActor": "振るアクターが決まりません。トークンを選ぶか、担当キャラクターを設定してください。",
+        "NotCharacterLike": "この種別は技能判定を持ちません。"
       },
       "resonanceRequest": {
         "Title": "共鳴判定の要求",
         "PossessionTitle": "憑依判定の要求",
         "Targets": "対象",
         "Roll": "共鳴判定を振る",
-        "NoActor": "振る共鳴者が決まりません。トークンを選ぶか、担当キャラクターを設定してください",
-        "NoGM": "共鳴値を上げる権限がありません。GMの接続が必要です"
+        "NoActor": "振る共鳴者が決まりません。トークンを選ぶか、担当キャラクターを設定してください。",
+        "NoDealer": "共鳴値を上げる権限がありません。ディーラーの接続が必要です。"
       },
       "resonanceOutcome": {
         "Raised": "{name} 〈∞共鳴〉Lv.{before} → Lv.{after}（+{rise}）",
         "Unchanged": "{name} 〈∞共鳴〉Lv.{after} のまま",
-        "Howling": "トリプル以上：ハウリング（極限共鳴）が発生。共鳴表を引いてください",
+        "Howling": "トリプル以上：ハウリング（極限共鳴）が発生。共鳴表を引いてください。",
         "Draw": "共鳴表を引く",
-        "PossessionReached": "成功数が【精神】以上。〈＊自我〉判定に失敗すると【憑依】が成立します"
+        "PossessionReached": "成功数が【精神】以上。〈＊自我〉判定に失敗すると【憑依】が成立します。"
       },
       "howlingDraw": {
         "Apply": "適用"
@@ -448,12 +447,12 @@
           "label": "技能"
         }
       },
-      "bar": {
-        "title": "行動値",
-        "preset": "プリセット",
-        "custom": "カスタム",
-        "noSkill": "技能なし",
-        "recomputeAll": "全員再算出"
+      "Bar": {
+        "Title": "行動値",
+        "Preset": "プリセット",
+        "Custom": "カスタム",
+        "NoSkill": "技能なし",
+        "RecomputeAll": "全員再算出"
       }
     },
     "ApplyDamage": {
@@ -699,36 +698,36 @@
       "PasteJSON": "JSONデータを貼り付け",
       "JSONPlaceholder": "キャラクターシートのJSONデータをここに貼り付けてください...",
       "Hint": "https://emoklore.charasheet.jp からエクスポートしたJSONデータを貼り付けてください。",
-      "Success": "{name}のデータをインポートしました",
-      "WarnUnknownEmotions": "共鳴感情「{labels}」は認識できなかったため取り込みませんでした",
-      "WarnUnknownSkills": "技能「{labels}」は認識できなかったため取り込みませんでした",
-      "ErrorEmptyInput": "JSONデータを入力してください",
-      "ErrorInvalidJSON": "無効なJSONデータです",
-      "ErrorInvalidKind": "キャラクターデータではありません",
-      "ErrorMissingData": "データが見つかりません",
-      "ErrorImportFailed": "インポートに失敗しました"
+      "Success": "{name}のデータをインポートしました。",
+      "WarnUnknownEmotions": "共鳴感情「{labels}」は認識できなかったため取り込みませんでした。",
+      "WarnUnknownSkills": "技能「{labels}」は認識できなかったため取り込みませんでした。",
+      "ErrorEmptyInput": "JSONデータを入力してください。",
+      "ErrorInvalidJSON": "無効なJSONデータです。",
+      "ErrorInvalidKind": "キャラクターデータではありません。",
+      "ErrorMissingData": "データが見つかりません。",
+      "ErrorImportFailed": "インポートに失敗しました。"
     },
     "SkillRequest": {
       "Title": "判定を要求",
       "Post": "チャットに出す",
       "Skills": "技能",
-      "SkillsHint": "Ctrl（⌘）を押しながらで複数選べます",
+      "SkillsHint": "Ctrl（⌘）を押しながらで複数選べます。",
       "WithBase": "ベース技能も併記する",
-      "WithBaseHint": "「〈観察眼〉または〈＊知覚〉で判定」の形になります",
+      "WithBaseHint": "「〈観察眼〉または〈＊知覚〉で判定」の形になります。",
       "NormalSkills": "通常技能",
       "BaseSkills": "基本技能",
       "Note": "補足",
       "NotePlaceholder": "この判定にだけ効く条件があれば",
       "ResonanceTitle": "共鳴判定を要求",
-      "RiseHint": "成功時に〈∞共鳴〉が上がる量。1D3 のようなダイス式も書けます",
-      "ForcedMatchHint": "自動なら、各共鳴者の感情と指定した感情から決まります",
+      "RiseHint": "成功時に〈∞共鳴〉が上がる量。1D3 のようなダイス式も書けます。",
+      "ForcedMatchHint": "自動なら、各共鳴者の感情と指定した感情から決まります。",
       "Possession": "憑依判定",
-      "PossessionHint": "成否によらず〈∞共鳴〉+1。ハウリングは起きず、成功数が【精神】以上かを見ます"
+      "PossessionHint": "成否によらず〈∞共鳴〉+1。ハウリングは起きず、成功数が【精神】以上かを見ます。"
     },
     "RollOptions": {
       "Title": "判定オプション",
       "DiceBonus": "ダイスボーナス",
-      "DiceBonusHint": "非常に有利な状況で1個、極めて有利な状況で2個が目安",
+      "DiceBonusHint": "非常に有利な状況で1個、極めて有利な状況で2個が目安。",
       "SuccessMod": "成功数修正",
       "Requirement": "必要成功数",
       "NoRequirement": "指定なし",
@@ -750,35 +749,35 @@
       "Open": "感情を選ぶ",
       "OpenAcquired": "追加取得を選ぶ",
       "AcquiredSection": "追加取得した共鳴感情",
-      "NoAcquired": "まだありません",
+      "NoAcquired": "まだありません。",
       "Unselected": "未選択",
       "Clear": "外す",
       "Confirm": "決定",
       "Cancel": "キャンセル",
-      "HintSlots": "枠を選んでから感情をクリックします",
-      "HintMany": "感情をクリックして選びます。もう一度クリックすると外れます"
+      "HintSlots": "枠を選んでから感情をクリックします。",
+      "HintMany": "感情をクリックして選びます。もう一度クリックすると外れます。"
     },
     "Resonance": {
-      "Name": "♾️共鳴",
+      "Name": "∞共鳴",
       "Intensity": "強度",
       "Rise": "上昇値",
       "Match": "一致度",
       "MatchAuto": "自動",
-      "MatchAutoHint": "選んだ感情と自分の共鳴感情から決まります。DLが一致度を指定したときは手で選んでください",
+      "MatchAutoHint": "選んだ感情と自分の共鳴感情から決まります。DLが一致度を指定したときは手で選んでください。",
       "MatchNone": "一致なし",
       "MatchRoot": "ルーツ属性一致",
       "MatchCompletely": "完全一致",
       "RollButton": "ロール",
-      "NotCharacter": "共鳴判定は共鳴者だけが振れます"
+      "NotCharacter": "共鳴判定は共鳴者だけが振れます。"
     },
     "Howling": {
       "RecoveryBySkill": "{skills} の成功で回復",
-      "NoTable": "この怪異に共鳴表が設定されていません",
-      "Exhausted": "共鳴表を引き切っています。表の「引いた」印を戻してください",
-      "NoActor": "共鳴者が見つかりません",
-      "NotOwner": "この共鳴者を操作する権限がありません",
-      "NoReaction": "ハウリング反応が見つかりません",
-      "Applied": "{name} に「{reaction}」を適用しました",
+      "NoTable": "この怪異に共鳴表が設定されていません。",
+      "Exhausted": "共鳴表を引き切っています。表の「引いた」印を戻してください。",
+      "NoActor": "共鳴者が見つかりません。",
+      "NotOwner": "この共鳴者を操作する権限がありません。",
+      "NoReaction": "ハウリング反応が見つかりません。",
+      "Applied": "{name} に「{reaction}」を適用しました。",
       "Section": "ハウリング",
       "Recover": "回復判定"
     },

@@ -385,6 +385,47 @@ export async function run({ page, check }) {
     ),
   );
 
+  // ラベルは systemFields から引く。**綴りを間違えると空文字になる** — Handlebars は
+  // 無い値を黙って空で返すので、未解決キーの検査（生の `EMOKLORE.…` を探す）では拾えない
+  await check("npc・怪異のラベルがスキーマから引けている", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const empty = [];
+        const seen = [];
+        for (const [type, targets] of [
+          ["npc", [".em-npc__resource"]],
+          ["kai", [".em-kai__stat", ".em-kai__field"]],
+        ]) {
+          const sheet = game.actors.getName(`${tag}_${type}`).sheet;
+          if (!sheet.rendered) await sheet.render(true);
+          await window.__setMode(sheet, "edit");
+
+          for (const selector of targets) {
+            for (const row of sheet.element.querySelectorAll(selector)) {
+              // ラベルは行の先頭の span（怪異）か、tooltip（NPCはアイコンだけなので）
+              const text = row.querySelector("span")?.textContent?.trim() ?? "";
+              const tooltip = row.dataset.tooltip ?? "";
+              const label = tooltip || text;
+              seen.push(label);
+              if (!label) empty.push(`${type} ${selector}`);
+            }
+          }
+          await window.__setMode(sheet, "play");
+        }
+
+        return {
+          ok: empty.length === 0 && seen.length > 0,
+          detail:
+            empty.length === 0
+              ? `${seen.length}件すべてラベルあり（${seen.slice(0, 4).join(" / ")}…）`
+              : `空のラベル: ${empty.join(", ")}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
   // 行の開く・消すはアクターシートの基底が持つ。行の解決を data-item-id の手辿りではなく
   // getEmbeddedDocument に任せているので、data-document-class が付いていないと何も起きない
   await check("npcの武器行を開けて消せる", () =>

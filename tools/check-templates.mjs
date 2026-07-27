@@ -4,6 +4,7 @@
 // 2. HTMLタグの対応を見る
 // 3. {{> "..."}} が指すpartialが実在するか見る
 // 4. どこからも参照されていないテンプレートを見つける
+// 5. ハッシュ引数つきで呼ばれるpartialが先頭コメントに @param を持つか見る
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import Handlebars from "handlebars";
@@ -112,10 +113,35 @@ for (const orphan of orphans) {
   errors.push(`${orphan}: どこからも参照されていない`);
 }
 
+// 引数を取る再利用部品は先頭のコメントに @param を書く（docs/ui-design.md）。
+// 引数なしで呼ぶpartialは現在のコンテキストがそのまま渡るだけなので対象にしない
+const withHashArgs = new Set();
+for (const file of templates) {
+  const source = readFileSync(file, "utf-8");
+  for (const [, path, args] of source.matchAll(/\{\{>\s*"([^"]+)"([\s\S]*?)\}\}/g)) {
+    if (!path.startsWith(SYSTEM_PREFIX)) continue;
+    if (/[A-Za-z_]\w*\s*=/.test(args)) withHashArgs.add(path.slice(SYSTEM_PREFIX.length));
+  }
+}
+for (const partial of [...withHashArgs].sort()) {
+  if (!existsSync(partial)) continue;
+  // 先頭のコメントブロックだけを見る。本文中の @param は目次にならない
+  const head = /^\s*\{\{!--([\s\S]*?)--\}\}|^\s*\{\{!([\s\S]*?)\}\}/.exec(
+    readFileSync(partial, "utf-8"),
+  );
+  const doc = head ? (head[1] ?? head[2] ?? "") : "";
+  if (!doc.includes("@param")) {
+    errors.push(`${partial}: ハッシュ引数で呼ばれるのに先頭コメントに @param が無い`);
+  }
+}
+
 if (errors.length > 0) {
   for (const error of errors) console.error(`NG ${error}`);
   console.error(`\ntemplates NG: ${errors.length}件`);
   process.exit(1);
 }
 
-console.log(`templates OK: ${templates.length}ファイル（構文・タグ対応・参照）`);
+console.log(
+  `templates OK: ${templates.length}ファイル（構文・タグ対応・参照、` +
+    `引数つきpartial ${withHashArgs.size}件の @param）`,
+);

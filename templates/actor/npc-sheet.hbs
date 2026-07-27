@@ -13,7 +13,7 @@
       最大値は能力値からの派生なので、どちらのモードでも表示だけ — 変えたいなら能力値を変える }}
   <div class="em-npc__resources">
     <label class="em-npc__resource"
-      data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.hp.label"}}">
+      data-tooltip="{{systemFields.resources.fields.hp.label}}">
       {{! HP/MPのアイコンは共鳴者のメータと同じものを使う（fa-heart / fa-wand-magic-sparkles） }}
       <i class="fa-solid fa-heart em-npc__resource-icon" inert></i>
       <span class="em-npc__resource-edit">
@@ -23,7 +23,7 @@
       </span>
     </label>
     <label class="em-npc__resource"
-      data-tooltip="{{localize "EMOKLORE.Actor.character.FIELDS.resources.mp.label"}}">
+      data-tooltip="{{systemFields.resources.fields.mp.label}}">
       <i class="fa-solid fa-wand-magic-sparkles em-npc__resource-icon" inert></i>
       <span class="em-npc__resource-edit">
         {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}

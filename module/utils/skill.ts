@@ -197,7 +197,7 @@ export const formatCharacteristicOptions = (options: Iterable<CharacteristicKey>
 
 /** 技能グループの表示名。所属しないカスタム技能は「なし」 */
 export const formatSkillGroup = (group: SkillGroupKey | ""): string =>
-  group ? CONFIG.EMOKLORE.skillGroups[group].label : _loc("EMOKLORE.Common.none");
+  group ? CONFIG.EMOKLORE.skillGroups[group].label : _loc("EMOKLORE.Common.None");
 
 /**
  * 表に居る技能への参照。保存データや選択の値に書ける形。
