@@ -61,13 +61,42 @@ const weaponCard = (page) =>
     return { "weapon-card": id };
   }, SHOT_NAMES);
 
-/** 怪異の攻撃カード。判定ありと判定なしの2枚（#110 の重複が写るのは後者） */
+/**
+ * 怪異の攻撃カード。3枚を撮る。
+ *
+ * 判定ありは「出しただけ」と「判定→ダメージまで押した」の2枚。押す前の姿は
+ * カードが最初に出る形なので、ここが読めるかどうかが実際の卓での見え方になる。
+ * 判定なしは判定を持たないぶん、押す回数が1つ少ない姿になる。
+ */
 const kaiAttacks = (page) =>
   page.eval(async (names) => {
     const kai = window.__shot.actor(names.kai);
-    const judged = await kai.rollKaiAttack(0);
-    const judgeless = await kai.rollKaiAttack(1);
-    return { "kai-attack": judged.id, "kai-attack-judgeless": judgeless.id };
+
+    const fresh = await kai.useKaiAttack(0);
+
+    const grown = await kai.useKaiAttack(0);
+    await window.__waitFor(() => game.messages.get(grown.id), { label: "怪異の攻撃カードの作成" });
+    await window.__cardAction(game.messages.get(grown.id), "rollAttack");
+    await window.__waitFor(() => game.messages.get(grown.id).rolls.length >= 1, {
+      label: "判定ロール",
+    });
+    await window.__cardAction(game.messages.get(grown.id), "rollDamage");
+    await window.__waitFor(() => game.messages.get(grown.id).rolls.length >= 2, {
+      label: "ダメージロール",
+    });
+
+    const judgeless = await kai.useKaiAttack(1);
+    await window.__waitFor(() => game.messages.get(judgeless.id), { label: "判定なしのカード" });
+    await window.__cardAction(game.messages.get(judgeless.id), "rollDamage");
+    await window.__waitFor(() => game.messages.get(judgeless.id).rolls.length >= 1, {
+      label: "ダメージロール",
+    });
+
+    return {
+      "kai-attack-fresh": fresh.id,
+      "kai-attack": grown.id,
+      "kai-attack-judgeless": judgeless.id,
+    };
   }, SHOT_NAMES);
 
 /** DLからの判定要求カード。チャット欄のボタン → ダイアログ、が実際の経路 */
