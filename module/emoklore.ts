@@ -4,22 +4,17 @@ import "../css/emoklore.css";
 import { api } from "./api";
 import { EmokloreActiveEffectConfig } from "./applications/active-effect-config";
 import { EmokloreArmorSheet } from "./applications/armor-sheet";
+import { applyDamage, applyDamageWithReduction } from "./applications/attack-card";
 import { EmokloreCharacterSheet } from "./applications/character-sheet";
 import { injectChatControls } from "./applications/chat-controls";
 import { EmokloreCombatTracker } from "./applications/combat-tracker";
 import { applyHowling, drawHowling } from "./applications/howling";
 import { EmokloreHowlingSheet } from "./applications/howling-sheet";
-import { applyKaiDamage } from "./applications/kai-attack";
 import { EmokloreKaiSheet } from "./applications/kai-sheet";
 import { EmokloreNpcSheet } from "./applications/npc-sheet";
 import { rollRequested, rollRequestedResonance } from "./applications/requests";
 import { EmokloreSkillSheet } from "./applications/skill-sheet";
-import {
-  applyDamage,
-  applyDamageWithReduction,
-  rollAttack,
-  rollDamage,
-} from "./applications/weapon-card";
+import { rollAttack, rollDamage } from "./applications/weapon-card";
 import { EmokloreWeaponSheet } from "./applications/weapon-sheet";
 import { EMOKLORE } from "./config/index";
 import { statusEffects } from "./config/status-effects";
@@ -144,14 +139,17 @@ Hooks.once("init", () => {
   CONFIG.Dice.terms.d = EmokloreDie;
 
   // カードのボタンはすべて applications/ 側にハンドラを置き、モジュールにも開いている
-  // ACTIONS の口から登録する。data/ から documents/ への逆依存を作らないため
+  // ACTIONS の口から登録する。data/ から documents/ への逆依存を作らないため。
+  //
+  // ダメージ適用の2つは攻撃カードで共通の実体を指す。表は AttackCardModel ではなく
+  // カードごとに持つ（addListeners が this.constructor から引くので、基底に置いても届かない）
   WeaponCardModel.ACTIONS.rollAttack = rollAttack;
   WeaponCardModel.ACTIONS.rollDamage = rollDamage;
   WeaponCardModel.ACTIONS.applyDamage = applyDamage;
   WeaponCardModel.ACTIONS.applyDamageWithReduction = applyDamageWithReduction;
 
-  // 怪異の攻撃カードの「ダメージ適用」
-  KaiAttackCardModel.ACTIONS.applyDamage = applyKaiDamage;
+  KaiAttackCardModel.ACTIONS.applyDamage = applyDamage;
+  KaiAttackCardModel.ACTIONS.applyDamageWithReduction = applyDamageWithReduction;
 
   // DLからの判定要求。押した人のアクターで振るので、これも applications/ 側から登録する
   SkillRequestModel.ACTIONS.rollRequested = rollRequested;

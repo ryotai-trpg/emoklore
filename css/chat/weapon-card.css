@@ -47,20 +47,4 @@
   .em-weapon-card__roll-label {
     margin: 0 0 var(--spacer-2);
   }
-
-  /* ボタンは縦に積む。チャットの幅は狭く、横並びにすると文字が潰れる */
-  .em-weapon-card__buttons {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacer-4);
-  }
-
-  /* 地・枠・角丸・ホバーは本体の --button-* が持っているので塗り直さない。
-     アイコンと文字の間隔だけ足す */
-  .em-weapon-card__buttons button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacer-4);
-  }
 }

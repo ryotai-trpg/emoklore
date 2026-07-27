@@ -1,9 +1,9 @@
 /**
- * 武器カードのボタンのハンドラ。
+ * 武器カードのうち、武器に固有のボタンのハンドラ。
  *
- * 判定とダメージ適用を駆動するので `data/` には置かず、`emoklore.ts` の init から
+ * 判定を駆動するので `data/` には置かず、`emoklore.ts` の init から
  * `WeaponCardModel.ACTIONS` に登録する。`data/` から `documents/` への逆依存を作らない
- * ためで、他のカードと同じ形。
+ * ためで、他のカードと同じ形。ダメージ適用は怪異カードと共通なので `attack-card.ts` にある。
  */
 
 import { updateWeaponCard } from "../chat/weapon-card";
@@ -13,8 +13,6 @@ import type { WeaponCardModel, WeaponCardState } from "../data/messages/weapon-c
 import type { EmokloreActor } from "../documents/actor";
 import { buildDamageFormula, resolveStrengthBonus } from "../rules/weapon-damage";
 import { resolveAttackSkill } from "../utils/weapon";
-import { applyDamageAndReport, requireTargets } from "./damage";
-import { promptDamageReduction } from "./dialogs/apply-damage-dialog";
 
 /**
  * 攻撃判定を振り、同じカードに書き足す。
@@ -78,37 +76,6 @@ export async function rollDamage(this: WeaponCardModel): Promise<void> {
   await applyRoll(this, rolls, { damageTotal: roll.total ?? 0 });
 
   Hooks.callAll("emoklore.rollDamage", this.message, roll);
-}
-
-/** 振ったダメージを、押した瞬間のターゲットにそのまま適用する */
-export async function applyDamage(this: WeaponCardModel): Promise<void> {
-  const amount = this.damageTotal;
-  // canApplyDamage と同じ条件だが、ダメージ量の型を絞るためここでは直接見る
-  if (amount === null) return;
-
-  const targets = requireTargets();
-  if (!targets) return;
-
-  await applyDamageAndReport(targets, amount);
-}
-
-/**
- * 「軽減して適用」。軽減値と防具を尋ねてから適用する。
- *
- * 対象は押した瞬間に凍結する。ダイアログを開いている間にターゲットを付け替えても、
- * 防御判定を振った相手と適用先が食い違わないようにするため。
- */
-export async function applyDamageWithReduction(this: WeaponCardModel): Promise<void> {
-  const amount = this.damageTotal;
-  if (amount === null) return;
-
-  const targets = requireTargets();
-  if (!targets) return;
-
-  const input = await promptDamageReduction({ amount, successCount: this.successCount, targets });
-  if (!input) return;
-
-  await applyDamageAndReport(targets, amount, { reduction: input.reduction, armor: input.armor });
 }
 
 /** ロールと状態をカードに書き戻す。描き直しとダイス音は chat/ 側が持つ */
