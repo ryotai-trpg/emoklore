@@ -105,7 +105,7 @@ export const installPageHelpers = (page) =>
     /**
      * 閲覧/編集の切替ボタン。
      *
-     * mixin が `_renderFrame` でウィンドウ枠に足すので、シート本体（`sheet.element`）の
+     * mixin が `_onRender` でウィンドウ枠に足すので、シート本体（`sheet.element`）の
      * 外にある。見つからないまま `?.click()` で流すと「切り替えたつもりで閲覧のまま
      * 検証していた」ことに気付けないので、無ければ投げる。
      */
