@@ -43,6 +43,32 @@ const attackFieldLabels = (): { judgeless: string; mpCost: string } => {
 };
 
 /**
+ * ヘッダの補足に並べる断片。
+ *
+ * **まだ解決していないものだけを置く。** 判定を振れば `2DM≦7` はロールの式として、
+ * ダメージを振れば `@successd4+3` は差し替え済みの式として、それぞれ下に出る。
+ * ヘッダにも残すと同じものが1枚に二度出ることになる（Issue #110 と同じ形）。
+ *
+ * 判定なしの成功数だけは例外で、振るものが無く下に出る先が無いのでここに残す。
+ */
+const buildMetaParts = (state: KaiAttackCardState): string[] => {
+  const labels = attackFieldLabels();
+  const parts: string[] = [];
+
+  if (state.judgeless) {
+    parts.push(labels.judgeless);
+    parts.push(`${_loc("EMOKLORE.ChatMessage.kaiAttack.SuccessCount")} ${state.successCount}`);
+  } else if (state.successCount === null) {
+    parts.push(`${state.diceCount}DM≦${state.target}`);
+  }
+
+  if (state.damageFormula !== "" && state.damageTotal === null) parts.push(state.damageFormula);
+  if (state.mpCost) parts.push(`${labels.mpCost} ${state.mpCost}`);
+
+  return parts;
+};
+
+/**
  * 怪異の攻撃カードのHTMLを組み立てる。
  *
  * 状態をモデルからではなく引数で受けるのは、更新の直前に「これから保存する状態」で
@@ -55,7 +81,7 @@ async function renderKaiAttackCard(
   return foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     ...state,
     ...resolveCardButtons(state, canRollKaiDamage(state)),
-    attackLabels: attackFieldLabels(),
+    metaParts: buildMetaParts(state),
     judgmentHTML: attackRoll ? await attackRoll.render() : "",
     damageHTML: damageRoll ? await damageRoll.render() : "",
   });
