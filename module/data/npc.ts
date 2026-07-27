@@ -11,8 +11,7 @@ const { SetField, StringField } = foundry.data.fields;
  * 共鳴者との違いは持たないもの側にある — 共鳴値・共鳴感情・経歴・キャラポイント予算を持たず、
  * シートも軽量にする。判定の計算は共鳴者と1つの実装を共有する。
  *
- * かつては `wickedness`（邪気）だけを持つ登録外の stub だった。邪気はルールブックに該当が
- * 無いので落とした（Issue #81）。怪異の「強度」は共鳴強度で、邪気とは別物。
+ * **「邪気」は持たない。** ルールブックに該当が無く、怪異の「強度」は共鳴強度で別物。
  */
 export class NpcDataModel extends CharacterLikeDataModel {
   /** 閲覧モードで並べる基本技能。空なら基本技能の欄そのものを出さない */

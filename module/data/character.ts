@@ -59,7 +59,7 @@ export class CharacterDataModel extends CharacterLikeDataModel {
         root: new StringField(),
 
         // 共振や怪異の付与で後から増える枠。3枠と違って枚数が決まらないので Set で持つ。
-        // 感情マッチングは3枠とこれを合わせて見る（#75）。編集UIが付くのも #75
+        // 感情マッチングは3枠とこれを合わせて見る。編集は効果タブの感情ピッカーが行う
         acquired: new SetField(
           new StringField({
             required: true,

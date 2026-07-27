@@ -60,9 +60,10 @@ const defineDamageAppliedSchema = () => {
 /**
  * ダメージ適用（とMP減少）の結果を知らせるChatMessage。
  *
- * 以前は subtype なしの content だけのメッセージだったが、境界の案内に
- * ステータス付与のボタンを載せるにはリスナの配線先（system.addListeners）が要る。
- * 武器カードと同じ形のサブタイプにして、`renderChatMessageHTML` の汎用配線に乗せる。
+ * 境界の案内にステータス付与のボタンを載せるには、リスナの配線先
+ * （`system.addListeners`）が要る。subtype なしの content だけのメッセージでは
+ * そこが無いので、武器カードと同じ形のサブタイプにして
+ * `renderChatMessageHTML` の汎用配線に乗せる。
  */
 export class DamageAppliedModel extends ChatCardModel {
   declare resource: ResourceKind;

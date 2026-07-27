@@ -47,8 +47,8 @@ export class EmokloreCombat extends Combat {
    * ラウンド終了時、【心肺停止】のキャラクターに〈＊生存〉判定を促すリマインダを出す。
    *
    * 本体の #triggerTurnEvents はGM限定なので、リマインダはGMのクライアントで1枚だけ作られる。
-   * 表示のみで、判定の強制や【死亡】の自動付与はしない（#86 と同じ方針）。ラウンド進行が線形な
-   * 通常の進み方でこのフックは発火する。
+   * 表示のみで、判定の強制や【死亡】の自動付与はしない（HP/MP境界の案内と同じ方針）。
+   * ラウンド進行が線形な通常の進み方でこのフックは発火する。
    */
   override async _onEndRound(context: Parameters<Combat["_onEndRound"]>[0]): Promise<void> {
     await super._onEndRound(context);

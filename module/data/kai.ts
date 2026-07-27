@@ -63,7 +63,7 @@ const defineKaiDataModelSchema = () => ({
   // 非既定の基準（@characteristics.X.value）では解決できないが、基準はDLが選ぶので許容する
   initiative: new NumberField({ required: true, integer: true, initial: 0 }),
 
-  // 共鳴感情（複数）。#74 の感情ピッカーで置き換わるまでは素の複数選択で編集する。
+  // 共鳴感情（複数）。編集は怪異シートの感情ピッカーが行う。
   // 保存されるのは感情キー。ラベルは CONFIG.EMOKLORE から引く
   emotions: new SetField(
     new StringField({
@@ -73,12 +73,12 @@ const defineKaiDataModelSchema = () => ({
     }),
   ),
 
-  // 共鳴判定のプリセット。怪異シートから #75 の共鳴判定要求をこの値で起動する
+  // 共鳴判定のプリセット。怪異シートの「共鳴判定を要求」がこの値で要求カードを出す
   resonance: new SchemaField({
     // 強度（判定値）
     intensity: new NumberField({ required: true, integer: true, min: 1, initial: 5 }),
     // 上昇値。成功時の〈∞共鳴〉上昇量。ダイス式も受ける（公式シナリオに 上昇1D3 の例）。
-    // 上昇の適用そのものは #75 の担当で、ここは値を保持するだけ
+    // ここは値を保持するだけで、上昇の適用は applications/requests.ts の raiseResonance が行う
     rise: new StringField({
       required: true,
       blank: true,

@@ -17,7 +17,7 @@ export type ResonanceOutcomeState = {
 };
 
 const defineResonanceOutcomeSchema = () => ({
-  // 振った共鳴者。効果の適用先を #79 がここから辿る
+  // 振った共鳴者。引いたハウリング反応の適用先をここから辿る
   actorUuid: new DocumentUUIDField({ type: "Actor", nullable: true, initial: null }),
   name: new StringField({ required: true, blank: true, initial: "" }),
 
@@ -34,7 +34,7 @@ const defineResonanceOutcomeSchema = () => ({
   // 憑依判定で、成功数が【精神】以上に届いたか
   possessionReached: new BooleanField({ required: true, initial: false }),
 
-  // 引く共鳴表／デッキを辿るための怪異。#79 が使う
+  // 引く共鳴表を辿るための怪異。「共鳴表を引く」ボタンがここから表に行き着く
   kaiUuid: new DocumentUUIDField({ type: "Actor", nullable: true, initial: null }),
 });
 
