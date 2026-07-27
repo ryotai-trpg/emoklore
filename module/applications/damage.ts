@@ -26,7 +26,7 @@ export async function applyDamageAndReport(
 ): Promise<void> {
   const applied = await applyDamageToTargets(targets, amount, { reduction, armor });
   if (!applied) {
-    ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoDealer", { localize: true });
+    ui.notifications?.warn("EMOKLORE.ChatMessage.Common.NoDealer", { localize: true });
     return;
   }
 
@@ -43,6 +43,6 @@ export function requireTargets(): EmokloreActor[] | null {
   const targets = resolveTargetActors();
   if (targets.length > 0) return targets;
 
-  ui.notifications?.warn("EMOKLORE.ChatMessage.weapon.NoTarget", { localize: true });
+  ui.notifications?.warn("EMOKLORE.ChatMessage.Common.NoTarget", { localize: true });
   return null;
 }

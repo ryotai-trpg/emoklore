@@ -66,7 +66,7 @@ export async function promptDamageReduction({
     window: { title: "EMOKLORE.ApplyDamage.Title" },
     content,
     ok: {
-      label: "EMOKLORE.ChatMessage.weapon.Apply",
+      label: "EMOKLORE.ChatMessage.attack.Apply",
       callback: (_event: Event, button: HTMLElement) => readInput(button),
     },
     // content 内の data-action は ApplicationV2 のアクション機構がここに振り分ける
