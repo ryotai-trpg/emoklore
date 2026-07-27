@@ -3,7 +3,7 @@
  *
  * 共鳴結果カードの「共鳴表を引く」と、引いた結果カードの「適用」。どちらもドキュメントの
  * 作成を駆動するので `data/` には置かず、`emoklore.ts` の init からそれぞれの `ACTIONS` に
- * 登録する（architecture.md 課題5 を繰り返さない）。
+ * 登録する（code-design.md「層とimportの方向」）。
  */
 
 import { buildHowlingDrawState, createHowlingDrawMessage } from "../chat/howling-draw";

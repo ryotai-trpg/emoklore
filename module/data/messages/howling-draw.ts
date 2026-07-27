@@ -55,7 +55,7 @@ const defineHowlingDrawSchema = () => ({
  * で、要求カードや生存リマインダと同じ扱い。いま何を受けているかは共鳴者の効果タブが持つ。
  *
  * ボタンのハンドラは持たない。アイテムの作成を駆動するので `applications/` 側に置き、
- * `emoklore.ts` の init が `ACTIONS` へ登録する（architecture.md 課題5 を繰り返さない）。
+ * `emoklore.ts` の init が `ACTIONS` へ登録する（code-design.md「層とimportの方向」）。
  */
 export class HowlingDrawModel extends ChatCardModel {
   declare actorUuid: string | null;

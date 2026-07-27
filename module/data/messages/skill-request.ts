@@ -52,7 +52,7 @@ const defineSkillRequestSchema = () => ({
  * 書き戻す形にはせず、各自の判定結果は別のメッセージとして出す（生存リマインダと同じ）。
  *
  * ボタンのハンドラは持たない。判定を駆動するので `applications/` 側に置き、`emoklore.ts` の
- * init が `ACTIONS` へ登録する（architecture.md 課題5 を繰り返さない）。
+ * init が `ACTIONS` へ登録する（code-design.md「層とimportの方向」）。
  */
 export class SkillRequestModel extends ChatCardModel {
   declare skills: RequestedSkill[];
