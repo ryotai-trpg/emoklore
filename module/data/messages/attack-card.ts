@@ -69,6 +69,16 @@ export class AttackCardModel extends ChatCardModel {
   declare successCount: number | null;
   declare damageTotal: number | null;
 
+  /**
+   * メッセージ自身を書き換えるボタンの `data-action`。
+   *
+   * 本体は**作成者にしか OWNER を返さない**（`ChatMessage#getUserLevel`）ので、これらは
+   * 作成者とDL以外が押しても `message.update()` が通らない。`ACTIONS` と同じくモジュールが
+   * 足せるよう、表として持つ。ダメージ適用はここに入らない — あちらはメッセージを
+   * 書き換えず、権限が足りなければGMへ委譲する（`documents/queries.ts`）。
+   */
+  static OWNER_ACTIONS: string[] = ["rollAttack", "rollDamage"];
+
   static override defineSchema() {
     return {
       // まだ振っていなければ null。ボタンの出し分けはこの2つで決まる
@@ -113,6 +123,35 @@ export class AttackCardModel extends ChatCardModel {
   /** ボタンの出し分け。描画側と同じ判定を使う */
   get buttons(): CardButtons {
     return resolveCardButtons(this);
+  }
+
+  /**
+   * 配線に加えて、押しても通らないボタンを落とす。
+   *
+   * **`content` は作成者のクライアントが描いて保存した1本のHTML**なので、全員に同じものが
+   * 届く。テンプレートでは見る人によって出し分けられず、描画のたびに走るここで落とすしかない。
+   *
+   * 効いてくるのは怪異の攻撃カードで、DLが出したものを卓の全員が見る。落とさないと
+   * プレイヤーの画面に押せない〔判定〕〔ダメージ〕が並び、押すと権限エラーの通知が出る。
+   * 武器カードでも同じ経路を通るが、あちらは押すのが作成者本人なので普段は何も起きない。
+   */
+  override addListeners(html: HTMLElement): void {
+    super.addListeners(html);
+
+    if (this.message.isOwner) return;
+
+    const cls = this.constructor as typeof AttackCardModel;
+    const card = html.querySelector(cls.CARD.root);
+    if (!card) return;
+
+    for (const action of cls.OWNER_ACTIONS) {
+      for (const button of card.querySelectorAll(`[data-action="${action}"]`)) {
+        const row = button.parentElement;
+        button.remove();
+        // 空になったボタンの行は間隔だけが残るので畳む
+        if (row && row.childElementCount === 0) row.remove();
+      }
+    }
   }
 }
 

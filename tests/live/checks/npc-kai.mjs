@@ -282,6 +282,72 @@ export async function run({ page, check }) {
   );
   await pinDice(page, DICE.alwaysHit);
 
+  await check("所有していない人には判定のボタンが出ず、結果だけが見える", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const kai = game.actors.getName(`${tag}_kai`);
+        // ボタン列だけを見る。ロールの描画には本体の expandRoll が入っていて、
+        // あれはカードのボタンではないので数に含めない
+        const actionsOf = (html) =>
+          [...html.querySelectorAll(".em-kai-attack-card__buttons [data-action]")]
+            .map((el) => el.dataset.action)
+            .join(",");
+
+        // 保存された content は作成者が描いた1本で、全員に同じものが届く。
+        // 落とすのは addListeners の側なので、同じ content を2通りに描いて比べる
+        const render = (card, asOwner) => {
+          const el = document.createElement("div");
+          el.innerHTML = card.content;
+          // 検証はDL（常にOWNER）で走るので、所有していない状態を作って通す
+          if (!asOwner) Object.defineProperty(card, "isOwner", { get: () => false });
+          card.system.addListeners(el);
+          if (!asOwner) delete card.isOwner;
+          return el;
+        };
+
+        // まだ振っていないカード。〔判定〕を持つのはこの段だけ
+        const freshMsg = await kai.useKaiAttack(0);
+        await window.__waitFor(() => game.messages.get(freshMsg.id), { label: "カードの作成" });
+        const fresh = game.messages.get(freshMsg.id);
+        const freshOwner = actionsOf(render(fresh, true));
+        const freshOther = render(fresh, false);
+
+        // 振り終わったカード。適用は権限が足りなければGMへ委譲するので落とさない
+        const doneMsg = await kai.useKaiAttack(0);
+        const id = doneMsg.id;
+        await window.__waitFor(() => game.messages.get(id), { label: "カードの作成" });
+        await window.__cardAction(game.messages.get(id), "rollAttack");
+        await window.__waitFor(() => game.messages.get(id).system.successCount !== null, {
+          soft: true,
+          label: "判定の成功数",
+        });
+        await window.__cardAction(game.messages.get(id), "rollDamage");
+        await window.__waitFor(() => game.messages.get(id).system.damageTotal !== null, {
+          soft: true,
+          label: "ダメージの反映",
+        });
+        const done = game.messages.get(id);
+        const doneOther = actionsOf(render(done, false));
+
+        const ok =
+          freshOwner === "rollAttack" &&
+          actionsOf(freshOther) === "" &&
+          // 空になったボタンの行ごと畳む
+          freshOther.querySelector(".em-kai-attack-card__buttons") === null &&
+          // 攻撃の内容は残る
+          freshOther.textContent.includes("2DM≦7") &&
+          doneOther === "applyDamage,applyDamageWithReduction" &&
+          done.system.damageTotal !== null;
+        return {
+          ok,
+          detail: `振る前 所有者=${freshOwner || "なし"} 他=${actionsOf(freshOther) || "なし"} ／ 振ったあと 他=${doneOther || "なし"}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
   await check("怪異カードにも武器カードと同じ適用ボタンが配線されている", () =>
     assertInPage(page, () => {
       const kai = CONFIG.ChatMessage.dataModels.kaiAttack;
