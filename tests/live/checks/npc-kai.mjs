@@ -1,7 +1,7 @@
 // 人間NPC（npc）と怪異（kai）の作成・シート描画・判定・攻撃・初速・装甲。
 // 静的チェックでは通らない、種別ごとのランタイムの形を見る。
 import { TAG } from "../lib/config.mjs";
-import { assertInPage } from "../lib/harness.mjs";
+import { assertInPage, DICE, pinDice } from "../lib/harness.mjs";
 
 export const title = "NPC・怪異";
 
@@ -21,7 +21,7 @@ export async function run({ page, check }) {
         // 怪異は攻撃リスト・装甲・固定初速・共鳴感情（Set）を持つ
         const kaiOk =
           kai?.type === "kai" &&
-          kai.system.attacks.length === 2 &&
+          kai.system.attacks.length === 3 &&
           kai.system.resources.armor === 5 &&
           kai.system.initiative === 6 &&
           kai.system.emotions.has("selfAssertion");
@@ -128,46 +128,239 @@ export async function run({ page, check }) {
     ),
   );
 
-  await check("怪異の攻撃が判定とダメージのカードに出る（D4の自由式）", () =>
+  await check("怪異の攻撃カードが 判定→ダメージ と進む（D4の自由式）", () =>
     assertInPage(
       page,
       async (tag) => {
         const kai = game.actors.getName(`${tag}_kai`);
-        const msg = await kai.rollKaiAttack(0);
-        // サブタイプは update で作り直されるので id から引き直す
-        const sys = game.messages.get(msg.id).system;
+        const msg = await kai.useKaiAttack(0);
+        const id = msg.id;
+        await window.__waitFor(() => game.messages.get(id), { label: "怪異の攻撃カードの作成" });
+
+        // 出した時点では何も振っていない。押す前に判定のボタンだけが出ている
+        const fresh = game.messages.get(id).system;
+        if (fresh.successCount !== null || fresh.damageTotal !== null) {
+          return { ok: false, detail: "カードを出しただけで振られている" };
+        }
+        if (!fresh.buttons.canRollAttack || fresh.buttons.canRollDamage) {
+          return { ok: false, detail: `押す前のボタン: ${JSON.stringify(fresh.buttons)}` };
+        }
+
+        // update のたびにモデルは作り直されるので、毎回メッセージから取り直す
+        await window.__cardAction(game.messages.get(id), "rollAttack");
+        const afterAttack = await window.__waitFor(
+          () => {
+            const sys = game.messages.get(id).system;
+            return sys.successCount === null ? null : sys;
+          },
+          { soft: true, label: "判定の成功数" },
+        );
+        if (!afterAttack) return { ok: false, detail: "判定のあとも successCount が null" };
+
+        await window.__cardAction(game.messages.get(id), "rollDamage");
+        await window.__waitFor(() => game.messages.get(id).system.damageTotal !== null, {
+          soft: true,
+          label: "ダメージの反映",
+        });
+
+        const card = game.messages.get(id);
         // alwaysHit（出目1）なので各D4=1。ダメージ式 @successd4+3 は成功数個のD4＋3になり、
         // damageTotal === 成功数 + 3 が成り立てば @success の差し替えと D4 の評価が効いている
         const ok =
-          msg.type === "kaiAttack" &&
-          sys.successCount > 0 &&
-          sys.damageTotal === sys.successCount + 3 &&
-          msg.rolls.length === 2;
+          card.type === "kaiAttack" &&
+          afterAttack.successCount > 0 &&
+          card.system.damageTotal === afterAttack.successCount + 3 &&
+          card.rolls.length === 2 &&
+          card.system.buttons.canApplyDamage;
         return {
           ok,
-          detail: `成功数${sys.successCount} ダメージ${sys.damageTotal}（成功数D4+3, D4=1） 判定+ダメージ${msg.rolls.length}本`,
+          detail: `成功数${afterAttack.successCount} ダメージ${card.system.damageTotal}（成功数D4+3, D4=1） 判定+ダメージ${card.rolls.length}本`,
         };
       },
       TAG,
     ),
   );
 
-  await check("判定なしの攻撃は固定成功数でダメージまで通る", () =>
+  await check("判定なしの攻撃は固定成功数で出て、ダメージだけ振れる", () =>
     assertInPage(
       page,
       async (tag) => {
         const kai = game.actors.getName(`${tag}_kai`);
-        const msg = await kai.rollKaiAttack(1);
-        const sys = game.messages.get(msg.id).system;
-        // judgeless: 判定を振らず固定成功数3、ダメージ "1"、ロールはダメージ1本だけ
-        const ok = sys.successCount === 3 && sys.damageTotal === 1 && msg.rolls.length === 1;
+        const msg = await kai.useKaiAttack(1);
+        const id = msg.id;
+        await window.__waitFor(() => game.messages.get(id), { label: "怪異の攻撃カードの作成" });
+
+        // judgeless は振るものが無いので、固定成功数3が最初から入って出る
+        const fresh = game.messages.get(id).system;
+        if (fresh.successCount !== 3 || fresh.buttons.canRollAttack) {
+          return {
+            ok: false,
+            detail: `成功数${fresh.successCount} ボタン${JSON.stringify(fresh.buttons)}`,
+          };
+        }
+
+        await window.__cardAction(game.messages.get(id), "rollDamage");
+        await window.__waitFor(() => game.messages.get(id).system.damageTotal !== null, {
+          soft: true,
+          label: "ダメージの反映",
+        });
+
+        const card = game.messages.get(id);
+        // ダメージ "1" の1本だけが載る。判定を振っていないので rolls[0] はダメージで、
+        // 位置で解釈すると判定として読まれる。描いた見出しと、番号を決める getter の両方を見る
+        const headings = [
+          ...new Set([...card.content.matchAll(/roll-label">\s*([^<]+?)\s*</g)].map((m) => m[1])),
+        ];
+        const ok =
+          card.system.damageTotal === 1 &&
+          card.rolls.length === 1 &&
+          headings.length === 1 &&
+          headings[0] === game.i18n.localize("EMOKLORE.ChatMessage.kaiAttack.Damage") &&
+          card.system.attackRoll === undefined;
         return {
           ok,
-          detail: `成功数${sys.successCount}(固定) ダメージ${sys.damageTotal} ロール${msg.rolls.length}本`,
+          detail: `成功数${card.system.successCount}(固定) ダメージ${card.system.damageTotal} ロール${card.rolls.length}本 見出し=${headings.join("・") || "なし"} 判定ロール=${card.system.attackRoll === undefined ? "なし" : "あり"}`,
         };
       },
       TAG,
     ),
+  );
+
+  await check("ダメージ式が空の攻撃はダメージのボタンが出ない", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const kai = game.actors.getName(`${tag}_kai`);
+        const msg = await kai.useKaiAttack(2);
+        const id = msg.id;
+        await window.__waitFor(() => game.messages.get(id), { label: "怪異の攻撃カードの作成" });
+
+        await window.__cardAction(game.messages.get(id), "rollAttack");
+        await window.__waitFor(() => game.messages.get(id).system.successCount !== null, {
+          soft: true,
+          label: "判定の成功数",
+        });
+
+        const card = game.messages.get(id);
+        const ok = card.system.successCount > 0 && !card.system.buttons.canRollDamage;
+        return {
+          ok,
+          detail: `成功数${card.system.successCount} ボタン${JSON.stringify(card.system.buttons)}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
+  // 外れる出目に固定して「命中しなければダメージを振れない」を見る。触った設定は必ず戻す
+  await pinDice(page, DICE.alwaysMiss);
+  await check("命中しなければダメージを振れない", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const kai = game.actors.getName(`${tag}_kai`);
+        const msg = await kai.useKaiAttack(0);
+        const id = msg.id;
+        await window.__waitFor(() => game.messages.get(id), { label: "怪異の攻撃カードの作成" });
+
+        await window.__cardAction(game.messages.get(id), "rollAttack");
+        await window.__waitFor(() => game.messages.get(id).system.successCount !== null, {
+          soft: true,
+          label: "判定の成功数",
+        });
+
+        const card = game.messages.get(id);
+        const ok = card.system.successCount <= 0 && !card.system.buttons.canRollDamage;
+        return {
+          ok,
+          detail: `成功数${card.system.successCount} ボタン${JSON.stringify(card.system.buttons)}`,
+        };
+      },
+      TAG,
+    ),
+  );
+  await pinDice(page, DICE.alwaysHit);
+
+  await check("所有していない人には判定のボタンが出ず、結果だけが見える", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const kai = game.actors.getName(`${tag}_kai`);
+        // ボタン列だけを見る。ロールの描画には本体の expandRoll が入っていて、
+        // あれはカードのボタンではないので数に含めない
+        const actionsOf = (html) =>
+          [...html.querySelectorAll(".em-kai-attack-card__buttons [data-action]")]
+            .map((el) => el.dataset.action)
+            .join(",");
+
+        // 保存された content は作成者が描いた1本で、全員に同じものが届く。
+        // 落とすのは addListeners の側なので、同じ content を2通りに描いて比べる
+        const render = (card, asOwner) => {
+          const el = document.createElement("div");
+          el.innerHTML = card.content;
+          // 検証はDL（常にOWNER）で走るので、所有していない状態を作って通す
+          if (!asOwner) Object.defineProperty(card, "isOwner", { get: () => false });
+          card.system.addListeners(el);
+          if (!asOwner) delete card.isOwner;
+          return el;
+        };
+
+        // まだ振っていないカード。〔判定〕を持つのはこの段だけ
+        const freshMsg = await kai.useKaiAttack(0);
+        await window.__waitFor(() => game.messages.get(freshMsg.id), { label: "カードの作成" });
+        const fresh = game.messages.get(freshMsg.id);
+        const freshOwner = actionsOf(render(fresh, true));
+        const freshOther = render(fresh, false);
+
+        // 振り終わったカード。適用は権限が足りなければGMへ委譲するので落とさない
+        const doneMsg = await kai.useKaiAttack(0);
+        const id = doneMsg.id;
+        await window.__waitFor(() => game.messages.get(id), { label: "カードの作成" });
+        await window.__cardAction(game.messages.get(id), "rollAttack");
+        await window.__waitFor(() => game.messages.get(id).system.successCount !== null, {
+          soft: true,
+          label: "判定の成功数",
+        });
+        await window.__cardAction(game.messages.get(id), "rollDamage");
+        await window.__waitFor(() => game.messages.get(id).system.damageTotal !== null, {
+          soft: true,
+          label: "ダメージの反映",
+        });
+        const done = game.messages.get(id);
+        const doneOther = actionsOf(render(done, false));
+
+        const ok =
+          freshOwner === "rollAttack" &&
+          actionsOf(freshOther) === "" &&
+          // 空になったボタンの行ごと畳む
+          freshOther.querySelector(".em-kai-attack-card__buttons") === null &&
+          // 攻撃の内容は残る
+          freshOther.textContent.includes("2DM≦7") &&
+          doneOther === "applyDamage,applyDamageWithReduction" &&
+          done.system.damageTotal !== null;
+        return {
+          ok,
+          detail: `振る前 所有者=${freshOwner || "なし"} 他=${actionsOf(freshOther) || "なし"} ／ 振ったあと 他=${doneOther || "なし"}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
+  await check("怪異カードにも武器カードと同じ適用ボタンが配線されている", () =>
+    assertInPage(page, () => {
+      const kai = CONFIG.ChatMessage.dataModels.kaiAttack;
+      const weapon = CONFIG.ChatMessage.dataModels.weapon;
+      // 適用の2つは実体を共有する。名前だけ揃えて別物を指していないことを見る
+      const shared = ["applyDamage", "applyDamageWithReduction"].filter(
+        (name) => kai.ACTIONS[name] && kai.ACTIONS[name] === weapon.ACTIONS[name],
+      );
+      const own = ["rollAttack", "rollDamage"].filter((name) => !!kai.ACTIONS[name]);
+      return {
+        ok: shared.length === 2 && own.length === 2,
+        detail: `共有=${shared.join(",") || "なし"} 固有=${own.join(",") || "なし"}`,
+      };
+    }),
   );
 
   await check("怪異の固定イニシアチブが既定基準（@initiative）で解決する", () =>

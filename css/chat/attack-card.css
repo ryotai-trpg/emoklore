@@ -1,0 +1,37 @@
+/* 攻撃カード（武器・怪異）で共通のボタン列。
+
+   どちらも chat 層に閉じているので部品は作らず、セレクタを並べる
+   （docs/ui-design.md「重複をどこに寄せるか」）。ここに置くのは、
+   片方のカードのファイルにもう片方のクラス名を書かせないため */
+
+@layer chat {
+  /* メタ行の区切り。主役より一段引かせる */
+  .em-weapon-card__sep,
+  .em-kai-attack-card__sep {
+    opacity: 0.5;
+  }
+
+  /* ロールの見出し。下だけ詰める */
+  .em-weapon-card__roll-label,
+  .em-kai-attack-card__roll-label {
+    margin: 0 0 var(--spacer-2);
+  }
+
+  /* ボタンは縦に積む。チャットの幅は狭く、横並びにすると文字が潰れる */
+  .em-weapon-card__buttons,
+  .em-kai-attack-card__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacer-4);
+  }
+
+  /* 地・枠・角丸・ホバーは本体の --button-* が持っているので塗り直さない。
+     アイコンと文字の間隔だけ足す */
+  .em-weapon-card__buttons button,
+  .em-kai-attack-card__buttons button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacer-4);
+  }
+}

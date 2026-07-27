@@ -8,7 +8,6 @@ import type { KaiDataModel } from "../data/kai";
 import type { KaiAttackCardState } from "../data/messages/kai-attack-card";
 import type { NpcDataModel } from "../data/npc";
 import { EmokloreRoll } from "../dice/emoklore-roll";
-import { buildKaiAttackSpec, substituteSuccess } from "../rules/kai-attack";
 import { type ResonanceMatch, resolveResonanceRoll } from "../rules/resonance-roll";
 import { resolveMpBoundary } from "../rules/resource-boundary";
 import { resolveSkillRoll } from "../rules/skill-roll";
@@ -219,16 +218,16 @@ export class EmokloreActor extends Actor {
   }
 
   /**
-   * 怪異の攻撃を振り、結果を攻撃カードに出す。
+   * 怪異の攻撃を使い、チャットに攻撃カードを出す。
    *
-   * 攻撃判定は能力値から派生させず、攻撃が持つダイス数と判定値で直接振る。judgeless の攻撃は
-   * 判定を振らず固定成功数を使う。ダメージは自由式で、成功数（@success）を差し替えて評価する。
-   * カードの「ダメージ適用」ボタンのハンドラは applications/ 側が持つ（data/ に駆動を置かない）。
+   * 判定は振らない。カードのボタンから判定とダメージを順に振る形にしているので、
+   * ここはカードを1枚置くだけの薄い層になる（`EmokloreItem#use` と同じ）。
+   *
+   * 判定に要るダイス数・判定値とダメージ式は、そのまま焼き込んでカードに持たせる。
+   * 攻撃判定は能力値から派生しないので、これだけあれば怪異を消したあとでも振れる。
+   * judgeless の攻撃は判定そのものが無いため、固定成功数を最初から入れて出す。
    */
-  async rollKaiAttack(
-    index: number,
-    options: Record<string, unknown> = {},
-  ): Promise<ChatMessage | undefined> {
+  async useKaiAttack(index: number): Promise<ChatMessage | undefined> {
     if (!this.isKai()) {
       throw new Error(`emoklore | 怪異ではないので攻撃を持ちません: ${this.type}`);
     }
@@ -236,37 +235,19 @@ export class EmokloreActor extends Actor {
     const attack = this.system.attacks[index];
     if (!attack) return;
 
-    // 判定。judgeless なら振らずに固定成功数を使う
-    let judgmentRoll: EmokloreRoll | null = null;
-    let successCount: number;
-    if (attack.judgeless) {
-      successCount = attack.fixedSuccess;
-    } else {
-      const spec = buildKaiAttackSpec({ diceCount: attack.diceCount, target: attack.target });
-      judgmentRoll = EmokloreRoll.fromSpec(spec, options);
-      await judgmentRoll.evaluate();
-      successCount = judgmentRoll.successCount;
-    }
-
-    // ダメージ。式が空なら振らない。成功数は @success を差し替えて渡す
-    let damageRoll: foundry.dice.Roll | null = null;
-    let damageTotal: number | null = null;
-    if (attack.damage) {
-      damageRoll = new foundry.dice.Roll(substituteSuccess(attack.damage, successCount));
-      await damageRoll.evaluate();
-      damageTotal = damageRoll.total ?? 0;
-    }
-
     const state: KaiAttackCardState = {
       attackName: attack.name || _loc("EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"),
       actorUuid: this.uuid ?? null,
       mpCost: attack.mpCost,
       judgeless: attack.judgeless,
-      successCount,
-      damageTotal,
+      diceCount: attack.diceCount,
+      target: attack.target,
+      damageFormula: attack.damage,
+      successCount: attack.judgeless ? attack.fixedSuccess : null,
+      damageTotal: null,
     };
 
-    return createKaiAttackMessage(this, state, { judgmentRoll, damageRoll });
+    return createKaiAttackMessage(this, state);
   }
 
   /**

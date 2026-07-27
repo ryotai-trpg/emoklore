@@ -62,6 +62,7 @@
 
 /* Chat — シートの外に出るチャットカード */
 @import url("./chat/dice-roll.css");
+@import url("./chat/attack-card.css");
 @import url("./chat/weapon-card.css");
 @import url("./chat/damage-applied.css");
 @import url("./chat/kai-attack-card.css");

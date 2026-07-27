@@ -94,7 +94,7 @@ const defineResonanceRequestSchema = () => ({
  * OWNER を返さないので、PLは更新できない。各自の結果は別のメッセージとして出る。
  *
  * ボタンのハンドラは持たない。判定と共鳴値の更新を駆動するので `applications/` 側に置き、
- * `emoklore.ts` の init が `ACTIONS` へ登録する（architecture.md 課題5 を繰り返さない）。
+ * `emoklore.ts` の init が `ACTIONS` へ登録する（code-design.md「層とimportの方向」）。
  */
 export class ResonanceRequestModel extends ChatCardModel {
   declare intensity: number;

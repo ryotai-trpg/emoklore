@@ -36,8 +36,9 @@ export type KaiAttack = {
 };
 
 // ダメージ式が妥当なRoll式かを確かめる。空は許す。成功数の @success は本体の validate が
-// @参照を1に置き換えて評価するので、そのまま通る（差し替えは rules/kai-attack が行う）
-const diceFormulaValidator = (value: unknown) => {
+// @参照を1に置き換えて評価するので、そのまま通る（差し替えは rules/kai-attack が行う）。
+// 攻撃カードが同じ式を焼き込むので、そちらからも引ける形にしてある
+export const diceFormulaValidator = (value: unknown) => {
   if (typeof value === "string" && value !== "" && !foundry.dice.Roll.validate(value)) return false;
   return undefined;
 };

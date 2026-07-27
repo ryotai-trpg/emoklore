@@ -76,7 +76,11 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 
 ### 武器カードのフック
 
-戦闘の自動化は他モジュール（midi-qol相当のもの）が引き取れる余地を残したいので、判定とダメージの各段にフックを置いている。`pre` が付くものは `Hooks.call` で呼ぶので、`false` を返すとその場で中断する。完了の通知は `Hooks.callAll` なので戻り値を見ない。命名と使い分けはdnd5eの規約に合わせている。
+戦闘の自動化は他モジュール（midi-qol相当のもの）が引き取れる余地を残したいので、判定とダメージの各段にフックを置いている。
+
+**怪異の攻撃カードは、このうち武器と判定の6つを発火しない**（`preUseWeapon` / `useWeapon` / `preRollAttack` / `rollAttack` / `preRollDamage` / `rollDamage`）。カードの形は武器カードに揃えてあるが、下の `config` は武器専用（`skill` / `damageDie` / `attackPower`）で、怪異はダイス数・判定値・自由式という別の形をしている。同じ名前のフックに別形状の `config` を流すと、`config.damageDie` を読んで書き換えるモジュールの側が壊れる。
+
+**`preApplyDamage` / `applyDamage` の2つは怪異からも発火する。** あれは `EmokloreActor#applyDamage` に置いてあり、ダメージの出どころを問わないため。`pre` が付くものは `Hooks.call` で呼ぶので、`false` を返すとその場で中断する。完了の通知は `Hooks.callAll` なので戻り値を見ない。命名と使い分けはdnd5eの規約に合わせている。
 
 | フック | 引数 | 中断 |
 |---|---|---|
@@ -192,7 +196,7 @@ Foundryは `Document#update` をサーバ側で権限検査するので、OWNER�
 ## 既知の構造的課題
 
 1. **スキーマ定義が `CONFIG.EMOKLORE` に依存**: `module/data/character.ts` がキー集合を得るために定義時点で `CONFIG.EMOKLORE` を読む。`CONFIG.EMOKLORE` を設定するのは自分の `init` フックなので制御下にあるが、他モジュールが `init` 中に `Actor.dataModels.character.schema` へ触ると壊れうる。`TypedObjectField` での解消は検討したうえで見送った（下記）
-2. **Actorの種別とunion**: `character`（共鳴者）・`npc`（人間NPC）・`kai`（怪異）の3種別を登録しているので、`EmokloreActor#system` は3つのunion。共通して持つ `resources.hp/mp` に触るリソース操作（`applyDamage`・MP境界）は絞り込みなしで通り、共鳴値・技能判定のように一部の種別しか持たないものは型述語（`isCharacter` / `isCharacterLike` / `isKai`、`EmokloreItem#isWeapon` と同じ形）で絞る。人間NPCは能力値・技能・派生値・技能判定を共鳴者と共有する（両者が `CharacterLikeDataModel` を継承。ルール上「人間NPCに専用ルールは無く、判定が要るなら共鳴者と同じ作り」）。怪異は能力値の標準ブロックを持たない別形状で、直接判定（ダイス数＋判定値）の攻撃を持つ。怪異の攻撃カードのボタンハンドラは `applications/`（`applyKaiDamage`）に置き `ACTIONS` へ外部登録する（どのカードも同じ形）。**種別は `system.json` の `documentTypes` と `CONFIG.Actor.dataModels` で必ず揃える**（作成できない種別を登録すると `system` の型が嘘になる）
+2. **Actorの種別とunion**: `character`（共鳴者）・`npc`（人間NPC）・`kai`（怪異）の3種別を登録しているので、`EmokloreActor#system` は3つのunion。共通して持つ `resources.hp/mp` に触るリソース操作（`applyDamage`・MP境界）は絞り込みなしで通り、共鳴値・技能判定のように一部の種別しか持たないものは型述語（`isCharacter` / `isCharacterLike` / `isKai`、`EmokloreItem#isWeapon` と同じ形）で絞る。人間NPCは能力値・技能・派生値・技能判定を共鳴者と共有する（両者が `CharacterLikeDataModel` を継承。ルール上「人間NPCに専用ルールは無く、判定が要るなら共鳴者と同じ作り」）。怪異は能力値の標準ブロックを持たない別形状で、直接判定（ダイス数＋判定値）の攻撃を持つ。怪異の攻撃カードのボタンハンドラは `applications/`（`kai-attack-card.ts` と `attack-card.ts`）に置き `ACTIONS` へ外部登録する（どのカードも同じ形）。**種別は `system.json` の `documentTypes` と `CONFIG.Actor.dataModels` で必ず揃える**（作成できない種別を登録すると `system` の型が嘘になる）
 3. **`config/` の副作用**: `module/config/index.ts` が import 時に `preLocalize` を呼び、`performPreLocalization` が `CONFIG.EMOKLORE` を破壊的に書き換える。この表の「`config/` に置かないもの」に反するが、dnd5e / draw-steel 由来の確立したパターンなので当面は踏襲する
 4. **取り込みのパーサが `CONFIG.EMOKLORE` を読む**: `utils/charsheet-importer.ts` の `buildImportIndexes()` が表示名からキーへの逆引き索引を `CONFIG.EMOKLORE` から作る。解析関数そのもの（`parseSkills` / `parseEmotions`）は索引を引数で受けるので単体テストできるが、索引を作るところは Foundry の起動を要る。完全に純粋化するなら索引を呼び出し側から渡す形になり、変更が呼び出し側まで広がる（Issue #58）
 5. **CIの穴**: 型チェックジョブはフォークからのPRで実行されない。理由は本体ソースの調達手段が無くなることで、secretsがフォークPRに渡らないため、キャッシュミス時のフォールバックである `tools/fetch-foundry.mjs` が成立しない。**Actions cache そのものはフォークPRからでもbase/デフォルトブランチのぶんをrestoreできる**（できないのは新規cacheの保存のほう）ので、ミスしなければ動きうるが、ミスしたときに落ちるだけのジョブは置いていない。lefthookには型チェックもテストも入っていない（`pre-push` 自体が無い）ので、**フォークからのPRは型チェックを一度も通さずに緑になれる**（Issue #56）

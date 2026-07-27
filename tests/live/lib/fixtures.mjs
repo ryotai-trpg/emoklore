@@ -88,6 +88,17 @@ export const createFixtures = (page) =>
             judgeless: true,
             fixedSuccess: 3,
           },
+          // ダメージ式が空の攻撃。怪異の attacks は固有技能も兼ねるので、判定だけの
+          // ものが普通にある。カードにダメージのボタンが出ないことを見るために置く
+          {
+            name: `${tag}_威嚇`,
+            diceCount: 2,
+            target: 7,
+            damage: "",
+            mpCost: 0,
+            judgeless: false,
+            fixedSuccess: 1,
+          },
         ],
       },
     });

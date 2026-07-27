@@ -371,9 +371,30 @@ Itemにしてあるのは、コンペンディウムに入れて配ったり他�
 
 **機械的な修正はここに書かない。** 「判定値に【精神】を使用する技能での判定は成功数-1される」のような効果は、このアイテムに付けた[効果（ActiveEffect）](/active-effect)が持つ。`effect` はその読み下しで、「即座に〈∞共鳴〉レベルが1増加する」のように一度きりで効果に落ちないものも、文として置いたまま人が処理する。
 
+## 攻撃カード（`weapon` / `kaiAttack`）に共通の分
+
+武器カードと怪異の攻撃カードは、どちらも**1枚のカードが育つ**。シートのクリックではカードを置くだけで、判定とダメージはカードのボタンから順に振る。共通の進み具合は `AttackCardModel`（`module/data/messages/attack-card.ts`）が持ち、各カードが継承する。
+
+| パス | 型 | 既定 | 意味 |
+|---|---|---|---|
+| `successCount` | NumberField | `null` | 判定の成功数。`null` は「まだ振っていない」 |
+| `damageTotal` | NumberField | `null` | ダメージ合計。`null` は「まだ振っていない」 |
+
+この2つの `null` がそのままボタンの出し分けになる（`resolveCardButtons`）。判定の済んだカードには〔ダメージ〕が、ダメージの済んだカードには〔ダメージを適用〕〔軽減して適用〕が出る。**適用の2つは押した瞬間の盤面から対象を取るので何度でも押せる**。
+
+ボタンを出す条件の実体は、カードごとの `resolve*CardButtons` が1つだけ持つ。ダメージを振れる条件がカードで違うため（武器は命中していること、怪異はそこに判定なしと空のダメージ式が加わる）。**描画側もモデルの `buttons` もそこを通す** — 別々に書くと片方だけ直したときにずれる。基底の `resolveCardButtons` に既定を置かないのはこのためで、既定があると渡し忘れたカードが黙って別のルールで動く。
+
+`message.rolls` の**添字を読むのは `attackRoll` だけ**にする。怪異の判定なしの攻撃は判定を振らないので `rolls[0]` がダメージになり、他所で添字を書くとダメージを判定として扱う。そのカードは `attackRoll` を上書きして `undefined` を返す。
+
+**メッセージを書き換えるボタンは、所有者以外には出さない。** 本体は作成者にしか OWNER を返さない（`ChatMessage#getUserLevel`）ので、〔判定〕〔ダメージ〕は他の人が押しても `message.update()` が通らない。効いてくるのは怪異の攻撃カードで、DLが出したものを卓の全員が見る。対象は `OWNER_ACTIONS`。`ACTIONS` と違いモジュール向けの拡張点ではない（2枚が同じ1本を共有するうえ、ボタンは保存済みの `content` に焼き込まれた要素なので、名前を足しても描く口が無い）。
+
+落とすのは**描画のたびに走る `addListeners`**であって、テンプレートではない。`content` は作成者のクライアントが描いて保存した1本のHTMLなので、見る人によって出し分けられない。
+
+**ダメージ適用の2つはここに入らない。** あちらはメッセージを書き換えず、権限が足りなければGMへ委譲する（[アーキテクチャ](/architecture)「GMへの委譲」）ので、誰が押しても通る。
+
 ## ChatMessage `weapon`
 
-武器カード。1枚のカードに攻撃判定とダメージを追記していくので、状態をメッセージ自身が持つ。
+武器カード。
 
 | パス | 型 | 既定 | 意味 |
 |---|---|---|---|
@@ -384,25 +405,30 @@ Itemにしてあるのは、コンペンディウムに入れて配ったり他�
 | `rangeLabel` | StringField | `""` | 翻訳済みの間合い表示 |
 | `itemUuid` | DocumentUUIDField | `null` | 元の武器 |
 | `actorUuid` | DocumentUUIDField | `null` | 使ったアクター |
-| `successCount` | NumberField | `null` | 攻撃判定の成功数。`null` は「まだ振っていない」 |
-| `damageTotal` | NumberField | `null` | ダメージ合計。`null` は「まだ振っていない」 |
 
-**表示に要る値を使用時に焼き込んでいる**のは、あとで武器やアクターを消してもカードが読めるようにするため。`successCount` と `damageTotal` の `null` がそのままボタンの出し分けになる。
+**表示に要る値を使用時に焼き込んでいる**のは、あとで武器やアクターを消してもカードが読めるようにするため。
 
 ## ChatMessage `kaiAttack`
 
-怪異の攻撃カード。武器カードと違い育たず、判定とダメージを一度に振って1枚に出す。
+怪異の攻撃カード。
 
 | パス | 型 | 既定 | 意味 |
 |---|---|---|---|
 | `attackName` | StringField | `""` | 攻撃名 |
-| `actorUuid` | DocumentUUIDField | `null` | 振った怪異。ダメージ適用の参照 |
+| `actorUuid` | DocumentUUIDField | `null` | 出した怪異。モジュール連携のための参照 |
 | `mpCost` | NumberField | 0 | 消費MP（表示のみ） |
 | `judgeless` | BooleanField | `false` | 判定なしの攻撃か |
-| `successCount` | NumberField | `null` | 判定の成功数（judgeless なら固定成功数） |
-| `damageTotal` | NumberField | `null` | ダメージ合計 |
+| `diceCount` | NumberField | 1 | 使用時のダイス数（`NDM≦X` の N） |
+| `target` | NumberField | 7 | 使用時の判定値（X） |
+| `damageFormula` | StringField | `""` | 使用時のダメージ式。`@success` を含みうる |
 
-ボタンのハンドラ（ダメージ適用）は `data/` に置かず、`applications/kai-attack.ts` のものを `emoklore.ts` の init が `ACTIONS` へ登録する（どのカードも同じ形。[コード設計の規約](/code-design)「層とimportの方向」）。
+**判定に要る値も焼き込む。** 攻撃判定は能力値から派生しないので、ダイス数・判定値・ダメージ式さえあれば、怪異を消したあとでも攻撃欄を書き換えたあとでも、そのカードは出したときの内容で振れる。
+
+`judgeless` の攻撃は判定そのものが無いので、カードを出す時点で `successCount` に固定成功数（`fixedSuccess`）が入る。〔判定〕は出ず、〔ダメージ〕から始まる。カードは `fixedSuccess` を持たない。
+
+ダメージを振れる条件は武器と違い、`rules/kai-attack.ts` の `canRollKaiDamage` が決める。ダメージ式が空の攻撃（判定だけの固有技能）と、判定なしの攻撃の2つを見るため。**判定なしを「命中していれば」の条件に掛けない**のは、そこに「外れる」概念が無いからで、固定成功数0と `@success` を含まない式の組み合わせを塞ぐとボタンが1つも出ないカードになる。
+
+ボタンのハンドラは `data/` に置かず、`applications/` のものを `emoklore.ts` の init が `ACTIONS` へ登録する（どのカードも同じ形。[コード設計の規約](/code-design)「層とimportの方向」）。判定とダメージは `applications/kai-attack-card.ts`、ダメージ適用の2つは武器カードと同じ実体で `applications/attack-card.ts` にある。
 
 ## ChatMessage `damageApplied`
 

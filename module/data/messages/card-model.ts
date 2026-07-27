@@ -17,6 +17,17 @@ export type CardType =
   | "resonanceOutcome"
   | "howlingDraw";
 
+/**
+ * カードが載っている ChatMessage。
+ *
+ * `parent` は本体の型では DataModel 止まりで、ChatMessage のメンバーが出てこない。
+ * 実際に使うものだけを交差型で補う（docs/code-design.md「本体の型が足りないとき」）。
+ */
+export type CardMessage = ChatMessage & {
+  rolls: foundry.dice.Roll[];
+  update: (data: Record<string, unknown>) => Promise<unknown>;
+};
+
 /** カードごとに違うのはこの2つだけ。配線そのものは基底が持つ */
 export type CardIdentity = {
   /** カードの根を指すセレクタ。見つからなければ配線しない */

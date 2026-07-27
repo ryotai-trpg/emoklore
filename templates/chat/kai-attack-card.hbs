@@ -2,30 +2,23 @@
 <div class="em-kai-attack-card">
   <header class="em-kai-attack-card__head">
     <div class="em-kai-attack-card__name">{{attackName}}</div>
-    {{! 「判定なし」と「消費MP」は攻撃の性質なのでスキーマのラベルを引く（attackLabels）。
-        判定なしのときも成功数は固定値として出るので、両方を / 区切りで並べる }}
+    {{! 並べるものは chat/kai-attack-card.ts が決める（まだ解決していないものだけが入る）。
+        ここは区切りを挟んで並べるだけ }}
     <div class="em-meta">
-      {{#if judgeless}}
-        {{attackLabels.judgeless}}
-        <span class="em-kai-attack-card__sep">/</span>
-      {{/if}}
-      {{localize "EMOKLORE.ChatMessage.kaiAttack.SuccessCount"}}
-      {{successCount}}
-      {{#if mpCost}}
-        <span class="em-kai-attack-card__sep">/</span>
-        {{attackLabels.mpCost}}
-        {{mpCost}}
-      {{/if}}
+      {{#each metaParts}}
+        {{#unless @first}}<span class="em-kai-attack-card__sep">/</span>{{/unless}}
+        {{this}}
+      {{/each}}
     </div>
   </header>
 
   {{! ロールは本体の描画をそのまま埋める。content に要素があるので二重には描かれない }}
-  {{#if judgmentHTML}}
+  {{#if attackHTML}}
     <section class="em-kai-attack-card__roll">
       <h4 class="em-meta em-kai-attack-card__roll-label">
         {{localize "EMOKLORE.ChatMessage.kaiAttack.Judgment"}}
       </h4>
-      {{{judgmentHTML}}}
+      {{{attackHTML}}}
     </section>
   {{/if}}
 
@@ -38,13 +31,31 @@
     </section>
   {{/if}}
 
-  {{#if canApplyDamage}}
-    {{! 対象は押した瞬間の盤面から取るので、何度でも押せる }}
+  {{#if (or canRollAttack canRollDamage canApplyDamage)}}
     <footer class="em-kai-attack-card__buttons">
-      <button type="button" data-action="applyDamage">
-        <i class="fa-solid fa-heart-crack" inert></i>
-        <span>{{localize "EMOKLORE.ChatMessage.weapon.Apply"}}</span>
-      </button>
+      {{#if canRollAttack}}
+        <button type="button" data-action="rollAttack">
+          <i class="fa-solid fa-dice-d20" inert></i>
+          <span>{{localize "EMOKLORE.ChatMessage.kaiAttack.Judgment"}}</span>
+        </button>
+      {{/if}}
+      {{#if canRollDamage}}
+        <button type="button" data-action="rollDamage">
+          <i class="fa-solid fa-burst" inert></i>
+          <span>{{localize "EMOKLORE.ChatMessage.kaiAttack.Damage"}}</span>
+        </button>
+      {{/if}}
+      {{#if canApplyDamage}}
+        {{! 対象は押した瞬間の盤面から取るので、何度でも押せる }}
+        <button type="button" data-action="applyDamage">
+          <i class="fa-solid fa-heart-crack" inert></i>
+          <span>{{localize "EMOKLORE.ChatMessage.attack.Apply"}}</span>
+        </button>
+        <button type="button" data-action="applyDamageWithReduction">
+          <i class="fa-solid fa-shield-halved" inert></i>
+          <span>{{localize "EMOKLORE.ChatMessage.attack.ApplyWithReduction"}}</span>
+        </button>
+      {{/if}}
     </footer>
   {{/if}}
 </div>

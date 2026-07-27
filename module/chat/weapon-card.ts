@@ -6,14 +6,15 @@
  */
 
 import { systemPath } from "../constants";
+import { type AttackRolls, flattenRolls } from "../data/messages/attack-card";
+import type { CardMessage } from "../data/messages/card-model";
 import {
-  resolveCardButtons,
-  type WeaponCardMessage,
+  resolveWeaponCardButtons,
   type WeaponCardSource,
   type WeaponCardState,
 } from "../data/messages/weapon-card";
 import { localizeAttackSkill } from "../utils/weapon";
-import { buildCardMessageData } from "./message";
+import { buildCardMessageData, updateCardMessage } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/weapon-card.hbs");
 
@@ -25,13 +26,11 @@ const TEMPLATE = systemPath("templates/chat/weapon-card.hbs");
  */
 async function renderWeaponCard(
   state: WeaponCardState,
-  rolls: foundry.dice.Roll[],
+  { attackRoll, damageRoll }: AttackRolls,
 ): Promise<string> {
-  const [attackRoll, damageRoll] = rolls;
-
   return foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     ...state,
-    ...resolveCardButtons(state),
+    ...resolveWeaponCardButtons(state),
     skillLabel: localizeAttackSkill(state.skill),
     attackHTML: attackRoll ? await attackRoll.render() : "",
     damageHTML: damageRoll ? await damageRoll.render() : "",
@@ -52,27 +51,20 @@ export async function buildWeaponCardMessageData(
   return buildCardMessageData({
     type: "weapon",
     system: state,
-    content: await renderWeaponCard(state, []),
+    content: await renderWeaponCard(state, {}),
     speaker,
   });
 }
 
-/**
- * 振った結果をカードに書き戻して描き直す。
- *
- * `content` を毎回組み直すのは、ボタンの出し分けと結果の表示が状態と一緒に変わるため。
- * 作成時と違って更新では `sound` が鳴らないので、ダイス音はここで明示的に鳴らす。
- */
+/** 振った結果をカードに書き戻して描き直す。当て方とダイス音は `chat/message.ts` が持つ */
 export async function updateWeaponCard(
-  message: WeaponCardMessage,
+  message: CardMessage,
   system: WeaponCardState,
-  rolls: foundry.dice.Roll[],
+  rolls: AttackRolls,
 ): Promise<void> {
-  const content = await renderWeaponCard(system, rolls);
-
-  await message.update({ content, rolls, system });
-
-  // モジュールが CONFIG.sounds を空にしている場合があるので、あるときだけ鳴らす
-  const sound = CONFIG.sounds.dice;
-  if (sound) foundry.audio.AudioHelper.play({ src: sound }, true);
+  await updateCardMessage(message, {
+    content: await renderWeaponCard(system, rolls),
+    rolls: flattenRolls(rolls),
+    system,
+  });
 }

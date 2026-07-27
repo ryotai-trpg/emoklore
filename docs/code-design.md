@@ -219,7 +219,7 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 | 見送ったもの | 実測 | 理由 |
 |---|---|---|
 | `noPropertyAccessFromIndexSignature` | 28件 | ほぼ全部 `dataset.rollType` → `dataset['rollType']`。DOMのdatasetに対して読みにくくなるだけ |
-| `lib: ES2025` / `ESNext` | 1件 | 武器カードの `parent` のキャストが comparability を失う（`weapon-card.ts` の `this.parent as CardMessage`）。ES2024までは0件なので、そちらに固定している。二重キャストは禁止しているので、直すなら型述語か構造の側 |
+| `lib: ES2025` / `ESNext` | 1件 | 攻撃カードの `parent` のキャストが comparability を失う（`data/messages/attack-card.ts` の `this.parent as CardMessage`）。ES2024までは0件なので、そちらに固定している。二重キャストは禁止しているので、直すなら型述語か構造の側 |
 | `checkJs` + `tools/` `tests/` を `include` | 99件 | ページに注入するグローバル（`__waitFor` など）とコールバックの暗黙 `any` が大半で、型を付けるには注入側の宣言が要る。1件ずつ当たった結果、実行時に壊れるものは無い。**件数は当たるべき対象の量であって、中身の証拠ではない** |
 | `types: ["node"]` の分離 | — | ブラウザ向けコードにNodeのグローバルが載るが、ルートの `vite.config.ts` が同じ `include` にあるため tsconfig を分ける必要がある |
 | Biome `preset: all` | 700件超 | `useNamingConvention` 116 / `noMagicNumbers` 51 / `noConsole` 36 / `noTernary` 26 と、大半がノイズ |

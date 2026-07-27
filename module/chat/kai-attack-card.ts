@@ -1,15 +1,20 @@
 /**
  * 怪異の攻撃カードの組み立て。
  *
- * 武器カードと違い育たない（判定とダメージを一度に振って1枚に出す）ので、状態の更新用の
- * 再描画は持たない。ルール計算は `rules/kai-attack.ts` が持つ。
+ * 武器カードと同じく1枚のカードが育つので、作るときと書き足すときの両方でここを通る。
+ * ルール計算は `rules/kai-attack.ts` が持つ。
  */
 
 import { systemPath } from "../constants";
 import { KaiDataModel } from "../data/kai";
-import type { KaiAttackCardState } from "../data/messages/kai-attack-card";
+import { type AttackRolls, flattenRolls } from "../data/messages/attack-card";
+import type { CardMessage } from "../data/messages/card-model";
+import {
+  type KaiAttackCardState,
+  resolveKaiAttackCardButtons,
+} from "../data/messages/kai-attack-card";
 import type { EmokloreActor } from "../documents/actor";
-import { createCardMessage } from "./message";
+import { createCardMessage, updateCardMessage } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/kai-attack-card.hbs");
 
@@ -35,41 +40,77 @@ const attackFieldLabels = (): { judgeless: string; mpCost: string } => {
   return { judgeless: fields.judgeless.label, mpCost: fields.mpCost.label };
 };
 
-/** カードに載るロール。judgeless なら判定が無く、ダメージ式が空ならダメージが無い */
-export type KaiAttackRolls = {
-  judgmentRoll: foundry.dice.Roll | null;
-  damageRoll: foundry.dice.Roll | null;
+/**
+ * ヘッダの補足に並べる断片。
+ *
+ * **まだ解決していないものだけを置く。** 判定を振れば `2DM≦7` はロールの式として、
+ * ダメージを振れば `@successd4+3` は差し替え済みの式として、それぞれ下に出る。
+ * ヘッダにも残すと同じものが1枚に二度出ることになる（Issue #110 と同じ形）。
+ *
+ * 判定なしの成功数だけは例外で、振るものが無く下に出る先が無いのでここに残す。
+ */
+const buildMetaParts = (state: KaiAttackCardState): string[] => {
+  const labels = attackFieldLabels();
+  const parts: string[] = [];
+
+  if (state.judgeless) {
+    parts.push(labels.judgeless);
+    parts.push(`${_loc("EMOKLORE.ChatMessage.kaiAttack.SuccessCount")} ${state.successCount}`);
+  } else if (state.successCount === null) {
+    parts.push(`${state.diceCount}DM≦${state.target}`);
+  }
+
+  if (state.damageFormula !== "" && state.damageTotal === null) parts.push(state.damageFormula);
+  if (state.mpCost) parts.push(`${labels.mpCost} ${state.mpCost}`);
+
+  return parts;
 };
 
-/** 怪異の攻撃カードのHTMLを組み立てる */
+/**
+ * 怪異の攻撃カードのHTMLを組み立てる。
+ *
+ * 状態をモデルからではなく引数で受けるのは、更新の直前に「これから保存する状態」で
+ * 描く必要があるため。カードを最初に作る時点ではモデルがまだ存在しないという事情もある。
+ */
 async function renderKaiAttackCard(
   state: KaiAttackCardState,
-  { judgmentRoll, damageRoll }: KaiAttackRolls,
+  { attackRoll, damageRoll }: AttackRolls,
 ): Promise<string> {
   return foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     ...state,
-    attackLabels: attackFieldLabels(),
-    canApplyDamage: state.damageTotal !== null,
-    judgmentHTML: judgmentRoll ? await judgmentRoll.render() : "",
+    ...resolveKaiAttackCardButtons(state),
+    metaParts: buildMetaParts(state),
+    attackHTML: attackRoll ? await attackRoll.render() : "",
     damageHTML: damageRoll ? await damageRoll.render() : "",
   });
 }
 
-/** 怪異の攻撃カードをチャットに流す */
+/**
+ * 怪異の攻撃カードをチャットに流す。
+ *
+ * まだ何も振っていないので、ロールも空でダイス音も鳴らさない（武器カードと同じ）。
+ */
 export async function createKaiAttackMessage(
   actor: EmokloreActor,
   state: KaiAttackCardState,
-  rolls: KaiAttackRolls,
 ): Promise<ChatMessage | undefined> {
   return createCardMessage({
     type: "kaiAttack",
     system: state,
     speaker: ChatMessage.getSpeaker({ actor }),
-    // 振らなかったぶんはメッセージに載せない
-    rolls: [rolls.judgmentRoll, rolls.damageRoll].filter(
-      (roll): roll is foundry.dice.Roll => roll !== null,
-    ),
-    content: await renderKaiAttackCard(state, rolls),
-    sound: CONFIG.sounds.dice,
+    content: await renderKaiAttackCard(state, {}),
+  });
+}
+
+/** 振った結果をカードに書き戻して描き直す。当て方とダイス音は `chat/message.ts` が持つ */
+export async function updateKaiAttackCard(
+  message: CardMessage,
+  system: KaiAttackCardState,
+  rolls: AttackRolls,
+): Promise<void> {
+  await updateCardMessage(message, {
+    content: await renderKaiAttackCard(system, rolls),
+    rolls: flattenRolls(rolls),
+    system,
   });
 }

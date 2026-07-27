@@ -3,7 +3,7 @@
  *
  * ハンドラは判定を駆動する（`documents/` を呼ぶ）ので `data/` には置かず、`emoklore.ts` の
  * init から `SkillRequestModel.ACTIONS` に登録する。`data/` から `documents/` への逆依存を
- * 作らないためで、怪異の攻撃カードと同じ形（architecture.md 課題5）。
+ * 作らないためで、怪異の攻撃カードと同じ形（code-design.md「層とimportの方向」）。
  */
 
 import { createResonanceOutcomeMessage } from "../chat/resonance-outcome";
