@@ -13,12 +13,12 @@
   </header>
 
   {{! ロールは本体の描画をそのまま埋める。content に要素があるので二重には描かれない }}
-  {{#if judgmentHTML}}
+  {{#if attackHTML}}
     <section class="em-kai-attack-card__roll">
       <h4 class="em-meta em-kai-attack-card__roll-label">
         {{localize "EMOKLORE.ChatMessage.kaiAttack.Judgment"}}
       </h4>
-      {{{judgmentHTML}}}
+      {{{attackHTML}}}
     </section>
   {{/if}}
 

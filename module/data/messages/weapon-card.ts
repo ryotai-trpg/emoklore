@@ -1,6 +1,12 @@
 import type { AttackSkillKey } from "../../config/attack-skills";
+import { canRollDamage } from "../../rules/weapon-damage";
 import type { CardActions } from "../../utils/chat-card";
-import { AttackCardModel, type AttackProgress } from "./attack-card";
+import {
+  AttackCardModel,
+  type AttackProgress,
+  type CardButtons,
+  resolveCardButtons,
+} from "./attack-card";
 import type { CardIdentity } from "./card-model";
 
 const { DocumentUUIDField, StringField } = foundry.data.fields;
@@ -19,6 +25,15 @@ export type WeaponCardSource = WeaponCardState & {
   itemUuid: string | null;
   actorUuid: string | null;
 };
+
+/**
+ * 武器カードのボタンの出し分け。**描画側とモデルの `buttons` はここだけを通る。**
+ *
+ * ダメージを振れるのは命中しているとき。武器のダメージ式は参照技能から必ず組み立てられる
+ * ので、式の有無は条件に入らない。
+ */
+export const resolveWeaponCardButtons = (state: AttackProgress): CardButtons =>
+  resolveCardButtons(state, state.successCount !== null && canRollDamage(state.successCount));
 
 const defineWeaponCardSchema = () => {
   return {
@@ -69,5 +84,9 @@ export class WeaponCardModel extends AttackCardModel {
 
   static override defineSchema() {
     return { ...super.defineSchema(), ...defineWeaponCardSchema() };
+  }
+
+  override get buttons(): CardButtons {
+    return resolveWeaponCardButtons(this);
   }
 }

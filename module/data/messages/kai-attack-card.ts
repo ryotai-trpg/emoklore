@@ -22,10 +22,20 @@ export type KaiAttackCardState = AttackProgress & {
   damageFormula: string;
 };
 
+/**
+ * 怪異の攻撃カードのボタンの出し分け。**描画側とモデルの `buttons` はここだけを通る。**
+ *
+ * ダメージを振れる条件が武器と違う（判定なしの攻撃と、空のダメージ式）ので、
+ * 判断は `rules/kai-attack.ts` の純粋関数に置いてある。
+ */
+export const resolveKaiAttackCardButtons = (state: KaiAttackCardState): CardButtons =>
+  resolveCardButtons(state, canRollKaiDamage(state));
+
 const defineKaiAttackCardSchema = () => {
   return {
     attackName: new StringField({ required: true, blank: true, initial: "" }),
-    // ダメージ適用の委譲・参照のために持つ。カードの描画自体は下の焼き込みで足りる
+    // 参照はモジュール連携のために持つ。判定もダメージも焼き込みだけで振れるので、
+    // システム側はここを読まない（武器カードの itemUuid / actorUuid と同じ扱い）
     actorUuid: new DocumentUUIDField({ type: "Actor", nullable: true, initial: null }),
     mpCost: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
     judgeless: new BooleanField({ required: true, initial: false }),
@@ -74,13 +84,12 @@ export class KaiAttackCardModel extends AttackCardModel {
     return { ...super.defineSchema(), ...defineKaiAttackCardSchema() };
   }
 
-  /** 判定なしの攻撃は判定を振らないので、`message.rolls` の先頭がダメージになる */
-  protected override get hasAttackRoll(): boolean {
-    return !this.judgeless;
+  /** 判定なしの攻撃は判定を振らないので、`message.rolls` の先頭はダメージになる */
+  override get attackRoll(): foundry.dice.Roll | undefined {
+    return this.judgeless ? undefined : super.attackRoll;
   }
 
-  /** ダメージを振れる条件が武器と違う。判定なしと空のダメージ式のぶん */
   override get buttons(): CardButtons {
-    return resolveCardButtons(this, canRollKaiDamage(this));
+    return resolveKaiAttackCardButtons(this);
   }
 }

@@ -15,19 +15,12 @@
       font-weight: bold;
     }
 
-    .em-kai-attack-card__sep {
-      opacity: 0.5;
-    }
-
     .em-kai-attack-card__roll {
       margin-top: var(--spacer-4);
     }
 
-    .em-kai-attack-card__roll-label {
-      margin: 0 0 var(--spacer-2);
-    }
-
-    /* 並びは css/chat/attack-card.css が武器カードと共通で持つ。ここは間隔だけ */
+    /* 区切り・見出し・ボタンの並びは css/chat/attack-card.css が武器カードと共通で持つ。
+       ここに残るのは怪異のカードだけの間隔になる */
     .em-kai-attack-card__buttons {
       margin-top: var(--spacer-8);
     }

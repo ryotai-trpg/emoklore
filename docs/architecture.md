@@ -76,7 +76,11 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 
 ### 武器カードのフック
 
-戦闘の自動化は他モジュール（midi-qol相当のもの）が引き取れる余地を残したいので、判定とダメージの各段にフックを置いている。**怪異の攻撃カードはこのフック群を発火しない。** カードの形は武器カードに揃えてあるが、下の `config` は武器専用（`skill` / `damageDie` / `attackPower`）で、怪異はダイス数・判定値・自由式という別の形をしている。同じ名前のフックに別形状の `config` を流すと、`config.damageDie` を読んで書き換えるモジュールの側が壊れる。`pre` が付くものは `Hooks.call` で呼ぶので、`false` を返すとその場で中断する。完了の通知は `Hooks.callAll` なので戻り値を見ない。命名と使い分けはdnd5eの規約に合わせている。
+戦闘の自動化は他モジュール（midi-qol相当のもの）が引き取れる余地を残したいので、判定とダメージの各段にフックを置いている。
+
+**怪異の攻撃カードは、このうち武器と判定の6つを発火しない**（`preUseWeapon` / `useWeapon` / `preRollAttack` / `rollAttack` / `preRollDamage` / `rollDamage`）。カードの形は武器カードに揃えてあるが、下の `config` は武器専用（`skill` / `damageDie` / `attackPower`）で、怪異はダイス数・判定値・自由式という別の形をしている。同じ名前のフックに別形状の `config` を流すと、`config.damageDie` を読んで書き換えるモジュールの側が壊れる。
+
+**`preApplyDamage` / `applyDamage` の2つは怪異からも発火する。** あれは `EmokloreActor#applyDamage` に置いてあり、ダメージの出どころを問わないため。`pre` が付くものは `Hooks.call` で呼ぶので、`false` を返すとその場で中断する。完了の通知は `Hooks.callAll` なので戻り値を見ない。命名と使い分けはdnd5eの規約に合わせている。
 
 | フック | 引数 | 中断 |
 |---|---|---|

@@ -9,8 +9,7 @@
  * `content` を組み直すのはカードごとの仕事だが、更新の当て方とダイス音は共通になる。
  */
 
-import type { CardMessage } from "../data/messages/attack-card";
-import type { CardType } from "../data/messages/card-model";
+import type { CardMessage, CardType } from "../data/messages/card-model";
 import type { EmokloreRoll } from "../dice/emoklore-roll";
 import type { EmokloreActor } from "../documents/actor";
 

@@ -1,18 +1,6 @@
-import { canRollDamage } from "../../rules/weapon-damage";
-import { ChatCardModel } from "./card-model";
+import { type CardMessage, ChatCardModel } from "./card-model";
 
 const { NumberField } = foundry.data.fields;
-
-/**
- * カードが載っている ChatMessage。
- *
- * `parent` は本体の型では DataModel 止まりで、ChatMessage のメンバーが出てこない。
- * 実際に使うものだけを交差型で補う（docs/code-design.md「本体の型が足りないとき」）。
- */
-export type CardMessage = ChatMessage & {
-  rolls: foundry.dice.Roll[];
-  update: (data: Record<string, unknown>) => Promise<unknown>;
-};
 
 /** カードの進み具合。まだ振っていなければ null */
 export type AttackProgress = {
@@ -20,10 +8,10 @@ export type AttackProgress = {
   damageTotal: number | null;
 };
 
-/** カードに載るロール。振っていない段はまだ無い */
+/** カードに載るロール。振っていない段は無い */
 export type AttackRolls = {
-  attackRoll: foundry.dice.Roll | undefined;
-  damageRoll: foundry.dice.Roll | undefined;
+  attackRoll?: foundry.dice.Roll | undefined;
+  damageRoll?: foundry.dice.Roll | undefined;
 };
 
 /** カードのどのボタンが出るか。押せるかどうかの判定にも同じものを使う */
@@ -39,13 +27,13 @@ export type CardButtons = {
  * 描画とアクション側のガードで同じ条件が要る。別々に書くと、片方だけ直したときに
  * 「押せるのに何も起きない」「押せないはずが実行される」という形でずれる。
  *
- * @param damageReady ダメージを振れる段まで進んだか。既定は「命中している」＝成功数1以上。
- *   怪異は判定なしの攻撃とダメージ式の空を持つので、条件を `rules/kai-attack.ts` から渡す
+ * **`damageReady` に既定値を置かない。** ダメージを振れる条件はカードごとに違う（武器は
+ * 命中していること、怪異はそこに判定なしと空のダメージ式が加わる）ので、既定を置くと
+ * 共通の土台が片方の事情を持つことになり、渡し忘れたカードが黙って別のルールで動く。
+ * カードごとの答えは各カードの `resolve*CardButtons` が1つだけ持ち、描画もモデルの
+ * `buttons` もそこを通る。
  */
-export const resolveCardButtons = (
-  state: AttackProgress,
-  damageReady: boolean = state.successCount !== null && canRollDamage(state.successCount),
-): CardButtons => ({
+export const resolveCardButtons = (state: AttackProgress, damageReady: boolean): CardButtons => ({
   canRollAttack: state.successCount === null,
   canRollDamage: damageReady && state.damageTotal === null,
   // 適用は何度でも押せるようにしておく。狙いを変えて続けて当てることがある
@@ -65,7 +53,7 @@ export const resolveCardButtons = (
  * 共有ハンドラを `this: AttackCardModel` で書けるのは `this` 引数が反変だからで、
  * `CardActions<never>` と同じ理屈になる。
  */
-export class AttackCardModel extends ChatCardModel {
+export abstract class AttackCardModel extends ChatCardModel {
   declare successCount: number | null;
   declare damageTotal: number | null;
 
@@ -73,11 +61,14 @@ export class AttackCardModel extends ChatCardModel {
    * メッセージ自身を書き換えるボタンの `data-action`。
    *
    * 本体は**作成者にしか OWNER を返さない**（`ChatMessage#getUserLevel`）ので、これらは
-   * 作成者とDL以外が押しても `message.update()` が通らない。`ACTIONS` と同じくモジュールが
-   * 足せるよう、表として持つ。ダメージ適用はここに入らない — あちらはメッセージを
-   * 書き換えず、権限が足りなければGMへ委譲する（`documents/queries.ts`）。
+   * 作成者とDL以外が押しても `message.update()` が通らない。ダメージ適用はここに入らない —
+   * あちらはメッセージを書き換えず、権限が足りなければGMへ委譲する（`documents/queries.ts`）。
+   *
+   * **`ACTIONS` と違い、モジュール向けの拡張点ではない。** 2枚のカードが同じ1本を共有する
+   * ので片方だけ足せず、そもそもボタンは保存済みの `content` に焼き込まれた要素なので、
+   * ここに名前を足しても描く口が無い。
    */
-  static OWNER_ACTIONS: string[] = ["rollAttack", "rollDamage"];
+  static readonly OWNER_ACTIONS: readonly string[] = ["rollAttack", "rollDamage"];
 
   static override defineSchema() {
     return {
@@ -103,27 +94,24 @@ export class AttackCardModel extends ChatCardModel {
   }
 
   /**
-   * 判定ロールを持つカードか。
+   * 判定のロール。
    *
-   * `message.rolls` の何番目が何かは、これで決まる。**添字を直に書かない** — 怪異の
-   * 判定なしの攻撃は判定を振らないので、`rolls[0]` がダメージになる。
+   * **`message.rolls` の添字を読むのはここだけ**にする。判定を振らないカード（怪異の
+   * 判定なしの攻撃）では `rolls[0]` がダメージになるので、他所で添字を書くとダメージを
+   * 判定として扱ってしまう。そのカードは `undefined` を返すよう上書きする。
    */
-  protected get hasAttackRoll(): boolean {
-    return true;
-  }
-
   get attackRoll(): foundry.dice.Roll | undefined {
-    return this.hasAttackRoll ? this.message.rolls[0] : undefined;
+    return this.message.rolls[0];
   }
 
-  get damageRoll(): foundry.dice.Roll | undefined {
-    return this.message.rolls[this.hasAttackRoll ? 1 : 0];
-  }
-
-  /** ボタンの出し分け。描画側と同じ判定を使う */
-  get buttons(): CardButtons {
-    return resolveCardButtons(this);
-  }
+  /**
+   * ボタンの出し分け。
+   *
+   * ダメージを振れる条件がカードごとに違うので、実体はサブクラスが持つ。**描画側が呼ぶ
+   * `resolve*CardButtons` と同じものを返すこと** — 別々に書くと、片方だけ直したときに
+   * 「押せるのに何も起きない」形でずれる。
+   */
+  abstract get buttons(): CardButtons;
 
   /**
    * 配線に加えて、押しても通らないボタンを落とす。
@@ -144,13 +132,12 @@ export class AttackCardModel extends ChatCardModel {
     const card = html.querySelector(cls.CARD.root);
     if (!card) return;
 
-    for (const action of cls.OWNER_ACTIONS) {
-      for (const button of card.querySelectorAll(`[data-action="${action}"]`)) {
-        const row = button.parentElement;
-        button.remove();
-        // 空になったボタンの行は間隔だけが残るので畳む
-        if (row && row.childElementCount === 0) row.remove();
-      }
+    const selector = cls.OWNER_ACTIONS.map((action) => `[data-action="${action}"]`).join(",");
+    for (const button of card.querySelectorAll(selector)) {
+      const row = button.parentElement;
+      button.remove();
+      // 空になったボタンの行は間隔だけが残るので畳む
+      if (row && row.childElementCount === 0) row.remove();
     }
   }
 }

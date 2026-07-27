@@ -6,13 +6,13 @@
  */
 
 import { systemPath } from "../constants";
+import { type AttackRolls, flattenRolls } from "../data/messages/attack-card";
+import type { CardMessage } from "../data/messages/card-model";
 import {
-  type AttackRolls,
-  type CardMessage,
-  flattenRolls,
-  resolveCardButtons,
-} from "../data/messages/attack-card";
-import type { WeaponCardSource, WeaponCardState } from "../data/messages/weapon-card";
+  resolveWeaponCardButtons,
+  type WeaponCardSource,
+  type WeaponCardState,
+} from "../data/messages/weapon-card";
 import { localizeAttackSkill } from "../utils/weapon";
 import { buildCardMessageData, updateCardMessage } from "./message";
 
@@ -30,7 +30,7 @@ async function renderWeaponCard(
 ): Promise<string> {
   return foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     ...state,
-    ...resolveCardButtons(state),
+    ...resolveWeaponCardButtons(state),
     skillLabel: localizeAttackSkill(state.skill),
     attackHTML: attackRoll ? await attackRoll.render() : "",
     damageHTML: damageRoll ? await damageRoll.render() : "",
@@ -51,7 +51,7 @@ export async function buildWeaponCardMessageData(
   return buildCardMessageData({
     type: "weapon",
     system: state,
-    content: await renderWeaponCard(state, { attackRoll: undefined, damageRoll: undefined }),
+    content: await renderWeaponCard(state, {}),
     speaker,
   });
 }

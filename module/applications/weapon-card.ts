@@ -8,7 +8,7 @@
 
 import { updateWeaponCard } from "../chat/weapon-card";
 import { resolveSkillRef } from "../data/character-like";
-import { type AttackRolls, resolveCardButtons } from "../data/messages/attack-card";
+import type { AttackRolls } from "../data/messages/attack-card";
 import type { WeaponCardModel, WeaponCardState } from "../data/messages/weapon-card";
 import type { EmokloreActor } from "../documents/actor";
 import { buildDamageFormula, resolveStrengthBonus } from "../rules/weapon-damage";
@@ -20,7 +20,7 @@ import { resolveAttackSkill } from "../utils/weapon";
  * 攻撃判定は技能判定そのものなので、アクター側の組み立てをそのまま借りる。
  */
 export async function rollAttack(this: WeaponCardModel): Promise<void> {
-  if (!resolveCardButtons(this).canRollAttack) return;
+  if (!this.buttons.canRollAttack) return;
 
   const actor = await resolveActor(this);
   if (!actor) {
@@ -43,7 +43,7 @@ export async function rollAttack(this: WeaponCardModel): Promise<void> {
   }
 
   const { roll } = await actor.buildSkillRoll(ref);
-  const rolls = { attackRoll: roll, damageRoll: undefined };
+  const rolls = { attackRoll: roll };
   await applyRoll(this, rolls, { successCount: roll.successCount });
 
   Hooks.callAll("emoklore.rollAttack", this.message, roll);
@@ -51,7 +51,7 @@ export async function rollAttack(this: WeaponCardModel): Promise<void> {
 
 /** ダメージを振り、同じカードに書き足す */
 export async function rollDamage(this: WeaponCardModel): Promise<void> {
-  if (!resolveCardButtons(this).canRollDamage) return;
+  if (!this.buttons.canRollDamage) return;
 
   // アクターが消えたカードでもダメージは振り直せる。そのときは〈ストレングス〉加算なし
   const actor = await resolveActor(this);

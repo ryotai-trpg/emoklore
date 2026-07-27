@@ -48,6 +48,10 @@ export function substituteSuccess(formula: string, successCount: number): string
  * もう1つは**判定なしの攻撃**で、こちらには「外れる」概念が無い。固定成功数は0も取れて
  * （スキーマの `min` が0）、`@success` を含まない固定ダメージ式と組み合わせられるため、
  * 命中の条件（成功数1以上）に掛けるとボタンが1つも出ないカードになる。
+ *
+ * **どちらの道でも成功数が決まっていることは要る。** カードは `judgeless` と
+ * `successCount: null` の組を保存できてしまう（スキーマがその対を禁じられない）ので、
+ * ここで見ておかないと `@success` の差し替えが `"nulld4+3"` を作る。
  */
 export function canRollKaiDamage({
   judgeless,
@@ -59,7 +63,7 @@ export function canRollKaiDamage({
   damageFormula: string;
 }): boolean {
   if (damageFormula === "") return false;
-  if (judgeless) return true;
+  if (successCount === null) return false;
 
-  return successCount !== null && canRollDamage(successCount);
+  return judgeless || canRollDamage(successCount);
 }

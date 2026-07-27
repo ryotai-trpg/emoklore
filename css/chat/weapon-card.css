@@ -39,12 +39,4 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-
-  .em-weapon-card__sep {
-    opacity: 0.5;
-  }
-
-  .em-weapon-card__roll-label {
-    margin: 0 0 var(--spacer-2);
-  }
 }

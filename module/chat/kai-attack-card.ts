@@ -7,16 +7,14 @@
 
 import { systemPath } from "../constants";
 import { KaiDataModel } from "../data/kai";
+import { type AttackRolls, flattenRolls } from "../data/messages/attack-card";
+import type { CardMessage } from "../data/messages/card-model";
 import {
-  type AttackRolls,
-  type CardMessage,
-  flattenRolls,
-  resolveCardButtons,
-} from "../data/messages/attack-card";
-import type { KaiAttackCardState } from "../data/messages/kai-attack-card";
+  type KaiAttackCardState,
+  resolveKaiAttackCardButtons,
+} from "../data/messages/kai-attack-card";
 import type { EmokloreActor } from "../documents/actor";
-import { canRollKaiDamage } from "../rules/kai-attack";
-import { buildCardMessageData, postMessage, updateCardMessage } from "./message";
+import { createCardMessage, updateCardMessage } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/kai-attack-card.hbs");
 
@@ -80,9 +78,9 @@ async function renderKaiAttackCard(
 ): Promise<string> {
   return foundry.applications.handlebars.renderTemplate(TEMPLATE, {
     ...state,
-    ...resolveCardButtons(state, canRollKaiDamage(state)),
+    ...resolveKaiAttackCardButtons(state),
     metaParts: buildMetaParts(state),
-    judgmentHTML: attackRoll ? await attackRoll.render() : "",
+    attackHTML: attackRoll ? await attackRoll.render() : "",
     damageHTML: damageRoll ? await damageRoll.render() : "",
   });
 }
@@ -96,19 +94,12 @@ export async function createKaiAttackMessage(
   actor: EmokloreActor,
   state: KaiAttackCardState,
 ): Promise<ChatMessage | undefined> {
-  const content = await renderKaiAttackCard(state, {
-    attackRoll: undefined,
-    damageRoll: undefined,
+  return createCardMessage({
+    type: "kaiAttack",
+    system: state,
+    speaker: ChatMessage.getSpeaker({ actor }),
+    content: await renderKaiAttackCard(state, {}),
   });
-
-  return postMessage(
-    buildCardMessageData({
-      type: "kaiAttack",
-      system: state,
-      speaker: ChatMessage.getSpeaker({ actor }),
-      content,
-    }),
-  );
 }
 
 /** 振った結果をカードに書き戻して描き直す。当て方とダイス音は `chat/message.ts` が持つ */

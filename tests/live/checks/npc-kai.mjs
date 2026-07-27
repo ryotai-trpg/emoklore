@@ -216,8 +216,7 @@ export async function run({ page, check }) {
           card.rolls.length === 1 &&
           headings.length === 1 &&
           headings[0] === game.i18n.localize("EMOKLORE.ChatMessage.kaiAttack.Damage") &&
-          card.system.attackRoll === undefined &&
-          card.system.damageRoll === card.rolls[0];
+          card.system.attackRoll === undefined;
         return {
           ok,
           detail: `成功数${card.system.successCount}(固定) ダメージ${card.system.damageTotal} ロール${card.rolls.length}本 見出し=${headings.join("・") || "なし"} 判定ロール=${card.system.attackRoll === undefined ? "なし" : "あり"}`,

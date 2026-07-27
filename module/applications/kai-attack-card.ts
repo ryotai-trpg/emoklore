@@ -23,7 +23,7 @@ export async function rollKaiAttack(this: KaiAttackCardModel): Promise<void> {
   const roll = EmokloreRoll.fromSpec(spec);
   await roll.evaluate();
 
-  const rolls = { attackRoll: roll, damageRoll: undefined };
+  const rolls = { attackRoll: roll };
   await applyRoll(this, rolls, { successCount: roll.successCount });
 }
 
@@ -31,7 +31,7 @@ export async function rollKaiAttack(this: KaiAttackCardModel): Promise<void> {
 export async function rollKaiDamage(this: KaiAttackCardModel): Promise<void> {
   if (!this.buttons.canRollDamage) return;
 
-  // canRollDamage が成功数の非nullを保証している
+  // canRollKaiDamage が成功数の非nullを保証している
   const formula = substituteSuccess(this.damageFormula, this.successCount as number);
   const roll = new foundry.dice.Roll(formula);
   await roll.evaluate();

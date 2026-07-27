@@ -59,6 +59,12 @@ describe("canRollKaiDamage", () => {
     expect(canRollKaiDamage({ ...judgeless, successCount: 0 })).toBe(true);
   });
 
+  // スキーマは judgeless × successCount: null の対を禁じられない。ここで止めないと
+  // @success の差し替えが "nulld6" を作る
+  it("判定なしでも成功数が決まっていなければ振れない", () => {
+    expect(canRollKaiDamage({ ...judgeless, successCount: null })).toBe(false);
+  });
+
   it("ダメージ式が空なら振れない", () => {
     expect(canRollKaiDamage({ judgeless: false, damageFormula: "", successCount: 3 })).toBe(false);
     expect(canRollKaiDamage({ judgeless: true, damageFormula: "", successCount: 3 })).toBe(false);

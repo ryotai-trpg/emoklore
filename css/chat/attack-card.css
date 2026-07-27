@@ -5,6 +5,18 @@
    片方のカードのファイルにもう片方のクラス名を書かせないため */
 
 @layer chat {
+  /* メタ行の区切り。主役より一段引かせる */
+  .em-weapon-card__sep,
+  .em-kai-attack-card__sep {
+    opacity: 0.5;
+  }
+
+  /* ロールの見出し。下だけ詰める */
+  .em-weapon-card__roll-label,
+  .em-kai-attack-card__roll-label {
+    margin: 0 0 var(--spacer-2);
+  }
+
   /* ボタンは縦に積む。チャットの幅は狭く、横並びにすると文字が潰れる */
   .em-weapon-card__buttons,
   .em-kai-attack-card__buttons {
