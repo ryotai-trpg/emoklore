@@ -7,7 +7,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.5",
     "@foundryvtt/foundryvtt-cli": "^3.0.4",
-    "@types/node": "^26.1.1",
+    "@types/node": "^26.1.2",
     "handlebars": "^4.7.9",
     "lefthook": "^2.1.10",
     "typescript": "^7.0.2",
