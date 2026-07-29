@@ -3,7 +3,6 @@ import { systemPath } from "../constants";
 import type { CharacterDataModel } from "../data/character";
 import type { EmokloreActor } from "../documents/actor";
 import { getSetting, setSetting } from "../settings";
-import { getEmbeddedDocument, resolveEmbeddedDocumentClass } from "../utils/sheet";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
 import {
@@ -13,14 +12,8 @@ import {
   buildSidebarContext,
   buildSkillsContext,
 } from "./context/character";
-import { promptCreateSkill } from "./dialogs/create-skill-dialog";
 import { EmotionPicker } from "./emotion-picker";
-import {
-  EMOTION_KEYS,
-  getAcquiredEmotionRows,
-  getEmotionRows,
-  resolveSegmentValue,
-} from "./helpers";
+import { EMOTION_KEYS, getAcquiredEmotionRows, getEmotionRows } from "./helpers";
 import type { CharacterContext, EmokloreRenderOptions, EmotionKey } from "./types";
 /**
  * characterアクターのシート。
@@ -56,12 +49,8 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
     actions: {
       ...super.DEFAULT_OPTIONS.actions,
-      toggleEffect: this._toggleEffect,
-      toggleEquipped: this._toggleEquipped,
       importCharacter: this._importCharacter,
-      selectSegment: this._selectSegment,
       toggleSidebar: this._toggleSidebar,
-      createSkill: this._createSkill,
       pickEmotions: this._pickEmotions,
       pickAcquiredEmotions: this._pickAcquiredEmotions,
     },
@@ -76,8 +65,7 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         "templates/actor/partials/emotion-rows.hbs",
       ].map(systemPath),
     },
-    // 本体のテンプレートなので systemPath は通さない
-    tabs: { template: "templates/generic/tab-navigation.hbs" },
+    tabs: EmokloreActorSheet.TAB_NAV_PART,
     // タブに属さないパート。class="tab" と data-group を持たないので changeTab が
     // 触らず、タブを切り替えてもDOMごと残る（スクロール位置も入力中の値も保たれる）
     sidebar: {
@@ -182,64 +170,12 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
         break;
     }
 
-    if (partId in context.tabs) context.tab = context.tabs[partId] as unknown;
     return context;
-  }
-
-  static async _toggleEffect(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
-    const effect = getEmbeddedDocument(target, this.actor);
-    if (effect) await effect.update({ disabled: !effect.disabled });
-  }
-
-  /**
-   * アイテムタブの装備チェックボックス。
-   *
-   * アイテムの値の編集だがシートのフォームには載せられない（同じ name の入力を
-   * 2箇所に描けない）ので、name を持たないチェックボックスから直接アイテムへ書く。
-   */
-  static async _toggleEquipped(this: EmokloreCharacterSheet, _event: Event, target: HTMLElement) {
-    const item = getEmbeddedDocument(target, this.actor);
-    if (item) await item.update({ "system.equipped": (target as HTMLInputElement).checked });
   }
 
   static async _importCharacter(this: EmokloreCharacterSheet, event: Event, _target: HTMLElement) {
     event.preventDefault();
     await CharSheetImportDialog.show(this.actor);
-  }
-
-  /**
-   * カスタム技能を作る。
-   *
-   * `createDoc` は dataset をそのまま作成データに載せる汎用の口だが、技能は名前と
-   * 参照能力値が決まっていないと行を描けないので、先にダイアログで尋ねる。
-   * 「尋ねるかどうか」はプレゼンテーションの決定なので applications 側に置く。
-   */
-  static async _createSkill(this: EmokloreCharacterSheet, event: Event, _target: HTMLElement) {
-    event.preventDefault();
-
-    const input = await promptCreateSkill();
-    if (!input) return;
-
-    // defaultName / create は ClientDocumentMixin 由来で本体の型に出ないため、
-    // utils/sheet.ts の口を通す（createDoc と同じ経路）
-    const docCls = resolveEmbeddedDocumentClass("Item");
-
-    await docCls.create(
-      {
-        // 名前は空でも通す。あとから鉛筆で直せるので、入力し直しを強いるより
-        // 既定の名前で作ってしまうほうが早い（本体の createDoc と同じ扱い）
-        name: input.name || docCls.defaultName({ type: "skill", parent: this.actor }),
-        type: "skill",
-        system: {
-          category: input.category,
-          characteristicOptions: input.characteristicOptions,
-          // 選べるものが1つでも、判定に使う能力値は明示しておく
-          characteristic: input.characteristicOptions[0],
-          group: input.group,
-        },
-      },
-      { parent: this.actor },
-    );
   }
 
   /**
@@ -292,77 +228,6 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     if (!picked) return;
 
     await this.actor.update({ "system.emotions.acquired": picked });
-  }
-
-  /**
-   * 段入力で、いま選ばれている段をもう一度押したときに値を戻す。
-   *
-   * ラジオは押しても外れないので、0（未修得）に戻す手段がこれしかない。
-   * 段を1つ増やして0を置く手もあるが、バーの左端が常に空いて見えるのでやめた。
-   *
-   * 選択中でない段を押したときは何もしない。ラジオの既定の動作と
-   * submitOnChange に任せる。
-   */
-  static async _selectSegment(this: EmokloreCharacterSheet, event: Event, target: HTMLElement) {
-    const input = target as HTMLInputElement;
-    const value = Number(input.value);
-    if (!Number.isFinite(value)) return;
-
-    // Number("") は NaN ではなく 0 なので、空文字は「属性が無い」と同じに倒す
-    const raw = input.dataset.clearTo;
-    const clearTo = raw ? Number(raw) : undefined;
-
-    // カスタム技能のレベルはアイテム側が正。段の name はアクター側のミラー
-    // （保存しない枠）を指しているので、フォームの送信に任せると値がどこにも残らない。
-    // 組込技能・能力値は name がそのまま保存先なので、書き込みはフォームに任せる
-    const itemId = input.closest<HTMLElement>("[data-item-id]")?.dataset.itemId;
-    const item = itemId ? this.actor.items.get(itemId) : undefined;
-
-    if (item?.isSkill()) {
-      const next = resolveSegmentValue(value, item.system.level, clearTo);
-      if (next === null || next === item.system.level) return;
-
-      // ラジオの既定動作を止めないと、checked が立ったままアクターのフォームが送られる
-      event.preventDefault();
-      await item.update({ "system.level": next });
-      return;
-    }
-
-    const current = Number(foundry.utils.getProperty(this.actor, input.name));
-    const next = resolveSegmentValue(value, current, clearTo);
-    // 選択中でない段（next === value）はラジオの既定動作と submitOnChange に任せる。
-    // 戻せない入力（能力値は1未満にならない）で押し直したときは null が返る
-    if (next === null || next === value) return;
-
-    // ラジオの既定動作を止めないと、checked が立って submitOnChange が
-    // 元の値で送られ、こちらの更新を打ち消してしまう
-    event.preventDefault();
-    await this.actor.update({ [input.name]: next });
-  }
-
-  /**
-   * カスタム技能の参照能力値を書く。
-   *
-   * 本体の actions はクリックしか見ないので、select の change はフォームの change を
-   * 拾う本体の口（`_onChangeForm`）で受ける。リスナは初回描画で1本張られたきり
-   * 差し替わらないので、描画のたびに繋ぎ直す必要がない。
-   *
-   * 拾ったぶんは super に渡さない。この select は name を持たずアイテム側が保存先なので、
-   * アクターのフォームを送っても何も起きない。
-   */
-  override _onChangeForm(formConfig: unknown, event: Event): void {
-    const select = (event.target as HTMLElement | null)?.closest?.<HTMLSelectElement>(
-      "select[data-skill-characteristic]",
-    );
-
-    if (select) {
-      const itemId = select.closest<HTMLElement>("[data-item-id]")?.dataset.itemId;
-      const item = itemId ? this.actor.items.get(itemId) : undefined;
-      if (item?.isSkill()) void item.update({ "system.characteristic": select.value });
-      return;
-    }
-
-    super._onChangeForm(formConfig, event);
   }
 
   /**

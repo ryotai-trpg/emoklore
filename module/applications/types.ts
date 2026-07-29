@@ -177,6 +177,12 @@ export type EmokloreActorSheetActions = {
   viewDoc: (event: Event, target: HTMLElement) => Promise<void>;
   createDoc: (event: Event, target: HTMLElement) => Promise<void>;
   deleteDoc: (event: Event, target: HTMLElement) => Promise<void>;
+  // 効果・装備のトグル、技能の段入力と作成。行操作と同じく基底が持ち、
+  // マークアップに data-action がある種別だけで実際に発火する
+  toggleEffect: (event: Event, target: HTMLElement) => Promise<void>;
+  toggleEquipped: (event: Event, target: HTMLElement) => Promise<void>;
+  selectSegment: (event: Event, target: HTMLElement) => Promise<void>;
+  createSkill: (event: Event, target: HTMLElement) => Promise<void>;
   // mixin側のDEFAULT_OPTIONSから継承チェーン経由でマージされるので、各シートでの宣言は任意
   toggleMode?: (event: Event, target: HTMLElement) => Promise<void>;
 };
