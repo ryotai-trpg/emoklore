@@ -27,6 +27,7 @@ import * as npcKai from "./checks/npc-kai.mjs";
 import * as registration from "./checks/registration.mjs";
 import * as resonanceRequest from "./checks/resonance-request.mjs";
 import * as schema from "./checks/schema.mjs";
+import * as skillModDisplay from "./checks/skill-mod-display.mjs";
 import * as skillRequest from "./checks/skill-request.mjs";
 import * as skillRoll from "./checks/skill-roll.mjs";
 import * as weapon from "./checks/weapon.mjs";
@@ -54,6 +55,7 @@ const CHECKS = [
   armor,
   howling,
   activeEffect,
+  skillModDisplay,
   combat,
   importCheck,
   automation,
