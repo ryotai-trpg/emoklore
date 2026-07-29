@@ -116,7 +116,10 @@ export class EmokloreCharacterSheet extends EmokloreActorSheet {
     },
     effects: {
       template: systemPath("templates/actor/effects.hbs"),
-      templates: ["templates/partials/doc-controls.hbs"].map(systemPath),
+      templates: [
+        "templates/actor/partials/effect-sections.hbs",
+        "templates/partials/doc-controls.hbs",
+      ].map(systemPath),
       scrollable: [""],
     },
   };

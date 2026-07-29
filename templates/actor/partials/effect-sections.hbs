@@ -1,0 +1,71 @@
+{{! 効果の区分（一時的・恒常・無効）ごとの見出しと明細。`em-data-table` の ol の中で使う。
+    @param effects prepareActiveEffectCategories の戻り値（呼び出し側のコンテキストから引く）
+    ハッシュ引数は取らず、@root の isPlay / editable / document.uuid も参照する }}
+{{#each effects as |section sid|}}
+  {{! 区分ごとに1項目。見出しと明細のolを li の中に収める（ol直下にolは置けない） }}
+  <li data-effect-type="{{section.type}}">
+    <div class="em-data-table__head">
+      <div class="em-data-table__name">{{section.label}}</div>
+      <div class="em-data-table__cell">{{localize "EMOKLORE.Effect.Source"}}</div>
+      <div class="em-data-table__cell">{{localize "EFFECT.TABS.duration"}}</div>
+      {{! 見出しの controls 列は常に置く。明細が閲覧モードでも有効/無効のトグルを
+          持つので、ここを消すと見出しだけ1列少なくなって列がずれる }}
+      <div class="em-data-table__controls">
+        {{#if (and @root.editable (not @root.isPlay))}}
+        <a
+          class="em-data-table__control"
+          data-action="createDoc"
+          data-document-class="ActiveEffect"
+          data-origin="{{@root.document.uuid}}"
+          data-img="icons/svg/aura.svg"
+          {{#if (eq section.type "inactive")}}
+            data-disabled="true"
+          {{else if (eq section.type "temporary")}}
+            {{! v14 の duration は {value, units} 。rounds/turns/seconds の直指定は
+                スキーマから消えており、data-duration.rounds では何も入らなかった }}
+            data-duration.value="1"
+            data-duration.units="rounds"
+          {{/if}}
+          data-tooltip='{{localize "DOCUMENT.Create" type=""}}'
+        >
+          <i class="fas fa-plus"></i>
+        </a>
+        {{/if}}
+      </div>
+    </div>
+
+    <ol class="em-data-table__body">
+      {{#each section.effects as |effect|}}
+        <li
+          class="em-data-table__row draggable"
+          data-effect-id="{{effect.id}}"
+          data-parent-id="{{effect.parent.id}}"
+          data-document-class="ActiveEffect"
+        >
+          <div class="em-data-table__name">
+            <img class="em-data-table__image" src="{{effect.img}}" height="24" width="24" />
+            <div>{{effect.name}}</div>
+          </div>
+          <div class="em-data-table__cell">{{effect.sourceName}}</div>
+          <div class="em-data-table__cell">{{effect.duration.label}}</div>
+          <div class="em-data-table__controls">
+            {{! 有効/無効は卓中の操作（状態異常のON/OFF）なので閲覧モードでも出す }}
+            {{#if @root.editable}}
+              <a
+                class="em-data-table__control"
+                data-action="toggleEffect"
+                data-tooltip="EMOKLORE.Effect.Toggle"
+              >
+                <i class="fas {{#if effect.disabled}}fa-check{{else}}fa-times{{/if}}"></i>
+              </a>
+            {{/if}}
+            {{! 開く・消すは組み立ての操作。閲覧では行を右クリックする }}
+            {{#unless @root.isPlay}}
+              {{> "systems/emoklore/templates/partials/doc-controls.hbs" controlClass="em-data-table__control" editable=@root.editable}}
+            {{/unless}}
+          </div>
+        </li>
+      {{/each}}
+    </ol>
+  </li>
+{{/each}}
