@@ -130,6 +130,18 @@ export type BaseSkillRow = SkillDisplay & {
   target: number;
 };
 
+/** 技能タブのコンテキスト。共鳴者とNPCで共有する（`context/skills.ts` が組む） */
+export type SkillsContext = {
+  skills: Record<string, SkillRow>;
+  baseSkills: BaseSkillRow[];
+  /** 技能リストに並べるカスタム技能（通常・エクストラ、編集モードではベースも） */
+  customSkills: CustomSkillRow[];
+  /** 基本技能のチップ列に並べるカスタム技能（ベース区分のみ、閲覧モードだけ） */
+  customBaseSkills: CustomSkillRow[];
+  skillPointSum: number;
+  skillPointMax: number;
+};
+
 /**
  * 武器1行の表示用データ。アイテムタブは読むだけの一覧なので、値はすべて表示用の文字列。
  *
