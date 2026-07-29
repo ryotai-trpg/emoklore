@@ -1,0 +1,50 @@
+{{! NPCの技能タブ。能力値・技能・基本技能を1列に並べる。
+    技能の行は共鳴者と同じ部品（skills.hbs / base-skills.hbs）を使う — スキーマが
+    CharacterLikeDataModel で同一なので、段入力も分野も能力値の選択もそのまま動く }}
+<section class="tab skills {{tab.cssClass}}" data-group="primary" data-tab="skills">
+  <section class="em-npc__characteristics">
+    {{#each characteristics}}
+      <div class="em-npc__characteristic">
+        {{! CONFIG が持つのは字形のクラスだけ。書体（fa-solid）は使う側が足す }}
+        <i class="fa-solid {{icon}}" inert></i>
+        <span class="em-npc__characteristic-label">{{label}}</span>
+        {{#if ../isPlay}}
+          <span class="em-npc__characteristic-value">{{value}}</span>
+        {{else}}
+          {{! min / max はスキーマから来る。type を渡さないと、段階が決まる数値は
+              本体が range-picker にする（NumberField#_toInput） }}
+          {{formInput field value=value type="number"}}
+        {{/if}}
+      </div>
+    {{/each}}
+  </section>
+
+  {{> "systems/emoklore/templates/actor/skills.hbs"}}
+  {{> "systems/emoklore/templates/actor/base-skills.hbs"}}
+
+  {{! 基本技能の表示選択。レベルが常に1で「未修得」が無いため、どれを閲覧モードに
+      出すかをここで選ぶ（`shownBaseSkills`）。共鳴者には無いNPC固有のブロック }}
+  {{#unless isPlay}}
+  <section class="em-npc__skills">
+    <h3>{{localize "EMOKLORE.Sheet.npc.BaseSkills"}}</h3>
+    <ul class="em-npc__skill-list">
+      {{#each baseSkillToggles}}
+        <li class="em-npc__skill">
+          {{! name を持たないチェックボックス。SetField へは toggleBaseSkill が直接書く }}
+          <input
+            type="checkbox"
+            class="em-npc__skill-shown"
+            data-action="toggleBaseSkill"
+            data-skill="{{key}}"
+            data-tooltip="EMOKLORE.Sheet.npc.ShowBaseSkill"
+            {{checked shown}}
+          />
+          <a class="em-rollable em-npc__skill-name" data-action="roll" data-roll-type="base-skill" data-skill="{{key}}">{{markedLabel}}</a>
+          <i class="fa-solid {{characteristicIcon}}" inert></i>
+          <span class="em-npc__skill-target">{{target}}</span>
+        </li>
+      {{/each}}
+    </ul>
+  </section>
+  {{/unless}}
+</section>

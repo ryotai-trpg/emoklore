@@ -2,22 +2,18 @@ import { isBaseSkillKey } from "../config/base-skills";
 import { systemPath } from "../constants";
 import type { NpcDataModel } from "../data/npc";
 import type { EmokloreActor } from "../documents/actor";
-import type { EmokloreItem } from "../documents/item";
-import { typedEntries } from "../utils/object";
-import { describeSkill, describeSkillLabel, SHEET_CONTEXT } from "../utils/skill";
-import { formatDamagePreview, formatRangeLabel } from "../utils/weapon";
 import { EmokloreActorSheet } from "./actor-sheet";
+import { buildEffectCategories, buildItemsContext } from "./context/actor";
+import { buildNpcSkillsContext } from "./context/npc";
 import type { EmokloreRenderOptions, NpcSheetContext } from "./types";
-
-/** `sort` はスキーマ由来で本体JSDocの型に出ないため、並べ替えの場面だけ足す */
-type SortableItem = EmokloreItem & { sort: number };
 
 /**
  * 人間NPCのシート。
  *
- * 能力値・技能で共鳴者と同じ判定を振れる軽量版。感情・経歴・キャラポイント予算は持たず、
- * 能力値／HP・MP／技能／武器を1画面に並べる。判定はベースの `EmokloreActorSheet` の
- * `roll` アクションにそのまま乗せる（共鳴者と同じ計算を使う）。
+ * 能力値・技能で共鳴者と同じ判定を振れる軽量版。技能・アイテム・効果の3タブを持ち、
+ * 技能タブの行は共鳴者と同じ部品（skills.hbs と行partial）をそのまま使う。感情・経歴・
+ * キャラポイント予算は持たない。判定はベースの `EmokloreActorSheet` の `roll` アクションに
+ * そのまま乗せる（共鳴者と同じ計算を使う）。
  */
 export class EmokloreNpcSheet extends EmokloreActorSheet {
   // type: "npc" にしか登録しないので actor は人間NPCに絞れる
@@ -34,87 +30,63 @@ export class EmokloreNpcSheet extends EmokloreActorSheet {
   };
 
   static override PARTS = {
-    main: {
-      template: systemPath("templates/actor/npc-sheet.hbs"),
+    header: { template: systemPath("templates/actor/npc-header.hbs") },
+    tabs: EmokloreActorSheet.TAB_NAV_PART,
+    skills: {
+      template: systemPath("templates/actor/npc-skills.hbs"),
+      // 入れ子のpartialは再帰的に解決されないので、使うものをすべて並べる
+      templates: [
+        "templates/actor/skills.hbs",
+        "templates/actor/base-skills.hbs",
+        "templates/actor/partials/skill-row-play.hbs",
+        "templates/actor/partials/skill-row-edit.hbs",
+        "templates/actor/partials/custom-skill-row-play.hbs",
+        "templates/actor/partials/custom-skill-row-edit.hbs",
+        "templates/actor/partials/segments.hbs",
+        "templates/partials/doc-controls.hbs",
+      ].map(systemPath),
       scrollable: [""],
+    },
+    // アイテムタブは共鳴者とパートごと共有する。テンプレートはコンテキスト
+    // （weapons / armors / isPlay / editable）しか見ないので、そのまま使える
+    items: {
+      template: systemPath("templates/actor/items.hbs"),
+      templates: ["templates/partials/doc-controls.hbs"].map(systemPath),
+      scrollable: [""],
+    },
+    effects: EmokloreActorSheet.EFFECTS_TAB_PART,
+  };
+
+  static override TABS = {
+    primary: {
+      tabs: [{ id: "skills" }, { id: "items" }, { id: "effects" }],
+      labelPrefix: "EMOKLORE.Sheet.npc.tab",
+      initial: "skills",
     },
   };
 
-  override async _prepareContext(options: EmokloreRenderOptions): Promise<NpcSheetContext> {
-    const context = (await super._prepareContext(options)) as NpcSheetContext;
-    const system = this.actor.system;
+  override async _preparePartContext(
+    partId: string,
+    context: NpcSheetContext,
+    options: EmokloreRenderOptions,
+  ): Promise<NpcSheetContext> {
+    await super._preparePartContext(partId, context, options);
 
-    // 入力の min / max はスキーマから来させる。テンプレートに数値を書くと limits.ts と
-    // 黙ってずれる。段階が min・max・step とも決まる数値は既定でスライダーになるので、
-    // テンプレート側で type="number" を渡している（本体 NumberField#_toInput）
-    context.characteristics = typedEntries(CONFIG.EMOKLORE.characteristics).map(
-      ([key, { label, fa }]) => ({
-        key,
-        label,
-        icon: fa,
-        value: system.characteristics[key].value,
-        field: system.schema.getField(["characteristics", key, "value"]),
-      }),
-    );
-
-    context.skills = typedEntries(CONFIG.EMOKLORE.skills).map(([key]) => {
-      const entry = system.skills[key];
-      return {
-        ...describeSkill({ kind: "skill", key }, entry.characteristic, SHEET_CONTEXT),
-        key,
-        rollType: "skill",
-        level: entry.level,
-        target: entry.target,
-        field: system.schema.getField(["skills", key, "level"]),
-      };
-    });
-
-    // プレイ画面では未修得（Lv.0）の技能を並べない（共鳴者シートと同じ）。編集では全技能を出す
-    if (context.isPlay) {
-      context.skills = context.skills.filter((skill) => skill.level > 0);
+    switch (partId) {
+      case "skills":
+        Object.assign(context, buildNpcSkillsContext(this.actor, { isPlay: context.isPlay }));
+        break;
+      case "items":
+        Object.assign(context, buildItemsContext(this.actor));
+        break;
+      case "effects":
+        // 共鳴者と違いハウリングの専用区分を持たないので、乗ってしまった効果も隠さず出す
+        context.effects = buildEffectCategories(this.actor, { excludeHowlingSources: false });
+        break;
+      default:
+        // header / tabs は追加のコンテキストを必要としないので何もしない
+        break;
     }
-
-    // 基本技能はレベルが常に1で「未修得」が無いので、Lv.0 のフィルタが使えない。
-    // かわりに、どれを出すかをアクターが持つ（`shownBaseSkills`）。編集では選ぶために全件出す
-    context.baseSkills = typedEntries(system.baseSkills)
-      .map(([key, entry]) => ({
-        ...describeSkill({ kind: "base", key }, entry.characteristic, SHEET_CONTEXT),
-        key,
-        rollType: "base-skill",
-        level: entry.level,
-        target: entry.target,
-        shown: system.shownBaseSkills.has(key),
-      }))
-      .filter((skill) => !context.isPlay || skill.shown);
-
-    context.customSkills = Object.entries(system.customSkills).map(([id, entry]) => ({
-      ...describeSkillLabel(
-        {
-          kind: "custom",
-          label: entry.label,
-          isBase: entry.isBase,
-          isExtra: entry.isExtra,
-        },
-        SHEET_CONTEXT,
-      ),
-      id,
-      level: entry.level,
-      target: entry.target,
-    }));
-
-    // 武器は一覧と使用まで。値の編集は武器シートが持つ（同じ name の入力を二重に描かない）。
-    // itemTypes は本体が Record<string, Item[]> で型付けており、実装クラスまで絞られない。
-    // 並べ直すのは、本体の itemTypes が保存順で返し sort を見ないため（共鳴者側と同じ）
-    context.weapons = ((this.actor.itemTypes.weapon ?? []) as SortableItem[])
-      .toSorted((a, b) => a.sort - b.sort)
-      .filter((item) => item.isWeapon())
-      .map((item) => ({
-        id: item.id ?? "",
-        name: item.name,
-        img: item.img,
-        rangeLabel: formatRangeLabel(item.system.rangeType, item.system.range),
-        damagePreview: formatDamagePreview(item.system.damageDie, item.system.attackPower),
-      }));
 
     return context;
   }

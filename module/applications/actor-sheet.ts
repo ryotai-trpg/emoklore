@@ -1,6 +1,7 @@
 import type { ApplicationRenderContext, ApplicationTab } from "@client/applications/_types.mjs";
 import { isBaseSkillKey } from "../config/base-skills";
 import { isSkillKey } from "../config/skills";
+import { systemPath } from "../constants";
 import type { SkillRef } from "../data/character-like";
 import type { EmokloreActor } from "../documents/actor";
 import { getSetting } from "../settings";
@@ -56,6 +57,17 @@ export class EmokloreActorSheet extends EmokloreDocumentSheetMixin(
   // 各シートの PARTS はクラスごとに丸ごと宣言し直す決まり（HandlebarsApplicationMixin は
   // PARTS を継承マージしない）ので、パスをここに置いて写し間違いを防ぐ
   static readonly TAB_NAV_PART = { template: "templates/generic/tab-navigation.hbs" };
+
+  // 効果タブのパート。共鳴者専用の区分（追加取得共鳴感情・ハウリング）を持たない
+  // 素の効果一覧で、NPCと怪異が共有する
+  static readonly EFFECTS_TAB_PART = {
+    template: systemPath("templates/actor/effects-tab.hbs"),
+    templates: [
+      "templates/actor/partials/effect-sections.hbs",
+      "templates/partials/doc-controls.hbs",
+    ].map(systemPath),
+    scrollable: [""],
+  };
 
   /**
    * 行の埋め込みドキュメントを開く・作る・消す。

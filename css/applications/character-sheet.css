@@ -125,32 +125,8 @@
       margin-block-start: var(--spacer-4);
     }
 
-    /* アイテムタブは名前より式のほうが長いので、部品の既定（2fr 1fr 1fr）から
-       配分を変える。列の内訳は置く側が決める（部品は位置決めを持たない） */
-    .tab.items {
-      .em-data-table__head,
-      .em-data-table__row {
-        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) minmax(0, 1fr) 48px 70px;
-      }
-
-      /* ダメージ式は途中で折り返すと読めなくなるので、切り詰めて全文はツールチップに任せる */
-      .em-data-table__cell {
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        display: block;
-        text-align: center;
-      }
-
-      /* 装備チェックボックスの列。切り詰め用の block 上書きのままでは中央に置けない */
-      .em-data-table__cell--toggle {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: visible;
-      }
-    }
+    /* アイテムタブの列の配分は css/applications/actor-sheet.css が持つ
+       （NPCシートと同じ items.hbs を使うため） */
 
     /* 経歴タブの入力フォーム。
        ラベルと入力の縦積みは本体の `.form-group.stacked` に任せる（`biography.hbs` の

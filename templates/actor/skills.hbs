@@ -1,8 +1,11 @@
 <div class="em-skill-list{{#unless isPlay}} em-skill-list--edit{{/unless}}">
+  {{! 技能ポイントの予算を持つのは共鳴者だけ。NPCは skillPointMax を積まずに共有する }}
   {{#unless isPlay}}
+  {{#if skillPointMax}}
   <div class="em-cap">
     {{skillPointSum}} / {{skillPointMax}}
   </div>
+  {{/if}}
   {{/unless}}
   {{#each skills as |skill key|}}
     {{#if @root.isPlay}}

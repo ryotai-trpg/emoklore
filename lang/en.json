@@ -256,10 +256,12 @@
         "Specialization": "Specialization"
       },
       "npc": {
-        "Skills": "Skills",
+        "tab": {
+          "skills": "Skills",
+          "items": "Items",
+          "effects": "Effects"
+        },
         "BaseSkills": "Base Skills",
-        "CustomSkills": "Custom Skills",
-        "Weapons": "Weapons",
         "ShowBaseSkill": "Show in play mode"
       },
       "rowMenu": {

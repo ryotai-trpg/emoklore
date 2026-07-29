@@ -1,7 +1,7 @@
-/* NPCシートと怪異シートが共有する配置。`module/applications/actor-sheet.ts`（両者の基底）と対。
+/* アクターシートどうしで共有する配置。`module/applications/actor-sheet.ts`（共通の基底）と対。
 
    **セレクタを並べる形にしてあるのは、マークアップを1要素1クラスに保つため。**
-   同じ3行を両シートに書き写すのは避けたいが、`em-pair` のような形を名前にしたクラスを
+   同じ規則を各シートに書き写すのは避けたいが、`em-pair` のような形を名前にしたクラスを
    足して合成すると、要素が何であるかがクラス名から読めなくなる。共有する規則をここに置き、
    使う側はBEMの名前だけを持つ。
 
@@ -10,7 +10,7 @@
    `applications/` のクラス名を `components/` から名指しすると依存が逆向きになる。 */
 
 @layer applications {
-  /* ラベルと値を1行に詰める。項目の詰め方を2シートで揃えるために共有する */
+  /* ラベルと値を1行に詰める。項目の詰め方をNPC・怪異の2シートで揃えるために共有する */
   .em-npc__resource,
   .em-npc__resource-edit,
   .em-npc__characteristic,
@@ -27,11 +27,39 @@
      桁が変わっても行の幅が動かない。3rem は3桁ぶんで、remなのでフォントサイズ設定に追従する */
   .em-npc__resource-edit input,
   .em-npc__characteristic input,
-  .em-npc__skill-input,
   .em-kai__stat input,
   .em-kai__field input[type="number"],
   .em-kai__attack-fields input[type="number"] {
     width: 3rem;
     text-align: center;
+  }
+
+  /* アイテムタブの列。名前より式のほうが長いので、部品の既定（2fr 1fr 1fr）から
+     配分を変える。列の内訳は置く側が決める（部品は位置決めを持たない）。
+     共鳴者とNPCが同じ items.hbs を使うので、表の形もここで揃える */
+  .emoklore.sheet.character .tab.items,
+  .emoklore.sheet.npc .tab.items {
+    .em-data-table__head,
+    .em-data-table__row {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) minmax(0, 1fr) 48px 70px;
+    }
+
+    /* ダメージ式は途中で折り返すと読めなくなるので、切り詰めて全文はツールチップに任せる */
+    .em-data-table__cell {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: block;
+      text-align: center;
+    }
+
+    /* 装備チェックボックスの列。切り詰め用の block 上書きのままでは中央に置けない */
+    .em-data-table__cell--toggle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: visible;
+    }
   }
 }

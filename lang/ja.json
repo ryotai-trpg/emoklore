@@ -256,10 +256,12 @@
         "Specialization": "分野"
       },
       "npc": {
-        "Skills": "技能",
+        "tab": {
+          "skills": "技能",
+          "items": "アイテム",
+          "effects": "効果"
+        },
         "BaseSkills": "基本技能",
-        "CustomSkills": "カスタム技能",
-        "Weapons": "武器",
         "ShowBaseSkill": "プレイ画面に出す"
       },
       "rowMenu": {
