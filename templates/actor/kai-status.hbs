@@ -1,0 +1,85 @@
+{{! 怪異のステータスタブ。装甲・行動値・共鳴感情・共鳴プリセット・憑依変異を縦に並べる。
+    どれも組み立ての値か参照で、卓中に頻繁には触らないもの（HP/MPはヘッダが持つ） }}
+<section class="tab status {{tab.cssClass}}" data-group="primary" data-tab="status">
+  <section class="em-kai__stats">
+    <label class="em-kai__stat">
+      <span>{{systemFields.resources.fields.armor.label}}</span>
+      {{#if isPlay}}
+        <span>{{system.resources.armor}}</span>
+      {{else}}
+        <input type="number" name="system.resources.armor" value="{{system.resources.armor}}" min="0" />
+      {{/if}}
+    </label>
+    <label class="em-kai__stat">
+      <span>{{systemFields.initiative.label}}</span>
+      {{#if isPlay}}
+        <span>{{system.initiative}}</span>
+      {{else}}
+        <input type="number" name="system.initiative" value="{{system.initiative}}" />
+      {{/if}}
+    </label>
+  </section>
+
+  <section class="em-kai__block">
+    <h3>{{localize "EMOKLORE.Actor.kai.Emotions"}}</h3>
+    <div class="em-kai__emotions">
+      {{#each selectedEmotions}}<span class="em-tag">{{label}}</span>{{/each}}
+    </div>
+    {{#unless isPlay}}
+      {{! 編集はピッカーで行う。ここは入口だけを持つ }}
+      <button type="button" class="em-button em-button--inline em-kai__emotion-pick" data-action="pickEmotions">
+        <i class="fa-solid fa-heart" inert></i>
+        <span>{{localize "EMOKLORE.EmotionPicker.Open"}}</span>
+      </button>
+    {{/unless}}
+  </section>
+
+  <section class="em-kai__block">
+    <header class="em-section-head em-kai__block-head">
+      <h3>{{localize "EMOKLORE.Actor.kai.Resonance"}}</h3>
+      <button type="button" data-action="requestResonance">
+        <i class="fa-solid fa-tower-broadcast" inert></i>
+        <span>{{localize "EMOKLORE.Actor.kai.RequestResonance"}}</span>
+      </button>
+    </header>
+    <div class="em-kai__resonance">
+      <label class="em-kai__field">
+        <span>{{systemFields.resonance.fields.intensity.label}}</span>
+        {{#if isPlay}}
+          <span>{{system.resonance.intensity}}</span>
+        {{else}}
+          <input type="number" name="system.resonance.intensity" value="{{system.resonance.intensity}}" min="1" />
+        {{/if}}
+      </label>
+      <label class="em-kai__field">
+        <span>{{systemFields.resonance.fields.rise.label}}</span>
+        {{#if isPlay}}
+          <span>{{system.resonance.rise}}</span>
+        {{else}}
+          <input type="text" name="system.resonance.rise" value="{{system.resonance.rise}}" />
+        {{/if}}
+      </label>
+    </div>
+    {{! 編集では RollTable をドラッグして紐づける（DocumentUUIDField が受け口を描く）。
+        閲覧では紐づいているときだけリンクを出す }}
+    {{#if isPlay}}
+      {{#if resonanceTableLink}}
+        <div>
+          <span>{{localize "EMOKLORE.Actor.kai.ResonanceTable"}}</span>
+          {{{resonanceTableLink}}}
+        </div>
+      {{/if}}
+    {{else}}
+      {{formGroup systemFields.resonanceTable value=system.resonanceTable}}
+    {{/if}}
+  </section>
+
+  <section class="em-kai__block">
+    <h3>{{localize "EMOKLORE.Actor.kai.Mutation"}}</h3>
+    {{#if isPlay}}
+      <div>{{{mutationHTML}}}</div>
+    {{else}}
+      <textarea class="em-kai__mutation-input" name="system.mutation" rows="3">{{system.mutation}}</textarea>
+    {{/if}}
+  </section>
+</section>

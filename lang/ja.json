@@ -264,6 +264,13 @@
         "BaseSkills": "基本技能",
         "ShowBaseSkill": "プレイ画面に出す"
       },
+      "kai": {
+        "tab": {
+          "status": "ステータス",
+          "attacks": "攻撃",
+          "effects": "効果"
+        }
+      },
       "rowMenu": {
         "Open": "開く",
         "Delete": "削除"

@@ -1,0 +1,56 @@
+{{! 怪異の攻撃タブ。攻撃は怪異の固有技能も兼ねるので、判定だけのものも並ぶ }}
+<section class="tab attacks {{tab.cssClass}}" data-group="primary" data-tab="attacks">
+  <header class="em-section-head em-kai__block-head">
+    <h3>{{localize "EMOKLORE.Actor.kai.Attacks"}}</h3>
+    {{#unless isPlay}}
+      <button type="button" data-action="addAttack">
+        <i class="fa-solid fa-plus" inert></i>
+      </button>
+    {{/unless}}
+  </header>
+  <ul class="em-kai__attack-list">
+    {{#each system.attacks}}
+      <li class="em-kai__attack" data-attack-index="{{@index}}">
+        {{#if ../isPlay}}
+          <a class="em-rollable em-kai__attack-name" data-action="useAttack">
+            {{#if name}}{{name}}{{else}}{{localize "EMOKLORE.ChatMessage.kaiAttack.UnnamedAttack"}}{{/if}}
+          </a>
+          {{! ラベルはスキーマから引く（attackFields）。攻撃の性質なので、
+              チャットカードと同じところを見る }}
+          <span>
+            {{#if judgeless}}
+              {{@root.attackFields.judgeless.label}} {{fixedSuccess}}
+            {{else}}
+              {{diceCount}}DM≦{{target}}
+            {{/if}}
+          </span>
+          {{#if damage}}<span class="em-kai__attack-damage">{{damage}}</span>{{/if}}
+          {{#if mpCost}}<span>{{@root.attackFields.mpCost.label}}{{mpCost}}</span>{{/if}}
+        {{else}}
+          {{! ラベルとプレースホルダはスキーマから引く（コンテキストの attackFields）。
+              name 属性だけは添字が要るのでここで組み立てる }}
+          <input class="em-kai__attack-name-input" type="text" name="system.attacks.{{@index}}.name"
+            value="{{name}}" placeholder="{{@root.attackFields.name.placeholder}}" />
+          <div class="em-kai__attack-fields">
+            <label>{{@root.attackFields.diceCount.label}}
+              <input type="number" name="system.attacks.{{@index}}.diceCount" value="{{diceCount}}" min="0" /></label>
+            <label>{{@root.attackFields.target.label}}
+              <input type="number" name="system.attacks.{{@index}}.target" value="{{target}}" min="0" /></label>
+            <label>{{@root.attackFields.damage.label}}
+              <input type="text" name="system.attacks.{{@index}}.damage" value="{{damage}}"
+                placeholder="{{@root.attackFields.damage.placeholder}}" /></label>
+            <label>{{@root.attackFields.mpCost.label}}
+              <input type="number" name="system.attacks.{{@index}}.mpCost" value="{{mpCost}}" min="0" /></label>
+            <label>{{@root.attackFields.judgeless.label}}
+              <input type="checkbox" name="system.attacks.{{@index}}.judgeless" {{checked judgeless}} /></label>
+            <label>{{@root.attackFields.fixedSuccess.label}}
+              <input type="number" name="system.attacks.{{@index}}.fixedSuccess" value="{{fixedSuccess}}" min="0" /></label>
+          </div>
+          <a data-action="deleteAttack" data-tooltip="APPLICATION.ACTIONS.Delete">
+            <i class="fa-solid fa-trash" inert></i>
+          </a>
+        {{/if}}
+      </li>
+    {{/each}}
+  </ul>
+</section>
