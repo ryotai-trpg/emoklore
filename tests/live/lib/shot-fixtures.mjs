@@ -255,6 +255,10 @@ export const createShotFixtures = (page) =>
         },
       });
       made.push(kai.name);
+      // 効果タブに1件は行が写るように
+      await kai.createEmbeddedDocuments("ActiveEffect", [
+        { name: "怯み", img: "icons/svg/daze.svg" },
+      ]);
 
       return made;
     },

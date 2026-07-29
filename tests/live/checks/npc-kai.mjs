@@ -598,6 +598,121 @@ export async function run({ page, check }) {
     ),
   );
 
+  await check("kaiシートが3タブを持ち、切り替えで表示が移る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const sheet = game.actors.getName(`${tag}_kai`).sheet;
+        if (!sheet.rendered) await sheet.render(true);
+
+        const tabs = [...sheet.element.querySelectorAll("nav.tabs [data-tab]")].map(
+          (el) => el.dataset.tab,
+        );
+        const active = () => sheet.element.querySelector("section.tab.active")?.dataset.tab;
+        const initial = active();
+        sheet.changeTab("attacks", "primary");
+        const afterChange = active();
+        sheet.changeTab("status", "primary");
+
+        const ok =
+          tabs.join(",") === "status,attacks,effects" &&
+          initial === "status" &&
+          afterChange === "attacks";
+        return { ok, detail: `タブ=${tabs.join("/")} 初期=${initial} 切替→${afterChange}` };
+      },
+      TAG,
+    ),
+  );
+
+  await check("kaiの攻撃タブで攻撃の追加・使用・削除ができる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_kai`);
+        const sheet = actor.sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        sheet.changeTab("attacks", "primary");
+
+        // 追加と削除は組み立ての操作なので編集モードで
+        await window.__setMode(sheet, "edit");
+        const rows = () => sheet.element.querySelectorAll(".em-kai__attack").length;
+        const before = actor.system.attacks.length;
+
+        sheet.element.querySelector("[data-action=addAttack]").click();
+        await window.__waitFor(() => actor.system.attacks.length === before + 1, {
+          soft: true,
+          label: "攻撃の追加",
+        });
+        await window.__waitFor(() => rows() === before + 1, { soft: true, label: "行の追加" });
+        const added = actor.system.attacks.length;
+
+        sheet.element
+          .querySelector(
+            `.em-kai__attack[data-attack-index="${added - 1}"] [data-action=deleteAttack]`,
+          )
+          .click();
+        await window.__waitFor(() => actor.system.attacks.length === before, {
+          soft: true,
+          label: "攻撃の削除",
+        });
+
+        // 使用は卓中の操作なので閲覧モードで。名前を押すと攻撃カードが出る
+        await window.__setMode(sheet, "play");
+        const messagesBefore = game.messages.size;
+        sheet.element
+          .querySelector('.em-kai__attack[data-attack-index="0"] [data-action=useAttack]')
+          .click();
+        await window.__waitFor(() => game.messages.size > messagesBefore, {
+          soft: true,
+          label: "攻撃カードの作成",
+        });
+        const card = game.messages.contents.at(-1);
+        sheet.changeTab("status", "primary");
+
+        const ok =
+          added === before + 1 &&
+          actor.system.attacks.length === before &&
+          card?.type === "kaiAttack";
+        return {
+          ok,
+          detail: `追加 ${before}→${added} 削除→${actor.system.attacks.length} 使用→${card?.type}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
+  await check("kaiの効果タブが3区分を描き、効果の行が乗る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_kai`);
+        const sheet = actor.sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        sheet.changeTab("effects", "primary");
+
+        const sections = [
+          ...sheet.element.querySelectorAll("section.tab.effects [data-effect-type]"),
+        ].map((el) => el.dataset.effectType);
+
+        const [effect] = await actor.createEmbeddedDocuments("ActiveEffect", [
+          { name: `${tag}_kai効果`, img: "icons/svg/aura.svg" },
+        ]);
+        const row = () =>
+          sheet.element.querySelector(`.em-data-table__row[data-effect-id="${effect.id}"]`);
+        await window.__waitFor(() => row(), { label: "効果の行の描画" });
+        const rendered = !!row();
+
+        await actor.deleteEmbeddedDocuments("ActiveEffect", [effect.id]);
+        sheet.changeTab("status", "primary");
+
+        const ok = sections.join(",") === "temporary,passive,inactive" && rendered;
+        return { ok, detail: `区分=${sections.join("/") || "なし"} 行の描画=${rendered}` };
+      },
+      TAG,
+    ),
+  );
+
   await check("npc・kaiのHP/MPを閲覧モードで直接減らせる", () =>
     assertInPage(
       page,
@@ -712,10 +827,10 @@ export async function run({ page, check }) {
       page,
       async (tag) => {
         const results = [];
-        // npcはタブ化でタブのパートがスクロールの単位になった。怪異は単一パートのまま
+        // タブ化で、タブのパートがスクロールの単位になった（npc・kai とも）
         for (const [type, sel] of [
           ["npc", "section.tab.active"],
-          ["kai", ".em-kai"],
+          ["kai", "section.tab.active"],
         ]) {
           const sheet = game.actors.getName(`${tag}_${type}`).sheet;
           if (!sheet.rendered) await sheet.render(true);
