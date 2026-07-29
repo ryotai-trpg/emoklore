@@ -15,4 +15,16 @@
     /* 桁が変わっても数字の位置がずれないようにする */
     font-variant-numeric: tabular-nums;
   }
+
+  /* 効果で動いている値。基準値と違うことを色で知らせ、内訳はこの要素の
+     ツールチップ（data-tooltip-html）が持つ。
+
+     position: relative は技能行のため — 行は名前のリンクが擬似要素で行全体を
+     覆っており（skill-row.css）、持ち上げないとホバーがこのスパンに届かない */
+  .em-target--modified {
+    position: relative;
+    border-color: var(--emoklore-modified);
+    color: var(--emoklore-modified);
+    font-weight: 600;
+  }
 }

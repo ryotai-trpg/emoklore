@@ -691,6 +691,13 @@
         "Label": "段階",
         "initial": "通常",
         "final": "計算後"
+      },
+      "Breakdown": {
+        "Target": "判定値 {base} → {effective}",
+        "Dice": "ダイス {base} → {effective}",
+        "Success": "成功数 {amount}",
+        "Line": "{name} {amount}（{aspect}）",
+        "LineNoAmount": "{name}（{aspect}）"
       }
     },
     "Status": {

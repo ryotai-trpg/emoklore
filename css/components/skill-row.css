@@ -66,6 +66,12 @@
     margin-inline-start: var(--spacer-4);
   }
 
+  /* ダイスボーナスが効いている行のLv表示。判定値と同じ印の色で知らせる */
+  .em-skill-row__level--modified {
+    color: var(--emoklore-modified);
+    font-weight: 600;
+  }
+
   .em-skill-row__stat {
     display: flex;
     justify-content: center;
