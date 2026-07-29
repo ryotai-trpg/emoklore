@@ -5,10 +5,10 @@ import type { EmokloreActor } from "../documents/actor";
 import { getSetting, setSetting } from "../settings";
 import { EmokloreActorSheet } from "./actor-sheet";
 import { CharSheetImportDialog } from "./charsheet-import-dialog";
+import { buildItemsContext } from "./context/actor";
 import {
   buildBiographyContext,
   buildEffectsContext,
-  buildItemsContext,
   buildSidebarContext,
   buildSkillsContext,
 } from "./context/character";

@@ -9,7 +9,6 @@
 
 import type { CharacterDataModel } from "../../data/character";
 import type { EmokloreActor } from "../../documents/actor";
-import type { EmokloreItem } from "../../documents/item";
 import {
   CHARACTERISTIC_POINT_MAX,
   calculateCharPointSum,
@@ -18,12 +17,10 @@ import {
 } from "../../rules/character-points";
 import { CHARACTERISTIC_MAX, CHARACTERISTIC_MIN } from "../../rules/limits";
 import { getSetting } from "../../settings";
-import { prepareActiveEffectCategories } from "../../utils/effects";
 import { prepareHowlingRows } from "../../utils/howling";
 import { typedEntries } from "../../utils/object";
 import { enrichDocumentHTML } from "../../utils/sheet";
 import { describeSkill, SHEET_CONTEXT } from "../../utils/skill";
-import { formatDamagePreview, formatRangeLabel } from "../../utils/weapon";
 import {
   BIOGRAPHY_PAIRED_COUNT,
   buildBiographyRows,
@@ -38,26 +35,10 @@ import type {
   LabeledField,
   SkillRow,
 } from "../types";
+import { buildEffectCategories, itemsOfType } from "./actor";
 
 /** このシートは type: "character" にしか登録しないので、アクターは共鳴者に絞れる */
 type CharacterActor = EmokloreActor & { system: CharacterDataModel };
-
-/** `sort` はスキーマ由来で本体JSDocの型に出ないため、並べ替えの場面だけ足す */
-type SortableItem = EmokloreItem & { sort: number };
-
-/**
- * 所持アイテムを種別で絞り、`sort` の順に並べる。
- *
- * 絞り込みは本体の `itemTypes` に任せる（埋め込みコレクション側でメモ化されている）。
- * 本体は `Record<string, Item[]>` で型付けており実装クラスまでは絞られないので、
- * ここで1回だけ絞る。呼び出し側はさらに型述語を通して `system` を確定させる。
- *
- * **並べ直しは必須。** 本体の `documentsByType` は保存順（＝作成順）で返し `sort` を見ない
- * （`common/abstract/embedded-collection.mjs`）ので、ここを通さないとドラッグの並び替えが
- * `sort` を書くだけで表示に出ない。
- */
-const itemsOfType = (actor: CharacterActor, type: string): EmokloreItem[] =>
-  ((actor.itemTypes[type] ?? []) as SortableItem[]).toSorted((a, b) => a.sort - b.sort);
 
 /**
  * 能力値の表示用データ。
@@ -245,41 +226,6 @@ export const buildBiographyContext = async (
 };
 
 /**
- * アイテムタブ。
- *
- * 間合いとダメージ式は武器の派生値（参照技能から引いたもの）なので、ここでは表示用に
- * 整えるだけ。読むだけの一覧で、値の編集は武器シートが持つ。同じ `name` の入力を2箇所に
- * 描くとフォームの送信が壊れるため、ここに入力は置かない。
- */
-export const buildItemsContext = (
-  actor: CharacterActor,
-): Pick<CharacterContext, "weapons" | "armors"> => ({
-  // isWeapon / isArmor は型述語なので、filter を通すと system が絞られる。
-  // itemTypes の中身は元からその種別だけなので、実行時のふるまいは変わらない
-  weapons: itemsOfType(actor, "weapon")
-    .filter((item) => item.isWeapon())
-    .map((item) => ({
-      // 保存済みの埋め込みドキュメントなので id は必ずある
-      id: item.id!,
-      name: item.name,
-      img: item.img,
-      rangeLabel: formatRangeLabel(item.system.rangeType, item.system.range),
-      damagePreview: formatDamagePreview(item.system.damageDie, item.system.attackPower),
-      equipped: item.system.equipped,
-    })),
-  armors: itemsOfType(actor, "armor")
-    .filter((item) => item.isArmor())
-    .map((item) => ({
-      id: item.id!,
-      name: item.name,
-      img: item.img,
-      defense: item.system.defense,
-      coverage: item.system.coverage,
-      equipped: item.system.equipped,
-    })),
-});
-
-/**
  * 効果タブ。
  *
  * ハウリング反応はアイテムそのものを別区分に並べる。反応が持つ効果は一時的／永続的の
@@ -295,9 +241,5 @@ export const buildEffectsContext = (
       // 埋め込みドキュメントなので id は必ずある（アイテムタブの行と同じ扱い）
       .map((item) => ({ id: item.id!, name: item.name, img: item.img, system: item.system })),
   ),
-  effects: prepareActiveEffectCategories(
-    [...actor.allApplicableEffects()].filter(
-      (effect) => (effect.parent as { type?: string } | null)?.type !== "howling",
-    ),
-  ),
+  effects: buildEffectCategories(actor, { excludeHowlingSources: true }),
 });
