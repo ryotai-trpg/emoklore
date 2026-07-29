@@ -201,6 +201,22 @@ export const createShotFixtures = (page) =>
         // チップの見た目が撮れないので、聞き込みで使いそうな3つを選んでおく
         "system.shownBaseSkills": ["negotiations", "knowledge", "news"],
       });
+      // アイテムタブと効果タブに行が写るように、武器・防具と状態異常をひとつずつ
+      await npc.createEmbeddedDocuments("Item", [
+        {
+          name: "護身用の警棒",
+          type: "weapon",
+          system: { skill: "martialArt", attackPower: "1", equipped: true },
+        },
+        {
+          name: "古い革ジャケット",
+          type: "armor",
+          system: { defense: 1, coverage: "胴", equipped: true },
+        },
+      ]);
+      await npc.createEmbeddedDocuments("ActiveEffect", [
+        { name: "怯え", img: "icons/svg/aura.svg" },
+      ]);
 
       // --- 怪異 ---------------------------------------------------------
       //

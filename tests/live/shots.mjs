@@ -67,9 +67,13 @@ const CHARACTER = { actor: SHOT_NAMES.character };
 const TABS = ["skills", "biography", "items", "effects"];
 const MODES = ["play", "edit"];
 
-/** 既定幅で撮る対象。共鳴者以外はタブを持たないので寸法もそのまま */
+/** タブを持つ軽量シート。既定寸法のまま、タブ×モードで撮る */
+const TABBED_SHEETS = [
+  { name: "npc", spec: { actor: SHOT_NAMES.npc }, tabs: ["skills", "items", "effects"] },
+];
+
+/** 既定幅で撮る対象。怪異とアイテムはタブを持たないので寸法もそのまま */
 const OTHER_SHEETS = [
-  { name: "npc", spec: { actor: SHOT_NAMES.npc } },
   { name: "kai", spec: { actor: SHOT_NAMES.kai } },
   { name: "item-weapon", spec: { actor: CHARACTER.actor, item: SHOT_NAMES.weapon } },
   { name: "item-armor", spec: { actor: CHARACTER.actor, item: SHOT_NAMES.armor } },
@@ -170,6 +174,18 @@ try {
       );
     }
     await closeSheet(page, CHARACTER);
+
+    for (const { name, spec, tabs } of TABBED_SHEETS) {
+      await openSheet(page, spec);
+      for (const mode of MODES) {
+        for (const tab of tabs) {
+          await take(theme, `${name}-${tab}-${mode}`, (path) =>
+            captureSheet(page, { spec, path, mode, tab }),
+          );
+        }
+      }
+      await closeSheet(page, spec);
+    }
 
     for (const { name, spec } of OTHER_SHEETS) {
       await openSheet(page, spec);

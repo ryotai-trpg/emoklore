@@ -418,8 +418,9 @@ export async function run({ page, check }) {
       async (tag) => {
         const sheet = game.actors.getName(`${tag}_npc`).sheet;
         if (!sheet.rendered) await sheet.render(true);
-        // 通常技能の行は data-roll-type=skill。プレイ/編集を跨いで数えられる
-        const count = () => sheet.element.querySelectorAll("[data-roll-type=skill]").length;
+        // 組込技能の行は .em-skill-row[data-skill]（共鳴者と同じ行partial）。
+        // 編集モードの行はロールの口を持たないので、data-roll-type では数えられない
+        const count = () => sheet.element.querySelectorAll(".em-skill-row[data-skill]").length;
         await window.__setMode(sheet, "play");
         const play = count();
         await window.__setMode(sheet, "edit");
@@ -429,6 +430,169 @@ export async function run({ page, check }) {
         // フィクスチャは search だけ Lv.2。プレイは修得済みのみ、編集は全技能
         const ok = edit === all && play > 0 && play < edit;
         return { ok, detail: `閲覧${play} → 編集${edit}（全${all}）` };
+      },
+      TAG,
+    ),
+  );
+
+  await check("npcシートが3タブを持ち、切り替えで表示が移る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const sheet = game.actors.getName(`${tag}_npc`).sheet;
+        if (!sheet.rendered) await sheet.render(true);
+
+        const tabs = [...sheet.element.querySelectorAll("nav.tabs [data-tab]")].map(
+          (el) => el.dataset.tab,
+        );
+        const active = () => sheet.element.querySelector("section.tab.active")?.dataset.tab;
+        const initial = active();
+        sheet.changeTab("items", "primary");
+        const afterChange = active();
+        sheet.changeTab("skills", "primary");
+
+        const ok =
+          tabs.join(",") === "skills,items,effects" &&
+          initial === "skills" &&
+          afterChange === "items";
+        return { ok, detail: `タブ=${tabs.join("/")} 初期=${initial} 切替→${afterChange}` };
+      },
+      TAG,
+    ),
+  );
+
+  await check("npcのアイテムタブで防具を装備すると装甲に乗る", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_npc`);
+        const sheet = actor.sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        // 装備は卓中の操作なので、閲覧モードのまま通す
+        await window.__setMode(sheet, "play");
+        sheet.changeTab("items", "primary");
+
+        const armor = actor.itemTypes.armor[0];
+        const row = () =>
+          sheet.element.querySelector(`.em-data-table__row[data-item-id="${armor.id}"]`);
+        const toggle = () => row()?.querySelector("[data-action=toggleEquipped]");
+        if (!toggle()) {
+          sheet.changeTab("skills", "primary");
+          return { ok: false, detail: "防具の行か装備トグルが無い" };
+        }
+
+        const before = actor.system.armor;
+        toggle().click();
+        await window.__waitFor(() => actor.system.armor === before + 1, {
+          soft: true,
+          label: "装甲への反映",
+        });
+        const armored = actor.system.armor;
+
+        // アイテムの更新で行が描き直されるので、新しいチェックボックスを待ってから戻す
+        await window.__waitFor(() => toggle()?.checked === true, {
+          soft: true,
+          label: "トグルの再描画",
+        });
+        toggle().click();
+        await window.__waitFor(() => actor.system.armor === before, {
+          soft: true,
+          label: "装備解除の反映",
+        });
+        sheet.changeTab("skills", "primary");
+
+        const ok = armored === before + 1 && actor.system.armor === before;
+        return {
+          ok,
+          detail: `装甲 ${before} → ${armored} → ${actor.system.armor}（防御1の防具を着脱）`,
+        };
+      },
+      TAG,
+    ),
+  );
+
+  await check("npcの効果タブが3区分を描き、閲覧モードでも有効/無効を切り替えられる", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_npc`);
+        const sheet = actor.sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        await window.__setMode(sheet, "play");
+        sheet.changeTab("effects", "primary");
+
+        const sections = [
+          ...sheet.element.querySelectorAll("section.tab.effects [data-effect-type]"),
+        ].map((el) => el.dataset.effectType);
+
+        const [effect] = await actor.createEmbeddedDocuments("ActiveEffect", [
+          { name: `${tag}_npc効果`, img: "icons/svg/aura.svg" },
+        ]);
+        const row = () =>
+          sheet.element.querySelector(`.em-data-table__row[data-effect-id="${effect.id}"]`);
+        await window.__waitFor(() => row(), { label: "効果の行の描画" });
+
+        row().querySelector("[data-action=toggleEffect]").click();
+        await window.__waitFor(() => actor.effects.get(effect.id)?.disabled, {
+          soft: true,
+          label: "無効化の反映",
+        });
+        const disabled = actor.effects.get(effect.id)?.disabled === true;
+
+        await actor.deleteEmbeddedDocuments("ActiveEffect", [effect.id]);
+        sheet.changeTab("skills", "primary");
+
+        const ok = sections.join(",") === "temporary,passive,inactive" && disabled;
+        return {
+          ok,
+          detail: `区分=${sections.join("/") || "なし"} 閲覧モードの無効化=${disabled}`,
+        };
+      },
+      TAG,
+    ),
+  );
+
+  // 共鳴者の行partial（segments）がNPCでも配線ごと動くことを見る。段のラジオは
+  // submitOnChange が書き、選択中の段をもう一度押すと selectSegment が 0 に戻す
+  await check("npcの技能タブの段入力がレベルを書く", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const actor = game.actors.getName(`${tag}_npc`);
+        const sheet = actor.sheet;
+        if (!sheet.rendered) await sheet.render(true);
+        sheet.changeTab("skills", "primary");
+        await window.__setMode(sheet, "edit");
+
+        // insight は fixture では Lv.0
+        const segment = () =>
+          sheet.element.querySelector('input[name="system.skills.insight.level"][value="2"]');
+        if (!segment()) {
+          await window.__setMode(sheet, "play");
+          return { ok: false, detail: "段入力が描かれていない" };
+        }
+
+        segment().click();
+        await window.__waitFor(() => actor.system.skills.insight.level === 2, {
+          soft: true,
+          label: "レベルの書き込み",
+        });
+        const written = actor.system.skills.insight.level;
+
+        await window.__waitFor(() => segment()?.checked === true, {
+          soft: true,
+          label: "段の再描画",
+        });
+        segment().click();
+        await window.__waitFor(() => actor.system.skills.insight.level === 0, {
+          soft: true,
+          label: "未修得への戻し",
+        });
+        const cleared = actor.system.skills.insight.level;
+        await window.__setMode(sheet, "play");
+
+        const ok = written === 2 && cleared === 0;
+        return { ok, detail: `Lv.0 → 段2クリックで${written} → もう一度押して${cleared}` };
       },
       TAG,
     ),
@@ -548,8 +712,9 @@ export async function run({ page, check }) {
       page,
       async (tag) => {
         const results = [];
+        // npcはタブ化でタブのパートがスクロールの単位になった。怪異は単一パートのまま
         for (const [type, sel] of [
-          ["npc", ".em-npc"],
+          ["npc", "section.tab.active"],
           ["kai", ".em-kai"],
         ]) {
           const sheet = game.actors.getName(`${tag}_${type}`).sheet;
@@ -620,7 +785,8 @@ export async function run({ page, check }) {
   );
 
   // 行の開く・消すはアクターシートの基底が持つ。行の解決を data-item-id の手辿りではなく
-  // getEmbeddedDocument に任せているので、data-document-class が付いていないと何も起きない
+  // getEmbeddedDocument に任せているので、data-document-class が付いていないと何も起きない。
+  // 武器行はタブ化でアイテムタブの em-data-table に移った（共鳴者と同じ表）
   await check("npcの武器行を開けて消せる", () =>
     assertInPage(
       page,
@@ -629,9 +795,11 @@ export async function run({ page, check }) {
         const sheet = actor.sheet;
         if (!sheet.rendered) await sheet.render(true);
         await window.__setMode(sheet, "edit");
+        sheet.changeTab("items", "primary");
 
         const item = actor.itemTypes.weapon[0];
-        const row = () => sheet.element.querySelector(`.em-npc__weapon[data-item-id="${item.id}"]`);
+        const row = () =>
+          sheet.element.querySelector(`.em-data-table__row[data-item-id="${item.id}"]`);
 
         row().querySelector("[data-action=viewDoc]").click();
         await window.__waitFor(() => item.sheet?.rendered, { label: "武器シートの表示" });
@@ -642,6 +810,7 @@ export async function run({ page, check }) {
         await window.__waitFor(() => !actor.items.get(item.id), { label: "武器の削除" });
         await window.__waitFor(() => !row(), { label: "行の消失" });
 
+        sheet.changeTab("skills", "primary");
         await window.__setMode(sheet, "play");
 
         return {
