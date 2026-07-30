@@ -3,6 +3,7 @@
 
   違いは区分の印（＊/★）だけ。組込技能は名前をルールブックで引けるが、カスタム技能は
   引けないので、区分が分かるのはここしかない。チャットの見出しと効果の適用先も同じ印を使う。
+  判定値の実効値と強調も組込技能と同じ形（rollMod）。
 
   @param skill カスタム技能の表示用データ（CustomSkillRow）
 --}}
@@ -13,8 +14,11 @@
     data-roll-type="custom-skill"
     data-item-id="{{skill.id}}"
   >{{skill.displayLabel}}</a>
-  <span class="em-skill-row__level">{{localize "EMOKLORE.Format.level" level=skill.level}}</span>
+  <span class="em-skill-row__level{{#if skill.rollMod.bonusApplies}} em-skill-row__level--modified{{/if}}">{{localize "EMOKLORE.Format.level" level=skill.level}}</span>
   <progress class="em-progress em-progress--sm" value="{{skill.level}}" max="3"></progress>
-  <span class="em-target">{{skill.target}}</span>
+  <span
+    class="em-target{{#if skill.rollMod.modified}} em-target--modified{{/if}}"
+    {{#if skill.rollMod.modified}}data-tooltip-html="{{skill.rollMod.tooltipHTML}}"{{/if}}
+  >{{skill.rollMod.target}}</span>
   <i class="em-skill-row__stat fa-solid {{skill.characteristicIcon}}"></i>
 </div>

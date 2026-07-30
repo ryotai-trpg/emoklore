@@ -185,6 +185,19 @@ export const createShotFixtures = (page) =>
         },
       ]);
 
+      // 技能タブの修正表示（実効値の強調）が写るように、判定値修正の効果をひとつ乗せる
+      await char.createEmbeddedDocuments("ActiveEffect", [
+        {
+          name: "集中",
+          img: "icons/svg/upgrade.svg",
+          system: {
+            changes: [
+              { key: "system.skills.search.mod.target", type: "add", value: 2, phase: "initial" },
+            ],
+          },
+        },
+      ]);
+
       // --- 人間NPC ------------------------------------------------------
       const npc = await Actor.implementation.create({
         name: names.npc,
@@ -201,7 +214,8 @@ export const createShotFixtures = (page) =>
         // チップの見た目が撮れないので、聞き込みで使いそうな3つを選んでおく
         "system.shownBaseSkills": ["negotiations", "knowledge", "news"],
       });
-      // アイテムタブと効果タブに行が写るように、武器・防具と状態異常をひとつずつ
+      // アイテムタブと効果タブに行が写るように、武器・防具と状態異常をひとつずつ。
+      // 状態異常には判定値修正を持たせ、技能タブの実効値の強調も同時に写るようにする
       await npc.createEmbeddedDocuments("Item", [
         {
           name: "護身用の警棒",
@@ -215,7 +229,15 @@ export const createShotFixtures = (page) =>
         },
       ]);
       await npc.createEmbeddedDocuments("ActiveEffect", [
-        { name: "怯え", img: "icons/svg/aura.svg" },
+        {
+          name: "怯え",
+          img: "icons/svg/aura.svg",
+          system: {
+            changes: [
+              { key: "system.skills.search.mod.target", type: "add", value: -1, phase: "initial" },
+            ],
+          },
+        },
       ]);
 
       // --- 怪異 ---------------------------------------------------------

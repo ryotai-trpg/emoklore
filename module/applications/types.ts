@@ -12,7 +12,6 @@ import type { KaiDataModel } from "../data/kai";
 import type { NpcDataModel } from "../data/npc";
 import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
-import type { ModifierSet } from "../rules/types";
 import type { HowlingRow } from "../utils/howling";
 import type { SkillDisplay } from "../utils/skill";
 import type { ValueSegment } from "./helpers";
@@ -42,6 +41,26 @@ export type EmokloreRenderOptions = HandlebarsRenderOptions & {
 };
 
 /**
+ * 技能1行の、効果による修正の表示データ。
+ *
+ * `context/skill-mods.ts` が判定と同じ道（`resolveSkillRoll`）から組む。
+ * 閲覧モードの行とチップだけが使い、編集モードは基準値のまま出す。
+ */
+export type SkillRowMod = {
+  /** 効果で判定が動いているか。値の強調とツールチップの有無 */
+  modified: boolean;
+  /** セルに出す実効判定値（基準値＋判定値修正の合算） */
+  target: number;
+  baseTarget: number;
+  /** ダイスボーナスが効いているか。Lvセルの強調に使う */
+  bonusApplies: boolean;
+  diceCount: number;
+  successMod: number;
+  /** `data-tooltip-html` に入れる内訳。修正が無ければ空文字 */
+  tooltipHTML: string;
+};
+
+/**
  * 技能1行の表示用データ。保存値と、技能の見せ方（`describeSkill`）を合流させたもの。
  *
  * 名前まわり（label / marker / 能力値のラベルとアイコン）は `SkillDisplay` が持つ。
@@ -59,11 +78,11 @@ export type SkillRow = SkillDisplay & {
   level: number;
   target: number;
   specialization?: string | undefined;
-  mod: ModifierSet;
   isExtra: boolean;
   /** 編集モードの段入力に渡す。フォームの名前と段の並び */
   name: string;
   levelSegments: ValueSegment[];
+  rollMod: SkillRowMod;
 };
 
 /**
@@ -122,12 +141,14 @@ export type CustomSkillRow = SkillDisplay & {
    */
   name: string;
   levelSegments: ValueSegment[];
+  rollMod: SkillRowMod;
 };
 
 /** 基本技能の表示用データ。判定のトリガとして1行1ボタンで並べる */
 export type BaseSkillRow = SkillDisplay & {
   key: string;
   target: number;
+  rollMod: SkillRowMod;
 };
 
 /** 技能タブのコンテキスト。共鳴者とNPCで共有する（`context/skills.ts` が組む） */

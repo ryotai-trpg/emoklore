@@ -691,6 +691,13 @@
         "Label": "Phase",
         "initial": "Normal",
         "final": "After Derivation"
+      },
+      "Breakdown": {
+        "Target": "Target {base} → {effective}",
+        "Dice": "Dice {base} → {effective}",
+        "Success": "Successes {amount}",
+        "Line": "{name} {amount} ({aspect})",
+        "LineNoAmount": "{name} ({aspect})"
       }
     },
     "Status": {

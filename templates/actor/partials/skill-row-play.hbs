@@ -1,6 +1,10 @@
 {{!--
   技能1行（閲覧）。技能名がそのまま判定のトリガになる。
 
+  判定値セルには効果込みの実効値（rollMod.target）を出す。効果で動いている行は
+  値を強調し、内訳は判定値セルのツールチップが持つ（data-tooltip-html は本体の
+  TooltipManager が cleanHTML を通して描く）。
+
   @param skill 技能の表示用データ
   @param key   技能のキー
 --}}
@@ -12,8 +16,11 @@
     data-roll-type="skill"
     data-skill="{{key}}"
   >{{skill.displayLabel}}</a>
-  <span class="em-skill-row__level">{{localize "EMOKLORE.Format.level" level=skill.level}}</span>
+  <span class="em-skill-row__level{{#if skill.rollMod.bonusApplies}} em-skill-row__level--modified{{/if}}">{{localize "EMOKLORE.Format.level" level=skill.level}}</span>
   <progress class="em-progress em-progress--sm" value="{{skill.level}}" max="3"></progress>
-  <span class="em-target">{{skill.target}}</span>
+  <span
+    class="em-target{{#if skill.rollMod.modified}} em-target--modified{{/if}}"
+    {{#if skill.rollMod.modified}}data-tooltip-html="{{skill.rollMod.tooltipHTML}}"{{/if}}
+  >{{skill.rollMod.target}}</span>
   <i class="em-skill-row__stat fa-solid {{skill.characteristicIcon}}"></i>
 </div>

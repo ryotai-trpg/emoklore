@@ -1,4 +1,6 @@
-{{! 基本技能。修得していなくても振れるので、閲覧モードにボタンで並べる }}
+{{! 基本技能。修得していなくても振れるので、閲覧モードにボタンで並べる。
+    判定値は効果込みの実効値（rollMod.target）。効果で動いているチップは値を強調し、
+    内訳はチップのツールチップが持つ }}
 {{#if isPlay}}
 <div class="em-chip-list">
   {{#each baseSkills as |baseSkill|}}
@@ -10,7 +12,12 @@
     data-skill="{{baseSkill.key}}"
   >
     <span class="em-chip__name">{{baseSkill.markedLabel}}</span>
-    <span class="em-target">{{baseSkill.target}}</span>
+    {{! ツールチップは値のスパン自身に置く。本体の TooltipManager は event.target の
+        dataset しか見ないので、ボタンに置くと内側の要素へ入った時点で消えてしまう }}
+    <span
+      class="em-target{{#if baseSkill.rollMod.modified}} em-target--modified{{/if}}"
+      {{#if baseSkill.rollMod.modified}}data-tooltip-html="{{baseSkill.rollMod.tooltipHTML}}"{{/if}}
+    >{{baseSkill.rollMod.target}}</span>
     <i class="fa-solid {{baseSkill.characteristicIcon}}"></i>
   </button>
   {{/each}}
@@ -26,7 +33,10 @@
     data-item-id="{{baseSkill.id}}"
   >
     <span class="em-chip__name">{{baseSkill.markedLabel}}</span>
-    <span class="em-target">{{baseSkill.target}}</span>
+    <span
+      class="em-target{{#if baseSkill.rollMod.modified}} em-target--modified{{/if}}"
+      {{#if baseSkill.rollMod.modified}}data-tooltip-html="{{baseSkill.rollMod.tooltipHTML}}"{{/if}}
+    >{{baseSkill.rollMod.target}}</span>
     <i class="fa-solid {{baseSkill.characteristicIcon}}"></i>
   </button>
   {{/each}}

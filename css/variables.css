@@ -70,6 +70,10 @@
     --emoklore-accent: #0b5fa5; /* 地 #DAD8CC に対し 4.59:1 */
     --emoklore-gaiacare: #a34400; /* 同 4.34:1 */
 
+    /* 効果で動いている値の印。アクセントに追従させる（役割名で参照する）。
+       アクセントを使ってよいのはバーの塗りとこの印だけ（docs/ui-design.md） */
+    --emoklore-modified: var(--emoklore-accent);
+
     /* --- 意味色 ---
        リソースの種別を表す。本体に対応する変数がないので独自に持つ */
     --emoklore-hp: #2e7d32; /* 3.58:1 */

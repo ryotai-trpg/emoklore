@@ -9,13 +9,34 @@
 import type { CharacterLikeDataModel } from "../../data/character-like";
 import type { EmokloreActor } from "../../documents/actor";
 import { calculateTotalSkillPoints, SKILL_POINT_MAX } from "../../rules/character-points";
+import { resolveSkillRoll } from "../../rules/skill-roll";
+import { type AttributedChange, resolveRowScopes } from "../../utils/effect-breakdown";
+import type { ModifierTarget } from "../../utils/effect-keys";
 import { typedEntries } from "../../utils/object";
 import { describeSkill, SHEET_CONTEXT } from "../../utils/skill";
 import { buildSkillLevelSegments } from "../helpers";
-import type { BaseSkillRow, CustomSkillRow, SkillRow, SkillsContext } from "../types";
+import type { BaseSkillRow, CustomSkillRow, SkillRow, SkillRowMod, SkillsContext } from "../types";
+import { buildRowMod, collectModifierChanges } from "./skill-mods";
 
 /** 能力値と技能を持つアクター。character と npc のシートがこの形に絞って渡す */
 export type CharacterLikeActor = EmokloreActor & { system: CharacterLikeDataModel };
+
+/**
+ * 1行ぶんの効果修正の表示データ。実効値は判定と同じ道（`getSkillRollContext` +
+ * `resolveSkillRoll`）から出すので、セルの値とチャットの式が食い違わない。
+ */
+const buildRollMod = (
+  actor: CharacterLikeActor,
+  ref: Parameters<CharacterLikeDataModel["getSkillRollContext"]>[0],
+  own: ModifierTarget,
+  characteristic: string,
+  group: string,
+  changes: AttributedChange[],
+): SkillRowMod => {
+  const { params } = actor.system.getSkillRollContext(ref);
+  const spec = resolveSkillRoll(params);
+  return buildRowMod(params, spec, resolveRowScopes(own, characteristic, group), changes);
+};
 
 /**
  * 技能の表示用データ。
@@ -23,9 +44,12 @@ export type CharacterLikeActor = EmokloreActor & { system: CharacterLikeDataMode
  * 名前と区分は CONFIG.EMOKLORE 側の定義なので `describeSkill` が合流させる。ここが足すのは
  * アクター側の値と、編集モードの入力に要るものだけ。
  */
-const buildSkills = (actor: CharacterLikeActor): Record<string, SkillRow> =>
+const buildSkills = (
+  actor: CharacterLikeActor,
+  changes: AttributedChange[],
+): Record<string, SkillRow> =>
   Object.fromEntries(
-    typedEntries(CONFIG.EMOKLORE.skills).map(([key, { isExtra }]) => {
+    typedEntries(CONFIG.EMOKLORE.skills).map(([key, { isExtra, group }]) => {
       const entry = actor.system.skills[key];
       return [
         key,
@@ -41,20 +65,35 @@ const buildSkills = (actor: CharacterLikeActor): Record<string, SkillRow> =>
           level: entry.level,
           target: entry.target,
           specialization: entry.specialization,
-          mod: entry.mod,
           name: `system.skills.${key}.level`,
           levelSegments: buildSkillLevelSegments(entry.level),
+          rollMod: buildRollMod(
+            actor,
+            { kind: "skill", key },
+            { kind: "collection", collection: "skills", key },
+            entry.characteristic,
+            group,
+            changes,
+          ),
         },
       ];
     }),
   );
 
 /** 基本技能の表示用データ。目標値と能力値はアクター側が正 */
-const buildBaseSkills = (actor: CharacterLikeActor): BaseSkillRow[] =>
+const buildBaseSkills = (actor: CharacterLikeActor, changes: AttributedChange[]): BaseSkillRow[] =>
   typedEntries(actor.system.baseSkills).map(([key, { characteristic, target }]) => ({
     ...describeSkill({ kind: "base", key }, characteristic, SHEET_CONTEXT),
     key,
     target,
+    rollMod: buildRollMod(
+      actor,
+      { kind: "base", key },
+      { kind: "collection", collection: "baseSkills", key },
+      characteristic,
+      CONFIG.EMOKLORE.baseSkills[key].group,
+      changes,
+    ),
   }));
 
 /**
@@ -64,7 +103,10 @@ const buildBaseSkills = (actor: CharacterLikeActor): BaseSkillRow[] =>
  * `prepareBaseData` が作るので、効果を適用したあとのレベルと目標値がそのまま入っている。
  * 並び順も `actor.items` の順のままなので、アイテムを引き直さない。
  */
-const buildCustomSkills = (actor: CharacterLikeActor): CustomSkillRow[] =>
+const buildCustomSkills = (
+  actor: CharacterLikeActor,
+  changes: AttributedChange[],
+): CustomSkillRow[] =>
   Object.entries(actor.system.customSkills).map(([id, entry]) => {
     const options = entry.characteristicOptions.map((key) => ({
       value: key,
@@ -87,6 +129,14 @@ const buildCustomSkills = (actor: CharacterLikeActor): CustomSkillRow[] =>
       hasCharacteristicChoice: options.length > 1,
       name: `system.customSkills.${id}.level`,
       levelSegments: buildSkillLevelSegments(entry.level),
+      rollMod: buildRollMod(
+        actor,
+        { kind: "custom", id },
+        { kind: "collection", collection: "customSkills", key: id },
+        entry.characteristic,
+        entry.group,
+        changes,
+      ),
     };
   });
 
@@ -114,14 +164,16 @@ export const buildSkillsContext = (
   actor: CharacterLikeActor,
   { isPlay }: { isPlay: boolean },
 ): SkillsContext => {
-  const skills = buildSkills(actor);
-  const customSkills = buildCustomSkills(actor);
+  // 効果のchangeは行をまたいで同じものを見るので、1描画で1回だけ集める
+  const changes = collectModifierChanges(actor);
+  const skills = buildSkills(actor, changes);
+  const customSkills = buildCustomSkills(actor, changes);
   const base = customSkills.filter((skill) => skill.isBase);
   const leveled = customSkills.filter((skill) => !skill.isBase);
 
   return {
     skills,
-    baseSkills: buildBaseSkills(actor),
+    baseSkills: buildBaseSkills(actor, changes),
     // 閲覧モードのベース技能はチップ列に並ぶ。編集モードは編集・削除の口が要るので
     // 区分に関わらず技能リストへ出す（組込の基本技能は編集する項目が無いので出ない）
     customSkills: isPlay ? leveled : customSkills,
