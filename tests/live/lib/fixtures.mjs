@@ -51,12 +51,18 @@ export const createFixtures = (page) =>
     made.push(npc.name);
     await npc.update({ "system.skills.search.level": 2 });
     // 武器を1本。NPCシートの武器行は、開く・消すを共鳴者シートと同じ基底の
-    // ハンドラで処理する。行の解決が効いていることを見るために要る
+    // ハンドラで処理する。行の解決が効いていることを見るために要る。
+    // 防具はアイテムタブの装備トグルが system.armor に効くことを見るため（未装備で持たせる）
     await npc.createEmbeddedDocuments("Item", [
       {
         name: `${tag}_鉄パイプ`,
         type: "weapon",
         system: { skill: "martialArt", attackPower: "2" },
+      },
+      {
+        name: `${tag}_破れた外套`,
+        type: "armor",
+        system: { defense: 1, equipped: false },
       },
     ]);
 

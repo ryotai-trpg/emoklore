@@ -1,0 +1,36 @@
+{{! NPCのヘッダ。名前とHP/MPは卓中に常時見えている必要があるので、タブの外の独立パートにする。
+    クラス名の `em-npc__` は、ブロック根（.em-npc）をタブ化で失ったあとも変えていない —
+    CSSと実機検証のフックを揃えたまま保つほうが、名前の整合より価値がある }}
+<header class="em-npc__header">
+  <img class="em-avatar em-npc__avatar" src="{{document.img}}" data-edit="img" alt="" />
+  {{#if isPlay}}
+    <h1 class="em-npc__name">{{document.name}}</h1>
+  {{else}}
+    <input class="em-npc__name-input" type="text" name="name" value="{{document.name}}"
+      placeholder="{{localize "DOCUMENT.FIELDS.name.label"}}" />
+  {{/if}}
+
+  {{! 現在値は卓中に減っていくものなので、モードによらず入力にする（共鳴者のメータと同じ）。
+      最大値は能力値からの派生なので、どちらのモードでも表示だけ — 変えたいなら能力値を変える }}
+  <div class="em-npc__resources">
+    <label class="em-npc__resource"
+      data-tooltip="{{systemFields.resources.fields.hp.label}}">
+      {{! HP/MPのアイコンは共鳴者のメータと同じものを使う（fa-heart / fa-wand-magic-sparkles） }}
+      <i class="fa-solid fa-heart em-npc__resource-icon" inert></i>
+      <span class="em-npc__resource-edit">
+        {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
+        <span>/</span>
+        <span>{{system.resources.hp.max}}</span>
+      </span>
+    </label>
+    <label class="em-npc__resource"
+      data-tooltip="{{systemFields.resources.fields.mp.label}}">
+      <i class="fa-solid fa-wand-magic-sparkles em-npc__resource-icon" inert></i>
+      <span class="em-npc__resource-edit">
+        {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
+        <span>/</span>
+        <span>{{system.resources.mp.max}}</span>
+      </span>
+    </label>
+  </div>
+</header>

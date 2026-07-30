@@ -14,7 +14,7 @@ import type { EmokloreActor } from "../documents/actor";
 import type { EmokloreItem } from "../documents/item";
 import type { ModifierSet } from "../rules/types";
 import type { HowlingRow } from "../utils/howling";
-import type { SkillDisplay, SkillLabel } from "../utils/skill";
+import type { SkillDisplay } from "../utils/skill";
 import type { ValueSegment } from "./helpers";
 
 /**
@@ -128,6 +128,18 @@ export type CustomSkillRow = SkillDisplay & {
 export type BaseSkillRow = SkillDisplay & {
   key: string;
   target: number;
+};
+
+/** 技能タブのコンテキスト。共鳴者とNPCで共有する（`context/skills.ts` が組む） */
+export type SkillsContext = {
+  skills: Record<string, SkillRow>;
+  baseSkills: BaseSkillRow[];
+  /** 技能リストに並べるカスタム技能（通常・エクストラ、編集モードではベースも） */
+  customSkills: CustomSkillRow[];
+  /** 基本技能のチップ列に並べるカスタム技能（ベース区分のみ、閲覧モードだけ） */
+  customBaseSkills: CustomSkillRow[];
+  skillPointSum: number;
+  skillPointMax: number;
 };
 
 /**
@@ -400,40 +412,36 @@ export type WeaponContext = SheetContextBase<EmokloreItem, WeaponDataModel> & {
   notesHTML: string;
 };
 
-/** 人間NPCシートの技能1行。共鳴者シートと違い、組込技能にも区分の印を出す */
-export type NpcSkillRow = SkillDisplay & {
+/** 人間NPCシートの能力値1行。共鳴者のカード（段入力）と違い、素の数値入力で編集する */
+export type NpcCharacteristicRow = {
   key: string;
-  /** シートの `data-roll-type` の値 */
-  rollType: string;
-  level: number;
-  target: number;
-  /** レベル入力のスキーマフィールド。基本技能はレベルを編集できないので持たない */
-  field?: foundry.data.fields.DataField | undefined;
-  /** 閲覧モードに並べるか。基本技能だけが持つ（`shownBaseSkills`） */
-  shown?: boolean;
+  label: string;
+  icon: string;
+  value: number;
+  /** 入力のスキーマフィールド。min / max はここから来る（SkillRow#field と同じ扱い） */
+  field: foundry.data.fields.DataField | undefined;
 };
 
 /**
  * 人間NPCシートのコンテキスト。
  *
- * 共通の8項目は SheetContextBase が持つ（理由はそちらを参照）。
+ * 共通の8項目は SheetContextBase が持つ（理由はそちらを参照）。技能タブの行は
+ * 共鳴者と同じ型（`SkillsContext` の分配）で、パートごとに積むので optional。
  */
 export type NpcSheetContext = SheetContextBase<EmokloreActor, NpcDataModel> & {
-  characteristics: Array<{
-    key: string;
-    label: string;
-    icon: string;
-    value: number;
-    /** 入力のスキーマフィールド。min / max はここから来る（SkillRow#field と同じ扱い） */
-    field: foundry.data.fields.DataField | undefined;
-  }>;
-  skills: NpcSkillRow[];
-  /** 閲覧モードでは `shownBaseSkills` に選ばれたものだけ。編集モードは13件すべて */
-  baseSkills: NpcSkillRow[];
-  /** カスタム技能は判定に要る分だけ。能力値は列に出さないので SkillLabel で足りる */
-  customSkills: Array<SkillLabel & { id: string; level: number; target: number }>;
-  /** 装備の概念を持たないので、共鳴者の武器行から equipped を落としたもの */
-  weapons: Array<Omit<WeaponRow, "equipped">>;
+  tabs: Record<string, ApplicationTab>;
+  tab?: unknown;
+  characteristics?: NpcCharacteristicRow[];
+  skills?: Record<string, SkillRow>;
+  /** 閲覧モードでは `shownBaseSkills` に選ばれたものだけ。編集モードは全件 */
+  baseSkills?: BaseSkillRow[];
+  customSkills?: CustomSkillRow[];
+  customBaseSkills?: CustomSkillRow[];
+  /** 編集モードの「プレイ画面に出す」選択リスト。選択によらず全件 */
+  baseSkillToggles?: Array<BaseSkillRow & { shown: boolean }>;
+  weapons?: WeaponRow[];
+  armors?: ArmorRow[];
+  effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;
 };
 
 /**

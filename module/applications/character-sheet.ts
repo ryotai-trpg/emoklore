@@ -10,8 +10,8 @@ import {
   buildBiographyContext,
   buildEffectsContext,
   buildSidebarContext,
-  buildSkillsContext,
 } from "./context/character";
+import { buildSkillsContext } from "./context/skills";
 import { EmotionPicker } from "./emotion-picker";
 import { EMOTION_KEYS, getAcquiredEmotionRows, getEmotionRows } from "./helpers";
 import type { CharacterContext, EmokloreRenderOptions, EmotionKey } from "./types";
