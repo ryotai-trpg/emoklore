@@ -1,5 +1,5 @@
-/* 怪異シートのレイアウト。templates/actor/kai-sheet.hbs と対。
-   HP/装甲/MP・共鳴感情・共鳴プリセット・憑依変異・攻撃リストを縦に並べる */
+/* 怪異シートのレイアウト。templates/actor/kai-*.hbs と対。
+   ヘッダ（名前・HP/MP）を常時表示し、その下にステータス・攻撃・効果のタブを持つ */
 
 @layer applications {
   /* リサイズの下限。**内容から導ける値ではない。**
@@ -12,27 +12,51 @@
   }
 
   .emoklore.sheet.kai {
-    /* 単一パート（.em-kai）を .window-content（本体が flex 縦積み）の中で伸ばし、はみ出しを
-       スクロールさせる。flex の子は min-height: auto だと縮まずスクロールが効かないので 0 にする */
-    .em-kai {
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
+    /* パートは .window-content 直下に兄弟として並ぶ。ヘッダとタブナビを上に固定し、
+       3行目のセルにタブの中身を重ねる（非アクティブなタブは本体が display: none にする）。
+       3行目を minmax(0, 1fr) にしないと、中身の高さが行を押し広げて
+       タブ内の独立スクロールが効かなくなる（NPCシートと同じ作り） */
+    .window-content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto minmax(0, 1fr);
+    }
+
+    section.tab {
+      grid-row: 3;
+      overflow: auto;
       padding-right: var(--spacer-4);
     }
 
     .em-kai__header {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas: "avatar name" "avatar resources";
       align-items: center;
-      gap: var(--spacer-8);
+      gap: var(--spacer-4) var(--spacer-8);
       padding-bottom: var(--spacer-8);
       border-bottom: 1px solid var(--color-border);
     }
 
+    .em-kai__header .em-avatar {
+      grid-area: avatar;
+    }
+
     .em-kai__name {
+      grid-area: name;
       margin: 0;
       font-size: var(--font-size-20);
+    }
+
+    .em-kai__name-input {
+      grid-area: name;
+    }
+
+    .em-kai__resources {
+      grid-area: resources;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacer-16);
     }
 
     .em-kai__stats {
@@ -53,7 +77,9 @@
       border-top: 1px solid var(--color-border);
     }
 
-    .em-kai__block h3 {
+    /* 攻撃タブの見出しはブロックの外（em-section-head 直下）に居るので、両方に当てる */
+    .em-kai__block h3,
+    .em-kai__block-head h3 {
       margin: 0 0 var(--spacer-4);
       font-size: var(--font-size-14);
     }

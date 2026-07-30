@@ -70,11 +70,11 @@ const MODES = ["play", "edit"];
 /** タブを持つ軽量シート。既定寸法のまま、タブ×モードで撮る */
 const TABBED_SHEETS = [
   { name: "npc", spec: { actor: SHOT_NAMES.npc }, tabs: ["skills", "items", "effects"] },
+  { name: "kai", spec: { actor: SHOT_NAMES.kai }, tabs: ["status", "attacks", "effects"] },
 ];
 
-/** 既定幅で撮る対象。怪異とアイテムはタブを持たないので寸法もそのまま */
+/** 既定幅で撮る対象。アイテムシートはタブを持たないので寸法もそのまま */
 const OTHER_SHEETS = [
-  { name: "kai", spec: { actor: SHOT_NAMES.kai } },
   { name: "item-weapon", spec: { actor: CHARACTER.actor, item: SHOT_NAMES.weapon } },
   { name: "item-armor", spec: { actor: CHARACTER.actor, item: SHOT_NAMES.armor } },
   { name: "item-skill", spec: { actor: CHARACTER.actor, item: SHOT_NAMES.customSkill } },

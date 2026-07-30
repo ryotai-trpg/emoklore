@@ -448,14 +448,17 @@ export type NpcSheetContext = SheetContextBase<EmokloreActor, NpcDataModel> & {
  * 怪異シートのコンテキスト。
  *
  * 共通の8項目は SheetContextBase が持つ（理由はそちらを参照）。
+ * パートごとに積むフィールドは optional。
  */
 export type KaiSheetContext = SheetContextBase<EmokloreActor, KaiDataModel> & {
+  tabs: Record<string, ApplicationTab>;
+  tab?: unknown;
   /** 「感情（属性）」の並び。属性順に整えたもの */
-  selectedEmotions: Array<{ key: string; label: string }>;
+  selectedEmotions?: Array<{ key: string; label: string }>;
   /** enrichHTML 済みの憑依変異 */
-  mutationHTML: string;
+  mutationHTML?: string;
   /** 共鳴表への @UUID リンク。参照が無ければ空文字 */
-  resonanceTableLink: string;
+  resonanceTableLink?: string;
   /**
    * 攻撃1件ぶんのフィールド。ラベルとプレースホルダを引くために積む。
    *
@@ -464,5 +467,6 @@ export type KaiSheetContext = SheetContextBase<EmokloreActor, KaiDataModel> & {
    * "element" に固定する）。テンプレートから毎回この道を辿ると読めないので、
    * コンテキスト側で解決しておく
    */
-  attackFields: SchemaField["fields"];
+  attackFields?: SchemaField["fields"];
+  effects?: ReturnType<typeof import("../utils/effects").prepareActiveEffectCategories>;
 };

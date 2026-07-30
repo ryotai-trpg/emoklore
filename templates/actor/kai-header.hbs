@@ -1,0 +1,42 @@
+{{! 怪異のヘッダ。名前とHP/MPは卓中（攻撃タブを開いたまま減らす）に常時見えている必要が
+    あるので、タブの外の独立パートにする。HP/MPは現行のstat形式のまま — 怪異の最大値は
+    派生ではなく手入力なので、NPCの「最大値は表示だけ」の形には寄せない }}
+<header class="em-kai__header">
+  <img class="em-avatar" src="{{document.img}}" data-edit="img" alt="" />
+  {{#if isPlay}}
+    <h1 class="em-kai__name">{{document.name}}</h1>
+  {{else}}
+    <input class="em-kai__name-input" type="text" name="name" value="{{document.name}}"
+      placeholder="{{localize "DOCUMENT.FIELDS.name.label"}}" />
+  {{/if}}
+
+  {{! 現在値は卓中に減っていくものなので、モードによらず入力にする（共鳴者のメータと同じ）。
+      組み立ての値である最大値だけを編集モードに残す。入力はスキーマから描くので、
+      怪異のHP/MPが持つ min: 0 がそのまま効く }}
+  <div class="em-kai__resources">
+    <label class="em-kai__stat">
+      <span>{{systemFields.resources.fields.hp.label}}</span>
+      <span class="em-kai__stat-edit">
+        {{formInput systemFields.resources.fields.hp.fields.value value=system.resources.hp.value}}
+        <span>/</span>
+        {{#if isPlay}}
+          <span>{{system.resources.hp.max}}</span>
+        {{else}}
+          {{formInput systemFields.resources.fields.hp.fields.max value=system.resources.hp.max}}
+        {{/if}}
+      </span>
+    </label>
+    <label class="em-kai__stat">
+      <span>{{systemFields.resources.fields.mp.label}}</span>
+      <span class="em-kai__stat-edit">
+        {{formInput systemFields.resources.fields.mp.fields.value value=system.resources.mp.value}}
+        <span>/</span>
+        {{#if isPlay}}
+          <span>{{system.resources.mp.max}}</span>
+        {{else}}
+          {{formInput systemFields.resources.fields.mp.fields.max value=system.resources.mp.max}}
+        {{/if}}
+      </span>
+    </label>
+  </div>
+</header>

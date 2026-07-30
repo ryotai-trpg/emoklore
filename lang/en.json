@@ -264,6 +264,13 @@
         "BaseSkills": "Base Skills",
         "ShowBaseSkill": "Show in play mode"
       },
+      "kai": {
+        "tab": {
+          "status": "Status",
+          "attacks": "Attacks",
+          "effects": "Effects"
+        }
+      },
       "rowMenu": {
         "Open": "Open",
         "Delete": "Delete"
