@@ -124,7 +124,24 @@ dnd5e の module 構成（applications / data / dice / documents / config / util
 
 **MP境界の案内には `damageResultVisibility` を効かせない。** あれは「敵のHPを伏せる」ための設定で、こちらは自分のシートを編集した結果の案内なので伏せる理由が無い。
 
-公開範囲は本体の `messageMode`（`ChatMessage#_preCreate` が `applyMode` へ渡す）に写している。**渡さなければ `applyMode` 自体が走らない**ので、既定の「全員に出す」は何も渡さないことで表している。判定メッセージ側への適用は Issue #16 に残っている。
+公開範囲は本体の `messageMode`（`ChatMessage#_preCreate` が `applyMode` へ渡す）に写している。**渡さなければ `applyMode` 自体が走らない**ので、カードの既定「全員に出す」は何も渡さないことで表している。
+
+**判定はチャット欄のモード選択に従う**（`chat/message.ts` の `currentMessageMode`）。同じ理由で、渡さなければ設定そのものが無視されるため、現在のモードを読んで渡している。`blind` のときは振る側にもダイスを見せない（`evaluate({allowInteractive: false})`。本体の `Roll#toMessage` と同じ扱い）。
+
+**モードは評価より前に1回だけ決め、ロールと一緒に運ぶ。** `allowInteractive` は評価時に、`applyMode` は作成時に効くので、2箇所で別々に設定を読むと「秘匿したのにダイスは見えた」が起きる。`buildSkillRoll` が解決したモードを戻り値に載せ、呼び出し側がそれを `createRollMessage` へ渡す形にしてある（`#buildRoll` はモードを必須引数で受けるので、勝手に読み直す経路は型で塞がっている）。draw-steel と ryuutama は同じことを `Roll#toMessage` のオーバーライド内で完結させているが、**`dice/` は `chat/` をimportできない**ので（[コード設計の規約](/code-design#層とimportの方向)）、両方を引ける `documents/` を解決点にしている。
+
+追従させるのは「振った人の結果」と、それに対になって**自動で出る**カードだけ。
+
+| 追従する | 理由 |
+|---|---|
+| 判定結果（`createRollMessage`） | 秘匿判定そのもの |
+| 共鳴のあと始末（`chat/resonance-outcome.ts`） | 判定の直後に自動で出るので、ここが公開だと〈∞共鳴〉が動いたことが漏れて秘匿が破れる |
+
+| 追従しない | 理由 |
+|---|---|
+| 技能要求・共鳴要求のカード | DLがPLに「振って」と頼むもの。届かないと機能しないのに、DL自身には見えているので気づけない |
+| 生存リマインダ | ラウンド終了で自動的に出るので、そのとき"たまたま"選ばれていたモードに左右させない |
+| 武器・怪異の攻撃カード | 追従させてよいが、判定とは別の判断なので保留 |
 
 ## 効果（ActiveEffect）の載せ方
 

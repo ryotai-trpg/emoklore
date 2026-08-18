@@ -284,4 +284,49 @@ export async function run({ page, check }) {
       TAG,
     ),
   );
+
+  await check("判定がチャット欄のモード選択に従う", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        await game.settings.set("core", "messageMode", "gm");
+        try {
+          const before = game.messages.size;
+          a.sheet.element.querySelector("[data-roll-type=skill][data-skill=search]").click();
+          await window.__waitFor(() => game.messages.size > before, { label: "判定のメッセージ" });
+
+          const posted = game.messages.contents.at(-1);
+          const gmIds = game.users.filter((u) => u.isGM).map((u) => u.id);
+          const whispered = gmIds.length > 0 && gmIds.every((id) => posted.whisper.includes(id));
+          if (!whispered) {
+            return { ok: false, detail: `DLへの限定になっていない: whisper=${posted.whisper}` };
+          }
+          return { ok: true, detail: `whisper=${posted.whisper.length}人（DLのみ）` };
+        } finally {
+          await game.settings.set("core", "messageMode", "public");
+        }
+      },
+      TAG,
+    ),
+  );
+
+  await check("モードを戻せば判定は全員に見える", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        const a = game.actors.getName(`${tag}_char`);
+        const before = game.messages.size;
+        a.sheet.element.querySelector("[data-roll-type=skill][data-skill=search]").click();
+        await window.__waitFor(() => game.messages.size > before, { label: "判定のメッセージ" });
+
+        const posted = game.messages.contents.at(-1);
+        return {
+          ok: posted.whisper.length === 0 && posted.blind === false,
+          detail: `whisper=${posted.whisper.length}件 blind=${posted.blind}`,
+        };
+      },
+      TAG,
+    ),
+  );
 }

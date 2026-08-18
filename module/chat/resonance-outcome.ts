@@ -9,7 +9,7 @@ import { systemPath } from "../constants";
 import type { ResonanceOutcomeState } from "../data/messages/resonance-outcome";
 import type { EmokloreActor } from "../documents/actor";
 import { resolveResonanceTable } from "../utils/howling";
-import { createCardMessage } from "./message";
+import { createCardMessage, currentMessageMode } from "./message";
 
 const TEMPLATE = systemPath("templates/chat/resonance-outcome.hbs");
 
@@ -35,15 +35,23 @@ const renderResonanceOutcomeCard = async (state: ResonanceOutcomeState): Promise
   });
 };
 
-/** 共鳴判定のあと始末をチャットに流す */
+/**
+ * 共鳴判定のあと始末をチャットに流す。
+ *
+ * 判定結果と同じモードに乗せる。このカードは共鳴判定の**直後に自動で**出るので、
+ * 判定だけを秘匿してもここが公開のままだと〈∞共鳴〉が動いたことが漏れ、秘匿が破れる。
+ */
 export async function createResonanceOutcomeMessage(
   actor: EmokloreActor,
   outcome: ResonanceOutcomeState,
 ): Promise<ChatMessage | undefined> {
-  return createCardMessage({
-    type: "resonanceOutcome",
-    system: outcome,
-    speaker: ChatMessage.getSpeaker({ actor }),
-    content: await renderResonanceOutcomeCard(outcome),
-  });
+  return createCardMessage(
+    {
+      type: "resonanceOutcome",
+      system: outcome,
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content: await renderResonanceOutcomeCard(outcome),
+    },
+    { messageMode: currentMessageMode() },
+  );
 }

@@ -94,8 +94,10 @@ async function rollDefense(defender: EmokloreActor | null, button: HTMLElement):
   const el = button as HTMLButtonElement;
   el.disabled = true;
   try {
-    const { roll, flavor } = await defender.buildSkillRoll(ref);
-    await createRollMessage({ actor: defender, flavor, roll });
+    // buildSkillRoll が解決したモードをそのまま渡す。評価時とカード作成時で
+    // 別々に読むと blind が食い違う
+    const { roll, flavor, messageMode } = await defender.buildSkillRoll(ref);
+    await createRollMessage({ actor: defender, flavor, roll }, { messageMode });
     (form.elements.namedItem("reduction") as HTMLInputElement).value = String(
       normalizeReduction(roll.successCount),
     );
