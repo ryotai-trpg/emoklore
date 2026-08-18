@@ -44,7 +44,11 @@ const renderResonanceRequestCard = (state: ResonanceRequestState): Promise<strin
     targets: state.targets.map((target) => target.name).join("、"),
   });
 
-/** DLからの共鳴判定・憑依判定の要求をチャットに流す */
+/**
+ * DLからの共鳴判定・憑依判定の要求をチャットに流す。
+ *
+ * 技能要求カードと同じく、**チャット欄のモード選択には追従しない**（届かないと機能しない）。
+ */
 export async function createResonanceRequestMessage(
   request: ResonanceRequestState,
 ): Promise<ChatMessage | undefined> {

@@ -47,7 +47,12 @@ const renderSkillRequestCard = (state: SkillRequestState): Promise<string> =>
     note: state.note,
   });
 
-/** DLからの判定要求をチャットに流す */
+/**
+ * DLからの判定要求をチャットに流す。
+ *
+ * **チャット欄のモード選択には追従しない。** 振ってほしい相手に届かないと機能しない
+ * カードで、DLが「GMのみ」のまま出すと誰にも届かないのに自分には見えているので気づけない。
+ */
 export async function createSkillRequestMessage(
   request: SkillRequestState,
 ): Promise<ChatMessage | undefined> {

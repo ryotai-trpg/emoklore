@@ -31,6 +31,19 @@ export type PostOptions = {
 };
 
 /**
+ * チャット欄で選ばれているモード。
+ *
+ * 本体は `create` に `options.messageMode` を渡さないと `applyMode` を呼ばないので、
+ * **この設定は自分で読んで渡さないと一切効かない**（`Roll#toMessage` は自前で埋めているが、
+ * このシステムは `toMessage` を使っていない）。
+ *
+ * 追従させるのは「振った人の結果」だけにする。DLからの要求カードや自動で出る
+ * リマインダまで追従させると、届かないと機能しないものが黙って隠れる。
+ */
+export const currentMessageMode = (): MessageMode =>
+  game.settings.get("core", "messageMode") as MessageMode;
+
+/**
  * 型付きカード1枚ぶんの中身。
  *
  * `system` はサブタイプのスキーマと同じ形。型引数で受けるので、
@@ -115,18 +128,22 @@ export type RollMessageData = {
  * 判定の種類によらず内容は同じなので、ここに集約している。サブタイプを持たない
  * （状態もボタンも無い）ので、カードの口とは分けてある。
  */
-export async function createRollMessage({
-  actor,
-  flavor,
-  roll,
-}: RollMessageData): Promise<ChatMessage | undefined> {
-  const created = await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ actor }),
-    flavor,
-    rolls: [roll],
-    sound: CONFIG.sounds.dice,
-    flags: COMMON_FLAGS,
-  });
+export async function createRollMessage(
+  { actor, flavor, roll }: RollMessageData,
+  { messageMode }: PostOptions = {},
+): Promise<ChatMessage | undefined> {
+  const options: CreateOptions = { messageMode: messageMode ?? currentMessageMode() };
+
+  const created = await ChatMessage.create(
+    {
+      speaker: ChatMessage.getSpeaker({ actor }),
+      flavor,
+      rolls: [roll],
+      sound: CONFIG.sounds.dice,
+      flags: COMMON_FLAGS,
+    },
+    options,
+  );
 
   return created as ChatMessage | undefined;
 }

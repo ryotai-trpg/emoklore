@@ -13,7 +13,12 @@ import { formatRollFlavor } from "./roll-flavor";
 
 const TEMPLATE = systemPath("templates/chat/survival-reminder.hbs");
 
-/** ラウンド終了時のリマインダをチャットに流す */
+/**
+ * ラウンド終了時のリマインダをチャットに流す。
+ *
+ * **チャット欄のモード選択には追従しない。** ラウンド終了で自動的に出るものなので、
+ * そのとき"たまたま"選ばれていたモードに左右させない。
+ */
 export async function createSurvivalReminderMessage(
   targets: SurvivalTarget[],
   round: number,

@@ -1,6 +1,6 @@
 import { createMpNoticeMessage } from "../chat/damage-applied";
 import { createKaiAttackMessage } from "../chat/kai-attack-card";
-import { createRollMessage } from "../chat/message";
+import { createRollMessage, currentMessageMode } from "../chat/message";
 import { formatRollFlavor, formatSkillName, resonanceSkillName } from "../chat/roll-flavor";
 import type { CharacterDataModel } from "../data/character";
 import type { CharacterLikeDataModel, SkillRef } from "../data/character-like";
@@ -321,7 +321,11 @@ export class EmokloreActor extends Actor {
   async #buildRoll(spec: RollSpec, options: Record<string, unknown>): Promise<EmokloreRoll> {
     // 本体の evaluate() の戻り型は Roll なので、戻り値ではなくインスタンスを取り回す
     const roll = EmokloreRoll.fromSpec(spec, options);
-    await roll.evaluate();
+
+    // blind は「DLだけに見える」ので、振る側にもダイスを見せない。本体の
+    // Roll#toMessage が evaluate({allowInteractive: messageMode !== "blind"}) で
+    // やっているのと同じ扱い（client/dice/roll.mjs:935）
+    await roll.evaluate({ allowInteractive: currentMessageMode() !== "blind" });
 
     return roll;
   }

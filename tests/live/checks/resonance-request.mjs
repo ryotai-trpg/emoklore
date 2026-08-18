@@ -253,4 +253,59 @@ export async function run({ page, check }) {
       TAG,
     ),
   );
+
+  await check("共鳴判定を秘匿するとあと始末カードも秘匿される", () =>
+    assertInPage(
+      page,
+      async (tag) => {
+        // 既存のチェックと同じ形。assertInPage はページ側で評価されるので、
+        // ヘルパもこの関数の中で定義する
+        const useActor = async (target) => {
+          await game.user.update({ character: target.id });
+          for (const token of [...(canvas?.tokens?.controlled ?? [])]) token.release();
+          await window.__waitFor(() => (canvas?.tokens?.controlled ?? []).length === 0, {
+            soft: true,
+            timeout: 1000,
+            label: "トークンの選択解除",
+          });
+        };
+
+        const actor = game.actors.getName(`${tag}_char`);
+        await actor.update({ "system.resources.resonance.value": 1 });
+
+        const previous = game.user.character;
+        await useActor(actor);
+        await game.settings.set("core", "messageMode", "gm");
+        try {
+          const request = game.messages.contents.findLast((m) => m.type === "resonanceRequest");
+          const card = await window.__waitFor(
+            () => document.querySelector(`[data-message-id="${request.id}"] .em-resonance-request`),
+            { label: "要求カードの描画" },
+          );
+
+          const before = game.messages.size;
+          card.querySelector("[data-action=rollResonance]").click();
+          await window.__waitFor(() => game.messages.size >= before + 2, { label: "判定と結果" });
+
+          // 判定とあと始末の2件。片方だけ秘匿されると〈∞共鳴〉が動いたことが漏れる
+          const posted = game.messages.contents.slice(-2);
+          const gmIds = game.users.filter((u) => u.isGM).map((u) => u.id);
+          const hidden = (m) => gmIds.length > 0 && gmIds.every((id) => m.whisper.includes(id));
+
+          const outcome = posted.at(-1);
+          if (outcome.type !== "resonanceOutcome") {
+            return { ok: false, detail: `あと始末カードが出ていない: ${outcome.type}` };
+          }
+          return {
+            ok: posted.every(hidden),
+            detail: `判定=${hidden(posted[0]) ? "秘匿" : "公開"} あと始末=${hidden(outcome) ? "秘匿" : "公開"}`,
+          };
+        } finally {
+          await game.settings.set("core", "messageMode", "public");
+          await game.user.update({ character: previous?.id ?? null });
+        }
+      },
+      TAG,
+    ),
+  );
 }
