@@ -4,6 +4,11 @@ on:
   push:
     branches: [develop, main]
   pull_request:
+  # typecheckジョブのキャッシュ延命を兼ねる。Actions cacheは7日アクセスが無いと
+  # 消えるので週2回触る。消えるとフォーク・DependabotのPRが型チェックを飛ばすようになる。
+  # 併せて develop が今も型チェックを通ることの定期確認になる
+  schedule:
+    - cron: "0 21 * * 1,4" # 月・木 06:00 JST
 
 # 追加の権限は要らない。読み取りだけに絞る
 permissions:
@@ -37,6 +42,7 @@ jobs:
   build:
     name: Build & Checks
     runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -67,6 +73,7 @@ jobs:
   audit:
     name: Audit
     runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -83,14 +90,12 @@ jobs:
   typecheck:
     name: Type Check
     runs-on: ubuntu-latest
-    # フォークPRにはsecretsが渡らないので、キャッシュミス時に fetch-foundry.mjs へ倒せない。
-    # 本体ソースを用意する手段が無くなるため、ジョブごと実行しない。
-    # cache自体はフォークPRからでもbase/デフォルトブランチのぶんをrestoreできるが、
-    # ミスしたときに落ちるだけのジョブは置かない
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     env:
       # ローカルのFoundry本体を更新したら合わせて上げる（世代はsystem.jsonのcompatibilityと対応）
       FOUNDRY_BUILD: "365"
+      # フォークPRとDependabotのPRにはsecretsが渡らない（Dependabotは専用のsecret storeを見る）。
+      # secretsコンテキストは if: から読めないので、有無だけをここに写して判定に使う
+      HAS_CREDENTIALS: ${{ secrets.FOUNDRY_USERNAME != '' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -99,6 +104,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      # cacheはフォークPRからでもbase/デフォルトブランチのぶんをrestoreできる
+      # （できないのは新規cacheの保存のほう）。scheduleで週2回触って消さないようにしてある
       - name: Restore Foundry sources
         id: foundry-cache
         uses: actions/cache@v6
@@ -106,10 +113,18 @@ jobs:
           path: foundry
           key: foundry-types-${{ env.FOUNDRY_BUILD }}
       - name: Fetch Foundry sources
-        if: steps.foundry-cache.outputs.cache-hit != 'true'
+        id: fetch
+        if: steps.foundry-cache.outputs.cache-hit != 'true' && env.HAS_CREDENTIALS == 'true'
         run: node tools/fetch-foundry.mjs
         env:
           FOUNDRY_USERNAME: ${{ secrets.FOUNDRY_USERNAME }}
           FOUNDRY_PASSWORD: ${{ secrets.FOUNDRY_PASSWORD }}
       - name: Type check
+        if: steps.foundry-cache.outputs.cache-hit == 'true' || steps.fetch.outcome == 'success'
         run: npm run typecheck
+      # 飛ばしたことを緑の中に埋もれさせない。「CIが緑なので検証済み」という誤解は
+      # docs/testing.md が実機検証をCIに載せない理由に挙げているもので、ここでも同じ
+      - name: Note skipped type check
+        if: steps.foundry-cache.outputs.cache-hit != 'true' && steps.fetch.outcome != 'success'
+        run: |
+          echo "::warning::本体ソースを用意できなかったため型チェックを飛ばした（cacheミス、かつsecretsの無いPR）"
