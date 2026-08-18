@@ -111,10 +111,13 @@ feat: add resonance roll dialog
 
 ### 自動チェック
 
-- **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。`.hbs` を触れば `check:templates`、`lang/*.json` を触れば `check:lang`、`system.json` を触れば `check:manifest-urls`、`package.json` / `biome.json` / `ci.yml` を触れば `check:biome-version` も走る。翻訳キーと参照側の突き合わせ（`check:i18n`）は、`lang/*.json` / `.hbs` / `module/**/*.ts` / `system.json` のどれを触っても走る。スキーマ表とconfigのテーブルの突き合わせ（`check:schema-doc`）は、`module/config/` / `docs/data-model.md` / `docs/active-effect.md` / `lang/ja.json` のどれを触っても走る。緊急時は `git commit --no-verify` でスキップできるが非推奨
-- **CI**: pushとPRで GitHub Actions が Biome・テスト・ビルド・型チェック・翻訳/テンプレート/スキーマ表/配布URL/Biomeバージョンの整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要
-  - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。フォークからのPRでは実行されない。本体のビルド番号は `ci.yml` の `FOUNDRY_BUILD` でピン留めしてあり（キャッシュキーもここから作られる）、ローカルのFoundryを更新したら合わせて上げる
-- **依存の更新**: DependabotがnpmとGitHub Actionsを週次で見る（`.github/dependabot.yml`）。パッチとマイナーは1本にまとめ、メジャーは個別にPRが立つ。**Biomeだけは3箇所（`package.json` / `biome.json` の `$schema` / `ci.yml` の `setup-biome`）を揃える必要がある**。Dependabotが上げてくるのは `package.json` だけなので、残り2つは手で追従させる。揃っていなければ `check:biome-version` が落ちるので、追従漏れはDependabotのPRの時点で分かる
+- **pre-commitフック**: `npm install` 時に [lefthook](https://lefthook.dev/) がgitフックを自動セットアップし、コミット時にstagedファイルへBiomeが適用される（修正は自動でstageされる）。`.hbs` を触れば `check:templates`、`lang/*.json` を触れば `check:lang`、`system.json` を触れば `check:manifest-urls`、`package.json` を触れば `check:biome-version` も走る。翻訳キーと参照側の突き合わせ（`check:i18n`）は、`lang/*.json` / `.hbs` / `module/**/*.ts` / `system.json` のどれを触っても走る。スキーマ表とconfigのテーブルの突き合わせ（`check:schema-doc`）は、`module/config/` / `docs/data-model.md` / `docs/active-effect.md` / `lang/ja.json` のどれを触っても走る。緊急時は `git commit --no-verify` でスキップできるが非推奨
+- **pre-pushフック**: pushの前に `npm test` と `npm run typecheck` が走る（合わせて1.5秒）。本体ソース（`foundry/`）が無い環境では型チェックだけ黙って飛ばす。CIの型チェックが動かない場合の受け皿でもある（下記）。`git push --no-verify` でスキップできるが非推奨
+- **CI**: pushとPRで GitHub Actions が Biome・テスト・ビルド・型チェック・翻訳/テンプレート/スキーマ表/配布URL/Biomeバージョンの整合チェックを実行する（`.github/workflows/ci.yml`）。マージにはCIが通ることが必要。Biomeは lockfile が入れたものを `npx` で呼ぶので、手元とCIで同一のバイナリが走る
+  - 型チェックジョブは本体ソース（`client/` + `common/`）をActions cacheで保持し、キャッシュミス時のみ `tools/fetch-foundry.mjs` がsecrets（`FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD`）でfoundryvtt.comからNode配布版を取得する。本体のビルド番号は `ci.yml` の `FOUNDRY_BUILD` でピン留めしてあり（キャッシュキーもここから作られる）、ローカルのFoundryを更新したら合わせて上げる
+  - **secretsはフォークからのPRとDependabotのPRには渡らない**（Dependabotは専用のsecret storeを見る）。cacheの復元自体はフォークPRからでもできるので、ヒットすれば型チェックは走る。ミスして取得もできないときはジョブを落とさず警告だけ出して飛ばす（手元の pre-push が受け皿）。Actions cacheは7日アクセスが無いと消えるため、週2回のscheduleで触って延命している。scheduleのときは型チェック以外のジョブは回らない
+  - **publicリポジトリのscheduled workflowは60日間リポジトリ活動が無いと自動で止まる。** 止まったらActionsの画面で再有効化する
+- **依存の更新**: DependabotがnpmとGitHub Actionsを週次で見る（`.github/dependabot.yml`）。パッチとマイナーは1本にまとめ、メジャーは個別にPRが立つ。Biomeのバージョンを書く場所は `package.json` の1箇所だけで、`biome.json` の `$schema` は `node_modules` のスキーマを、CIは lockfile のBiomeを見るので手で追従させるものは無い。`check:biome-version` は**完全固定に保たれているか**だけを見る（プラグイン `tools/*.grit` の挙動はパッチ版でも変わりうるので、上げる時期はDependabotのPRで明示的に決める）
 
 ## 表記ルール
 
