@@ -1,6 +1,6 @@
 import { createMpNoticeMessage } from "../chat/damage-applied";
 import { createKaiAttackMessage } from "../chat/kai-attack-card";
-import { createRollMessage, currentMessageMode } from "../chat/message";
+import { createRollMessage, currentMessageMode, type MessageMode } from "../chat/message";
 import { formatRollFlavor, formatSkillName, resonanceSkillName } from "../chat/roll-flavor";
 import type { CharacterDataModel } from "../data/character";
 import type { CharacterLikeDataModel, SkillRef } from "../data/character-like";
@@ -286,9 +286,9 @@ export class EmokloreActor extends Actor {
     options: Record<string, unknown> = {},
     situational: ModifierSet = NO_MODIFIER,
   ): Promise<ChatMessage | undefined> {
-    const { roll, flavor } = await this.buildSkillRoll(ref, options, situational);
+    const { roll, flavor, messageMode } = await this.buildSkillRoll(ref, options, situational);
 
-    return createRollMessage({ actor: this, flavor, roll });
+    return createRollMessage({ actor: this, flavor, roll }, { messageMode });
   }
 
   /**
@@ -301,7 +301,7 @@ export class EmokloreActor extends Actor {
     ref: SkillRef,
     options: Record<string, unknown> = {},
     situational: ModifierSet = NO_MODIFIER,
-  ): Promise<{ roll: EmokloreRoll; flavor: string }> {
+  ): Promise<{ roll: EmokloreRoll; flavor: string; messageMode: MessageMode }> {
     // 技能判定は能力値＋技能を持つ共鳴者・人間NPCだけ。怪異は直接判定の攻撃を使う
     if (!this.isCharacterLike()) {
       throw new Error(`emoklore | この種別は技能判定を持ちません: ${this.type}`);
@@ -311,21 +311,31 @@ export class EmokloreActor extends Actor {
     const context = this.system.getSkillRollContext(ref);
     const spec = resolveSkillRoll({ ...context.params, situationalMod: situational });
 
+    // モードは評価より前に決める。allowInteractive と applyMode が別々の値を見ると、
+    // blind を指定したのにダイスだけ見える、という食い違いが起きるため。
+    // 戻り値に載せてロールと一緒に運び、呼び出し側が同じ値を createRollMessage へ渡す
+    const messageMode = currentMessageMode();
+
     return {
-      roll: await this.#buildRoll(spec, options),
+      roll: await this.#buildRoll(spec, options, messageMode),
       flavor: formatRollFlavor(formatSkillName(context)),
+      messageMode,
     };
   }
 
-  /** 判定内容からRollを作って評価する */
-  async #buildRoll(spec: RollSpec, options: Record<string, unknown>): Promise<EmokloreRoll> {
+  /** 判定内容からRollを作って評価する。モードは呼び出し側が解決したものを受ける */
+  async #buildRoll(
+    spec: RollSpec,
+    options: Record<string, unknown>,
+    messageMode: MessageMode,
+  ): Promise<EmokloreRoll> {
     // 本体の evaluate() の戻り型は Roll なので、戻り値ではなくインスタンスを取り回す
     const roll = EmokloreRoll.fromSpec(spec, options);
 
     // blind は「DLだけに見える」ので、振る側にもダイスを見せない。本体の
     // Roll#toMessage が evaluate({allowInteractive: messageMode !== "blind"}) で
     // やっているのと同じ扱い（client/dice/roll.mjs:935）
-    await roll.evaluate({ allowInteractive: currentMessageMode() !== "blind" });
+    await roll.evaluate({ allowInteractive: messageMode !== "blind" });
 
     return roll;
   }
@@ -336,10 +346,15 @@ export class EmokloreActor extends Actor {
     skillName: string,
     options: Record<string, unknown>,
   ): Promise<ChatMessage | undefined> {
-    return createRollMessage({
-      actor: this,
-      flavor: formatRollFlavor(skillName),
-      roll: await this.#buildRoll(spec, options),
-    });
+    const messageMode = currentMessageMode();
+
+    return createRollMessage(
+      {
+        actor: this,
+        flavor: formatRollFlavor(skillName),
+        roll: await this.#buildRoll(spec, options, messageMode),
+      },
+      { messageMode },
+    );
   }
 }

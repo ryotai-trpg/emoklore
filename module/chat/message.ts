@@ -132,6 +132,9 @@ export async function createRollMessage(
   { actor, flavor, roll }: RollMessageData,
   { messageMode }: PostOptions = {},
 ): Promise<ChatMessage | undefined> {
+  // 省略時はここで設定を読むが、**モードを明示するなら評価時と同じ値を渡すこと**。
+  // blind のダイス抑止は Roll の評価時に決まるので（`documents/actor.ts` の #buildRoll）、
+  // ここだけ別の値にすると「秘匿したのにダイスは見えた」が起きる
   const options: CreateOptions = { messageMode: messageMode ?? currentMessageMode() };
 
   const created = await ChatMessage.create(
