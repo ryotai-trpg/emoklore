@@ -94,6 +94,31 @@ cp .env.example .env   # git管理外。書いた項目だけが効く
 
    セットアップ画面に入るための管理者アクセスキーは、この初回起動の画面で設定する（未設定でも入れる。検証自体はワールドへの参加しかしないのでどちらでもよい）
 
+### 本体を更新したあと
+
+**本体のビルドを上げると、次の `verify:live` は必ず一度落ちる。** 症状は「joinページにユーザーが1人もいない」で、原因が本体更新だと分からない出方をするので先に書いておく。
+
+ワールドの `compatibility.verified` はビルド単位（例: `14.365`）で記録される。本体が 14.366 になると `World#canAutoLaunch` が偽になり、`--world` を付けても起動しない。
+
+```js
+// dist/packages/world.mjs
+get canAutoLaunch(){
+  if(this.availability === PACKAGE_AVAILABILITY_CODES.MISSING_SYSTEM) return false;
+  if(this.incompatibleWithCoreVersion) return false;
+  const e = this.compatibility.verified;
+  return !!e && (Number.isInteger(Number(e)) ? e >= release.generation
+                                             : !isNewerVersion(release.version, e));
+}
+```
+
+対処は**セットアップ画面からワールドを一度手で起動する**こと。`verified` が新しいビルドに更新され、以後は `--world` で起動できる。
+
+```shell
+node <FOUNDRY_APP>/main.mjs --dataPath=<FVTT_DEV_DATA> --port=30014
+```
+
+合わせて `.github/workflows/ci.yml` の `FOUNDRY_BUILD` も上げる（キャッシュキーがここから作られる）。
+
 ### 構成
 
 ```
