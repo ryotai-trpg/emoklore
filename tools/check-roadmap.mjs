@@ -2,10 +2,12 @@
 // クローズ済みのIssueを引く行が [x] でなければ exit 1（オープンなのに [x] も同じ）。
 // 落ちたときに直す先はコードではなく docs/roadmap.md の側になる
 //
-// 唯一、外部の状態に依存するチェック。APIに到達できないとき（オフライン・
-// レート制限）は落とさずスキップし、pre-commit をネットワークに依存させない。
-// CIでは GITHUB_TOKEN（issues: read）を渡してレート制限を避ける
+// 唯一、外部の状態に依存するチェック（roadmap以外は check:issue-refs が見る）。
+// APIに到達できないとき（オフライン・レート制限）は落とさずスキップし、
+// pre-commit をネットワークに依存させない。CIでは GITHUB_TOKEN（issues: read）を
+// 渡してレート制限を避ける
 import { readFileSync } from "node:fs";
+import { fetchIssueStates } from "./issue-state.mjs";
 
 const DOC = "docs/roadmap.md";
 
@@ -27,33 +29,8 @@ if (items.length === 0) {
   process.exit(0);
 }
 
-// リポジトリは system.json の url が正
-const { url } = JSON.parse(readFileSync("system.json", "utf-8"));
-const repo = new URL(url).pathname.replace(/^\/+|\/+$/g, "");
-
-const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
-const fetchState = async (number) => {
-  const response = await fetch(`https://api.github.com/repos/${repo}/issues/${number}`, {
-    headers: {
-      accept: "application/vnd.github+json",
-      "x-github-api-version": "2022-11-28",
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-    },
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (response.status === 404) return "missing";
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return (await response.json()).state; // open | closed
-};
-
 const numbers = [...new Set(items.map((item) => item.number))];
-const states = new Map();
-const unreachable = [];
-const results = await Promise.allSettled(numbers.map(fetchState));
-results.forEach((result, index) => {
-  if (result.status === "fulfilled") states.set(numbers[index], result.value);
-  else unreachable.push(`#${numbers[index]}（${result.reason?.message ?? result.reason}）`);
-});
+const { repo, states, unreachable } = await fetchIssueStates(numbers);
 
 if (unreachable.length > 0) {
   console.warn(
