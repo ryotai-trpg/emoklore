@@ -1,6 +1,7 @@
-# gitフック定義（スキップしたい場合は `git commit --no-verify`。非推奨）
+# gitフック定義（スキップしたい場合は `git commit --no-verify` / `git push --no-verify`。非推奨）
 # - pre-commit: stagedファイルにBiome（format+lint）を自動適用し、テンプレートと翻訳を検査する
 # - commit-msg: コミットメッセージがdocs/contributing.mdの規約に沿うか検査する
+# - pre-push: 単体テストと型チェックを回す
 pre-commit:
   jobs:
     - name: biome
@@ -54,6 +55,25 @@ pre-commit:
     - name: biome-version
       glob: "package.json"
       run: npm run check:biome-version
+
+pre-push:
+  jobs:
+    # CIで見ているもののうち、依存も本体ソースも要らず一瞬で終わるもの（合わせて2秒）。
+    # フォークからのPRはCIの型チェックが本体ソースを用意できずに飛ぶことがあるので、
+    # 手元で一度は通す口をここに置く（Issue #56）
+    - name: test
+      run: npm test
+
+    - name: typecheck
+      # 本体ソースが無ければ型チェックのしようがない。pushは止めずに飛ばす。
+      # foundry そのものではなく foundry/client を見るのは、Foundryを移動して
+      # symlinkが切れた場合も拾うため（-d はリンク先の実在まで見る）
+      run: |
+        if [ ! -d foundry/client ]; then
+          echo "foundry/ が無いので型チェックを飛ばす（npm run link:foundry で用意できる）"
+          exit 0
+        fi
+        npm run typecheck
 
 commit-msg:
   jobs:
