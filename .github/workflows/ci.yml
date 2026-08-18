@@ -19,15 +19,20 @@ jobs:
   biome:
     name: Format & Lint
     runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
     steps:
       - uses: actions/checkout@v7
-      # プラグイン（tools/*.grit）を使うのでバージョンを固定する。
-      # package.json / biome.json の $schema と揃えること
-      # （buildジョブの check:biome-version が3箇所の一致を見ている）
-      - uses: biomejs/setup-biome@v2
+      - uses: actions/setup-node@v7
         with:
-          version: 2.5.5
-      - run: biome ci .
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      # lockfileが入れたBiomeをそのまま使う。プラグイン（tools/*.grit）の挙動が
+      # 手元とCIで食い違わないことを、バージョンの一致ではなく同一性で保証する。
+      # setup-biome でバージョンを書くと、Dependabotが package.json だけを上げた週に
+      # 必ず食い違って落ちていた
+      - run: npx biome ci .
 
   build:
     name: Build & Checks

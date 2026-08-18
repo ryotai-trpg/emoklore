@@ -49,13 +49,10 @@ pre-commit:
         - "lang/ja.json"
       run: npm run check:schema-doc
 
-    # Biomeのバージョンは3箇所に散っており、揃っていないとCIとローカルで違うBiomeが走る。
-    # Dependabotが上げてくるのは package.json だけなので、そのPRの時点で気付けるようにする
+    # プラグインの挙動が変わる時期を明示的に決めたいので、Biomeは完全固定にしている。
+    # 範囲指定に戻していないかを package.json を触った時点で見る
     - name: biome-version
-      glob:
-        - "package.json"
-        - "biome.json"
-        - ".github/workflows/ci.yml"
+      glob: "package.json"
       run: npm run check:biome-version
 
 commit-msg:
