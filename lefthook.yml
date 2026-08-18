@@ -50,6 +50,14 @@ pre-commit:
         - "lang/ja.json"
       run: npm run check:schema-doc
 
+    # 層とimportの方向。仕様は docs/code-design.md の表なので、コードと表の
+    # どちらを触っても走らせる。全体を見るチェックなのでファイルは渡さない
+    - name: layers
+      glob:
+        - "module/**/*.ts"
+        - "docs/code-design.md"
+      run: npm run check:layers
+
     # プラグインの挙動が変わる時期を明示的に決めたいので、Biomeは完全固定にしている。
     # 範囲指定に戻していないかを package.json を触った時点で見る
     - name: biome-version
