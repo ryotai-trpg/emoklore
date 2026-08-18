@@ -78,6 +78,10 @@ jobs:
         run: npm run check:roadmap
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Check issue references
+        run: npm run check:issue-refs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Build docs
         run: npm run docs:build
 

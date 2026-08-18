@@ -64,6 +64,20 @@ pre-commit:
       glob: "docs/roadmap.md"
       run: npm run check:roadmap
 
+    # コメントとdocs本文のIssue参照の検査。roadmapと同じくネットワークに出るので、
+    # 到達できないときは落とさず通す
+    - name: issue-refs
+      glob:
+        - "module/**/*.ts"
+        - "tools/**/*"
+        - "tests/**/*"
+        - "docs/*.md"
+        - "templates/**/*.hbs"
+        - "css/**/*.css"
+        - "lefthook.yml"
+        - ".github/**/*"
+      run: npm run check:issue-refs
+
     # プラグインの挙動が変わる時期を明示的に決めたいので、Biomeは完全固定にしている。
     # 範囲指定に戻していないかを package.json を触った時点で見る
     - name: biome-version
