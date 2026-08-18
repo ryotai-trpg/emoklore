@@ -35,6 +35,7 @@
     "check:schema-doc": "node tools/check-schema-doc.mjs",
     "check:manifest-urls": "node tools/check-manifest-urls.mjs",
     "check:layers": "node tools/check-layers.mjs",
+    "check:roadmap": "node tools/check-roadmap.mjs",
     "link:foundry": "node tools/create-symlinks.mjs",
     "typecheck": "node tools/typecheck.mjs",
     "verify:live": "node tests/live/run.mjs",

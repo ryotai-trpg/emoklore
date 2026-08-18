@@ -58,6 +58,12 @@ pre-commit:
         - "docs/code-design.md"
       run: npm run check:layers
 
+    # ロードマップが引くIssueの状態との突き合わせ。唯一ネットワークに出るチェックで、
+    # APIに到達できないときは落とさず通す（コミットをオフラインで止めない）
+    - name: roadmap
+      glob: "docs/roadmap.md"
+      run: npm run check:roadmap
+
     # プラグインの挙動が変わる時期を明示的に決めたいので、Biomeは完全固定にしている。
     # 範囲指定に戻していないかを package.json を触った時点で見る
     - name: biome-version

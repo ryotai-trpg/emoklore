@@ -12,9 +12,10 @@ on:
   schedule:
     - cron: "0 21 * * 1,4" # 月・木 06:00 JST
 
-# 追加の権限は要らない。読み取りだけに絞る
+# 書き込みの権限は要らない。読み取りだけに絞る（issues は check:roadmap が状態を読む）
 permissions:
   contents: read
+  issues: read
 
 # 同じブランチへ続けてpushしたときは古い実行を打ち切る。
 # ただし develop / main への push は履歴として残したいので打ち切らない
@@ -71,6 +72,12 @@ jobs:
         run: npm run check:layers
       - name: Check manifest URLs
         run: npm run check:manifest-urls
+      # 到達できなければスキップして通る設計だが、CIでは素の60回/時の
+      # レート制限に乗らないようトークンを渡して確実に照合させる
+      - name: Check roadmap issue states
+        run: npm run check:roadmap
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Build docs
         run: npm run docs:build
 
