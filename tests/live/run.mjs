@@ -101,11 +101,19 @@ try {
   console.error(`\n検証が中断した: ${error.message}`);
 } finally {
   if (page) {
-    try {
-      const removed = await removeFixtures(page);
-      log(`\n検証用データを削除: ${removed.join(", ") || "なし"}`);
-    } catch (error) {
-      console.error(`検証用データの後始末に失敗した（手で消すこと）: ${error.message}`);
+    // ゲームに入る前に落ちた場合、検証データはまだ1件も作られていない。removeFixtures は
+    // game を読むので必ず失敗するが、消すものが無いので「手で消すこと」は誤報になる。
+    // 入れたかどうかで分ける
+    const joined = await page.eval(() => globalThis.game?.ready === true).catch(() => false);
+    if (!joined) {
+      log("\nゲームに入れていないので検証データは作られていない（後始末なし）");
+    } else {
+      try {
+        const removed = await removeFixtures(page);
+        log(`\n検証用データを削除: ${removed.join(", ") || "なし"}`);
+      } catch (error) {
+        console.error(`検証用データの後始末に失敗した（手で消すこと）: ${error.message}`);
+      }
     }
     page.close();
   }
