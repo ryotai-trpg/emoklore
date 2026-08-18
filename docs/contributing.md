@@ -44,7 +44,8 @@ npm run build:packs   # packs/src → dist/packs
 `npm run build` / `dev` / `watch` はこれを先に走らせるので、普段は個別に叩かなくてよい。
 
 - パック名は `system.json` の `packs[].name` と揃える。揃っていないとFoundryが空のパックを開く
-- 各JSONには **`_key` が要る**（`!items!<id>` / `!tables!<id>`、埋め込みは `!items.effects!<親id>.<id>` / `!tables.results!<親id>.<id>`）。**`_key` の無いファイルは黙って飛ばされる**ので、書き忘れると「1件も入らないのにビルドは成功する」
+- 各JSONには **`_key` が要る**（`!items!<id>` / `!tables!<id>`、埋め込みは `!items.effects!<親id>.<id>` / `!tables.results!<親id>.<id>`）。`_key` の無いJSONはコンパイラが黙って飛ばして「1件も入らないのにビルドは成功する」形になる
+- どちらも壊れたまま通り抜けないよう、**ビルドがコンパイル前に検査して落とす**（名前の不一致と `_key` の欠け）
 - ドキュメント間の参照は `Compendium.emoklore.<パック名>.<種別>.<id>` の形。`_id` を固定しているのはこのため
 - **Foundryを起動したままだとビルドが失敗する。** LevelDBのロックは排他で、パックを開いているプロセスがあると `NotOpenError` になる。Foundryを止めてから叩くこと
 
