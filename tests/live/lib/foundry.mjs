@@ -73,24 +73,23 @@ export async function startFoundry() {
 export async function joinAsUser(page) {
   await page.nav(`${ORIGIN}/join`);
 
-  const users = await page.eval(() =>
-    [...document.querySelectorAll("select[name=userid] option")]
-      .map((o) => [o.value, o.textContent.trim()])
-      .filter(([v]) => v),
-  );
-  const match = users.find(([, name]) => name === USER) ?? users[0];
-  if (!match) throw new Error("joinページにユーザーが1人もいない");
+  // 14.366でユーザー選択が <select name=userid> の一覧から <input name=username> の
+  // 自由入力（typeahead）に変わり、候補がDOMに載らなくなった。一覧から選べないので
+  // 名前を直接入れる。実在しない名前を入れても即座には弾かれず、game.ready に
+  // ならないまま下のループが尽きる形になる
+  const hasField = await page.eval(() => !!document.querySelector("input[name=username]"));
+  if (!hasField) throw new Error("joinページにユーザー名の入力欄が無い");
 
-  await page.eval((id) => {
-    const s = document.querySelector("select[name=userid]");
-    s.value = id;
-    s.dispatchEvent(new Event("change", { bubbles: true }));
+  await page.eval((name) => {
+    const input = document.querySelector("input[name=username]");
+    input.value = name;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
     document.querySelector("button[name=join]").click();
-  }, match[0]);
+  }, USER);
 
   for (let i = 0; i < 200; i++) {
-    if (await page.eval(() => globalThis.game?.ready === true)) return match[1];
+    if (await page.eval(() => globalThis.game?.ready === true)) return USER;
     await new Promise((r) => setTimeout(r, 200));
   }
-  throw new Error(`${USER} でログインしたが game.ready にならない`);
+  throw new Error(`${USER} でログインできない（その名前のユーザーが無いか、アクセスキーが要る）`);
 }
