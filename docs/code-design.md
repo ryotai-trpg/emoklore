@@ -131,7 +131,7 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 - **モジュール定数はSCREAMING_SNAKE**（`SYSTEM_ID` `SUCCESS_MODIFIER` `SKILL_LEVEL_MAX` `HP_BASE`）。定数として並べるオブジェクトのキーも同じでよい（`{ PLAY: 1, EDIT: 2 }`）。**Biomeは `const` に camelCase も CONSTANT_CASE も許すのでこれは機械で守れない。** 人が見るしかない
 - **ファイルとディレクトリはkebab-case**。例外なく守られている（実測で違反0件）ので、`useFilenamingConvention` で固定してある
 - **`Emoklore*` を付けるのは、本体クラスを継承して本体の同名概念を置き換えるものだけ**。`EmokloreActor` `EmokloreRoll` `EmokloreCharacterSheet` がそれで、本体に `Actor` `Roll` `ActorSheet` があるから区別が要る。`CharacterDataModel` や `CharSheetImportDialog` のように本体に同名の概念が無いものには付けない
-- **`rules/` の動詞は3つに絞る**。`calculate*` は数式（`calculateMaxHp`）、`resolve*` は入力から一意に決まる導出（`resolveSkillRoll`）、`build*` は複合物の組み立て（`buildDamageFormula`）
+- **`rules/` の主要な動詞3つは意味を固定する**。`calculate*` は数式（`calculateMaxHp`）、`resolve*` は入力から一意に決まる導出（`resolveSkillRoll`）、`build*` は複合物の組み立て（`buildDamageFormula`）。この3つを別の意味で使わない。補助の関数（`normalize*` `can*` `meets*` など）は一般の命名でよい
 
 ### `lang/*.json` のキー
 
@@ -173,7 +173,7 @@ CSSの命名規約が [UI設計の規約](/ui-design) にあるのと同じく�
 
 ## アサーション（`as`）の使いどころ
 
-**`as` は本体APIとの境界に寄せ、`config/` と `rules/` には1つも置かない。** この2層はFoundryに依存しないので、キャストが要る場面が無い。逆に、純粋なはずの層にキャストが現れたら、それは型付けの失敗ではなく層の設計が崩れている合図になる。
+**`as` は本体APIとの境界に寄せる。`config/` と `rules/` に置いてよいのは、`Object.keys` の戻り値を有限キーのunionへ狭める形だけ。** この2層はFoundryに依存しないので、本体の型不足によるキャストが要る場面は無い。ただし `Object.keys` はTSが `string[]` を返して `keyof` へ狭めないため、キーの並びを配列で公開するときだけキャストが要る — `utils/` の `typedEntries` が閉じ込めているのと同じ制限で、`utils/` をimportできないこの2層では素の `as` で書き、理由コメントを付ける。それ以外のキャストが純粋なはずの層に現れたら、それは型付けの失敗ではなく層の設計が崩れている合図になる。
 
 - **`as unknown as` の二重キャストは lint で禁止**している（`tools/no-double-cast.grit`）。まず素の `as` で通るか試すこと。アサーションの判定は代入可能性より緩いので、代入で弾かれても `as` 単体なら通ることが多い。本当に必要なときは直前の行に `// biome-ignore lint: 理由` を付ける
 - **確かめたうえで名乗り直しているなら、型述語にできる**。`if (this.type !== "weapon") throw` の直後に `as WeaponDataModel` と書いていたのがこれで、`isWeapon(): this is ...` にすると確認がそのまま絞り込みになる
