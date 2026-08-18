@@ -84,6 +84,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Check script wiring
         run: npm run check:wiring
+      - name: Check CSS classes
+        run: npm run check:css
       - name: Build docs
         run: npm run docs:build
 
