@@ -67,6 +67,8 @@ jobs:
         run: npm run check:templates
       - name: Check schema doc
         run: npm run check:schema-doc
+      - name: Check layer imports
+        run: npm run check:layers
       - name: Check manifest URLs
         run: npm run check:manifest-urls
       - name: Build docs
