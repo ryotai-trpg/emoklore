@@ -4,9 +4,11 @@ on:
   push:
     branches: [develop, main]
   pull_request:
-  # typecheckジョブのキャッシュ延命を兼ねる。Actions cacheは7日アクセスが無いと
-  # 消えるので週2回触る。消えるとフォーク・DependabotのPRが型チェックを飛ばすようになる。
-  # 併せて develop が今も型チェックを通ることの定期確認になる
+  # 定期実行で回すのは typecheck と audit の2つ。
+  # typecheck: Actions cacheは7日アクセスが無いと消えるので週2回触って延命する。
+  #   消えるとフォーク・DependabotのPRが型チェックを飛ばすようになる。
+  #   併せて develop が今も型チェックを通ることの定期確認になる
+  # audit: 勧告は依存を触らなくても後から公開されるので、PRが立つのを待つと気付くのが遅れる
   schedule:
     - cron: "0 21 * * 1,4" # 月・木 06:00 JST
 
@@ -70,10 +72,11 @@ jobs:
       - name: Build docs
         run: npm run docs:build
 
+  # scheduleでも回す。勧告は依存を触らなくても後から公開されるので、PRが立つのを
+  # 待っていると気付くのが遅れる（nanoidのhighが3週間見過ごされた）
   audit:
     name: Audit
     runs-on: ubuntu-latest
-    if: github.event_name != 'schedule'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
