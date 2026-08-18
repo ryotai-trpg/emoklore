@@ -142,7 +142,7 @@ export type ParsedSkills = {
  *
  * ダイス数がそのまま技能レベルになる。判定式が「ダイス数 = 技能レベル + ボーナス」
  * なので、ボーナスの無いチャットパレットではダイス数と技能レベルが一致する
- * （保管所の実データで確認済み。Issue #14）。
+ * （保管所の実データで確認済み。証拠: #14）。
  */
 export function parseSkills(
   commands: string,
