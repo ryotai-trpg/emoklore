@@ -9,8 +9,10 @@
 // 4. 禁止表記（役割名の「GM」、絵文字の無限記号、技能の印の直書き）
 // 5. 途中に「。」があるのに末尾に無い文
 // 6. 通知（ui.notifications）に渡すキーの ja 値が「。」で終わること
+// 7. キーの形（ドットを含むキー、EMOKLORE 直下の裸のリーフ）
+// 8. en.json に残った日本語（訳し忘れ）
 //
-// 訳文の中身までは見ない。訳し忘れて日本語が残った en.json はここを通る。
+// 訳の正しさまでは見ない。
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -20,8 +22,10 @@ const flatten = (obj, prefix = "") =>
     return value !== null && typeof value === "object" ? flatten(value, path) : [[path, value]];
   });
 
-const jaEntries = flatten(JSON.parse(readFileSync("lang/ja.json", "utf-8")));
-const enEntries = flatten(JSON.parse(readFileSync("lang/en.json", "utf-8")));
+const jaRaw = JSON.parse(readFileSync("lang/ja.json", "utf-8"));
+const enRaw = JSON.parse(readFileSync("lang/en.json", "utf-8"));
+const jaEntries = flatten(jaRaw);
+const enEntries = flatten(enRaw);
 const jaKeys = jaEntries.map(([key]) => key);
 const enKeys = enEntries.map(([key]) => key);
 const ja = new Map(jaEntries);
@@ -47,6 +51,35 @@ const mismatched =
         return a.length !== b.length || a.some((name, index) => name !== b[index]);
       })
     : [];
+
+// キーの形。ドットを含むキーは本体は読めるが木として辿れず、EMOKLORE 直下の
+// 裸のリーフは名前空間と同じ列に文字列が並んでどちらなのか読めない。
+// flatten はドットで繋ぐので区別が消える — ここだけ木のまま見る
+const dotted = [];
+const walkKeys = (lang, node, path) => {
+  for (const [key, value] of Object.entries(node)) {
+    const joined = path ? `${path}.${key}` : key;
+    if (key.includes(".")) dotted.push(`[${lang}] ${joined}`);
+    if (value !== null && typeof value === "object") walkKeys(lang, value, joined);
+  }
+};
+walkKeys("ja", jaRaw, "");
+walkKeys("en", enRaw, "");
+
+const bareLeaves = [];
+for (const [lang, raw] of [
+  ["ja", jaRaw],
+  ["en", enRaw],
+]) {
+  for (const [key, value] of Object.entries(raw.EMOKLORE ?? {})) {
+    if (value === null || typeof value !== "object") bareLeaves.push(`[${lang}] EMOKLORE.${key}`);
+  }
+}
+
+// en.json にかな・漢字が残っていたら訳し忘れ。記号（〈〉 や ＊ ★ ∞）は
+// 訳語の一部として正当なので、文字種はかなと漢字だけを見る
+const JAPANESE = /[々ぁ-ゖァ-ヺ一-鿿]/;
+const untranslated = enEntries.filter(([, value]) => JAPANESE.test(String(value)));
 
 /**
  * 使ってはいけない表記。
@@ -127,6 +160,18 @@ const unterminatedNotice = [...notificationKeys]
   .filter((key) => ja.has(key) && !/[。！？]$/.test(String(ja.get(key))))
   .sort();
 
+if (dotted.length > 0) {
+  console.error(`ドットを含むキー（木として辿れない）: ${dotted.length}件`);
+  for (const key of dotted) console.error(`  - ${key}`);
+}
+if (bareLeaves.length > 0) {
+  console.error(`EMOKLORE 直下の裸のリーフ（名前空間の下に置く）: ${bareLeaves.length}件`);
+  for (const key of bareLeaves) console.error(`  - ${key}`);
+}
+if (untranslated.length > 0) {
+  console.error(`en.json に日本語が残っている（訳し忘れ）: ${untranslated.length}件`);
+  for (const [key, value] of untranslated) console.error(`  - ${key}: ${value}`);
+}
 if (banned.length > 0) {
   console.error(`使ってはいけない表記: ${banned.length}件`);
   for (const { lang, key, label, value } of banned) {
@@ -179,6 +224,9 @@ const failures =
   extra.length +
   misordered.length +
   mismatched.length +
+  dotted.length +
+  bareLeaves.length +
+  untranslated.length +
   banned.length +
   unmarked.length +
   unterminated.length +
