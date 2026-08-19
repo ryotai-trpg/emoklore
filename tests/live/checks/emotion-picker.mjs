@@ -218,7 +218,7 @@ export async function run({ page, check }) {
         );
 
         // 追加取得は効果タブが持つ。件数に上限が無く、ヘッダに置くと
-        // ヘッダの高さがそれで決まってしまうため（#83）
+        // ヘッダの高さがそれで決まってしまうため
         const shown = await window.__waitFor(
           () => sheet.element.querySelector(".em-acquired__list")?.textContent.includes("嫉妬"),
           { soft: true, timeout: 1000, label: "効果タブの追加取得" },

@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import type { Plugin } from "vite";
 
-// vite dev を Foundry へのproxy越しに使うための serve 専用プラグイン（Issue #52）。
+// vite dev を Foundry へのproxy越しに使うための serve 専用プラグイン。
 // Foundryが生成するHTMLは system.json に従って
 //   <script type="module" src="systems/emoklore/emoklore.mjs">
 //   @import "systems/emoklore/emoklore.css" layer(system)
