@@ -184,6 +184,8 @@ tests/live/
 
 configのテーブルは型だけをimportしていてFoundryに依存しないため、Nodeが `.ts` をそのまま読める。`erasableSyntaxOnly` が型剥がし可能であることを保証しているので、ローダもビルドも要らない。
 
+`check:roadmap` は [ロードマップ](/roadmap) の箇条書きが引くIssueの状態をGitHub APIと突き合わせる。クローズ済みのIssueを引く行が `[x]` でなければ落ちる（オープンなのに `[x]` も同じ）。本文の段落での参照は履歴・経緯の説明なので見ない。落ちたときに直す先はコードではなく `docs/roadmap.md` の側になる。唯一、外部の状態に依存するチェックなので、APIに到達できないとき（オフライン・レート制限）は落とさずスキップし、スキップしたことをOKと区別して報告する。CIでは `GITHUB_TOKEN` の読み取り権限で足りるため、フォークからのPRでも動く。
+
 ### CIで回さない理由
 
 **技術的にできないからではない。** CIはすでに `tools/fetch-foundry.mjs` で本体を落としており（`typecheck` ジョブ）、Chromeも `ubuntu-latest` に入っている。そのうえで見送っている。
