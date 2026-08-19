@@ -60,6 +60,7 @@ const REQUIRED_SUCCESSES: Record<SuccessRequirement, number> = {
  *
  * 表から起こすので、要求を足したときに並びだけ書き忘れることがない
  */
+// Object.keys は keyof へ狭めず string[] を返すためのキャスト（docs/code-design.md「as の使いどころ」）
 export const SUCCESS_REQUIREMENTS = Object.keys(REQUIRED_SUCCESSES) as SuccessRequirement[];
 
 /** 要求された成功度に要る成功数を返す */

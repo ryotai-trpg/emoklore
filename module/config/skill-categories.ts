@@ -29,6 +29,7 @@ export type SkillCategory = keyof typeof definitions;
 export const skillCategories: Record<SkillCategory, SkillCategoryConfig> = definitions;
 
 /** 区分の並び。作成ダイアログのラジオがこの順に出る */
+// Object.keys は keyof へ狭めず string[] を返すためのキャスト（docs/code-design.md「as の使いどころ」）
 export const SKILL_CATEGORIES = Object.keys(definitions) as SkillCategory[];
 
 /** 区分キーかどうか。フォームの入力など、外から来た文字列を絞るときに通す */
