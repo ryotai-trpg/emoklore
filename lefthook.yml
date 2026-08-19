@@ -84,6 +84,15 @@ pre-commit:
       glob: "package.json"
       run: npm run check:biome-version
 
+    # check:* を足して pre-commit / CI への配線を忘れると、検査は存在するのに
+    # 黙ってどこでも走らない。3箇所のどれを触っても突き合わせる
+    - name: wiring
+      glob:
+        - "package.json"
+        - "lefthook.yml"
+        - ".github/workflows/ci.yml"
+      run: npm run check:wiring
+
 pre-push:
   jobs:
     # CIで見ているもののうち、依存も本体ソースも要らず一瞬で終わるもの（合わせて2秒）。

@@ -9,28 +9,10 @@
 // **CIでは回さない。** FoundryVTT本体（要ライセンス）とChromeがローカルに要るため。
 // 設定は lib/config.mjs、規約は docs/testing.md を参照。
 //
-// 検証を足すときは checks/ にファイルを1つ作って CHECKS に並べる。
+// 検証を足すときは checks/ にファイルを1つ作って CHECK_FILES に並べる。
+// 並べ忘れたファイルは黙って回らない事故になるので、着手前に突き合わせて落とす。
 
-import * as activeEffect from "./checks/active-effect.mjs";
-import * as armor from "./checks/armor.mjs";
-import * as automation from "./checks/automation.mjs";
-import * as boundary from "./checks/boundary.mjs";
-import * as characterSheet from "./checks/character-sheet.mjs";
-import * as combat from "./checks/combat.mjs";
-import * as consoleCheck from "./checks/console.mjs";
-import * as customSkill from "./checks/custom-skill.mjs";
-import * as emotionMatch from "./checks/emotion-match.mjs";
-import * as emotionPicker from "./checks/emotion-picker.mjs";
-import * as howling from "./checks/howling.mjs";
-import * as importCheck from "./checks/import.mjs";
-import * as npcKai from "./checks/npc-kai.mjs";
-import * as registration from "./checks/registration.mjs";
-import * as resonanceRequest from "./checks/resonance-request.mjs";
-import * as schema from "./checks/schema.mjs";
-import * as skillModDisplay from "./checks/skill-mod-display.mjs";
-import * as skillRequest from "./checks/skill-request.mjs";
-import * as skillRoll from "./checks/skill-roll.mjs";
-import * as weapon from "./checks/weapon.mjs";
+import { readdirSync } from "node:fs";
 import { closeBrowser, ensureChrome, openPage } from "./lib/cdp.mjs";
 import { ORIGIN, WORLD } from "./lib/config.mjs";
 import { createFixtures, removeFixtures } from "./lib/fixtures.mjs";
@@ -39,28 +21,45 @@ import { createRunner, DICE, installPageHelpers, pinDice } from "./lib/harness.m
 
 // 並び順に意味がある。土台（登録・スキーマ）から先に見て、
 // 総合（エラーの有無）は全部触ったあとで見る
-const CHECKS = [
-  registration,
-  schema,
-  characterSheet,
-  skillRoll,
-  skillRequest,
-  customSkill,
-  weapon,
-  npcKai,
-  emotionPicker,
-  emotionMatch,
-  resonanceRequest,
-  boundary,
-  armor,
-  howling,
-  activeEffect,
-  skillModDisplay,
-  combat,
-  importCheck,
-  automation,
-  consoleCheck,
+const CHECK_FILES = [
+  "registration.mjs",
+  "schema.mjs",
+  "character-sheet.mjs",
+  "skill-roll.mjs",
+  "skill-request.mjs",
+  "custom-skill.mjs",
+  "weapon.mjs",
+  "npc-kai.mjs",
+  "emotion-picker.mjs",
+  "emotion-match.mjs",
+  "resonance-request.mjs",
+  "boundary.mjs",
+  "armor.mjs",
+  "howling.mjs",
+  "active-effect.mjs",
+  "skill-mod-display.mjs",
+  "combat.mjs",
+  "import.mjs",
+  "automation.mjs",
+  "console.mjs",
 ];
+
+const present = readdirSync(new URL("./checks/", import.meta.url))
+  .map(String)
+  .filter((file) => file.endsWith(".mjs"));
+const unregistered = present.filter((file) => !CHECK_FILES.includes(file));
+const notFound = CHECK_FILES.filter((file) => !present.includes(file));
+if (unregistered.length + notFound.length > 0) {
+  if (unregistered.length > 0)
+    console.error(
+      `checks/ にあるのに CHECK_FILES に並んでいない（回らない）: ${unregistered.join(", ")}`,
+    );
+  if (notFound.length > 0)
+    console.error(`CHECK_FILES にあるのに checks/ に無い: ${notFound.join(", ")}`);
+  process.exit(1);
+}
+
+const CHECKS = await Promise.all(CHECK_FILES.map((file) => import(`./checks/${file}`)));
 
 const log = (msg) => console.log(msg);
 

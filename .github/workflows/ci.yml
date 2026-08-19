@@ -82,6 +82,8 @@ jobs:
         run: npm run check:issue-refs
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Check script wiring
+        run: npm run check:wiring
       - name: Build docs
         run: npm run docs:build
 
