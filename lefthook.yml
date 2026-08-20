@@ -84,6 +84,16 @@ pre-commit:
       glob: "package.json"
       run: npm run check:biome-version
 
+    # CSSの規則とテンプレート・コード・実機検証のクラスの突き合わせ。
+    # どちら側だけ動かしても壊れるので、両方を引き金にする。全体を見るチェック
+    - name: css
+      glob:
+        - "css/**/*.css"
+        - "*.hbs"
+        - "module/**/*.ts"
+        - "tests/**/*.mjs"
+      run: npm run check:css
+
     # check:* を足して pre-commit / CI への配線を忘れると、検査は存在するのに
     # 黙ってどこでも走らない。3箇所のどれを触っても突き合わせる
     - name: wiring

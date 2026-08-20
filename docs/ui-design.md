@@ -304,7 +304,7 @@ BEMを土台に、層をまたぐ共有だけ合成を許す形になる。[CUBE
 
 逆に、`<i class="em-chip__icon fa-solid fa-...">` の `em-chip__icon` のように**役割が中身から明らかなもの**は落とす。
 
-`npm run check:templates` は**CSS側を見ない**ので、これは自分で確認する。
+この突き合わせは `npm run check:css` が機械で見ている — どこからも参照されない規則と、規則もフックも無いテンプレートのクラスの両方向で、フックの検索範囲には `module/` と `tests/live/` も入る。上の例外（兄弟を区別するクラス）はチェッカーのallowlistに理由ごと載せてある。
 - **意味を持つ要素を使う**。対になった項目の並びは `dl` / `dt` / `dd`、リストは `ul` / `ol`、フォームの塊は `fieldset` / `legend`。`div` を並べてCSSで見た目だけ整えない
 - **レイアウトのためだけのラッパを増やさない**。グリッドの入れ子が要るように見えたら、まず `grid-template-areas` や `subgrid` で親のトラックに直接載せられないか検討する。`display: contents` も選択肢になる
 - `vite.config.ts` は lib mode で `cssFileName` が単一値なので、**CSSは1ファイルにしか出せない**。`styles` を複数エントリにするには `viteStaticCopy` 経由の別系統が要る
@@ -323,7 +323,7 @@ BEMを土台に、層をまたぐ共有だけ合成を許す形になる。[CUBE
 - `{{#each}}` の中から親のコンテキストは**見えない**（Handlebarsは親スコープへフォールバックしない）。`@root` か `../` を明示する
 - **1つのパーツはルート要素を1つだけ返す**。兄弟を並べると `Template part "..." must render a single HTML element.` で描画が落ちる。囲むためだけの要素が必要になったら、`display: contents` を当てて親のレイアウトに影響させないか、パーツ自体を分ける
 - コンテキストにない値を参照しても Handlebars は空文字を返すだけで警告しない。`ActorSheetV2` は `actor` を積まないなど、**本体が何を積むかを確認してから使う**（`DocumentSheetV2._prepareContext` が積むのは `document` / `model` / `source` / `fields` / `editable` / `user` / `rootId`）
-- `npm run check:templates` が構文・HTMLタグの対応・partialの実在・孤児テンプレートを見る。lefthook の pre-commit でも走る。**CSS側は見ない**ので、規則のないクラス名は自分で確認する
+- `npm run check:templates` が構文・HTMLタグの対応・partialの実在・孤児テンプレートを見る。CSS側は `npm run check:css` が見る（参照されない規則と、規則もフックも無いクラス）。どちらも lefthook の pre-commit でも走る
 
 :::
 
